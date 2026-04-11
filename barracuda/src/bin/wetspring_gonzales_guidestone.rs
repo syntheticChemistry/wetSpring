@@ -4,6 +4,10 @@
     clippy::print_stdout,
     reason = "guideStone artifact: stdout is the output medium"
 )]
+#![expect(
+    clippy::too_many_lines,
+    reason = "guideStone: sequential validation + export steps in single main()"
+)]
 //! # wetspring-gonzales-guideStone
 //!
 //! Self-contained validation + visualization export artifact for the
@@ -59,7 +63,12 @@ fn main() {
         );
 
         let at_zero = hill(0.0, ic50, 1.0);
-        v.check(&format!("{name} Hill(0) = 0"), at_zero, 0.0, tolerances::ANALYTICAL_F64);
+        v.check(
+            &format!("{name} Hill(0) = 0"),
+            at_zero,
+            0.0,
+            tolerances::ANALYTICAL_F64,
+        );
     }
 
     v.check_pass("JAK1 is most potent (IC50=10 < IL-13=249)", true);
@@ -110,7 +119,10 @@ fn main() {
     let base_w = 10.0;
     let healthy_w = base_w * (1.0 - 0.85);
     let severe_w = base_w * (1.0 - 0.40);
-    v.check_pass("severe disorder W > healthy disorder W", severe_w > healthy_w);
+    v.check_pass(
+        "severe disorder W > healthy disorder W",
+        severe_w > healthy_w,
+    );
 
     // ═══════════════════════════════════════════════════════════════
     // Domain 4: Hormesis (Paper 14)
@@ -122,11 +134,14 @@ fn main() {
 
     if let Some(ref hp) = hp {
         let baseline = hormesis::response(0.0, hp);
-        v.check("hormesis response(0) = baseline", baseline, 1.0, tolerances::ANALYTICAL_F64);
+        v.check(
+            "hormesis response(0) = baseline",
+            baseline,
+            1.0,
+            tolerances::ANALYTICAL_F64,
+        );
 
-        let sweep_doses: Vec<f64> = (0..100)
-            .map(|i| 200.0 * f64::from(i) / 99.0)
-            .collect();
+        let sweep_doses: Vec<f64> = (0..100).map(|i| 200.0 * f64::from(i) / 99.0).collect();
 
         if let Some((peak_dose, peak_response)) = hormesis::find_peak(&sweep_doses, hp) {
             v.check_pass("hormetic peak > baseline", peak_response > 1.0);
@@ -156,7 +171,12 @@ fn main() {
     // Domain 6: Biome Atlas (Sub-thesis 01, Exp129)
     // ═══════════════════════════════════════════════════════════════
     v.section("28-Biome Atlas (Exp129)");
-    v.check("W_c estimate = 16.26 (Exp150)", 16.26, 16.26, tolerances::ANALYTICAL_F64);
+    v.check(
+        "W_c estimate = 16.26 (Exp150)",
+        16.26,
+        16.26,
+        tolerances::ANALYTICAL_F64,
+    );
 
     // ═══════════════════════════════════════════════════════════════
     // Domain 7: Disorder Sweep (Exp131/150)
@@ -175,12 +195,32 @@ fn main() {
         if let Err(e) = std::fs::create_dir_all(dir) {
             println!("  ERROR: cannot create dir: {e}");
         } else {
-            export_scenario(dir, "gonzales_dermatitis", visualization::scenarios::gonzales_scenario);
-            export_scenario(dir, "tissue_geometry", visualization::scenarios::tissue_geometry_scenario);
+            export_scenario(
+                dir,
+                "gonzales_dermatitis",
+                visualization::scenarios::gonzales_scenario,
+            );
+            export_scenario(
+                dir,
+                "tissue_geometry",
+                visualization::scenarios::tissue_geometry_scenario,
+            );
             export_scenario(dir, "hormesis", visualization::scenarios::hormesis_scenario);
-            export_scenario(dir, "cross_species", visualization::scenarios::cross_species_scenario);
-            export_scenario(dir, "full_gonzales", visualization::scenarios::full_gonzales_scenario);
-            export_scenario(dir, "full_anderson_exploration", visualization::scenarios::full_anderson_exploration_scenario);
+            export_scenario(
+                dir,
+                "cross_species",
+                visualization::scenarios::cross_species_scenario,
+            );
+            export_scenario(
+                dir,
+                "full_gonzales",
+                visualization::scenarios::full_gonzales_scenario,
+            );
+            export_scenario(
+                dir,
+                "full_anderson_exploration",
+                visualization::scenarios::full_anderson_exploration_scenario,
+            );
             println!("  Exported 6 scenarios.");
         }
     }

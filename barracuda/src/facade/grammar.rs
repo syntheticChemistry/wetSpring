@@ -8,12 +8,7 @@
 use serde_json::{Value, json};
 
 /// Build a `GrammarRenderRequest` for petalTongue from a grammar expression and data rows.
-fn grammar_request(
-    session_id: &str,
-    grammar: Value,
-    data: Vec<Value>,
-    domain: &str,
-) -> Value {
+fn grammar_request(session_id: &str, grammar: Value, data: Vec<Value>, domain: &str) -> Value {
     json!({
         "session_id": session_id,
         "grammar": grammar,
@@ -99,7 +94,10 @@ pub fn pk_decay_grammar(ipc_result: &Value) -> (Value, Vec<Value>) {
 
     if let (Some(times), Some(profiles)) = (times, profiles) {
         for profile in profiles {
-            let dose = profile.get("dose_mg_kg").and_then(Value::as_f64).unwrap_or(0.0);
+            let dose = profile
+                .get("dose_mg_kg")
+                .and_then(Value::as_f64)
+                .unwrap_or(0.0);
             let label = format!("{dose} mg/kg");
             let efficacy = profile.get("efficacy").and_then(Value::as_array);
             if let Some(efficacy) = efficacy {
@@ -213,8 +211,12 @@ pub fn hormesis_grammar(ipc_result: &Value) -> (Value, Vec<Value>) {
     let mut rows = Vec::new();
     let doses = ipc_result.get("doses").and_then(Value::as_array);
     let responses = ipc_result.get("responses").and_then(Value::as_array);
-    let stim = ipc_result.get("stimulatory_component").and_then(Value::as_array);
-    let surv = ipc_result.get("survival_component").and_then(Value::as_array);
+    let stim = ipc_result
+        .get("stimulatory_component")
+        .and_then(Value::as_array);
+    let surv = ipc_result
+        .get("survival_component")
+        .and_then(Value::as_array);
 
     if let Some(doses) = doses {
         for (i, dose) in doses.iter().enumerate() {
@@ -237,27 +239,37 @@ pub fn hormesis_grammar(ipc_result: &Value) -> (Value, Vec<Value>) {
 ///
 /// Returns the SVG string on success, or `None` if petalTongue is unreachable.
 pub fn render_grammar(grammar: &Value, data: &[Value], domain: &str) -> Option<Value> {
-    let session_id = format!("facade-{}", std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_millis());
+    let session_id = format!(
+        "facade-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis()
+    );
 
     let request = grammar_request(&session_id, grammar.clone(), data.to_vec(), domain);
 
     let neural_socket = {
         let family_id = std::env::var("FAMILY_ID").ok()?;
-        let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
+        let runtime = std::env::var("XDG_RUNTIME_DIR")
+            .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
         let path = std::path::PathBuf::from(runtime)
             .join("biomeos")
             .join(format!("neural-api-{family_id}.sock"));
-        if path.exists() { path } else { return None; }
+        if path.exists() {
+            path
+        } else {
+            return None;
+        }
     };
 
     use std::io::{BufRead, BufReader, Write};
     use std::os::unix::net::UnixStream;
 
     let mut stream = UnixStream::connect(&neural_socket).ok()?;
-    stream.set_read_timeout(Some(std::time::Duration::from_secs(15))).ok();
+    stream
+        .set_read_timeout(Some(std::time::Duration::from_secs(15)))
+        .ok();
 
     let rpc = json!({
         "jsonrpc": "2.0",

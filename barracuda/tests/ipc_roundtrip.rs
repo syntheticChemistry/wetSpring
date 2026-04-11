@@ -120,6 +120,103 @@ fn capability_list_includes_all_domains() {
 }
 
 #[test]
+fn composition_science_health_roundtrip() {
+    with_server("comp_science", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"composition.science_health","params":{},"id":10}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(resp.get("error").is_none(), "unexpected error: {resp}");
+
+        let result = &resp["result"];
+        assert_eq!(result["healthy"], true);
+        assert_eq!(result["spring"], "wetSpring");
+        assert!(result["deploy_graph"].as_str().is_some());
+        assert!(result["subsystems"]["ipc"].as_bool().unwrap_or(false));
+        assert!(result["subsystems"]["math"].as_bool().unwrap_or(false));
+        assert!(result["science_domains"].as_array().is_some());
+        assert!(result["capabilities_count"].as_u64().unwrap_or(0) > 30);
+    });
+}
+
+#[test]
+fn composition_nucleus_health_roundtrip() {
+    with_server("comp_nucleus", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"composition.nucleus_health","params":{},"id":11}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(resp.get("error").is_none(), "unexpected error: {resp}");
+
+        let result = &resp["result"];
+        assert_eq!(result["atomic"], "NUCLEUS");
+        assert_eq!(result["spring"], "wetSpring");
+        assert!(result["tiers"].is_object());
+        assert!(result["components"].is_object());
+        assert!(
+            result["components"]["beardog"].is_string()
+                || result["components"]["beardog"].is_object()
+        );
+    });
+}
+
+#[test]
+fn composition_tower_health_roundtrip() {
+    with_server("comp_tower", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"composition.tower_health","params":{},"id":12}"#,
+        );
+
+        let result = &resp["result"];
+        assert_eq!(result["atomic"], "Tower");
+        assert_eq!(result["spring"], "wetSpring");
+        assert!(result.get("healthy").is_some());
+        assert!(result["components"].is_object());
+    });
+}
+
+#[test]
+fn vault_store_roundtrip() {
+    with_server("vault_store", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"vault.store","params":{"key":"test","value":"data"},"id":13}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        let has_result = resp.get("result").is_some();
+        let has_error = resp.get("error").is_some();
+        assert!(
+            has_result || has_error,
+            "vault.store should return result or error"
+        );
+    });
+}
+
+#[test]
+fn data_fetch_roundtrip() {
+    with_server("data_fetch", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"data.fetch.chembl","params":{"chembl_id":"CHEMBL25"},"id":14}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        let has_result = resp.get("result").is_some();
+        let has_error = resp.get("error").is_some();
+        assert!(
+            has_result || has_error,
+            "data.fetch.chembl should return result or error"
+        );
+    });
+}
+
+#[test]
 fn qs_model_roundtrip() {
     with_server("qs_model", |socket| {
         let resp = rpc_roundtrip(

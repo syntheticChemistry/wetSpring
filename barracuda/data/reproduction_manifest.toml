@@ -7,7 +7,7 @@
 # entire science pipeline with these exact versions.
 #
 # Usage:
-#   cd plasmidBin && ./fetch.sh --tag v0.7.0
+#   cd plasmidBin && ./fetch.sh --tag v0.8.0
 #   biomeos deploy --graph graphs/wetspring_science_nucleus.toml
 
 [meta]
@@ -51,7 +51,14 @@ tier = "genomeBin"
 required = false
 role = "Content-addressed storage for computation cache and reference data"
 
-# ── Node Atomic (compute dispatch) ────────────────────────────────────
+# ── Node Atomic (compute + math) ──────────────────────────────────────
+
+[primals.barracuda]
+version = "0.3.7"
+domain = "math"
+tier = "ecoBin"
+required = true
+role = "Pure math + GPU compute (150+ primitives, 694+ WGSL shaders)"
 
 [primals.toadstool]
 version = "0.1.0"
@@ -86,7 +93,7 @@ role = "Semantic provenance braids (PROV-O aligned)"
 # ── Science + Visualization ───────────────────────────────────────────
 
 [springs.wetspring]
-version = "0.7.0"
+version = "0.8.0"
 domain = "metagenomics"
 tier = "ecoBin"
 required = true
@@ -110,6 +117,6 @@ role = "HTTP gateway — Dark Forest gated, CORS, progressive provenance"
 # ── Reproduction commands ─────────────────────────────────────────────
 
 [reproduce]
-fetch = "cd plasmidBin && ./fetch.sh --tag v0.7.0"
+fetch = "cd plasmidBin && ./fetch.sh --tag v0.8.0"
 deploy = "biomeos deploy --graph graphs/wetspring_science_nucleus.toml"
 verify = "curl -s https://lab.primals.eco/api/v1/health | jq .status"

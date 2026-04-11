@@ -15,7 +15,8 @@ pub fn socket_path() -> PathBuf {
     if let Ok(p) = std::env::var("WETSPRING_SOCKET") {
         return PathBuf::from(p);
     }
-    let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
+    let runtime = std::env::var("XDG_RUNTIME_DIR")
+        .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
     PathBuf::from(runtime)
         .join("biomeos")
         .join("wetspring-default.sock")
@@ -24,19 +25,13 @@ pub fn socket_path() -> PathBuf {
 /// Send a JSON-RPC 2.0 request and return the result or error.
 pub fn call(method: &str, params: &Value) -> Result<Value, String> {
     let path = socket_path();
-    let stream = UnixStream::connect(&path)
-        .map_err(|e| format!("connect to {}: {e}", path.display()))?;
-    stream
-        .set_read_timeout(Some(Duration::from_secs(10)))
-        .ok();
+    let stream =
+        UnixStream::connect(&path).map_err(|e| format!("connect to {}: {e}", path.display()))?;
+    stream.set_read_timeout(Some(Duration::from_secs(10))).ok();
     call_on_stream(stream, method, params)
 }
 
-fn call_on_stream(
-    mut stream: UnixStream,
-    method: &str,
-    params: &Value,
-) -> Result<Value, String> {
+fn call_on_stream(mut stream: UnixStream, method: &str, params: &Value) -> Result<Value, String> {
     let request = json!({
         "jsonrpc": "2.0",
         "method": method,

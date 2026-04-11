@@ -17,7 +17,10 @@ struct DeployGraph {
 #[derive(Deserialize)]
 struct GraphBody {
     name: String,
-    #[allow(dead_code)]
+    #[expect(
+        dead_code,
+        reason = "deserialized for structural completeness but not inspected"
+    )]
     version: Option<String>,
     node: Vec<GraphNode>,
 }
@@ -25,7 +28,10 @@ struct GraphBody {
 #[derive(Deserialize)]
 struct GraphNode {
     name: String,
-    #[allow(dead_code)]
+    #[expect(
+        dead_code,
+        reason = "deserialized for structural completeness but not inspected"
+    )]
     binary: Option<String>,
     order: Option<u32>,
     by_capability: Option<String>,
@@ -85,10 +91,7 @@ pub fn validate_graph(toml_source: &str) -> ValidationResult {
         }
 
         if node.capabilities.as_ref().map_or(true, |c| c.is_empty()) {
-            warnings.push(format!(
-                "node `{}` has no capabilities declared",
-                node.name
-            ));
+            warnings.push(format!("node `{}` has no capabilities declared", node.name));
         }
 
         if let Some(order) = node.order {
@@ -179,7 +182,10 @@ mod tests {
             .iter()
             .filter(|e| e.contains("missing `by_capability`"))
             .collect();
-        assert!(missing.is_empty(), "nodes missing by_capability: {missing:?}");
+        assert!(
+            missing.is_empty(),
+            "nodes missing by_capability: {missing:?}"
+        );
     }
 
     #[test]

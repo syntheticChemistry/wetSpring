@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-03-24 (V137: 379 experiments indexed (376 completed + 3 PROPOSED), **355** binaries (**333** barracuda + **22** forge), 5,700+ checks, **1,902** tests (unit + integration + property + doc, 0 failures). V137: `//! Provenance:` headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, doc link fixes. V136: thiserror derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. V135: doc reconciliation. V134: drug NMF delegation, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, 242 tolerances / 44 GPU / 49 CPU bio modules. Zero local math duplication, zero `#[allow()]`, zero clippy warnings, zero unsafe.)
+**Updated**: 2026-04-10 (V139: 380 experiments indexed (377 completed + 3 PROPOSED), **356** binaries (**334** barracuda + **22** forge), 5,800+ checks, **1,580** library tests (0 failures). V139: NUCLEUS composition validation — Exp400 proto-nucleate alignment (97/97), composition health JSON shape fix, Squirrel niche wiring, dispatch proptest sync (37 methods), 5 composition IPC round-trip tests, plasmidBin v0.8.0. V138: primal composition patterns. V137: provenance headers, tolerance centralization, IPC modularization. V136: thiserror, named casts, contract pinning. V133–V135: GPU evolution, math delegation, doc reconciliation. Zero local math duplication, zero `#[allow()]`, zero clippy errors, zero unsafe.)
 
 ---
 

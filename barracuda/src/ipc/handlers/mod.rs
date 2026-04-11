@@ -222,7 +222,11 @@ pub fn handle_health_readiness() -> Result<Value, RpcError> {
 /// is operational before attempting ionic bond interactions.
 pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcError> {
     #[cfg(feature = "gpu")]
-    let gpu_status = if try_gpu().is_some() { "available" } else { "unavailable" };
+    let gpu_status = if try_gpu().is_some() {
+        "available"
+    } else {
+        "unavailable"
+    };
     #[cfg(not(feature = "gpu"))]
     let gpu_status = "not_compiled";
 
@@ -352,7 +356,8 @@ pub fn handle_composition_nucleus_health(_params: &Value) -> Result<Value, RpcEr
 /// Probe a capability domain via Neural API capability.discover.
 fn probe_capability(domain: &str) -> Option<Value> {
     let family_id = std::env::var("FAMILY_ID").ok()?;
-    let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
+    let runtime = std::env::var("XDG_RUNTIME_DIR")
+        .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
     let socket_path = std::path::PathBuf::from(runtime)
         .join("biomeos")
         .join(format!("neural-api-{family_id}.sock"));

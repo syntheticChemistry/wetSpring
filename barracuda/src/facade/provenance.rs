@@ -105,7 +105,10 @@ fn witness_checkpoint(context: &str) -> Value {
 /// Build a BearDog signature witness from a `crypto.sign_ed25519` response.
 ///
 /// Used when BearDog is live to sign dehydrated Merkle roots (Tier 2 step 3).
-#[allow(dead_code)]
+#[expect(
+    dead_code,
+    reason = "scaffolded for BearDog Tier 2 signature witnessing"
+)]
 fn witness_signature(evidence_base64: &str, context: &str) -> Value {
     json!({
         "agent": "beardog:gate",
@@ -244,10 +247,7 @@ fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Va
         .to_owned();
 
     // Collect witnesses from dehydration (trio v2: field is now `witnesses`)
-    let dehydration_witnesses = dehydration
-        .get("witnesses")
-        .cloned()
-        .unwrap_or(json!([]));
+    let dehydration_witnesses = dehydration.get("witnesses").cloned().unwrap_or(json!([]));
 
     // 4. loamSpine: session.commit
     let commit_result = capability_call(
@@ -364,9 +364,7 @@ pub fn ferment_vertex(
     let vertex_input = format!("{method}:{params}:{result_hash}:{timestamp}");
     let vertex_id = blake3::hash(vertex_input.as_bytes()).to_hex().to_string();
 
-    let vertex_witness = witness_checkpoint(
-        &format!("nft:vertex_created:{vertex_id}")
-    );
+    let vertex_witness = witness_checkpoint(&format!("nft:vertex_created:{vertex_id}"));
 
     json!({
         "nft_vertex": {
@@ -425,10 +423,7 @@ pub fn envelope(method: &str, params: &Value, result: &Value) -> Value {
 
     let vertex = ferment_vertex(method, params, &content_hash, &[]);
 
-    let mut all_witnesses: Vec<Value> = t1["witnesses"]
-        .as_array()
-        .cloned()
-        .unwrap_or_default();
+    let mut all_witnesses: Vec<Value> = t1["witnesses"].as_array().cloned().unwrap_or_default();
 
     if let Some(ref tier2) = t2 {
         if let Some(t2w) = tier2["witnesses"].as_array() {
@@ -478,15 +473,12 @@ fn now_iso8601() -> String {
 
 fn neural_api_socket() -> Option<std::path::PathBuf> {
     let family_id = std::env::var("FAMILY_ID").ok()?;
-    let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
+    let runtime = std::env::var("XDG_RUNTIME_DIR")
+        .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
     let path = std::path::PathBuf::from(runtime)
         .join("biomeos")
         .join(format!("neural-api-{family_id}.sock"));
-    if path.exists() {
-        Some(path)
-    } else {
-        None
-    }
+    if path.exists() { Some(path) } else { None }
 }
 
 /// Route a call through Neural API `capability.call` with domain + operation.
@@ -500,11 +492,15 @@ fn capability_call(
     operation: &str,
     args: &Value,
 ) -> Option<Value> {
-    call_neural(socket_path, "capability.call", &json!({
-        "capability": domain,
-        "operation": operation,
-        "args": args,
-    }))
+    call_neural(
+        socket_path,
+        "capability.call",
+        &json!({
+            "capability": domain,
+            "operation": operation,
+            "args": args,
+        }),
+    )
 }
 
 fn call_neural(socket_path: &std::path::Path, method: &str, params: &Value) -> Option<Value> {
@@ -552,11 +548,15 @@ pub fn nestgate_get(method: &str, params: &Value) -> Option<Value> {
     let socket = neural_api_socket()?;
     let key = nestgate_key(method, params);
 
-    let result = call_neural(&socket, "capability.call", &json!({
-        "capability": "storage",
-        "operation": "retrieve",
-        "args": { "key": key },
-    }))?;
+    let result = call_neural(
+        &socket,
+        "capability.call",
+        &json!({
+            "capability": "storage",
+            "operation": "retrieve",
+            "args": { "key": key },
+        }),
+    )?;
 
     let data_str = result.get("data").and_then(Value::as_str)?;
     serde_json::from_str(data_str).ok()
@@ -564,35 +564,47 @@ pub fn nestgate_get(method: &str, params: &Value) -> Option<Value> {
 
 /// Store a computation result in NestGate for caching.
 pub fn nestgate_put(method: &str, params: &Value, result: &Value) {
-    let Some(socket) = neural_api_socket() else { return };
+    let Some(socket) = neural_api_socket() else {
+        return;
+    };
     let key = nestgate_key(method, params);
     let data = serde_json::to_string(result).unwrap_or_default();
     let content_hash = blake3_hash_json(result);
 
-    let _ = call_neural(&socket, "capability.call", &json!({
-        "capability": "storage",
-        "operation": "store",
-        "args": {
-            "key": key,
-            "data": data,
-            "content_hash": content_hash,
-            "metadata": {
-                "method": method,
-                "params": params,
-                "stored_at": now_iso8601(),
+    let _ = call_neural(
+        &socket,
+        "capability.call",
+        &json!({
+            "capability": "storage",
+            "operation": "store",
+            "args": {
+                "key": key,
+                "data": data,
+                "content_hash": content_hash,
+                "metadata": {
+                    "method": method,
+                    "params": params,
+                    "stored_at": now_iso8601(),
+                },
             },
-        },
-    }));
+        }),
+    );
 }
 
 /// Check if a NestGate key exists.
 pub fn nestgate_exists(key: &str) -> bool {
-    let Some(socket) = neural_api_socket() else { return false };
-    call_neural(&socket, "capability.call", &json!({
-        "capability": "storage",
-        "operation": "exists",
-        "args": { "key": key },
-    }))
+    let Some(socket) = neural_api_socket() else {
+        return false;
+    };
+    call_neural(
+        &socket,
+        "capability.call",
+        &json!({
+            "capability": "storage",
+            "operation": "exists",
+            "args": { "key": key },
+        }),
+    )
     .and_then(|r| r.get("exists").and_then(Value::as_bool))
     .unwrap_or(false)
 }

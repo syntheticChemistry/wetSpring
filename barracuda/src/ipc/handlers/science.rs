@@ -221,7 +221,13 @@ pub fn handle_ncbi_fetch(params: &Value) -> Result<Value, RpcError> {
         .map_err(|e| RpcError::server_error(-32000, format!("NCBI fetch failed: {e}")))
 }
 
-/// Anderson spectral analysis (GPU-preferred).
+/// Anderson spectral analysis (GPU-required — returns `-32001` without `gpu` feature).
+///
+/// Anderson localization involves 3D lattice generation and Lanczos eigendecomposition,
+/// both of which require GPU compute via barraCuda's spectral primitives. There is no
+/// CPU fallback by design; callers should check `health.readiness` substrate before
+/// invoking. The `science.full_pipeline` handler degrades gracefully when Anderson
+/// is unavailable.
 pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
     #[cfg(not(feature = "gpu"))]
     {

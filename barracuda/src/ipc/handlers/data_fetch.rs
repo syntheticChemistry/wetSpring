@@ -39,12 +39,15 @@ pub fn handle_chembl_fetch(params: &Value) -> Result<Value, RpcError> {
 
     match fetch_via_composition(&url, &cache_key) {
         Ok((data, content_hash, tier)) => {
-            let _ = trio::record_step(&session.id, &json!({
-                "step": "fetch",
-                "source": tier,
-                "url": url,
-                "content_hash": content_hash,
-            }));
+            let _ = trio::record_step(
+                &session.id,
+                &json!({
+                    "step": "fetch",
+                    "source": tier,
+                    "url": url,
+                    "content_hash": content_hash,
+                }),
+            );
             let completion = trio::complete_session(&session.id);
 
             Ok(json!({
@@ -56,10 +59,13 @@ pub fn handle_chembl_fetch(params: &Value) -> Result<Value, RpcError> {
             }))
         }
         Err(gap) => {
-            let _ = trio::record_step(&session.id, &json!({
-                "step": "gap_detected",
-                "gaps": gap.missing,
-            }));
+            let _ = trio::record_step(
+                &session.id,
+                &json!({
+                    "step": "gap_detected",
+                    "gaps": gap.missing,
+                }),
+            );
             let completion = trio::complete_session(&session.id);
 
             Ok(json!({
@@ -86,21 +92,22 @@ pub fn handle_pubchem_fetch(params: &Value) -> Result<Value, RpcError> {
         .or_else(|| params.get("assay_id").and_then(Value::as_str))
         .ok_or_else(|| RpcError::invalid_params("missing required param: aid or assay_id"))?;
 
-    let url = format!(
-        "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/{aid}/JSON"
-    );
+    let url = format!("https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/{aid}/JSON");
     let cache_key = format!("data:pubchem:{aid}");
 
     let session = trio::begin_session(&format!("data.fetch.pubchem:{aid}"));
 
     match fetch_via_composition(&url, &cache_key) {
         Ok((data, content_hash, tier)) => {
-            let _ = trio::record_step(&session.id, &json!({
-                "step": "fetch",
-                "source": tier,
-                "url": url,
-                "content_hash": content_hash,
-            }));
+            let _ = trio::record_step(
+                &session.id,
+                &json!({
+                    "step": "fetch",
+                    "source": tier,
+                    "url": url,
+                    "content_hash": content_hash,
+                }),
+            );
             let completion = trio::complete_session(&session.id);
 
             Ok(json!({
@@ -112,10 +119,13 @@ pub fn handle_pubchem_fetch(params: &Value) -> Result<Value, RpcError> {
             }))
         }
         Err(gap) => {
-            let _ = trio::record_step(&session.id, &json!({
-                "step": "gap_detected",
-                "gaps": gap.missing,
-            }));
+            let _ = trio::record_step(
+                &session.id,
+                &json!({
+                    "step": "gap_detected",
+                    "gaps": gap.missing,
+                }),
+            );
             let completion = trio::complete_session(&session.id);
 
             Ok(json!({
@@ -160,20 +170,19 @@ pub fn handle_register_table(params: &Value) -> Result<Value, RpcError> {
     });
     let content_hash = blake3_hash_json(&canonical);
 
-    let _ = trio::record_step(&session.id, &json!({
-        "step": "register",
-        "doi": doi,
-        "table_id": table_id,
-        "content_hash": content_hash,
-    }));
+    let _ = trio::record_step(
+        &session.id,
+        &json!({
+            "step": "register",
+            "doi": doi,
+            "table_id": table_id,
+            "content_hash": content_hash,
+        }),
+    );
 
     let completion = trio::complete_session(&session.id);
 
-    nestgate_store(
-        &format!("ref:{doi}:{table_id}"),
-        &canonical,
-        &content_hash,
-    );
+    nestgate_store(&format!("ref:{doi}:{table_id}"), &canonical, &content_hash);
 
     Ok(json!({
         "doi": doi,
@@ -291,10 +300,7 @@ fn fetch_external_via_biomeos(
 }
 
 /// Tier 2: NestGate `storage.retrieve` for cached data.
-fn nestgate_cache_retrieve(
-    socket: &std::path::Path,
-    cache_key: &str,
-) -> Option<(Value, String)> {
+fn nestgate_cache_retrieve(socket: &std::path::Path, cache_key: &str) -> Option<(Value, String)> {
     let request = json!({
         "jsonrpc": "2.0",
         "method": "capability.call",
@@ -350,7 +356,9 @@ fn blake3_hash_json(val: &Value) -> String {
 
 /// Best-effort store via NestGate `capability.call("storage", "store")`.
 fn nestgate_store(key: &str, data: &Value, content_hash: &str) {
-    let Some(socket) = trio::neural_api_socket() else { return };
+    let Some(socket) = trio::neural_api_socket() else {
+        return;
+    };
 
     let data_str = serde_json::to_string(data).unwrap_or_default();
     let request = json!({
@@ -388,7 +396,10 @@ mod tests {
         assert_eq!(result["chembl_id"], "CHEMBL2103874");
         assert_eq!(result["gap_report"], true);
         let missing = result["missing_primals"].as_array().unwrap();
-        assert!(!missing.is_empty(), "must report at least one missing primal");
+        assert!(
+            !missing.is_empty(),
+            "must report at least one missing primal"
+        );
         let primal_names: Vec<&str> = missing
             .iter()
             .filter_map(|g| g["primal"].as_str())

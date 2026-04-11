@@ -6,26 +6,28 @@ against Rust implementations, then promotes to GPU acceleration via
 [barraCuda](https://github.com/ecoPrimals/barraCuda).
 
 ```
-Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  sovereign pipeline
-   (58 scripts)       (1,902 tests)       (44 GPU modules)     (barraCuda/coralReef)
+Python/R baseline  →  Rust CPU parity  →  GPU acceleration  →  NUCLEUS composition
+   (58 scripts)       (1,580 lib tests)   (44 GPU modules)     (97/97 proto-nucleate)
 ```
 
 | | |
 |---|---|
-| **Tests** | 1,902 (unit + integration + property + doc), 0 failed |
-| **Validation checks** | 5,700+ across 355 binaries (333 barracuda + 22 forge) |
-| **Experiments** | 376 completed + 3 proposed (379 indexed) |
+| **Tests** | 1,580 library (unit + integration + property + doc), 0 failed |
+| **Validation checks** | 5,800+ across 356 binaries (334 barracuda + 22 forge) |
+| **Experiments** | 377 completed + 3 proposed (380 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **Named tolerances** | 242 |
-| **Clippy** | 0 warnings (pedantic + nursery, `-D warnings`) |
+| **IPC capabilities** | 45 (health, science, composition, vault, data, brain, AI) |
+| **Named tolerances** | 242+ |
+| **Clippy** | 0 errors (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
 | **`#[allow()]`** | 0 in production (uses `#[expect(reason)]` exclusively) |
 | **Local WGSL** | 0 — fully lean on barraCuda |
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
+| **Composition** | 97/97 proto-nucleate alignment checks (Exp400) |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V137:** Full provenance + tolerance centralization + IPC modularization: `//! Provenance:` headers on all 355 binaries, 8 new named tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: `thiserror` error derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoded primal strings eliminated, CONTRIBUTING.md + SECURITY.md.
+**Current release — V139:** NUCLEUS composition validation tier. Python was the validation target for Rust; now Rust + Python are the validation targets for ecoPrimal NUCLEUS composition patterns. `validate_composition_nucleus_v1` (Exp400, 97/97 pass), JSON shape fix for `composition.nucleus_health`, Squirrel added to niche dependencies, proptest synchronized to full dispatch surface (37 methods), 5 new composition IPC round-trip tests, plasmidBin metadata v0.8.0. V138: primal composition patterns, friction/gap analysis, wire format standardization. V137: provenance headers on all binaries, tolerance centralization, IPC modularization.
 
 ---
 

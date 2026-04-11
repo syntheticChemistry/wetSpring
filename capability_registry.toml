@@ -131,3 +131,139 @@ method = "ai.ecology_interpret"
 domain = "ecology.ai_assist"
 description = "Forward ecology queries to Squirrel AI with graceful degradation"
 gpu_accelerated = false
+
+# ── Gonzales dermatitis / immunological Anderson ─────────────────────
+
+[capabilities.gonzales_dose_response]
+method = "science.gonzales.dose_response"
+domain = "ecology.gonzales"
+description = "Gonzales JAK inhibitor dose-response (Hill equation)"
+gpu_accelerated = false
+
+[capabilities.gonzales_pk_decay]
+method = "science.gonzales.pk_decay"
+domain = "ecology.gonzales"
+description = "Gonzales pharmacokinetic decay modeling"
+gpu_accelerated = false
+
+[capabilities.gonzales_tissue_lattice]
+method = "science.gonzales.tissue_lattice"
+domain = "ecology.gonzales"
+description = "Gonzales tissue binding lattice (Anderson disorder mapping)"
+gpu_accelerated = true
+
+[capabilities.anderson_biome_atlas]
+method = "science.anderson.biome_atlas"
+domain = "ecology.anderson"
+description = "Anderson biome atlas (multi-environment disorder sweep)"
+gpu_accelerated = true
+
+[capabilities.anderson_disorder_sweep]
+method = "science.anderson.disorder_sweep"
+domain = "ecology.anderson"
+description = "Anderson disorder strength parameter sweep"
+gpu_accelerated = true
+
+[capabilities.anderson_hormesis]
+method = "science.anderson.hormesis"
+domain = "ecology.anderson"
+description = "Anderson-hormesis cross-domain analysis"
+gpu_accelerated = true
+
+[capabilities.anderson_cross_species]
+method = "science.anderson.cross_species"
+domain = "ecology.anderson"
+description = "Anderson cross-species spectral comparison"
+gpu_accelerated = true
+
+# ── External data ingestion ──────────────────────────────────────────
+
+[capabilities.data_fetch_chembl]
+method = "data.fetch.chembl"
+domain = "data.ingestion"
+description = "Fetch compound data from ChEMBL"
+gpu_accelerated = false
+
+[capabilities.data_fetch_pubchem]
+method = "data.fetch.pubchem"
+domain = "data.ingestion"
+description = "Fetch compound data from PubChem"
+gpu_accelerated = false
+
+[capabilities.data_fetch_register_table]
+method = "data.fetch.register_table"
+domain = "data.ingestion"
+description = "Register external data table in NestGate"
+gpu_accelerated = false
+
+# ── Vault (consent-gated storage) ────────────────────────────────────
+
+[capabilities.vault_store]
+method = "vault.store"
+domain = "vault"
+description = "Store encrypted consent-gated data"
+gpu_accelerated = false
+
+[capabilities.vault_retrieve]
+method = "vault.retrieve"
+domain = "vault"
+description = "Retrieve encrypted consent-gated data"
+gpu_accelerated = false
+
+[capabilities.vault_consent_verify]
+method = "vault.consent.verify"
+domain = "vault"
+description = "Verify consent status for vault access"
+gpu_accelerated = false
+
+# ── Composition health (cross-spring validation) ─────────────────────
+
+[capabilities.composition_science_health]
+method = "composition.science_health"
+domain = "composition"
+description = "Science pipeline composition health probe"
+gpu_accelerated = false
+
+[capabilities.composition_tower_health]
+method = "composition.tower_health"
+domain = "composition"
+description = "Tower atomic (BearDog + Songbird) health probe"
+gpu_accelerated = false
+
+[capabilities.composition_node_health]
+method = "composition.node_health"
+domain = "composition"
+description = "Node atomic (ToadStool + barraCuda + coralReef) health probe"
+gpu_accelerated = false
+
+[capabilities.composition_nest_health]
+method = "composition.nest_health"
+domain = "composition"
+description = "Nest atomic (NestGate + provenance trio) health probe"
+gpu_accelerated = false
+
+[capabilities.composition_nucleus_health]
+method = "composition.nucleus_health"
+domain = "composition"
+description = "Full NUCLEUS composition health probe"
+gpu_accelerated = false
+
+# ── Health / discovery (biomeOS infrastructure) ──────────────────────
+
+[capabilities.health_check]
+method = "health.check"
+domain = "health"
+description = "Full health and readiness check"
+gpu_accelerated = false
+
+[capabilities.health_liveness]
+method = "health.liveness"
+domain = "health"
+description = "Minimal liveness probe (process alive)"
+gpu_accelerated = false
+
+[capabilities.health_readiness]
+method = "health.readiness"
+domain = "health"
+description = "Readiness probe (subsystems + substrate)"
+gpu_accelerated = false

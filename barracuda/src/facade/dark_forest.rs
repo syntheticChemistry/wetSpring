@@ -51,12 +51,11 @@ impl DarkForestConfig {
             .map(|v| !matches!(v.as_str(), "false" | "0" | "no"))
             .unwrap_or(true);
 
-        let family_id =
-            std::env::var("FAMILY_ID").unwrap_or_else(|_| "default".into());
+        let family_id = std::env::var("FAMILY_ID").unwrap_or_else(|_| "default".into());
 
         let neural_api_socket = {
-            let runtime =
-                std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
+            let runtime = std::env::var("XDG_RUNTIME_DIR")
+                .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
             let path = std::path::PathBuf::from(runtime)
                 .join("biomeos")
                 .join(format!("neural-api-{family_id}.sock"));
@@ -143,9 +142,7 @@ pub async fn dark_forest_middleware(
             return Response::builder()
                 .status(StatusCode::OK)
                 .body(Body::empty())
-                .unwrap_or_else(|_| {
-                    Response::new(Body::empty())
-                });
+                .unwrap_or_else(|_| Response::new(Body::empty()));
         }
     }
 
@@ -165,19 +162,13 @@ pub async fn dark_forest_middleware(
         return Response::builder()
             .status(StatusCode::FORBIDDEN)
             .body(Body::empty())
-            .unwrap_or_else(|_| {
-                Response::new(Body::empty())
-            });
+            .unwrap_or_else(|_| Response::new(Body::empty()));
     }
 
     next.run(request).await
 }
 
-async fn verify_via_neural_api(
-    socket_path: Option<&str>,
-    family_id: &str,
-    token: &str,
-) -> bool {
+async fn verify_via_neural_api(socket_path: Option<&str>, family_id: &str, token: &str) -> bool {
     let Some(socket) = socket_path else {
         tracing::warn!("Dark Forest: no Neural API socket — rejecting token");
         return false;
@@ -202,10 +193,7 @@ fn parse_decrypt_result(value: &Value) -> bool {
         .get("success")
         .and_then(Value::as_bool)
         .unwrap_or(false);
-    let plaintext = value
-        .get("plaintext")
-        .and_then(Value::as_str)
-        .unwrap_or("");
+    let plaintext = value.get("plaintext").and_then(Value::as_str).unwrap_or("");
     success && !plaintext.is_empty()
 }
 

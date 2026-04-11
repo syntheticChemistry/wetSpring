@@ -165,9 +165,19 @@ pub fn shape_tissue_lattice(result: &Value) -> Value {
 pub fn shape_hormesis(result: &Value) -> Value {
     let doses = result.get("doses").cloned().unwrap_or(json!([]));
     let responses = result.get("responses").cloned().unwrap_or(json!([]));
-    let stim_component = result.get("stimulatory_component").cloned().unwrap_or(json!([]));
-    let surv_component = result.get("survival_component").cloned().unwrap_or(json!([]));
-    let disorder_w = result.get("disorder_mapping").and_then(|m| m.get("w_values")).cloned().unwrap_or(json!([]));
+    let stim_component = result
+        .get("stimulatory_component")
+        .cloned()
+        .unwrap_or(json!([]));
+    let surv_component = result
+        .get("survival_component")
+        .cloned()
+        .unwrap_or(json!([]));
+    let disorder_w = result
+        .get("disorder_mapping")
+        .and_then(|m| m.get("w_values"))
+        .cloned()
+        .unwrap_or(json!([]));
 
     let mut channels = vec![
         json!({

@@ -1,5 +1,7 @@
 # Rust
 target/
+barracuda/Cargo.lock
+metalForge/forge/Cargo.lock
 
 # Galaxy (root-owned setup remnant, not tracked)
 control/

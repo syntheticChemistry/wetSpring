@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V137:** Full provenance + tolerance centralization + IPC modularization — `//! Provenance:` headers on all 355 binaries, 8 new named tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: `thiserror` derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, zero hardcoded primal strings, CONTRIBUTING.md + SECURITY.md.
+**Current release — V139:** NUCLEUS composition validation — proto-nucleate alignment (97/97), composition health handlers, Squirrel niche wiring, proptest synchronized, plasmidBin v0.8.0 harvest-ready. V138: primal composition patterns, friction/gap analysis. V137: provenance headers, tolerance centralization, IPC modularization.
 
 ## Role in the Ecosystem
 
@@ -24,14 +24,15 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 355 validation/benchmark binaries (333 barracuda + 22 forge)
-- **Communication:** JSON-RPC 2.0 over Unix sockets (IPC feature-gated)
+- **Architecture:** 2 library crates + 356 validation/benchmark binaries (334 barracuda + 22 forge)
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 45 IPC capabilities, 37 dispatch methods
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,902 total (unit + integration + property + doc); 1,205+ lib (default), 1,569+ lib (ipc+vault+json)
-- **Validation checks:** 5,700+ across 355 binaries
+- **Tests:** 1,580 library (unit + integration + property + doc), 0 failed
+- **Validation checks:** 5,800+ across 356 binaries
+- **Composition:** 97/97 proto-nucleate alignment (Exp400), 9 niche dependencies (5 required + 4 optional)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
-- **Clippy:** zero warnings (pedantic + nursery, all features, `-D warnings`)
+- **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
@@ -45,7 +46,7 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, molecular docking
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.3.7, 150+ primitives consumed
-- **IPC:** 23 JSON-RPC methods, 8 MCP tools, Songbird discovery, capability-based primal coordination
+- **IPC:** 37 JSON-RPC methods, 45 advertised capabilities, 5 composition health handlers, 8 MCP tools
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 
@@ -67,8 +68,8 @@ evolution pipeline.
 ## Evolution Path
 
 ```
-Python baseline → Rust CPU parity → GPU validation → sovereign pipeline
-     (58 scripts)    (1,902 tests)     (44 GPU modules)   (barraCuda/coralReef)
+Python baseline → Rust CPU parity → GPU validation → NUCLEUS composition
+     (58 scripts)    (1,580 lib tests)  (44 GPU modules)   (97/97 proto-nucleate)
 ```
 
 ## Design Philosophy

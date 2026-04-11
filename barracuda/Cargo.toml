@@ -67,7 +67,7 @@ barracuda = { path = "../../../primals/barraCuda/crates/barracuda", default-feat
 # akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
 # Independent of barraCuda; sourced from toadStool neuromorphic crates.
 # Runtime discovery, capability-based dispatch, zero mocks.
-akida-driver = { path = "../../../primals/toadStool/crates/neuromorphic/akida-driver", optional = true }
+akida-driver = { path = "../../../primals/toadstool/crates/neuromorphic/akida-driver", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barraCuda to prevent duplicate symbol linking errors.
@@ -1912,6 +1912,12 @@ required-features = ["ipc"]
 name = "validate_nucleus_live_gonzales"
 path = "src/bin/validate_nucleus_live_gonzales.rs"
 required-features = ["ipc"]
+
+# ── Exp400: NUCLEUS Composition — Proto-Nucleate Alignment ──
+[[bin]]
+name = "validate_composition_nucleus_v1"
+path = "src/bin/validate_composition_nucleus_v1.rs"
+required-features = ["json"]
 
 # ── guideStone: Gonzales Interactive Science Artifact ──
 [[bin]]

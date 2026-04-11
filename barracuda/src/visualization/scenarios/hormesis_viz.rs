@@ -14,6 +14,10 @@ use super::{edge, gauge, node, scaffold, timeseries};
 /// Sweeps a dose range showing the hormetic zone, stimulation/survival
 /// components, and Anderson disorder mapping.
 #[must_use]
+#[expect(
+    clippy::expect_used,
+    reason = "compile-time constants (0.3, 10.0, 2.0, 100.0, 2.0) are all positive — infallible"
+)]
 pub fn hormesis_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Hormesis Dose-Response",

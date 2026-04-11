@@ -15,13 +15,7 @@ pub const DOMAIN: &str = "ecology";
 
 /// Recognised domain prefixes for validation.
 #[cfg(test)]
-const VALID_DOMAIN_PREFIXES: &[&str] = &[
-    "ecology.",
-    "health",
-    "provenance",
-    "brain",
-    "metrics",
-];
+const VALID_DOMAIN_PREFIXES: &[&str] = &["ecology.", "health", "provenance", "brain", "metrics"];
 
 /// All capability domains this primal registers with Songbird.
 ///

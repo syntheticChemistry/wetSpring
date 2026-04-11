@@ -4,7 +4,8 @@
 
 **Track:** 5 — Immunological Anderson & Drug Repurposing
 **Papers to reproduce:** 6 (Papers 53–58)
-**Total checks:** 0 (proposed)
+**Total checks:** 359+ (Gonzales pipeline validated — dose-response, PK decay, tissue lattice, provenance chain)
+**IPC methods:** `science.gonzales.dose_response`, `science.gonzales.pk_decay`, `science.gonzales.tissue_lattice`
 **Domains:** Cytokine signaling, JAK/STAT pathway, dose-response modeling,
 tissue geometry, neuro-immune axis, drug repurposing
 

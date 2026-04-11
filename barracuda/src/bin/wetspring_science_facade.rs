@@ -25,11 +25,11 @@ use tower_http::cors::{Any, CorsLayer};
 use wetspring_barracuda::facade::{dark_forest, routes};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
-    let cors_origin = std::env::var("FACADE_CORS_ORIGIN")
-        .unwrap_or_else(|_| "https://primals.eco".to_string());
+    let cors_origin =
+        std::env::var("FACADE_CORS_ORIGIN").unwrap_or_else(|_| "https://primals.eco".to_string());
 
     let cors = if cors_origin == "*" {
         CorsLayer::new()
@@ -37,9 +37,9 @@ async fn main() {
             .allow_methods(Any)
             .allow_headers(Any)
     } else {
-        let origin: axum::http::HeaderValue = cors_origin.parse().unwrap_or_else(|_| {
-            "https://primals.eco".parse().expect("valid header")
-        });
+        let origin: axum::http::HeaderValue = cors_origin
+            .parse()
+            .unwrap_or_else(|_| "https://primals.eco".parse().expect("valid header"));
         CorsLayer::new()
             .allow_origin(origin)
             .allow_methods(Any)
@@ -51,12 +51,19 @@ async fn main() {
 
     tracing::info!(
         "Dark Forest gate: {}",
-        if gate_config.enabled { "ENABLED" } else { "DISABLED" }
+        if gate_config.enabled {
+            "ENABLED"
+        } else {
+            "DISABLED"
+        }
     );
     if gate_config.enabled {
         tracing::info!(
             "Dark Forest neural socket: {}",
-            gate_config.neural_api_socket.as_deref().unwrap_or("not found")
+            gate_config
+                .neural_api_socket
+                .as_deref()
+                .unwrap_or("not found")
         );
     }
 
@@ -66,18 +73,12 @@ async fn main() {
             "/api/v1/science/gonzales/dose-response",
             get(routes::dose_response),
         )
-        .route(
-            "/api/v1/science/gonzales/pk-decay",
-            get(routes::pk_decay),
-        )
+        .route("/api/v1/science/gonzales/pk-decay", get(routes::pk_decay))
         .route(
             "/api/v1/science/gonzales/tissue-lattice",
             get(routes::tissue_lattice),
         )
-        .route(
-            "/api/v1/science/anderson/hormesis",
-            get(routes::hormesis),
-        )
+        .route("/api/v1/science/anderson/hormesis", get(routes::hormesis))
         .route(
             "/api/v1/science/anderson/cross-species",
             get(routes::cross_species),
@@ -90,10 +91,7 @@ async fn main() {
             "/api/v1/science/anderson/disorder-sweep",
             get(routes::disorder_sweep),
         )
-        .route(
-            "/api/v1/science/gonzales/full",
-            get(routes::full_dashboard),
-        )
+        .route("/api/v1/science/gonzales/full", get(routes::full_dashboard))
         .route(
             "/api/v1/render/gonzales/dose-response",
             get(routes::grammar_dose_response),
@@ -133,12 +131,13 @@ async fn main() {
         .layer(cors);
 
     let bind = std::env::var("FACADE_BIND").unwrap_or_else(|_| "127.0.0.1:3100".to_string());
-    let listener = tokio::net::TcpListener::bind(&bind).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(&bind).await?;
     tracing::info!("wetspring-science-facade listening on {bind}");
     tracing::info!(
         "wetspring IPC socket: {}",
         wetspring_barracuda::facade::ipc_client::socket_path().display()
     );
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app).await?;
+    Ok(())
 }

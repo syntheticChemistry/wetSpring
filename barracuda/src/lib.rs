@@ -80,6 +80,8 @@ pub mod cast;
 pub mod df64_host;
 pub mod encoding;
 pub mod error;
+#[cfg(feature = "facade")]
+pub mod facade;
 #[cfg(feature = "gpu")]
 pub mod gpu;
 pub mod io;
@@ -101,5 +103,3 @@ pub mod validation;
 pub mod vault;
 #[cfg(feature = "json")]
 pub mod visualization;
-#[cfg(feature = "facade")]
-pub mod facade;

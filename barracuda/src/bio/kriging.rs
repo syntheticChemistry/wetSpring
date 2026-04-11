@@ -22,8 +22,9 @@
 //! use wetspring_barracuda::error::Result;
 //! use wetspring_barracuda::gpu::GpuF64;
 //!
+//! # fn create_gpu() -> GpuF64 { unimplemented!("requires live GPU") }
 //! fn main() -> Result<()> {
-//!     let gpu: GpuF64 = todo!();
+//!     let gpu: GpuF64 = create_gpu();
 //!     let sites = vec![
 //!         SpatialSample { x: 0.0, y: 0.0, value: 2.3 },
 //!         SpatialSample { x: 100.0, y: 0.0, value: 1.8 },

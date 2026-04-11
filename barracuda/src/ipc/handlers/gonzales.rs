@@ -30,18 +30,12 @@ fn linspace(n: usize, max: f64) -> Vec<f64> {
 /// Computes Hill equation curves across a dose range for JAK1, IL-2, IL-6,
 /// IL-31, IL-4, and IL-13 using published IC50 values from Gonzales 2014.
 pub fn handle_dose_response(params: &Value) -> Result<Value, RpcError> {
-    let n_points = params
-        .get("n_points")
-        .and_then(Value::as_u64)
-        .unwrap_or(50);
+    let n_points = params.get("n_points").and_then(Value::as_u64).unwrap_or(50);
     let dose_max = params
         .get("dose_max")
         .and_then(Value::as_f64)
         .unwrap_or(500.0);
-    let hill_n = params
-        .get("hill_n")
-        .and_then(Value::as_f64)
-        .unwrap_or(1.0);
+    let hill_n = params.get("hill_n").and_then(Value::as_f64).unwrap_or(1.0);
 
     let pathways = [
         ("JAK1", 10.0),
@@ -97,8 +91,7 @@ pub fn handle_pk_decay(params: &Value) -> Result<Value, RpcError> {
     let doses_mg_kg: [f64; 3] = [0.125, 0.5, 2.0];
     let duration_days: [f64; 3] = [14.0, 28.0, 42.0];
 
-    let k_decay = (doses_mg_kg[2] / doses_mg_kg[0]).ln()
-        / (duration_days[2] - duration_days[0]);
+    let k_decay = (doses_mg_kg[2] / doses_mg_kg[0]).ln() / (duration_days[2] - duration_days[0]);
 
     let n = usize::try_from(n_points).unwrap_or(100);
     let times = linspace(n, t_max_days);
@@ -157,7 +150,9 @@ pub fn handle_tissue_lattice(params: &Value) -> Result<Value, RpcError> {
         ("chronic_lesion", 0.15),
     ];
 
-    let n = usize::try_from(n_profiles).unwrap_or(6).min(disease_profiles.len());
+    let n = usize::try_from(n_profiles)
+        .unwrap_or(6)
+        .min(disease_profiles.len());
 
     let cell_type_counts = [
         &[60.0, 20.0, 10.0, 5.0, 3.0, 2.0][..],
@@ -209,18 +204,9 @@ pub fn handle_hormesis(params: &Value) -> Result<Value, RpcError> {
         .get("amplitude")
         .and_then(Value::as_f64)
         .unwrap_or(0.3);
-    let k_stim = params
-        .get("k_stim")
-        .and_then(Value::as_f64)
-        .unwrap_or(10.0);
-    let n_stim = params
-        .get("n_stim")
-        .and_then(Value::as_f64)
-        .unwrap_or(2.0);
-    let k_inh = params
-        .get("k_inh")
-        .and_then(Value::as_f64)
-        .unwrap_or(100.0);
+    let k_stim = params.get("k_stim").and_then(Value::as_f64).unwrap_or(10.0);
+    let n_stim = params.get("n_stim").and_then(Value::as_f64).unwrap_or(2.0);
+    let k_inh = params.get("k_inh").and_then(Value::as_f64).unwrap_or(100.0);
     let n_inh = params.get("n_inh").and_then(Value::as_f64).unwrap_or(2.0);
     let n_points = params
         .get("n_points")
@@ -357,14 +343,8 @@ pub fn handle_biome_atlas(_params: &Value) -> Result<Value, RpcError> {
 /// given lattice size, identifying the critical disorder threshold.
 pub fn handle_disorder_sweep(params: &Value) -> Result<Value, RpcError> {
     let w_min = params.get("w_min").and_then(Value::as_f64).unwrap_or(1.0);
-    let w_max = params
-        .get("w_max")
-        .and_then(Value::as_f64)
-        .unwrap_or(30.0);
-    let n_points = params
-        .get("n_points")
-        .and_then(Value::as_u64)
-        .unwrap_or(30);
+    let w_max = params.get("w_max").and_then(Value::as_f64).unwrap_or(30.0);
+    let n_points = params.get("n_points").and_then(Value::as_u64).unwrap_or(30);
     let seed = params.get("seed").and_then(Value::as_u64).unwrap_or(42);
 
     let n = usize::try_from(n_points).unwrap_or(30);
@@ -379,8 +359,7 @@ pub fn handle_disorder_sweep(params: &Value) -> Result<Value, RpcError> {
         .iter()
         .map(|&offset| {
             let w = w_min + offset;
-            let r_approx = goe_r + (poisson_r - goe_r)
-                / (1.0 + (-0.5 * (w - 16.26)).exp());
+            let r_approx = goe_r + (poisson_r - goe_r) / (1.0 + (-0.5 * (w - 16.26)).exp());
             let regime = if r_approx > midpoint {
                 "extended"
             } else {
@@ -426,11 +405,46 @@ pub fn handle_cross_species(params: &Value) -> Result<Value, RpcError> {
         .map(|a| a.iter().filter_map(Value::as_f64).collect::<Vec<_>>());
 
     let species_data: &[SpeciesRecord] = &[
-        SpeciesRecord { name: "dog", epidermis_um: 15.0, follicle_per_cm2: 500.0, d_eff: 2.5, severity: "high", effective_ic50: 10.0 },
-        SpeciesRecord { name: "cat", epidermis_um: 10.0, follicle_per_cm2: 800.0, d_eff: 2.1, severity: "moderate", effective_ic50: 36.0 },
-        SpeciesRecord { name: "human", epidermis_um: 50.0, follicle_per_cm2: 100.0, d_eff: 2.8, severity: "moderate-high", effective_ic50: 15.0 },
-        SpeciesRecord { name: "horse", epidermis_um: 35.0, follicle_per_cm2: 300.0, d_eff: 2.3, severity: "low-moderate", effective_ic50: 63.0 },
-        SpeciesRecord { name: "mouse", epidermis_um: 8.0, follicle_per_cm2: 900.0, d_eff: 2.0, severity: "low (model)", effective_ic50: 100.0 },
+        SpeciesRecord {
+            name: "dog",
+            epidermis_um: 15.0,
+            follicle_per_cm2: 500.0,
+            d_eff: 2.5,
+            severity: "high",
+            effective_ic50: 10.0,
+        },
+        SpeciesRecord {
+            name: "cat",
+            epidermis_um: 10.0,
+            follicle_per_cm2: 800.0,
+            d_eff: 2.1,
+            severity: "moderate",
+            effective_ic50: 36.0,
+        },
+        SpeciesRecord {
+            name: "human",
+            epidermis_um: 50.0,
+            follicle_per_cm2: 100.0,
+            d_eff: 2.8,
+            severity: "moderate-high",
+            effective_ic50: 15.0,
+        },
+        SpeciesRecord {
+            name: "horse",
+            epidermis_um: 35.0,
+            follicle_per_cm2: 300.0,
+            d_eff: 2.3,
+            severity: "low-moderate",
+            effective_ic50: 63.0,
+        },
+        SpeciesRecord {
+            name: "mouse",
+            epidermis_um: 8.0,
+            follicle_per_cm2: 900.0,
+            d_eff: 2.0,
+            severity: "low (model)",
+            effective_ic50: 100.0,
+        },
     ];
 
     let species: Vec<Value> = species_data

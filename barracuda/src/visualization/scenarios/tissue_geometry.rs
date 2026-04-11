@@ -41,7 +41,10 @@ pub fn tissue_lattice_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let base_disorder = 10.0;
 
     let profile_names: Vec<String> = profiles.iter().map(|(n, _, _)| (*n).to_string()).collect();
-    let shannons: Vec<f64> = profiles.iter().map(|(_, _, c)| diversity::shannon(c)).collect();
+    let shannons: Vec<f64> = profiles
+        .iter()
+        .map(|(_, _, c)| diversity::shannon(c))
+        .collect();
     let pielous: Vec<f64> = profiles
         .iter()
         .map(|(_, _, c)| diversity::pielou_evenness(c))

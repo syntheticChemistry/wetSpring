@@ -9,8 +9,8 @@
     reason = "validation harness: sequential domain checks in single main()"
 )]
 #![expect(
-    clippy::items_after_statements,
-    reason = "validation harness: local helpers defined near use site"
+    clippy::expect_used,
+    reason = "validation binary: expect is the pass/fail mechanism"
 )]
 //! # Exp310: Gonzales Provenance Chain — Pure Primal Composition
 //!
@@ -62,16 +62,25 @@ fn main() {
         "IL-13": {"ic50_nm": 249.0, "pathway": "JAK1/TYK2 → STAT6"},
     });
 
-    let reg_result = dispatch("data.fetch.register_table", &json!({
-        "doi": "10.1111/jvp.12065",
-        "table_id": "table_1",
-        "values": gonzales_table1,
-    }));
+    let reg_result = dispatch(
+        "data.fetch.register_table",
+        &json!({
+            "doi": "10.1111/jvp.12065",
+            "table_id": "table_1",
+            "values": gonzales_table1,
+        }),
+    );
 
     let reg = reg_result.expect("register_table dispatch failed");
-    v.check_pass("register_table: status = registered", reg["status"] == "registered");
+    v.check_pass(
+        "register_table: status = registered",
+        reg["status"] == "registered",
+    );
     let paper_hash = reg["content_hash"].as_str().unwrap_or("");
-    v.check_pass("register_table: content_hash present", !paper_hash.is_empty());
+    v.check_pass(
+        "register_table: content_hash present",
+        !paper_hash.is_empty(),
+    );
     v.check_pass(
         "register_table: provenance session present",
         reg["provenance"].is_object(),
@@ -84,7 +93,10 @@ fn main() {
     );
 
     println!("  Paper content hash: {paper_hash}");
-    println!("  Register time: {:.1} µs", t0.elapsed().as_secs_f64() * 1e6);
+    println!(
+        "  Register time: {:.1} µs",
+        t0.elapsed().as_secs_f64() * 1e6
+    );
 
     // ═══════════════════════════════════════════════════════════════
     // D02: ChEMBL data — primal composition only (no fallbacks)
@@ -92,9 +104,12 @@ fn main() {
     v.section("═══ D02: ChEMBL Data — Primal Composition Only ═══");
     let t0 = Instant::now();
 
-    let chembl_result = dispatch("data.fetch.chembl", &json!({
-        "chembl_id": "CHEMBL2103874",
-    }));
+    let chembl_result = dispatch(
+        "data.fetch.chembl",
+        &json!({
+            "chembl_id": "CHEMBL2103874",
+        }),
+    );
 
     let chembl = chembl_result.expect("chembl fetch dispatch failed");
     let is_gap = chembl["gap_report"] == true;
@@ -111,11 +126,15 @@ fn main() {
         }
         v.check_pass(
             "chembl_fetch: gap report identifies missing primals",
-            chembl["missing_primals"].as_array().is_some_and(|a| !a.is_empty()),
+            chembl["missing_primals"]
+                .as_array()
+                .is_some_and(|a| !a.is_empty()),
         );
         v.check_pass(
             "chembl_fetch: action references primalSpring",
-            chembl["action"].as_str().is_some_and(|a| a.contains("primalSpring")),
+            chembl["action"]
+                .as_str()
+                .is_some_and(|a| a.contains("primalSpring")),
         );
         v.check_pass(
             "chembl_fetch: provenance session tracked despite gap",
@@ -132,7 +151,10 @@ fn main() {
             source == "nestgate_via_biomeos" || source == "nestgate_cache",
         );
         let chembl_hash = chembl["content_hash"].as_str().unwrap_or("");
-        v.check_pass("chembl_fetch: content_hash present", !chembl_hash.is_empty());
+        v.check_pass(
+            "chembl_fetch: content_hash present",
+            !chembl_hash.is_empty(),
+        );
         v.check_pass(
             "chembl_fetch: provenance session present",
             chembl["provenance"].is_object(),
@@ -173,10 +195,13 @@ fn main() {
 
         let jak1_entries = &chembl_data["jak_ic50_panel"]["JAK1"];
         if let Some(arr) = jak1_entries.as_array() {
-            v.check_pass("chembl: JAK1 has multiple assay measurements", arr.len() >= 2);
-            let has_10 = arr.iter().any(|e| {
-                (e["ic50_nm"].as_f64().unwrap_or(0.0) - 10.0).abs() < 0.01
-            });
+            v.check_pass(
+                "chembl: JAK1 has multiple assay measurements",
+                arr.len() >= 2,
+            );
+            let has_10 = arr
+                .iter()
+                .any(|e| (e["ic50_nm"].as_f64().unwrap_or(0.0) - 10.0).abs() < 0.01);
             v.check_pass("chembl: at least one JAK1 assay reports 10.0 nM", has_10);
         } else {
             v.check_pass("chembl: JAK1 panel present", false);
@@ -189,11 +214,14 @@ fn main() {
     v.section("═══ D04: Dose-Response Computation ═══");
     let t0 = Instant::now();
 
-    let dr_result = dispatch("science.gonzales.dose_response", &json!({
-        "n_points": 50,
-        "dose_max": 500.0,
-        "hill_n": 1.0,
-    }));
+    let dr_result = dispatch(
+        "science.gonzales.dose_response",
+        &json!({
+            "n_points": 50,
+            "dose_max": 500.0,
+            "hill_n": 1.0,
+        }),
+    );
 
     let dr = dr_result.expect("dose_response dispatch failed");
     v.check_pass("dose_response: result has curves", dr["curves"].is_array());
@@ -230,7 +258,10 @@ fn main() {
         }
     }
 
-    println!("  Dose-response time: {:.1} µs", t0.elapsed().as_secs_f64() * 1e6);
+    println!(
+        "  Dose-response time: {:.1} µs",
+        t0.elapsed().as_secs_f64() * 1e6
+    );
 
     // ═══════════════════════════════════════════════════════════════
     // D05: Provenance inspection
@@ -261,18 +292,21 @@ fn main() {
     // ═══════════════════════════════════════════════════════════════
     v.section("═══ D06: Reproducibility ═══");
 
-    let reg2 = dispatch("data.fetch.register_table", &json!({
-        "doi": "10.1111/jvp.12065",
-        "table_id": "table_1",
-        "values": json!({
-            "JAK1_enzyme": {"ic50_nm": 10.0, "pathway": "JAK/STAT"},
-            "IL-2": {"ic50_nm": 36.0, "pathway": "JAK1/JAK3 → STAT5"},
-            "IL-31": {"ic50_nm": 71.0, "pathway": "JAK1/JAK2 → STAT3"},
-            "IL-6": {"ic50_nm": 80.0, "pathway": "JAK1/JAK2 → STAT3"},
-            "IL-4": {"ic50_nm": 150.0, "pathway": "JAK1/JAK3 → STAT6"},
-            "IL-13": {"ic50_nm": 249.0, "pathway": "JAK1/TYK2 → STAT6"},
+    let reg2 = dispatch(
+        "data.fetch.register_table",
+        &json!({
+            "doi": "10.1111/jvp.12065",
+            "table_id": "table_1",
+            "values": json!({
+                "JAK1_enzyme": {"ic50_nm": 10.0, "pathway": "JAK/STAT"},
+                "IL-2": {"ic50_nm": 36.0, "pathway": "JAK1/JAK3 → STAT5"},
+                "IL-31": {"ic50_nm": 71.0, "pathway": "JAK1/JAK2 → STAT3"},
+                "IL-6": {"ic50_nm": 80.0, "pathway": "JAK1/JAK2 → STAT3"},
+                "IL-4": {"ic50_nm": 150.0, "pathway": "JAK1/JAK3 → STAT6"},
+                "IL-13": {"ic50_nm": 249.0, "pathway": "JAK1/TYK2 → STAT6"},
+            }),
         }),
-    }))
+    )
     .expect("second register_table failed");
 
     let hash2 = reg2["content_hash"].as_str().unwrap_or("");
@@ -281,20 +315,21 @@ fn main() {
         paper_hash == hash2,
     );
 
-    let dr2 = dispatch("science.gonzales.dose_response", &json!({
-        "n_points": 50,
-        "dose_max": 500.0,
-        "hill_n": 1.0,
-    }))
+    let dr2 = dispatch(
+        "science.gonzales.dose_response",
+        &json!({
+            "n_points": 50,
+            "dose_max": 500.0,
+            "hill_n": 1.0,
+        }),
+    )
     .expect("second dose_response failed");
 
-    if let (Some(c1), Some(c2)) = (
-        dr["curves"].as_array(),
-        dr2["curves"].as_array(),
-    ) {
-        let ic50s_match = c1.iter().zip(c2.iter()).all(|(a, b)| {
-            a["ic50_nm"] == b["ic50_nm"] && a["pathway"] == b["pathway"]
-        });
+    if let (Some(c1), Some(c2)) = (dr["curves"].as_array(), dr2["curves"].as_array()) {
+        let ic50s_match = c1
+            .iter()
+            .zip(c2.iter())
+            .all(|(a, b)| a["ic50_nm"] == b["ic50_nm"] && a["pathway"] == b["pathway"]);
         v.check_pass(
             "reproducibility: dose_response IC50s identical across runs",
             ic50s_match,

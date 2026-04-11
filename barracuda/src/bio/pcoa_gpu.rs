@@ -20,8 +20,9 @@
 //! use wetspring_barracuda::error::Result;
 //! use wetspring_barracuda::gpu::GpuF64;
 //!
+//! # fn create_gpu() -> GpuF64 { unimplemented!("requires live GPU") }
 //! fn main() -> Result<()> {
-//!     let gpu: GpuF64 = todo!();
+//!     let gpu: GpuF64 = create_gpu();
 //!     let samples: Vec<Vec<f64>> = vec![vec![1.0, 2.0, 3.0], vec![2.0, 3.0, 4.0]];
 //!     let n_samples = samples.len();
 //!     let condensed = bray_curtis_condensed_gpu(&gpu, &samples)?;

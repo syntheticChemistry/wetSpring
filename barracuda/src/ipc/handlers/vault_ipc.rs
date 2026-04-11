@@ -37,13 +37,16 @@ pub fn handle_vault_store(params: &Value) -> Result<Value, RpcError> {
 
     let session = trio::begin_session(&format!("vault.store:{owner_id}:{label}"));
 
-    let _ = trio::record_step(&session.id, &json!({
-        "step": "vault_store",
-        "owner_id": owner_id,
-        "label": label,
-        "content_hash": content_hash,
-        "data_size": data.len(),
-    }));
+    let _ = trio::record_step(
+        &session.id,
+        &json!({
+            "step": "vault_store",
+            "owner_id": owner_id,
+            "label": label,
+            "content_hash": content_hash,
+            "data_size": data.len(),
+        }),
+    );
 
     let completion = trio::complete_session(&session.id);
 
@@ -92,12 +95,15 @@ pub fn handle_vault_retrieve(params: &Value) -> Result<Value, RpcError> {
 
     let session = trio::begin_session(&format!("vault.retrieve:{owner_id}:{content_hash}"));
 
-    let _ = trio::record_step(&session.id, &json!({
-        "step": "vault_retrieve",
-        "owner_id": owner_id,
-        "content_hash": content_hash,
-        "consent_provided": true,
-    }));
+    let _ = trio::record_step(
+        &session.id,
+        &json!({
+            "step": "vault_retrieve",
+            "owner_id": owner_id,
+            "content_hash": content_hash,
+            "consent_provided": true,
+        }),
+    );
 
     let data = nestgate_retrieve_vault(&format!("vault:{owner_id}:{content_hash}"));
 
@@ -164,17 +170,29 @@ fn verify_consent_via_beardog(_owner_id: &str, _scope: &str, _token: &str) -> bo
     use std::io::{BufRead, BufReader, Write};
     use std::os::unix::net::UnixStream;
 
-    let Ok(mut stream) = UnixStream::connect(&socket) else { return false };
-    stream.set_read_timeout(Some(std::time::Duration::from_secs(5))).ok();
-    let Ok(payload) = serde_json::to_string(&request) else { return false };
+    let Ok(mut stream) = UnixStream::connect(&socket) else {
+        return false;
+    };
+    stream
+        .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+        .ok();
+    let Ok(payload) = serde_json::to_string(&request) else {
+        return false;
+    };
     let mut line = payload;
     line.push('\n');
-    if stream.write_all(line.as_bytes()).is_err() { return false }
-    if stream.flush().is_err() { return false }
+    if stream.write_all(line.as_bytes()).is_err() {
+        return false;
+    }
+    if stream.flush().is_err() {
+        return false;
+    }
 
     let mut reader = BufReader::new(stream);
     let mut resp = String::new();
-    if reader.read_line(&mut resp).is_err() { return false }
+    if reader.read_line(&mut resp).is_err() {
+        return false;
+    }
 
     serde_json::from_str::<Value>(resp.trim())
         .ok()
@@ -187,7 +205,9 @@ fn blake3_hash(input: &[u8]) -> String {
 }
 
 fn nestgate_store_vault(key: &str, data: &str, content_hash: &str) {
-    let Some(socket) = trio::neural_api_socket() else { return };
+    let Some(socket) = trio::neural_api_socket() else {
+        return;
+    };
 
     let request = json!({
         "jsonrpc": "2.0",
@@ -207,9 +227,15 @@ fn nestgate_store_vault(key: &str, data: &str, content_hash: &str) {
     use std::io::{BufRead, BufReader, Write};
     use std::os::unix::net::UnixStream;
 
-    let Ok(mut stream) = UnixStream::connect(&socket) else { return };
-    stream.set_read_timeout(Some(std::time::Duration::from_secs(5))).ok();
-    let Ok(payload) = serde_json::to_string(&request) else { return };
+    let Ok(mut stream) = UnixStream::connect(&socket) else {
+        return;
+    };
+    stream
+        .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+        .ok();
+    let Ok(payload) = serde_json::to_string(&request) else {
+        return;
+    };
     let mut line = payload;
     line.push('\n');
     let _ = stream.write_all(line.as_bytes());
@@ -237,7 +263,9 @@ fn nestgate_retrieve_vault(key: &str) -> Option<String> {
     use std::os::unix::net::UnixStream;
 
     let mut stream = UnixStream::connect(&socket).ok()?;
-    stream.set_read_timeout(Some(std::time::Duration::from_secs(5))).ok();
+    stream
+        .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+        .ok();
     let mut line = serde_json::to_string(&request).ok()?;
     line.push('\n');
     stream.write_all(line.as_bytes()).ok()?;

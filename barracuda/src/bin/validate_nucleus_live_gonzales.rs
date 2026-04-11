@@ -8,6 +8,10 @@
     clippy::too_many_lines,
     reason = "validation harness: sequential domain checks in single main()"
 )]
+#![expect(
+    clippy::expect_used,
+    reason = "validation binary: expect is the pass/fail mechanism"
+)]
 //! # Exp311: Live NUCLEUS Gonzales — Full Stack Deployment Validation
 //!
 //! Validates that all NUCLEUS subsystems are operational and that the full
@@ -48,23 +52,43 @@ fn main() {
     // ═══════════════════════════════════════════════════════════════
     v.section("═══ D01: NUCLEUS Composition Health ═══");
 
-    let nucleus = dispatch("composition.nucleus_health", &json!({}))
-        .expect("nucleus_health dispatch failed");
+    let nucleus =
+        dispatch("composition.nucleus_health", &json!({})).expect("nucleus_health dispatch failed");
 
-    let tower_ok = nucleus["tower"]["healthy"].as_bool().unwrap_or(false);
-    let node_ok = nucleus["node"]["healthy"].as_bool().unwrap_or(false);
-    let nest_ok = nucleus["nest"]["healthy"].as_bool().unwrap_or(false);
-    let trio_ok = nucleus["trio"]["healthy"].as_bool().unwrap_or(false);
-    let nucleus_ok = nucleus["nucleus"]["healthy"].as_bool().unwrap_or(false);
+    let tower_ok = nucleus["tiers"]["tower"].as_bool().unwrap_or(false);
+    let node_ok = nucleus["tiers"]["node"].as_bool().unwrap_or(false);
+    let nest_ok = nucleus["tiers"]["nest"].as_bool().unwrap_or(false);
+    let trio_ok = nucleus["tiers"]["provenance_trio"]
+        .as_bool()
+        .unwrap_or(false);
+    let nucleus_ok = nucleus["healthy"].as_bool().unwrap_or(false);
 
-    println!("  Tower (BearDog+Songbird): {}", if tower_ok { "UP" } else { "DOWN" });
-    println!("  Node  (Tower+ToadStool):  {}", if node_ok { "UP" } else { "DOWN" });
-    println!("  Nest  (Tower+NestGate):   {}", if nest_ok { "UP" } else { "DOWN" });
-    println!("  Trio  (rhizo+loam+sweet): {}", if trio_ok { "UP" } else { "DOWN" });
-    println!("  NUCLEUS:                  {}", if nucleus_ok { "FULL" } else { "PARTIAL" });
+    println!(
+        "  Tower (BearDog+Songbird): {}",
+        if tower_ok { "UP" } else { "DOWN" }
+    );
+    println!(
+        "  Node  (Tower+ToadStool):  {}",
+        if node_ok { "UP" } else { "DOWN" }
+    );
+    println!(
+        "  Nest  (Tower+NestGate):   {}",
+        if nest_ok { "UP" } else { "DOWN" }
+    );
+    println!(
+        "  Trio  (rhizo+loam+sweet): {}",
+        if trio_ok { "UP" } else { "DOWN" }
+    );
+    println!(
+        "  NUCLEUS:                  {}",
+        if nucleus_ok { "FULL" } else { "PARTIAL" }
+    );
 
     // These are informational — we don't fail the whole suite if a primal isn't up yet
-    v.check_pass("nucleus: health probe returns valid JSON", nucleus.is_object());
+    v.check_pass(
+        "nucleus: health probe returns valid JSON",
+        nucleus.is_object(),
+    );
 
     // ═══════════════════════════════════════════════════════════════
     // D02: NestGate storage round-trip (via vault handlers)
@@ -72,11 +96,14 @@ fn main() {
     v.section("═══ D02: NestGate Storage Round-Trip ═══");
 
     let test_data = r#"{"JAK1": 10.0, "IL-31": 71.0}"#;
-    let store_result = dispatch("vault.store", &json!({
-        "owner_id": "nucleus-validation",
-        "label": "gonzales_ic50_test",
-        "data": test_data,
-    }));
+    let store_result = dispatch(
+        "vault.store",
+        &json!({
+            "owner_id": "nucleus-validation",
+            "label": "gonzales_ic50_test",
+            "data": test_data,
+        }),
+    );
 
     let stored = store_result.expect("vault.store dispatch failed");
     let store_status = stored["status"].as_str().unwrap_or("unknown");
@@ -99,15 +126,17 @@ fn main() {
         );
     }
 
-    let retrieve_result = dispatch("vault.retrieve", &json!({
-        "owner_id": "nucleus-validation",
-        "content_hash": store_hash,
-        "consent_token": "nucleus-validation-token",
-    }));
+    let retrieve_result = dispatch(
+        "vault.retrieve",
+        &json!({
+            "owner_id": "nucleus-validation",
+            "content_hash": store_hash,
+            "consent_token": "nucleus-validation-token",
+        }),
+    );
 
     let retrieved = retrieve_result.expect("vault.retrieve dispatch failed");
-    let has_data = retrieved.get("data").is_some()
-        && !retrieved["data"].is_null();
+    let has_data = retrieved.get("data").is_some() && !retrieved["data"].is_null();
     let data_matches = retrieved["data"].as_str().map_or(false, |s| s == test_data);
     println!(
         "  Retrieve status: {}",
@@ -122,7 +151,9 @@ fn main() {
     if data_matches {
         v.check_pass("nestgate: retrieve returns stored data (round-trip)", true);
     } else {
-        println!("  [INFO] NestGate not running — vault store is best-effort. Deploy NestGate to complete.");
+        println!(
+            "  [INFO] NestGate not running — vault store is best-effort. Deploy NestGate to complete."
+        );
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -130,14 +161,20 @@ fn main() {
     // ═══════════════════════════════════════════════════════════════
     v.section("═══ D03: Provenance Trio Session ═══");
 
-    let reg = dispatch("data.fetch.register_table", &json!({
-        "doi": "10.1111/jvp.12065",
-        "table_id": "table_1_nucleus_test",
-        "values": {"JAK1_enzyme": {"ic50_nm": 10.0}},
-    }))
+    let reg = dispatch(
+        "data.fetch.register_table",
+        &json!({
+            "doi": "10.1111/jvp.12065",
+            "table_id": "table_1_nucleus_test",
+            "values": {"JAK1_enzyme": {"ic50_nm": 10.0}},
+        }),
+    )
     .expect("register_table dispatch failed");
 
-    v.check_pass("trio: register_table returns status=registered", reg["status"] == "registered");
+    v.check_pass(
+        "trio: register_table returns status=registered",
+        reg["status"] == "registered",
+    );
 
     let prov = &reg["provenance"];
     let session_id = prov["session_id"].as_str();
@@ -167,17 +204,24 @@ fn main() {
     // ═══════════════════════════════════════════════════════════════
     v.section("═══ D04: BearDog Consent Verification ═══");
 
-    let consent = dispatch("vault.consent.verify", &json!({
-        "owner_id": "nucleus-validation",
-        "scope": "read",
-        "consent_token": "test-nucleus-consent",
-    }))
+    let consent = dispatch(
+        "vault.consent.verify",
+        &json!({
+            "owner_id": "nucleus-validation",
+            "scope": "read",
+            "consent_token": "test-nucleus-consent",
+        }),
+    )
     .expect("consent.verify dispatch failed");
 
     let consent_valid = consent["valid"].as_bool().unwrap_or(false);
     println!(
         "  Consent verification: {}",
-        if consent_valid { "verified by BearDog" } else { "unverified (BearDog offline)" }
+        if consent_valid {
+            "verified by BearDog"
+        } else {
+            "unverified (BearDog offline)"
+        }
     );
     if consent_valid {
         v.check_pass("beardog: consent verification works", true);
@@ -205,22 +249,33 @@ fn main() {
         }
         v.check_pass("pipeline: ChEMBL gap report surfaced", true);
     } else {
-        v.check_pass("pipeline: ChEMBL data loaded via primal composition", chembl_ok);
+        v.check_pass(
+            "pipeline: ChEMBL data loaded via primal composition",
+            chembl_ok,
+        );
     }
 
-    let dr = dispatch("science.gonzales.dose_response", &json!({
-        "n_points": 50, "dose_max": 500.0, "hill_n": 1.0,
-    }))
+    let dr = dispatch(
+        "science.gonzales.dose_response",
+        &json!({
+            "n_points": 50, "dose_max": 500.0, "hill_n": 1.0,
+        }),
+    )
     .expect("dose_response failed");
     v.check_pass("pipeline: dose_response computed", dr["curves"].is_array());
 
-    let pk = dispatch("science.gonzales.pk_decay", &json!({}))
-        .expect("pk_decay failed");
-    v.check_pass("pipeline: pk_decay computed", pk.get("dose_profiles").is_some());
+    let pk = dispatch("science.gonzales.pk_decay", &json!({})).expect("pk_decay failed");
+    v.check_pass(
+        "pipeline: pk_decay computed",
+        pk.get("dose_profiles").is_some(),
+    );
 
-    let tissue = dispatch("science.gonzales.tissue_lattice", &json!({}))
-        .expect("tissue_lattice failed");
-    v.check_pass("pipeline: tissue_lattice computed", tissue.get("scenarios").is_some() || tissue.get("profiles").is_some());
+    let tissue =
+        dispatch("science.gonzales.tissue_lattice", &json!({})).expect("tissue_lattice failed");
+    v.check_pass(
+        "pipeline: tissue_lattice computed",
+        tissue.get("scenarios").is_some() || tissue.get("profiles").is_some(),
+    );
 
     // ═══════════════════════════════════════════════════════════════
     // D06: Stage 5 verdict
@@ -234,10 +289,18 @@ fn main() {
         println!("  Stage 5:    COMPLETE — NUCLEUS composition with provenance");
     } else {
         println!("  Stage 5:    PARTIAL — gaps for primalSpring:");
-        if merkle.is_none()  { println!("              → rhizoCrypt: DAG sessions + Merkle roots"); }
-        if braid.is_none()   { println!("              → sweetGrass: semantic provenance braids"); }
-        if chembl_is_gap     { println!("              → NestGate: storage.fetch_external for TLS"); }
-        if !consent_valid    { println!("              → BearDog: Dark Forest consent verification"); }
+        if merkle.is_none() {
+            println!("              → rhizoCrypt: DAG sessions + Merkle roots");
+        }
+        if braid.is_none() {
+            println!("              → sweetGrass: semantic provenance braids");
+        }
+        if chembl_is_gap {
+            println!("              → NestGate: storage.fetch_external for TLS");
+        }
+        if !consent_valid {
+            println!("              → BearDog: Dark Forest consent verification");
+        }
     }
 
     v.check_pass("pipeline: all science computations succeed", true);

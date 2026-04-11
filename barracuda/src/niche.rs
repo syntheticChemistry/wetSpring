@@ -29,7 +29,8 @@ pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry valid
 pub const NICHE_VERSION: &str = "1.0.0";
 
 use crate::primal_names::{
-    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SWEETGRASS, TOADSTOOL,
+    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SQUIRREL, SWEETGRASS,
+    TOADSTOOL,
 };
 
 /// Primals this niche depends on (germination order matters).
@@ -82,6 +83,12 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
         required: false,
         capability: "visualization",
     },
+    NicheDependency {
+        name: SQUIRREL,
+        role: "ai",
+        required: false,
+        capability: "ai",
+    },
 ];
 
 /// All capabilities this niche exposes to biomeOS.
@@ -89,6 +96,11 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 /// Derived from `ipc::capability_domains::DOMAINS` — kept as a flat list
 /// for biomeOS registration and Songbird advertisement.
 pub const CAPABILITIES: &[&str] = &[
+    // ── health / discovery (biomeOS infrastructure) ──
+    "capability.list",
+    "health.check",
+    "health.liveness",
+    "health.readiness",
     // ── ecology (science) ──
     "science.diversity",
     "science.qs_model",
@@ -102,6 +114,14 @@ pub const CAPABILITIES: &[&str] = &[
     "science.timeseries_diversity",
     "science.ncbi_fetch",
     "science.full_pipeline",
+    // ── Gonzales dermatitis / immunological Anderson ──
+    "science.gonzales.dose_response",
+    "science.gonzales.pk_decay",
+    "science.gonzales.tissue_lattice",
+    "science.anderson.biome_atlas",
+    "science.anderson.disorder_sweep",
+    "science.anderson.hormesis",
+    "science.anderson.cross_species",
     // ── provenance trio ──
     "provenance.begin",
     "provenance.record",
@@ -114,12 +134,24 @@ pub const CAPABILITIES: &[&str] = &[
     "metrics.snapshot",
     // ── AI assist (Squirrel) ──
     "ai.ecology_interpret",
+    // ── external data ingestion ──
+    "data.fetch.chembl",
+    "data.fetch.pubchem",
+    "data.fetch.register_table",
+    // ── vault (consent-gated storage) ──
+    "vault.store",
+    "vault.retrieve",
+    "vault.consent.verify",
+    // ── composition health (cross-spring validation) ──
+    "composition.science_health",
+    "composition.tower_health",
+    "composition.node_health",
+    "composition.nest_health",
+    "composition.nucleus_health",
     // ── ecosystem client integrations (optional primals) ──
     "integration.sweetgrass.braid",
     "integration.toadstool.performance_surface",
     "protocol.stream_item",
-    // ── niche infrastructure ──
-    "capability.list",
 ];
 
 /// A primal dependency for this niche.
@@ -199,18 +231,25 @@ pub fn cost_estimates() -> serde_json::Value {
 #[must_use]
 pub fn ecology_semantic_mappings() -> serde_json::Value {
     serde_json::json!({
-        "diversity":       "science.diversity",
-        "qs_model":        "science.qs_model",
-        "anderson":        "science.anderson",
-        "kinetics":        "science.kinetics",
-        "alignment":       "science.alignment",
-        "taxonomy":        "science.taxonomy",
-        "phylogenetics":   "science.phylogenetics",
-        "nmf":             "science.nmf",
+        "diversity":              "science.diversity",
+        "qs_model":               "science.qs_model",
+        "anderson":               "science.anderson",
+        "kinetics":               "science.kinetics",
+        "alignment":              "science.alignment",
+        "taxonomy":               "science.taxonomy",
+        "phylogenetics":          "science.phylogenetics",
+        "nmf":                    "science.nmf",
         "timeseries":             "science.timeseries",
         "timeseries_diversity":   "science.timeseries_diversity",
         "ncbi_fetch":             "science.ncbi_fetch",
-        "full_pipeline":   "science.full_pipeline",
+        "full_pipeline":          "science.full_pipeline",
+        "gonzales_dose_response": "science.gonzales.dose_response",
+        "gonzales_pk_decay":      "science.gonzales.pk_decay",
+        "gonzales_tissue_lattice":"science.gonzales.tissue_lattice",
+        "anderson_biome_atlas":   "science.anderson.biome_atlas",
+        "anderson_disorder_sweep":"science.anderson.disorder_sweep",
+        "anderson_hormesis":      "science.anderson.hormesis",
+        "anderson_cross_species": "science.anderson.cross_species",
     })
 }
 
@@ -276,8 +315,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            24,
-            "21 science/provenance/brain/metrics/ai + 3 ecosystem integrations + capability.list"
+            45,
+            "4 health + 19 science + 3 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 5 composition + 3 ecosystem integrations"
         );
     }
 

@@ -369,9 +369,10 @@ mod tests {
             ) {
                 let known = [
                     "health.check", "health.liveness", "health.readiness",
-                    "capability.list", "science.diversity", "science.qs_model",
-                    "science.anderson", "science.kinetics", "science.alignment",
-                    "science.taxonomy", "science.phylogenetics", "science.nmf",
+                    "capability.list",
+                    "science.diversity", "science.qs_model", "science.anderson",
+                    "science.kinetics", "science.alignment", "science.taxonomy",
+                    "science.phylogenetics", "science.nmf",
                     "science.ncbi_fetch", "science.full_pipeline",
                     "science.timeseries", "science.timeseries_diversity",
                     "science.gonzales.dose_response", "science.gonzales.pk_decay",
@@ -381,6 +382,11 @@ mod tests {
                     "provenance.begin", "provenance.record", "provenance.complete",
                     "brain.observe", "brain.attention", "brain.urgency",
                     "ai.ecology_interpret",
+                    "data.fetch.chembl", "data.fetch.pubchem", "data.fetch.register_table",
+                    "vault.store", "vault.retrieve", "vault.consent.verify",
+                    "composition.science_health", "composition.tower_health",
+                    "composition.node_health", "composition.nest_health",
+                    "composition.nucleus_health",
                 ];
                 if !known.contains(&method.as_str()) {
                     let err = dispatch(&method, &json!({})).unwrap_err();
