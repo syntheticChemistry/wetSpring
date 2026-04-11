@@ -1,5 +1,10 @@
 # Ecosystem Leverage Guide — wetSpring V128
 
+> **V141 note (Apr 11, 2026):** This guide was written at V128. Current
+> metrics, capability counts, and primal evolution status are in
+> `ABSORPTION_MANIFEST.md` (V141 banner) and
+> `handoffs/WETSPRING_V141_AUDIT_REMEDIATION_HANDOFF_APR11_2026.md`.
+
 **Date:** March 18, 2026
 **Scope:** What wetSpring absorbs from the ecoPrimals ecosystem and what it contributes back.
 

@@ -18,7 +18,7 @@ fn clamp_u64(v: u64, max: u64) -> u64 {
     v.min(max)
 }
 
-fn clamp_f64(v: f64, max: f64) -> f64 {
+const fn clamp_f64(v: f64, max: f64) -> f64 {
     v.min(max).max(0.0)
 }
 
@@ -94,11 +94,11 @@ pub async fn dose_response(
     let rpc_params = json!({
         "n_points": clamp_u64(params.n_points.unwrap_or(50), MAX_POINTS),
         "dose_max": clamp_f64(params.dose_max.unwrap_or(500.0), MAX_DOSE),
-        "hill_n": params.hill_n.unwrap_or(1.0).max(0.1).min(10.0),
+        "hill_n": params.hill_n.unwrap_or(1.0).clamp(0.1, 10.0),
     });
 
-    let result =
-        ipc_client::call("science.gonzales.dose_response", &rpc_params).map_err(ipc_error)?;
+    let result = ipc_client::call("science.gonzales.dose_response", &rpc_params)
+        .map_err(|e| ipc_error(&e))?;
 
     let node = shaping::shape_dose_response(&result);
     let prov = provenance::envelope("science.gonzales.dose_response", &rpc_params, &result);
@@ -106,7 +106,7 @@ pub async fn dose_response(
     Ok(Json(shaping::scenario_envelope(
         "Gonzales Dose-Response (Live)",
         "IC50 dose-response for 6 cytokine pathways — live from wetSpring",
-        vec![node],
+        std::slice::from_ref(&node),
         &prov,
     )))
 }
@@ -120,7 +120,8 @@ pub async fn pk_decay(
         "t_max_days": clamp_f64(params.t_max_days.unwrap_or(56.0), MAX_DAYS),
     });
 
-    let result = ipc_client::call("science.gonzales.pk_decay", &rpc_params).map_err(ipc_error)?;
+    let result =
+        ipc_client::call("science.gonzales.pk_decay", &rpc_params).map_err(|e| ipc_error(&e))?;
 
     let node = shaping::shape_pk_decay(&result);
     let prov = provenance::envelope("science.gonzales.pk_decay", &rpc_params, &result);
@@ -128,7 +129,7 @@ pub async fn pk_decay(
     Ok(Json(shaping::scenario_envelope(
         "Lokivetmab PK Decay (Live)",
         "Pharmacokinetic decay profiles — live from wetSpring",
-        vec![node],
+        std::slice::from_ref(&node),
         &prov,
     )))
 }
@@ -143,8 +144,8 @@ pub async fn tissue_lattice(
         "seed": params.seed.unwrap_or(42),
     });
 
-    let result =
-        ipc_client::call("science.gonzales.tissue_lattice", &rpc_params).map_err(ipc_error)?;
+    let result = ipc_client::call("science.gonzales.tissue_lattice", &rpc_params)
+        .map_err(|e| ipc_error(&e))?;
 
     let node = shaping::shape_tissue_lattice(&result);
     let prov = provenance::envelope("science.gonzales.tissue_lattice", &rpc_params, &result);
@@ -152,7 +153,7 @@ pub async fn tissue_lattice(
     Ok(Json(shaping::scenario_envelope(
         "Tissue Geometry (Live)",
         "AD severity profiles with Anderson disorder mapping — live from wetSpring",
-        vec![node],
+        std::slice::from_ref(&node),
         &prov,
     )))
 }
@@ -171,7 +172,8 @@ pub async fn hormesis(
         "dose_max": clamp_f64(params.dose_max.unwrap_or(200.0), MAX_DOSE),
     });
 
-    let result = ipc_client::call("science.anderson.hormesis", &rpc_params).map_err(ipc_error)?;
+    let result =
+        ipc_client::call("science.anderson.hormesis", &rpc_params).map_err(|e| ipc_error(&e))?;
 
     let node = shaping::shape_hormesis(&result);
     let prov = provenance::envelope("science.anderson.hormesis", &rpc_params, &result);
@@ -179,7 +181,7 @@ pub async fn hormesis(
     Ok(Json(shaping::scenario_envelope(
         "Hormesis (Live)",
         "Biphasic dose-response with Anderson disorder mapping — live from wetSpring",
-        vec![node],
+        std::slice::from_ref(&node),
         &prov,
     )))
 }
@@ -190,8 +192,8 @@ pub async fn cross_species(
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     let rpc_params = json!({});
 
-    let result =
-        ipc_client::call("science.anderson.cross_species", &rpc_params).map_err(ipc_error)?;
+    let result = ipc_client::call("science.anderson.cross_species", &rpc_params)
+        .map_err(|e| ipc_error(&e))?;
 
     let node = shaping::shape_cross_species(&result);
     let prov = provenance::envelope("science.anderson.cross_species", &rpc_params, &result);
@@ -199,7 +201,7 @@ pub async fn cross_species(
     Ok(Json(shaping::scenario_envelope(
         "Cross-Species Comparison (Live)",
         "Tissue geometry across dog, cat, human, horse, mouse — live from wetSpring",
-        vec![node],
+        std::slice::from_ref(&node),
         &prov,
     )))
 }
@@ -208,7 +210,7 @@ pub async fn cross_species(
 pub async fn biome_atlas() -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     let rpc_params = json!({});
     let result =
-        ipc_client::call("science.anderson.biome_atlas", &rpc_params).map_err(ipc_error)?;
+        ipc_client::call("science.anderson.biome_atlas", &rpc_params).map_err(|e| ipc_error(&e))?;
 
     let prov = provenance::envelope("science.anderson.biome_atlas", &rpc_params, &result);
 
@@ -226,8 +228,8 @@ pub async fn biome_atlas() -> Result<Json<Value>, (StatusCode, Json<Value>)> {
 /// Anderson localization finite-size scaling sweep.
 pub async fn disorder_sweep() -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     let rpc_params = json!({});
-    let result =
-        ipc_client::call("science.anderson.disorder_sweep", &rpc_params).map_err(ipc_error)?;
+    let result = ipc_client::call("science.anderson.disorder_sweep", &rpc_params)
+        .map_err(|e| ipc_error(&e))?;
 
     let prov = provenance::envelope("science.anderson.disorder_sweep", &rpc_params, &result);
 
@@ -246,25 +248,30 @@ pub async fn disorder_sweep() -> Result<Json<Value>, (StatusCode, Json<Value>)> 
 pub async fn provenance_query(
     axum::extract::Path(result_id): axum::extract::Path<String>,
 ) -> Json<Value> {
-    if let Some(tier3) = provenance::try_tier3(&result_id) {
-        Json(tier3)
-    } else {
-        Json(json!({
-            "error": "provenance_unavailable",
-            "message": "Provenance trio not reachable or result_id not found",
-            "result_id": result_id,
-        }))
-    }
+    provenance::try_tier3(&result_id).map_or_else(
+        || {
+            Json(json!({
+                "error": "provenance_unavailable",
+                "message": "Provenance trio not reachable or result_id not found",
+                "result_id": result_id,
+            }))
+        },
+        Json,
+    )
 }
 
 /// Full dashboard — combines all Gonzales + Anderson endpoints.
 pub async fn full_dashboard() -> Result<Json<Value>, (StatusCode, Json<Value>)> {
-    let dr = ipc_client::call("science.gonzales.dose_response", &json!({})).map_err(ipc_error)?;
-    let pk = ipc_client::call("science.gonzales.pk_decay", &json!({})).map_err(ipc_error)?;
-    let tissue =
-        ipc_client::call("science.gonzales.tissue_lattice", &json!({})).map_err(ipc_error)?;
-    let horm = ipc_client::call("science.anderson.hormesis", &json!({})).map_err(ipc_error)?;
-    let xs = ipc_client::call("science.anderson.cross_species", &json!({})).map_err(ipc_error)?;
+    let dr = ipc_client::call("science.gonzales.dose_response", &json!({}))
+        .map_err(|e| ipc_error(&e))?;
+    let pk =
+        ipc_client::call("science.gonzales.pk_decay", &json!({})).map_err(|e| ipc_error(&e))?;
+    let tissue = ipc_client::call("science.gonzales.tissue_lattice", &json!({}))
+        .map_err(|e| ipc_error(&e))?;
+    let horm =
+        ipc_client::call("science.anderson.hormesis", &json!({})).map_err(|e| ipc_error(&e))?;
+    let xs = ipc_client::call("science.anderson.cross_species", &json!({}))
+        .map_err(|e| ipc_error(&e))?;
 
     let nodes = vec![
         shaping::shape_dose_response(&dr),
@@ -285,7 +292,7 @@ pub async fn full_dashboard() -> Result<Json<Value>, (StatusCode, Json<Value>)> 
     Ok(Json(shaping::scenario_envelope(
         "Full Gonzales Dashboard (Live)",
         "Complete Gonzales dermatitis + Anderson science — live from wetSpring",
-        nodes,
+        &nodes,
         &prov,
     )))
 }
@@ -299,10 +306,10 @@ pub async fn grammar_dose_response(
     let rpc_params = json!({
         "n_points": clamp_u64(params.n_points.unwrap_or(50), MAX_POINTS),
         "dose_max": clamp_f64(params.dose_max.unwrap_or(500.0), MAX_DOSE),
-        "hill_n": params.hill_n.unwrap_or(1.0).max(0.1).min(10.0),
+        "hill_n": params.hill_n.unwrap_or(1.0).clamp(0.1, 10.0),
     });
-    let result =
-        ipc_client::call("science.gonzales.dose_response", &rpc_params).map_err(ipc_error)?;
+    let result = ipc_client::call("science.gonzales.dose_response", &rpc_params)
+        .map_err(|e| ipc_error(&e))?;
     let (grammar, data) = super::grammar::dose_response_grammar(&result);
     grammar_response("gonzales_dose_response", &grammar, &data, "health")
 }
@@ -315,7 +322,8 @@ pub async fn grammar_pk_decay(
         "n_points": clamp_u64(params.n_points.unwrap_or(100), MAX_POINTS),
         "t_max_days": clamp_f64(params.t_max_days.unwrap_or(56.0), MAX_DAYS),
     });
-    let result = ipc_client::call("science.gonzales.pk_decay", &rpc_params).map_err(ipc_error)?;
+    let result =
+        ipc_client::call("science.gonzales.pk_decay", &rpc_params).map_err(|e| ipc_error(&e))?;
     let (grammar, data) = super::grammar::pk_decay_grammar(&result);
     grammar_response("gonzales_pk", &grammar, &data, "health")
 }
@@ -329,8 +337,8 @@ pub async fn grammar_tissue_lattice(
         "n_profiles": clamp_u64(params.n_profiles.unwrap_or(6), 6),
         "seed": params.seed.unwrap_or(42),
     });
-    let result =
-        ipc_client::call("science.gonzales.tissue_lattice", &rpc_params).map_err(ipc_error)?;
+    let result = ipc_client::call("science.gonzales.tissue_lattice", &rpc_params)
+        .map_err(|e| ipc_error(&e))?;
     let (grammar, data) = super::grammar::tissue_lattice_grammar(&result);
     grammar_response("tissue_lattice", &grammar, &data, "health")
 }
@@ -348,7 +356,8 @@ pub async fn grammar_hormesis(
         "n_points": clamp_u64(params.n_points.unwrap_or(100), MAX_POINTS),
         "dose_max": clamp_f64(params.dose_max.unwrap_or(200.0), MAX_DOSE),
     });
-    let result = ipc_client::call("science.anderson.hormesis", &rpc_params).map_err(ipc_error)?;
+    let result =
+        ipc_client::call("science.anderson.hormesis", &rpc_params).map_err(|e| ipc_error(&e))?;
     let (grammar, data) = super::grammar::hormesis_grammar(&result);
     grammar_response("hormesis", &grammar, &data, "health")
 }
@@ -357,8 +366,8 @@ pub async fn grammar_hormesis(
 pub async fn grammar_cross_species(
     Query(_params): Query<CrossSpeciesParams>,
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
-    let result =
-        ipc_client::call("science.anderson.cross_species", &json!({})).map_err(ipc_error)?;
+    let result = ipc_client::call("science.anderson.cross_species", &json!({}))
+        .map_err(|e| ipc_error(&e))?;
     let (grammar, data) = super::grammar::cross_species_grammar(&result);
     grammar_response("cross_species", &grammar, &data, "health")
 }
@@ -369,26 +378,33 @@ fn grammar_response(
     data: &[Value],
     domain: &str,
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
-    match super::grammar::render_grammar(grammar, data, domain) {
-        Some(render_result) => Ok(Json(json!({
-            "id": id,
-            "renderer": "petaltongue",
-            "modality": render_result.get("modality").unwrap_or(&json!("svg")),
-            "svg": render_result.get("output"),
-            "scene_nodes": render_result.get("scene_nodes"),
-            "total_primitives": render_result.get("total_primitives"),
-            "tufte_report": render_result.get("tufte_report"),
-            "grammar": grammar,
-        }))),
-        None => Err((
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(json!({
-                "error": "petaltongue_unavailable",
-                "message": "petalTongue RPC not reachable — use Plotly.js renderer",
-                "fallback": "plotly",
-            })),
-        )),
-    }
+    super::grammar::render_grammar(grammar, data, domain).map_or_else(
+        || {
+            Err((
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(json!({
+                    "error": "petaltongue_unavailable",
+                    "message": "petalTongue RPC not reachable — use Plotly.js renderer",
+                    "fallback": "plotly",
+                })),
+            ))
+        },
+        |render_result| {
+            Ok(Json(json!({
+                "id": id,
+                "renderer": "petaltongue",
+                "modality": render_result
+                    .get("modality")
+                    .cloned()
+                    .unwrap_or_else(|| json!("svg")),
+                "svg": render_result.get("output"),
+                "scene_nodes": render_result.get("scene_nodes"),
+                "total_primitives": render_result.get("total_primitives"),
+                "tufte_report": render_result.get("tufte_report"),
+                "grammar": grammar,
+            })))
+        },
+    )
 }
 
 /// Validation chain endpoint: returns the full paper-to-code-to-primal chain.
@@ -399,8 +415,8 @@ pub async fn validation_chain(
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     const REGISTRY: &str = include_str!("../../data/reference_registry.json");
 
-    let registry: Value =
-        serde_json::from_str(REGISTRY).unwrap_or(json!({"error": "registry parse failure"}));
+    let registry: Value = serde_json::from_str(REGISTRY)
+        .unwrap_or_else(|_| json!({"error": "registry parse failure"}));
 
     let paper = registry
         .get("papers")
@@ -421,8 +437,8 @@ pub async fn validation_chain(
         })?;
 
     let live_computation = if paper_id == "gonzales_2014" {
-        let result =
-            ipc_client::call("science.gonzales.dose_response", &json!({})).map_err(ipc_error)?;
+        let result = ipc_client::call("science.gonzales.dose_response", &json!({}))
+            .map_err(|e| ipc_error(&e))?;
 
         let ic50s: Vec<Value> = result
             .get("curves")
@@ -509,7 +525,7 @@ pub async fn system_composition() -> Json<Value> {
     const BONDING_METADATA_RAW: &str = include_str!("../../data/bonding_metadata.json");
 
     let bonding: Value = serde_json::from_str(BONDING_METADATA_RAW)
-        .unwrap_or(json!({"error": "bonding metadata parse failure"}));
+        .unwrap_or_else(|_| json!({"error": "bonding metadata parse failure"}));
 
     let ipc_ok = ipc_client::call("health.check", &json!({})).is_ok();
 
@@ -521,7 +537,7 @@ pub async fn system_composition() -> Json<Value> {
         .unwrap_or(json!([]));
 
     let composition_health = ipc_client::call("composition.science_health", &json!({}))
-        .unwrap_or(json!({"status": "unavailable"}));
+        .unwrap_or_else(|_| json!({"status": "unavailable"}));
 
     let graph_validation = super::graph_validate::validate_graph(DEPLOY_GRAPH).to_json();
     let breaker = provenance::breaker_status();
@@ -555,7 +571,7 @@ pub async fn system_composition() -> Json<Value> {
     }))
 }
 
-fn ipc_error(msg: String) -> (StatusCode, Json<Value>) {
+fn ipc_error(msg: &str) -> (StatusCode, Json<Value>) {
     (
         StatusCode::BAD_GATEWAY,
         Json(json!({

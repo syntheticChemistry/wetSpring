@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** April 10, 2026  
+**Date:** April 11, 2026  
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -9,9 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V140** | `handoffs/WETSPRING_V140_COMPOSITION_AUDIT_EVOLUTION_HANDOFF_APR10_2026.md` | Apr 10 | **Composition validation evolution**: three-tier validation (Python→Rust→Primal→ecoBin), deploy graph canonicalization, tolerance provenance trail, ecosystem audit resolution, primal team handback. |
-| V140 | `handoffs/WETSPRING_V140_PRIMAL_EVOLUTION_HANDOFF_APR10_2026.md` | Apr 10 | Primal evolution: per-primal findings, composition patterns, deploy graph standard, ecoBin harvest path, gaps handed back. |
-| | *Superseded → `handoffs/archive/`* | | V139, V138, V137 and earlier are archived (**149** files). |
+| **V141** | `handoffs/WETSPRING_V141_AUDIT_REMEDIATION_HANDOFF_APR11_2026.md` | Apr 11 | **Audit remediation**: capability alignment (21 domains), cross-check CI, proto-nucleate test-time validation, provenance run commands, TensorSession PoC, PRIMAL_GAPS.md (7 gaps), primal evolution per-primal, NUCLEUS deployment via biomeOS/neuralAPI, patterns for spring teams. |
+| | *Superseded → `handoffs/archive/`* | | V140 and earlier are archived (**151** files). |
 
 ## Cross-Spring Documents
 
@@ -23,7 +22,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — **V139 and earlier** are archived (**149** files).  
+Superseded handoffs in `handoffs/archive/` — **V140 and earlier** are archived (**151** files).  
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → ecoBin harvest.
 
 ## Convention

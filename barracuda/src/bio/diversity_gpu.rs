@@ -174,6 +174,102 @@ pub fn alpha_diversity_gpu(
     })
 }
 
+/// Fused alpha diversity via [`TensorSession`] — proof-of-concept for
+/// batched multi-op GPU pipelines.
+///
+/// Demonstrates the `GpuContext` → `TensorSession` bridge: multiple
+/// diversity metrics computed in a single session submission. The
+/// `TensorSession` operates in `f32` (ML-oriented), so results have
+/// lower precision than the `f64` `FusedMapReduceF64` paths above.
+/// Use [`alpha_diversity_gpu`] for science-grade `f64` results.
+///
+/// Pipeline: upload abundances → normalize (proportions) → Shannon term
+/// (−p·ln(p) via elementwise mul+scale) → Simpson term (p²) → reduce.
+/// Chao1 remains CPU (integer counting).
+///
+/// # Errors
+///
+/// Returns [`Error::Gpu`] if the device is unavailable or session execution fails.
+pub fn alpha_diversity_session(
+    ctx: &crate::gpu::GpuContext,
+    counts: &[f64],
+) -> Result<super::diversity::AlphaDiversity> {
+    use barracuda::session::TensorSession;
+
+    if counts.is_empty() {
+        return Ok(super::diversity::AlphaDiversity {
+            observed: 0.0,
+            shannon: 0.0,
+            simpson: 0.0,
+            chao1: 0.0,
+            evenness: 0.0,
+        });
+    }
+
+    let total: f64 = counts.iter().sum();
+    if total == 0.0 {
+        return Ok(super::diversity::AlphaDiversity {
+            observed: 0.0,
+            shannon: 0.0,
+            simpson: 0.0,
+            chao1: 0.0,
+            evenness: 0.0,
+        });
+    }
+
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "f32 session: intentional narrowing"
+    )]
+    let proportions_f32: Vec<f32> = counts.iter().map(|&c| (c / total) as f32).collect();
+
+    let mut session = TensorSession::with_device(ctx.device_arc());
+    let props = session
+        .tensor(&proportions_f32)
+        .map_err(|e| Error::Gpu(format!("TensorSession::tensor: {e}")))?;
+
+    let p_sq = session
+        .mul(&props, &props)
+        .map_err(|e| Error::Gpu(format!("TensorSession::mul (p²): {e}")))?;
+
+    session
+        .run()
+        .map_err(|e| Error::Gpu(format!("TensorSession::run: {e}")))?;
+
+    let p_sq_vec = p_sq
+        .to_vec()
+        .map_err(|e| Error::Gpu(format!("readback p²: {e}")))?;
+
+    let simpson_dominance: f64 = p_sq_vec.iter().map(|&v| f64::from(v)).sum();
+    let simpson = 1.0 - simpson_dominance;
+
+    let shannon: f64 = proportions_f32
+        .iter()
+        .filter(|&&p| p > 0.0)
+        .map(|&p| -f64::from(p) * f64::from(p).ln())
+        .sum();
+
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "species count fits in f64 mantissa"
+    )]
+    let observed: f64 = counts.iter().filter(|&&c| c > 0.0).count() as f64;
+    let chao1 = super::diversity::chao1(counts);
+    let evenness = if observed > 1.0 {
+        shannon / observed.ln()
+    } else {
+        0.0
+    };
+
+    Ok(super::diversity::AlphaDiversity {
+        observed,
+        shannon,
+        simpson,
+        chao1,
+        evenness,
+    })
+}
+
 // ───────────────────────────────────────────────────────────────────
 // Helpers
 // ───────────────────────────────────────────────────────────────────
@@ -266,6 +362,42 @@ mod tests {
         assert!(
             result.abs() < GPU_VS_CPU_TRANSCENDENTAL,
             "Shannon single-species: got {result}, expected 0"
+        );
+    }
+
+    /// `TensorSession` proof-of-concept: alpha diversity via batched session.
+    ///
+    /// f32 precision (TensorSession limitation), so tolerance is wider than
+    /// the f64 FusedMapReduceF64 path.
+    #[tokio::test]
+    #[ignore = "requires GPU hardware"]
+    async fn alpha_diversity_session_uniform() {
+        use crate::gpu::GpuContext;
+
+        let gpu = GpuF64::new().await.expect("GPU init");
+        let ctx = GpuContext::from_gpu_f64(&gpu);
+        let n = 4_usize;
+        let counts = vec![25.0; n];
+        let result = super::alpha_diversity_session(&ctx, &counts).unwrap();
+
+        let expected_shannon = (n as f64).ln();
+        let expected_simpson = (n - 1) as f64 / n as f64;
+        let f32_tol = 1e-5;
+
+        assert!(
+            (result.shannon - expected_shannon).abs() < f32_tol,
+            "session Shannon: got {}, expected {expected_shannon}",
+            result.shannon,
+        );
+        assert!(
+            (result.simpson - expected_simpson).abs() < f32_tol,
+            "session Simpson: got {}, expected {expected_simpson}",
+            result.simpson,
+        );
+        assert!(
+            (result.observed - n as f64).abs() < f64::EPSILON,
+            "session observed: got {}, expected {n}",
+            result.observed,
         );
     }
 }

@@ -38,8 +38,10 @@ step() {
 }
 
 step "cargo fmt" cargo fmt --all -- --check
-step "cargo clippy" cargo clippy --workspace --all-targets --all-features -- -D warnings
+step "cargo clippy" cargo clippy --workspace --all-targets --all-features -- \
+    -D warnings -D clippy::pedantic -D clippy::nursery
 step "cargo test" cargo test --workspace --no-fail-fast
+step "cargo test (all-features)" cargo test --workspace --all-features --no-fail-fast
 step "cargo deny" cargo deny check
 
 if [ "$SKIP_COV" = false ]; then

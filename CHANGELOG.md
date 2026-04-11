@@ -3,6 +3,117 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V142] — 2026-04-11
+
+### Capability Wire Standard + Composition Evolution
+
+Full Capability Wire Standard v1.0 compliance (L2+L3), WireWitnessRef provenance
+encoding, barraCuda 0.3.11 alignment, and composition-first validation evolution.
+Moves wetSpring from "Rust validates Python" to "Rust + Python validate NUCLEUS
+composition patterns" to "composition patterns self-describe via standard wire
+protocols." primalSpring is the composition reference; plasmidBin is the harvest target.
+
+#### Added
+- `identity.get` JSON-RPC handler — returns `{primal, version, domain, license}`
+  per Capability Wire Standard v1.0
+- `methods` flat string array in `capabilities.list` response (Wire Standard L2) —
+  biomeOS v2.93+ reads `result.methods` first, skips format detection
+- `provided_capabilities` structured domain groups in `capabilities.list` (L3) —
+  replaces legacy `domains` key, uses `type` instead of `name`
+- `consumed_capabilities` in `capabilities.list` (L3) — 22 capabilities wetSpring
+  needs from Tower/Node/Nest/Meta primals (crypto, compute, storage, inference)
+- `CONSUMED_CAPABILITIES` constant in `niche.rs` — declares all primal dependencies
+  for biomeOS composition completeness validation
+- `WireWitnessRef` struct in `ipc/provenance.rs` — self-describing provenance events
+  per Attestation Encoding Standard v2.0 (`agent`, `kind`, `evidence`, `witnessed_at`,
+  `encoding`, `algorithm`, `tier`, `context`)
+- `WireWitnessRef::hash_observation()` and `::timestamp()` factory methods
+- `witnesses` array in `provenance.begin` and `provenance.record` IPC responses
+- 60+ new entries in `tolerance_provenance.toml` (now covers all major categories)
+- `identity.get` added to niche capabilities (now 46), dispatch table, and proptests
+
+#### Changed
+- `capabilities.list` response restructured: `domains` → `provided_capabilities`,
+  `name` → `type` on domain descriptors (Wire Standard L3)
+- `PINNED_BARRACUDA_VERSION` bumped `0.3.7` → `0.3.11` in `upstream_contract.rs`
+- `reproduction_manifest.toml` barracuda version bumped to `0.3.11`
+- `plasmidBin/manifest.lock` wetspring version aligned to `0.8.0`
+- `plasmidBin/wetspring/metadata.toml` barracuda version → `0.3.11`, tests → `1946`
+- 23 facade clippy pedantic/nursery warnings fixed (routes, grammar, shaping,
+  provenance, dark_forest, graph_validate)
+
+#### Fixed
+- `crate::gpu::context::GpuContext` → `crate::gpu::GpuContext` in `diversity_gpu.rs`
+  (2 locations) — tracks barraCuda 0.3.11 re-export after `context` module went private
+- Integration test `capability_list_includes_all_domains` updated for Wire Standard shape
+
+#### Metrics
+- Tests: 1,946 (unit + integration + property + doc), 0 failed
+- Named tolerances: 242 (90+ with machine-readable provenance in TOML)
+- Capability domains: 21 prefixes, 41 methods, 46 niche caps (was 45)
+- Wire Standard: L2+L3 compliant (methods, provided/consumed, identity.get)
+- Clippy: 0 warnings (pedantic + nursery) including --all-features
+- fmt: clean
+- barraCuda: 0.3.11 (was 0.3.7)
+- Composition: 97/97 proto-nucleate, 22 consumed capabilities declared
+
+## [V141] — 2026-04-11
+
+### Audit Remediation + Three-Tier Validation Alignment
+
+Comprehensive audit remediation: capability domain alignment, cross-check
+enforcement, proto-nucleate test-time validation, provenance run commands,
+TensorSession proof-of-concept, and PRIMAL_GAPS.md. Completes the three-tier
+validation narrative: Python validates Rust, Rust + Python validate NUCLEUS
+composition patterns, composition enables ecoBin harvest.
+
+#### Added
+- `EXPECTED_CHECKS` guard constant in `validate_composition_nucleus_v1.rs` —
+  runtime assertion that 97/97 check count matches the documented claim;
+  drifts are caught at binary exit rather than only in review
+- 3 new capability domains in `capability_domains.rs`: `data` (3 methods),
+  `vault` (3 methods), `composition` (5 methods) — 8 domain families, 21
+  domain prefixes, 41 total methods (up from 5/18/30)
+- Cross-check tests: `handlers_capabilities_covered_by_domains_or_documented`
+  and `niche_capabilities_superset_of_handlers` (`#[cfg(feature = "ipc")]`)
+  enforce that niche, handlers, and domain registry stay synchronized
+- `proto_nucleate_node_names_match_niche_dependencies` test in `niche.rs` —
+  reads `primalSpring/graphs/downstream/wetspring_lifescience_proto_nucleate.toml`
+  at test time and validates all niche dependencies appear as nodes
+- `command` field on `BaselineProvenance` struct in `provenance_registry.rs` —
+  8 key validation scripts now carry exact `python3 scripts/…` invocations
+- `provenance_registry_commands_reference_own_script` test enforcing command↔script
+  consistency
+- `alpha_diversity_session` TensorSession proof-of-concept in `diversity_gpu.rs`
+  — demonstrates fused multi-op `f32` GPU pipeline for alpha diversity
+- `docs/PRIMAL_GAPS.md` — 7 composition-specific gaps (PG-01…PG-07) for
+  feedback to primalSpring per ecosystem convention
+- `cargo test --workspace --all-features` step in `scripts/check_all.sh`
+
+#### Changed
+- `scripts/check_all.sh` clippy step now includes `-D clippy::pedantic -D
+  clippy::nursery`, matching CI strictness
+- Dispatch tests updated for 21 domains / 41 methods (was 18/30)
+- `CAPABILITIES` doc in `ipc/handlers/mod.rs` references the new cross-check test
+
+#### Fixed
+- Upstream `barraCuda` feature-gate: `for_precision_tier` in
+  `tolerances/precision.rs` and its test now `#[cfg(feature = "gpu")]` — was
+  causing `E0433` when building without `gpu` feature
+- Capability-domain test paths changed from `super::handlers` to
+  `crate::ipc::handlers` with proper `#[cfg(feature = "ipc")]` gating
+
+#### Metrics
+- Tests: 1,946 (unit + integration + property + doc), 0 failed
+  (barracuda lib: 1,607 with all features, forge: 253)
+- Named tolerances: 242 with provenance trail + 8 with run commands
+- Capability domains: 21 prefixes in 8 families, 41 methods, 45 niche caps
+- Proto-nucleate: 97/97 (Exp400, guard constant enforced)
+- Deploy graphs: 7 (all canonical)
+- Coverage: 91.20% line / 90.30% function (gated at 90%)
+- Clippy: 0 warnings (pedantic + nursery)
+- Unsafe: 0 (workspace-level forbid)
+
 ## [V140] — 2026-04-10
 
 ### Composition Validation Audit + Schema Canonicalization

@@ -45,6 +45,10 @@
 use wetspring_barracuda::niche;
 use wetspring_barracuda::validation::Validator;
 
+/// Expected total checks — matches the "97/97" claim in README/CONTEXT.
+/// Update this constant (and docs) whenever domains are added or removed.
+const EXPECTED_CHECKS: u32 = 97;
+
 fn main() {
     let mut v = Validator::new("Exp400: NUCLEUS Composition — Proto-Nucleate Alignment");
 
@@ -309,6 +313,15 @@ fn main() {
     v.check_pass(
         "niche deploy graph: references science_nucleus",
         graph_path.contains("science_nucleus") || graph_path.contains("wetspring"),
+    );
+
+    // ═══════════════════════════════════════════════════════════════
+    // Guard: total check count matches documented claim
+    // ═══════════════════════════════════════════════════════════════
+    let (_, total) = v.counts();
+    assert_eq!(
+        total, EXPECTED_CHECKS,
+        "Exp400 check count drifted: got {total}, expected {EXPECTED_CHECKS} — update EXPECTED_CHECKS and docs"
     );
 
     // ═══════════════════════════════════════════════════════════════

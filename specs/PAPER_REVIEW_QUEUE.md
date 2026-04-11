@@ -1,5 +1,9 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
+<!-- V141 note (Apr 11, 2026): Paper queue is ALL DONE (63/63). Current
+     experiment counts (380 indexed) and test counts (1,946) are in the root
+     README.md. This file preserves the V126 per-paper detail. -->
+
 # wetSpring — Paper Review Queue
 
 **Last Updated**: March 16, 2026 (V126 — 376 experiments, 5,707+ checks, 1,443+ tests, 63 papers complete + 6 reproduced. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery. All 46 three-tier eligible papers validated. barraCuda v0.3.5, clippy ZERO WARNINGS)

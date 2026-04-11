@@ -34,6 +34,7 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "health.liveness" => handlers::handle_health_liveness(),
         "health.readiness" => handlers::handle_health_readiness(),
         "capability.list" => handlers::handle_capability_list(),
+        "identity.get" => handlers::handle_identity(),
 
         // Core science capabilities
         "science.diversity" => handlers::handle_diversity(params),
@@ -310,34 +311,62 @@ mod tests {
     }
 
     #[test]
-    fn capability_list_returns_all_domains() {
+    fn capability_list_wire_standard_l2() {
         let result = dispatch("capability.list", &json!({})).unwrap();
         assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
         assert_eq!(result["domain"], "ecology");
 
-        let domains = result["domains"].as_array().unwrap();
-        assert_eq!(domains.len(), 18);
+        let methods = result["methods"].as_array().unwrap();
+        assert_eq!(methods.len(), 41, "Wire Standard L2: flat methods array");
+        assert!(methods.iter().any(|m| m == "science.diversity"));
+        assert!(methods.iter().any(|m| m == "health.liveness"));
+    }
 
-        let domain_names: Vec<&str> = domains.iter().filter_map(|d| d["name"].as_str()).collect();
-        assert!(domain_names.contains(&"ecology.diversity"));
-        assert!(domain_names.contains(&"health"));
-        assert!(domain_names.contains(&"provenance"));
-        assert!(domain_names.contains(&"brain"));
-        assert!(domain_names.contains(&"metrics"));
-        assert!(domain_names.contains(&"ecology.ai_assist"));
+    #[test]
+    fn capability_list_wire_standard_l3() {
+        let result = dispatch("capability.list", &json!({})).unwrap();
+
+        let provided = result["provided_capabilities"].as_array().unwrap();
+        assert_eq!(provided.len(), 21);
+        let types: Vec<&str> = provided.iter().filter_map(|d| d["type"].as_str()).collect();
+        assert!(types.contains(&"ecology.diversity"));
+        assert!(types.contains(&"health"));
+        assert!(types.contains(&"provenance"));
+        assert!(types.contains(&"brain"));
+        assert!(types.contains(&"metrics"));
+        assert!(types.contains(&"ecology.ai_assist"));
+        assert!(types.contains(&"data"));
+        assert!(types.contains(&"vault"));
+        assert!(types.contains(&"composition"));
+
+        let consumed = result["consumed_capabilities"].as_array().unwrap();
+        assert!(!consumed.is_empty(), "L3: consumed_capabilities declared");
+        assert!(consumed.iter().any(|c| c == "crypto.sign_ed25519"));
+        assert!(consumed.iter().any(|c| c == "storage.store"));
+        assert!(consumed.iter().any(|c| c == "dag.session.create"));
+        assert!(consumed.iter().any(|c| c == "inference.complete"));
     }
 
     #[test]
     fn capability_list_methods_total() {
         let result = dispatch("capability.list", &json!({})).unwrap();
-        let total_methods: usize = result["domains"]
+        let total_methods: usize = result["provided_capabilities"]
             .as_array()
             .unwrap()
             .iter()
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 30);
+        assert_eq!(total_methods, 41);
+    }
+
+    #[test]
+    fn identity_get_returns_envelope() {
+        let result = dispatch("identity.get", &json!({})).unwrap();
+        assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
+        assert!(result["version"].as_str().is_some());
+        assert_eq!(result["domain"], "ecology");
+        assert_eq!(result["license"], "AGPL-3.0-or-later");
     }
 
     #[test]
@@ -369,7 +398,7 @@ mod tests {
             ) {
                 let known = [
                     "health.check", "health.liveness", "health.readiness",
-                    "capability.list",
+                    "capability.list", "identity.get",
                     "science.diversity", "science.qs_model", "science.anderson",
                     "science.kinetics", "science.alignment", "science.taxonomy",
                     "science.phylogenetics", "science.nmf",

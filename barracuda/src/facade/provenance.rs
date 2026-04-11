@@ -70,10 +70,13 @@ fn trio_record_failure() {
 // ── WireWitnessRef builders ───────────────────────────────────────────
 
 fn now_nanos() -> u64 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos() as u64
+    u64::try_from(
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos(),
+    )
+    .unwrap_or(u64::MAX)
 }
 
 /// Build a hash observation witness (content hash of data at rest).

@@ -5,10 +5,13 @@
 //! them to petalTongue's `visualization.render.grammar` RPC for server-side
 //! SVG rendering. This replaces client-side Plotly.js when the toggle is active.
 
+use std::io::{BufRead, BufReader, Write};
+use std::os::unix::net::UnixStream;
+
 use serde_json::{Value, json};
 
 /// Build a `GrammarRenderRequest` for petalTongue from a grammar expression and data rows.
-fn grammar_request(session_id: &str, grammar: Value, data: Vec<Value>, domain: &str) -> Value {
+fn grammar_request(session_id: &str, grammar: &Value, data: &[Value], domain: &str) -> Value {
     json!({
         "session_id": session_id,
         "grammar": grammar,
@@ -247,7 +250,7 @@ pub fn render_grammar(grammar: &Value, data: &[Value], domain: &str) -> Option<V
             .as_millis()
     );
 
-    let request = grammar_request(&session_id, grammar.clone(), data.to_vec(), domain);
+    let request = grammar_request(&session_id, grammar, data, domain);
 
     let neural_socket = {
         let family_id = std::env::var("FAMILY_ID").ok()?;
@@ -262,9 +265,6 @@ pub fn render_grammar(grammar: &Value, data: &[Value], domain: &str) -> Option<V
             return None;
         }
     };
-
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
 
     let mut stream = UnixStream::connect(&neural_socket).ok()?;
     stream

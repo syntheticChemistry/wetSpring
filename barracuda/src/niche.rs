@@ -91,6 +91,40 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
     },
 ];
 
+/// Capabilities this niche consumes from other primals.
+///
+/// Declared per Capability Wire Standard v1.0 Level 3 — enables biomeOS
+/// to validate composition completeness without hardcoded knowledge of
+/// which primals provide what.
+pub const CONSUMED_CAPABILITIES: &[&str] = &[
+    // Tower Atomic
+    "crypto.sign_ed25519",
+    "crypto.verify_ed25519",
+    "crypto.blake3_hash",
+    "discovery.find_primals",
+    "discovery.announce",
+    // Node Atomic
+    "compute.dispatch.submit",
+    "math.tensor",
+    "math.stats",
+    "math.spectral",
+    "shader.compile.wgsl",
+    // Nest Atomic
+    "storage.store",
+    "storage.retrieve",
+    "dag.session.create",
+    "dag.event.append",
+    "spine.create",
+    "entry.append",
+    "braid.create",
+    "braid.commit",
+    // Meta-tier
+    "ai.complete",
+    "inference.complete",
+    "inference.embed",
+    "render.dashboard",
+];
+
 /// All capabilities this niche exposes to biomeOS.
 ///
 /// Derived from `ipc::capability_domains::DOMAINS` — kept as a flat list
@@ -98,6 +132,7 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 pub const CAPABILITIES: &[&str] = &[
     // ── health / discovery (biomeOS infrastructure) ──
     "capability.list",
+    "identity.get",
     "health.check",
     "health.liveness",
     "health.readiness",
@@ -315,8 +350,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            45,
-            "4 health + 19 science + 3 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 5 composition + 3 ecosystem integrations"
+            46,
+            "5 health/meta + 19 science + 3 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 5 composition + 3 ecosystem integrations"
         );
     }
 
@@ -372,5 +407,51 @@ mod tests {
                 "science capability '{cap}' should appear in ecology mappings"
             );
         }
+    }
+
+    /// Cross-validate niche dependencies against the proto-nucleate graph.
+    ///
+    /// The canonical proto-nucleate lives in primalSpring. This test
+    /// `include_str!`s it at compile time so drift is caught in CI.
+    /// If the file is not reachable (different checkout layout), the test
+    /// is a no-op rather than a hard failure.
+    #[test]
+    fn proto_nucleate_node_names_match_niche_dependencies() {
+        let proto_nucleate_path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../primalSpring/graphs/downstream/wetspring_lifescience_proto_nucleate.toml"
+        );
+        let Ok(proto) = std::fs::read_to_string(proto_nucleate_path) else {
+            eprintln!(
+                "proto-nucleate not found at {proto_nucleate_path} — \
+                 clone primalSpring alongside wetSpring to enable this check"
+            );
+            return;
+        };
+
+        for dep in DEPENDENCIES {
+            let pattern = format!("name = \"{}\"", dep.name);
+            assert!(
+                proto.contains(&pattern),
+                "niche dependency '{}' (role: {}) not found as a node in the proto-nucleate graph",
+                dep.name,
+                dep.role,
+            );
+        }
+
+        assert!(
+            proto.contains("name = \"wetspring\""),
+            "proto-nucleate must contain a 'wetspring' application node"
+        );
+
+        assert!(
+            proto.contains("pattern = \"proto_nucleate\""),
+            "proto-nucleate must declare pattern = \"proto_nucleate\""
+        );
+
+        assert!(
+            proto.contains("owner = \"wetSpring\""),
+            "proto-nucleate must declare owner = \"wetSpring\""
+        );
     }
 }

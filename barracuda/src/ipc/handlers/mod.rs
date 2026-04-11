@@ -55,8 +55,11 @@ use crate::ipc::protocol::RpcError;
 /// Kept in sync with [`crate::ipc::capability_domains::DOMAINS`] — the domain
 /// registry is the source of truth; this list adds `capability.list` (the
 /// introspection method that is not itself a domain capability).
+///
+/// Cross-checked by `capability_domains::tests::handlers_capabilities_covered_by_domains_or_documented`.
 pub const CAPABILITIES: &[&str] = &[
     "capability.list",
+    "identity.get",
     "health.check",
     "health.liveness",
     "health.readiness",
@@ -123,17 +126,21 @@ fn try_gpu() -> Option<&'static GpuF64> {
         .filter(|g| !g.is_lost())
 }
 
-/// Capability listing per Spring-as-Niche Deployment Standard.
+/// Capability listing per Capability Wire Standard v1.0.
 ///
-/// Returns all domains with their methods, descriptions, and GPU status.
+/// Returns the canonical `{primal, version, methods}` envelope (Level 2) plus
+/// `provided_capabilities`, `consumed_capabilities`, `cost_estimates`, and
+/// `operation_dependencies` (Level 3). biomeOS v2.93+ reads `result.methods`
+/// first and skips format detection.
 pub fn handle_capability_list() -> Result<Value, RpcError> {
-    use crate::ipc::capability_domains::DOMAINS;
+    use crate::ipc::capability_domains::{DOMAINS, all_methods};
+    use crate::niche::CONSUMED_CAPABILITIES;
 
-    let domains: Vec<Value> = DOMAINS
+    let provided_capabilities: Vec<Value> = DOMAINS
         .iter()
         .map(|d| {
             json!({
-                "name": d.name,
+                "type": d.name,
                 "description": d.description,
                 "methods": d.methods,
             })
@@ -144,8 +151,10 @@ pub fn handle_capability_list() -> Result<Value, RpcError> {
         "primal": crate::PRIMAL_NAME,
         "version": env!("CARGO_PKG_VERSION"),
         "domain": crate::ipc::capability_domains::DOMAIN,
+        "methods": all_methods(),
+        "provided_capabilities": provided_capabilities,
+        "consumed_capabilities": CONSUMED_CAPABILITIES,
         "capabilities": CAPABILITIES,
-        "domains": domains,
     });
 
     #[cfg(feature = "json")]
@@ -162,6 +171,19 @@ pub fn handle_capability_list() -> Result<Value, RpcError> {
     }
 
     Ok(response)
+}
+
+/// Identity probe per Capability Wire Standard v1.0.
+///
+/// Returns the minimal `{primal, version, domain, license}` envelope
+/// for biomeOS observability and cross-spring composition validation.
+pub fn handle_identity() -> Result<Value, RpcError> {
+    Ok(json!({
+        "primal": crate::PRIMAL_NAME,
+        "version": env!("CARGO_PKG_VERSION"),
+        "domain": crate::ipc::capability_domains::DOMAIN,
+        "license": "AGPL-3.0-or-later",
+    }))
 }
 
 /// Health/readiness probe (legacy — delegates to full readiness).

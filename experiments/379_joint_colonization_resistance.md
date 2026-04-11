@@ -63,5 +63,5 @@ Gonzales IC50 (Exp280) → Hormesis Model (Exp377) → **This**
 ## wateringHole Handoff
 
 ```
-wateringHole/handoffs/WETSPRING_V130_HEALTHSPRING_JOINT_COLONIZATION_HANDOFF_{DATE}.md
+(handoff to be created when experiment completes — currently PROPOSED)
 ```

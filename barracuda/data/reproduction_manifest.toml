@@ -54,7 +54,7 @@ role = "Content-addressed storage for computation cache and reference data"
 # ── Node Atomic (compute + math) ──────────────────────────────────────
 
 [primals.barracuda]
-version = "0.3.7"
+version = "0.3.11"
 domain = "math"
 tier = "ecoBin"
 required = true

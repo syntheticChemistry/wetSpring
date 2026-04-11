@@ -103,19 +103,31 @@ fn capability_list_includes_all_domains() {
         let result = &resp["result"];
         assert_eq!(result["primal"], "wetspring");
 
-        let domains = result["domains"].as_array().expect("domains array");
+        let methods = result["methods"]
+            .as_array()
+            .expect("methods flat array (Wire Standard L2)");
         assert!(
-            domains.len() >= 15,
-            "expected 15+ domains, got {}",
-            domains.len()
+            methods.len() >= 41,
+            "expected 41+ methods, got {}",
+            methods.len()
         );
 
-        let domain_names: Vec<&str> = domains.iter().filter_map(|d| d["name"].as_str()).collect();
-        assert!(domain_names.contains(&"ecology.diversity"));
-        assert!(domain_names.contains(&"ecology.anderson"));
-        assert!(domain_names.contains(&"health"));
-        assert!(domain_names.contains(&"provenance"));
-        assert!(domain_names.contains(&"brain"));
+        let provided = result["provided_capabilities"]
+            .as_array()
+            .expect("provided_capabilities array (Wire Standard L3)");
+        assert!(provided.len() >= 15, "expected 15+ capability groups");
+
+        let types: Vec<&str> = provided.iter().filter_map(|d| d["type"].as_str()).collect();
+        assert!(types.contains(&"ecology.diversity"));
+        assert!(types.contains(&"ecology.anderson"));
+        assert!(types.contains(&"health"));
+        assert!(types.contains(&"provenance"));
+        assert!(types.contains(&"brain"));
+
+        assert!(
+            result["consumed_capabilities"].as_array().is_some(),
+            "consumed_capabilities declared (Wire Standard L3)"
+        );
     });
 }
 

@@ -147,8 +147,8 @@ All models use the same barraCuda spectral toolkit:
 
 When ready:
 ```
-wateringHole/handoffs/WETSPRING_V130_ANDERSON_HORMESIS_HANDOFF_{DATE}.md
-wateringHole/handoffs/WETSPRING_V130_HEALTHSPRING_JOINT_COLONIZATION_HANDOFF_{DATE}.md
+wateringHole/handoffs/archive/WETSPRING_V130_ANDERSON_HORMESIS_FRAMEWORK_HANDOFF_MAR19_2026.md
+(joint colonization handoff not yet created — PROPOSED experiment)
 ```
 
 ## The Arrow of Causality

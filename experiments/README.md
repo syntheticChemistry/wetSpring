@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-04-10 (V140: 380 experiments indexed (377 completed + 3 PROPOSED), **356** binaries (**334** barracuda + **22** forge), 5,800+ checks, **1,942** tests (0 failures). Three-tier validation: Python→Rust (Tier 1), Rust→NUCLEUS composition (Tier 2, 97/97 proto-nucleate), Composition→ecoBin (Tier 3). Deploy graph canonical schema, tolerance provenance trail, zero clippy warnings, cargo-deny clean.)
+**Updated**: 2026-04-11 (V142: 380 experiments indexed (377 completed + 3 PROPOSED), **356** binaries (**334** barracuda + **22** forge), 5,800+ checks, **1,946** tests (0 failures). Three-tier validation: Python→Rust (Tier 1), Rust+Python→NUCLEUS composition (Tier 2, 97/97 proto-nucleate, 21 domains, Wire Standard L2+L3), Composition→ecoBin (Tier 3). barraCuda v0.3.11. 46 niche capabilities. 22 consumed capabilities. `identity.get`. `WireWitnessRef`. Clippy 0 warnings all-features.)
 
 ---
 
@@ -412,14 +412,15 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
-**Total validation checks**: 5,700+
-**Rust tests**: **1,902** total (unit + integration + property + doc)
-**Binaries**: **355** workspace total (**333** barracuda + **22** forge)
-**barraCuda primitives**: 150+ consumed (standalone v0.3.7, wgpu 28, Fp64Strategy, fused ops)
+**Total validation checks**: 5,800+
+**Rust tests**: **1,946** total (unit + integration + property + doc)
+**Binaries**: **356** workspace total (**334** barracuda + **22** forge)
+**barraCuda primitives**: 150+ consumed (standalone v0.3.11, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)
 **Local WGSL shaders**: 0 (all absorbed)
 **GPU modules**: **44** total
 **Named tolerances**: **242** across 6 submodules (bio, gpu, spectral, instrument, bio::esn, bio::misc)
+**IPC**: Wire Standard L2+L3, 46 niche capabilities, 22 consumed capabilities, identity.get
 **Benchmark infrastructure**: `bench.rs` harness with RAPL + nvidia-smi energy profiling, JSON output
 
 ### V97c — Fused Ops Chain (Exp306-310)
@@ -645,7 +646,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V137 index):** 379 experiments indexed (376 completed + 3 PROPOSED), 355 binaries (333 barracuda + 22 forge), 5,700+ checks, 1,902 tests.
+**Totals (V142):** 380 experiments indexed (377 completed + 3 PROPOSED), 356 binaries (334 barracuda + 22 forge), 5,800+ checks, 1,946 tests. barraCuda v0.3.11. Wire Standard L2+L3. 22 consumed capabilities.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -675,7 +676,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals: 379 experiments indexed, 355 binaries, 5,700+ checks, 1,902 tests.**
+**Totals (V142): 380 experiments indexed, 356 binaries, 5,800+ checks, 1,946 tests.**
 
 ---
 

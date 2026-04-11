@@ -288,7 +288,7 @@ pub fn shape_cross_species(result: &Value) -> Value {
 pub fn scenario_envelope(
     name: &str,
     description: &str,
-    nodes: Vec<Value>,
+    nodes: &[Value],
     provenance: &Value,
 ) -> Value {
     json!({

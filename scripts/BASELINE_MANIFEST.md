@@ -3,6 +3,7 @@
 **Generated:** February 27, 2026 (Phase 61 audit — SPDX headers + provenance metadata added)
 **Verified:** March 24, 2026 (V137 — SHA-256 hashes reconciled with `provenance_registry.rs`; `exp008_pfas_ml_baseline.py` and `python_anaerobic_biogas_baseline.py` hashes corrected; download script hashes added; numpy version matrix documented.)
 **Last scripts commit:** V120 (added `scripts/tolerances.py` — shared tolerance constants mirroring Rust)
+**V141 note:** `provenance_registry.rs` now includes `command` field for 8 key scripts. See `barracuda/src/provenance_registry.rs`.
 
 ## Commit History Clarification
 

@@ -90,7 +90,7 @@ pub fn validate_graph(toml_source: &str) -> ValidationResult {
             ));
         }
 
-        if node.capabilities.as_ref().map_or(true, |c| c.is_empty()) {
+        if node.capabilities.as_ref().is_none_or(Vec::is_empty) {
             warnings.push(format!("node `{}` has no capabilities declared", node.name));
         }
 

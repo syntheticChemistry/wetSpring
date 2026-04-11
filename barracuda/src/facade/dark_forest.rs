@@ -179,13 +179,15 @@ async fn verify_via_neural_api(socket_path: Option<&str>, family_id: &str, token
         "ciphertext": token,
     });
 
-    match call_neural_async(socket, "birdsong.decrypt", &params).await {
-        Some(result) => parse_decrypt_result(&result),
-        None => {
-            tracing::warn!("Dark Forest: birdsong.decrypt call failed");
-            false
-        }
-    }
+    call_neural_async(socket, "birdsong.decrypt", &params)
+        .await
+        .map_or_else(
+            || {
+                tracing::warn!("Dark Forest: birdsong.decrypt call failed");
+                false
+            },
+            |result| parse_decrypt_result(&result),
+        )
 }
 
 fn parse_decrypt_result(value: &Value) -> bool {

@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V140:** Composition validation evolution — full ecosystem audit, deploy graph canonicalization (all 7 `[[graph.node]]`), tolerance provenance trail, zero clippy warnings, cargo-deny clean, CI orchestrator. V139: NUCLEUS composition validation (97/97 proto-nucleate, Exp400). V138: primal composition patterns. V137: provenance headers, tolerance centralization.
+**Current release — V142:** Capability Wire Standard v1.0 L2+L3 (`methods`, `provided_capabilities`, `consumed_capabilities`, `identity.get`), `WireWitnessRef` provenance events, barraCuda 0.3.11 alignment, 22 consumed capabilities declared, facade clippy zero (all-features), tolerance provenance expanded, plasmidBin aligned. V141: audit remediation, capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition (97/97). V138: primal composition patterns.
 
 ## Role in the Ecosystem
 
@@ -25,9 +25,9 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 356 validation/benchmark binaries (334 barracuda + 22 forge)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 45 IPC capabilities, 37 dispatch methods
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 46 niche capabilities, 42 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,942 (unit + integration + property + doc), 0 failed
+- **Tests:** 1,946 (unit + integration + property + doc), 0 failed
 - **Validation checks:** 5,800+ across 356 binaries
 - **Composition:** 97/97 proto-nucleate alignment (Exp400), 9 niche dependencies (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.node]]` schema, validated by `graph_validate.rs`)
@@ -46,8 +46,8 @@ evolution pipeline.
 - **Math biology:** ODE systems (QS, bistable, cooperation, phage, capacitor)
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, molecular docking
-- **GPU acceleration:** 44 GPU modules via barraCuda v0.3.7, 150+ primitives consumed
-- **IPC:** 37 JSON-RPC methods, 45 advertised capabilities, 5 composition health handlers, 8 MCP tools
+- **GPU acceleration:** 44 GPU modules via barraCuda v0.3.11, 150+ primitives consumed
+- **IPC:** 42 JSON-RPC methods, 46 niche capabilities, 21 domains, 5 composition health handlers, 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 
@@ -70,10 +70,11 @@ evolution pipeline.
 
 ```
 Tier 1: Python baseline  → Rust CPU parity  → GPU validation
-           (58 scripts)     (1,942 tests)      (44 GPU modules)
+           (58 scripts)     (1,946 tests)      (44 GPU modules)
 Tier 2: Rust validation   → NUCLEUS composition patterns
            (356 binaries)   (97/97 proto-nucleate, 7 deploy graphs)
-Tier 3: Composition       → ecoBin harvest to plasmidBin
+Tier 3: Composition       → Wire Standard compliance → ecoBin harvest
+           (L2+L3)          (22 consumed caps)          (plasmidBin)
 ```
 
 ## Design Philosophy

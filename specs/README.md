@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: March 24, 2026
-**Status**: V137 — 5,700+ checks (379 experiments, 355 binaries), 1,902 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, clippy pedantic+nursery zero warnings, zero `#[allow()]`. V137: provenance headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, doc link fixes. V136: thiserror derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. V135: doc reconciliation. V134: deep audit (drug NMF delegation, validation harness refactored, primal discovery extended). V133: `validate_all`, `GpuContext`/`TensorSession`. V132: `ValidationSink`, `PROVENANCE_REGISTRY`, ecosystem wiring.
+**Last Updated**: April 11, 2026
+**Status**: V141 — 5,800+ checks (380 experiments, 356 binaries), 1,946 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 45 niche capabilities, 21 domains (8 families), 97/97 proto-nucleate (guard constant), 7 deploy graphs, 7 composition gaps in `docs/PRIMAL_GAPS.md`. V141: capability alignment, cross-check CI, proto-nucleate test, provenance run commands, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns. V137: provenance headers, tolerance centralization. *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -35,7 +35,7 @@
 | Faculty (Track 1b) | Liu (CMSE, MSU) — comparative genomics, phylogenetics |
 | Faculty (Track 1c) | R. Anderson (Carleton) — deep-sea metagenomics, population genomics |
 | Faculty (Track 2) | Jones (BMB/Chemistry, MSU) — PFAS mass spectrometry |
-| Handoffs | V116 active + 123 archived (v7–v115) |
+| Handoffs | V141 active + 151 archived (v7–v140) |
 
 ---
 

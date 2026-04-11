@@ -1,5 +1,9 @@
 # ToadStool barracuda vs wetSpring: Deep Gap Analysis
 
+> **SUPERSEDED.** Current absorption status: `barracuda/ABSORPTION_MANIFEST.md`
+> (V141). Current gaps: `docs/PRIMAL_GAPS.md` (PG-05 for toadStool).
+> Archived here as fossil record.
+
 **Date:** March 7, 2026 (V98+ — barraCuda `a898dee`, toadStool S130+ `bfe7977b`, coralReef Iteration 10 `d29a734`)
 **Status:** SUPERSEDED by `handoffs/WETSPRING_V120_TOADSTOOL_BARRACUDA_EVOLUTION_HANDOFF_MAR15_2026.md` (V120, Mar 15 2026).
 **Scope:** Compare barraCuda public exports with wetSpring actual usage. Identify unused primitives, adoption opportunities, and maintenance reduction.

@@ -1,5 +1,8 @@
 # Cross-System Benchmark Status
 
+> **V141 note (Apr 11, 2026):** Current GPU/metalForge status in
+> `barracuda/ABSORPTION_MANIFEST.md`. This matrix preserves V126 benchmarks.
+
 **Date:** March 16, 2026 (V126)
 **Purpose:** Track which algorithms are validated on which substrates
 

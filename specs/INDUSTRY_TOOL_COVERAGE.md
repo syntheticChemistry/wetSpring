@@ -1,5 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
+<!-- V141 note (Apr 11, 2026): Current metrics in root README.md. This
+     matrix preserves the V126 industry-tool coverage snapshot. -->
+
 # Industry Tool Coverage Matrix & Gap Analysis
 
 **Last Updated:** March 16, 2026
