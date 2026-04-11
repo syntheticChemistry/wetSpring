@@ -216,10 +216,11 @@ pub fn handle_health_readiness() -> Result<Value, RpcError> {
     }))
 }
 
-/// Cross-spring composition health check following primalSpring's
-/// `composition.*_health` pattern. Reports subsystem readiness so
-/// remote springs or primalSpring validators can verify this NUCLEUS
-/// is operational before attempting ionic bond interactions.
+/// Cross-spring composition health check for the science subsystem.
+///
+/// Follows primalSpring's `composition.*_health` pattern. Reports subsystem
+/// readiness so remote springs or primalSpring validators can verify this
+/// NUCLEUS is operational before attempting ionic bond interactions.
 pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcError> {
     #[cfg(feature = "gpu")]
     let gpu_status = if try_gpu().is_some() {
@@ -273,8 +274,8 @@ pub fn handle_composition_tower_health(_params: &Value) -> Result<Value, RpcErro
         "atomic": "Tower",
         "spring": "wetSpring",
         "components": {
-            "beardog": beardog.unwrap_or(json!("unreachable")),
-            "songbird": songbird.unwrap_or(json!("unreachable")),
+            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
+            "songbird": songbird.unwrap_or_else(|| json!("unreachable")),
         },
     }))
 }
@@ -290,8 +291,8 @@ pub fn handle_composition_node_health(_params: &Value) -> Result<Value, RpcError
         "atomic": "Node",
         "spring": "wetSpring",
         "components": {
-            "beardog": beardog.unwrap_or(json!("unreachable")),
-            "toadstool": toadstool.unwrap_or(json!("unreachable")),
+            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
+            "toadstool": toadstool.unwrap_or_else(|| json!("unreachable")),
         },
     }))
 }
@@ -307,8 +308,8 @@ pub fn handle_composition_nest_health(_params: &Value) -> Result<Value, RpcError
         "atomic": "Nest",
         "spring": "wetSpring",
         "components": {
-            "beardog": beardog.unwrap_or(json!("unreachable")),
-            "nestgate": nestgate.unwrap_or(json!("unreachable")),
+            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
+            "nestgate": nestgate.unwrap_or_else(|| json!("unreachable")),
         },
     }))
 }
@@ -342,19 +343,22 @@ pub fn handle_composition_nucleus_health(_params: &Value) -> Result<Value, RpcEr
             "provenance_trio": trio_ok,
         },
         "components": {
-            "beardog": beardog.unwrap_or(json!("unreachable")),
-            "songbird": songbird.unwrap_or(json!("unreachable")),
-            "toadstool": toadstool.unwrap_or(json!("unreachable")),
-            "nestgate": nestgate.unwrap_or(json!("unreachable")),
-            "rhizocrypt": rhizocrypt.unwrap_or(json!("unreachable")),
-            "loamspine": loamspine.unwrap_or(json!("unreachable")),
-            "sweetgrass": sweetgrass.unwrap_or(json!("unreachable")),
+            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
+            "songbird": songbird.unwrap_or_else(|| json!("unreachable")),
+            "toadstool": toadstool.unwrap_or_else(|| json!("unreachable")),
+            "nestgate": nestgate.unwrap_or_else(|| json!("unreachable")),
+            "rhizocrypt": rhizocrypt.unwrap_or_else(|| json!("unreachable")),
+            "loamspine": loamspine.unwrap_or_else(|| json!("unreachable")),
+            "sweetgrass": sweetgrass.unwrap_or_else(|| json!("unreachable")),
         },
     }))
 }
 
 /// Probe a capability domain via Neural API capability.discover.
 fn probe_capability(domain: &str) -> Option<Value> {
+    use std::io::{BufRead, BufReader, Write};
+    use std::os::unix::net::UnixStream;
+
     let family_id = std::env::var("FAMILY_ID").ok()?;
     let runtime = std::env::var("XDG_RUNTIME_DIR")
         .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
@@ -364,9 +368,6 @@ fn probe_capability(domain: &str) -> Option<Value> {
     if !socket_path.exists() {
         return None;
     }
-
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
 
     let mut stream = UnixStream::connect(&socket_path).ok()?;
     stream

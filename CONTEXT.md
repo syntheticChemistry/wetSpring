@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V139:** NUCLEUS composition validation — proto-nucleate alignment (97/97), composition health handlers, Squirrel niche wiring, proptest synchronized, plasmidBin v0.8.0 harvest-ready. V138: primal composition patterns, friction/gap analysis. V137: provenance headers, tolerance centralization, IPC modularization.
+**Current release — V140:** Composition validation evolution — full ecosystem audit, deploy graph canonicalization (all 7 `[[graph.node]]`), tolerance provenance trail, zero clippy warnings, cargo-deny clean, CI orchestrator. V139: NUCLEUS composition validation (97/97 proto-nucleate, Exp400). V138: primal composition patterns. V137: provenance headers, tolerance centralization.
 
 ## Role in the Ecosystem
 
@@ -27,9 +27,10 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 356 validation/benchmark binaries (334 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 45 IPC capabilities, 37 dispatch methods
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,580 library (unit + integration + property + doc), 0 failed
+- **Tests:** 1,942 (unit + integration + property + doc), 0 failed
 - **Validation checks:** 5,800+ across 356 binaries
 - **Composition:** 97/97 proto-nucleate alignment (Exp400), 9 niche dependencies (5 required + 4 optional)
+- **Deploy graphs:** 7 (all canonical `[[graph.node]]` schema, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
@@ -68,8 +69,11 @@ evolution pipeline.
 ## Evolution Path
 
 ```
-Python baseline → Rust CPU parity → GPU validation → NUCLEUS composition
-     (58 scripts)    (1,580 lib tests)  (44 GPU modules)   (97/97 proto-nucleate)
+Tier 1: Python baseline  → Rust CPU parity  → GPU validation
+           (58 scripts)     (1,942 tests)      (44 GPU modules)
+Tier 2: Rust validation   → NUCLEUS composition patterns
+           (356 binaries)   (97/97 proto-nucleate, 7 deploy graphs)
+Tier 3: Composition       → ecoBin harvest to plasmidBin
 ```
 
 ## Design Philosophy

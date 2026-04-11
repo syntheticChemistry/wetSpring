@@ -4,7 +4,7 @@
 
 **Date:** April 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V139 — **380** experiments indexed (377 completed + 3 PROPOSED), **5,800+** validation checks, ALL PASS; **1,580** library tests (0 failures); **356** workspace binaries (**334** barracuda + **22** forge); standalone `barraCuda` **v0.3.7** (**150+** primitives consumed; wgpu 28, 784+ WGSL shaders), toadStool S155+, coralReef Phase 10. **45** IPC capabilities, **37** dispatch methods, **9** niche dependencies (5 required + 4 optional). Composition validation: **97/97** proto-nucleate alignment (Exp400). plasmidBin **v0.8.0** harvest-ready. **V139:** NUCLEUS composition validation tier — Exp400, JSON shape fix, Squirrel niche wiring, proptest sync, 5 composition IPC round-trip tests. **V138:** primal composition patterns, friction/gap analysis. **V137:** provenance headers, tolerance centralization, IPC modularization. **V136:** thiserror, named casts, contract pinning. **V133–V135:** GPU evolution, math delegation, doc reconciliation. 0 local WGSL, 0 local math duplication, 0 `#[allow()]`.
+**Status:** V140 — Three-tier validation. **Tier 1:** Python→Rust (**1,942** tests, **5,800+** validation checks, **356** binaries). **Tier 2:** Rust→Primal composition (**97/97** proto-nucleate, **7** deploy graphs canonical, **45** IPC capabilities, **37** dispatch methods). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. **380** experiments indexed (377 completed + 3 PROPOSED). `barraCuda` v0.3.7 (150+ primitives). **242** named tolerances with provenance trail. Clippy zero warnings, cargo-deny clean, `forbid(unsafe_code)`, zero `#[allow()]`. **V140:** ecosystem audit + deploy graph canonicalization + tolerance provenance + CI orchestrator. **V139:** NUCLEUS composition validation (Exp400, 97/97). **V138:** primal composition patterns. **V137:** provenance headers, tolerance centralization.
 
 ---
 
@@ -12,19 +12,52 @@
 
 Each document in this directory summarizes what wetSpring reproduced, evolved,
 and validated from one faculty member's published work. The evolution follows
-a consistent five-stage path:
+three validation tiers:
 
 ```
-Python/Galaxy baseline
-  -> Rust CPU (sovereign, 1 dependency: barraCuda)
-    -> GPU acceleration (barraCuda WGSL, toadStool dispatch)
-      -> Pure GPU streaming (zero CPU round-trips)
-        -> metalForge cross-substrate (CPU = GPU = NPU output)
-          -> NPU reservoir deployment (ESN → int8 → Akida AKD1000)
+Tier 1 — Python validates Rust (science fidelity)
+  Python/Galaxy baseline
+    → Rust CPU (sovereign, 1 dep: barraCuda)
+      → GPU acceleration (barraCuda WGSL, toadStool dispatch)
+        → Pure GPU streaming (zero CPU round-trips)
+          → metalForge cross-substrate (CPU = GPU = NPU)
+            → NPU reservoir deployment (ESN → int8 → AKD1000)
+
+Tier 2 — Rust validates NUCLEUS composition (primal patterns)
+  Rust validation binaries
+    → IPC capability surface (45 methods)
+      → Proto-nucleate alignment (11 primals)
+        → Deploy graph validation (7 graphs, graph_validate.rs)
+          → Composition health handlers (5: science, tower, node, nest, nucleus)
+
+Tier 3 — Composition enables ecoBin harvest (deployment)
+  All checks green
+    → cargo build --release → infra/plasmidBin/
+      → biomeos deploy --graph wetspring_science_nucleus.toml
 ```
 
 Every stage is validated with explicit numerical checks. All data is open.
-All code is AGPL-3.0.
+All code is AGPL-3.0-or-later.
+
+## V138–V140 — Primal composition validation and ecosystem audit
+
+**V140** marks the transition from "Rust validates Python" to "Rust + Python
+validate NUCLEUS composition patterns." Full ecosystem audit executed against
+wateringHole standards. Deploy graph schema canonicalized (all 7 graphs
+`[[graph.node]]`). Machine-readable tolerance provenance trail added
+(`tolerance_provenance.toml`). Clippy driven to zero warnings. cargo-deny
+clean (stale allowances removed, `windows-sys` skip). CI orchestrator
+(`scripts/check_all.sh`). Handoff crafted for primal/spring teams.
+
+**V139** is the NUCLEUS composition validation tier: `validate_composition_nucleus_v1`
+(Exp400, 97/97 proto-nucleate alignment), JSON shape fix for `composition.nucleus_health`,
+Squirrel added to niche dependencies, proptest synchronized to 37 dispatch methods,
+5 composition IPC round-trip tests, plasmidBin v0.8.0 harvest-ready.
+
+**V138** introduces primal composition patterns: deploy graph migration to
+proto-nucleate alignment, composition health handlers, niche dependency table
+expansion, ecology semantic mappings, Anderson biome atlas and disorder sweep
+facades, first composition validation binary.
 
 ## V134–V137 — Deep audit, debt resolution, provenance completion, and IPC modularization
 

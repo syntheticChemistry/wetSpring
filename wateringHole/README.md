@@ -9,9 +9,9 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V139** | `handoffs/WETSPRING_V139_COMPOSITION_VALIDATION_HANDOFF_APR10_2026.md` | Apr 10 | **NUCLEUS composition validation**: proto-nucleate alignment (97/97), JSON shape fix, Squirrel niche wiring, proptest sync, composition IPC round-trip tests, plasmidBin v0.8.0 metadata, upstream barraCuda feature gate documented. |
-| V138 | `handoffs/WETSPRING_V138_PRIMAL_COMPOSITION_PATTERNS_HANDOFF_APR07_2026.md` | Apr 7 | primalSpring + primal teams — composition patterns, friction points, evolution gaps, Gonzales pipeline. |
-| | *Superseded → `handoffs/archive/`* | | V137, V135, V134, V133 and earlier are archived (**147** files). |
+| **V140** | `handoffs/WETSPRING_V140_COMPOSITION_AUDIT_EVOLUTION_HANDOFF_APR10_2026.md` | Apr 10 | **Composition validation evolution**: three-tier validation (Python→Rust→Primal→ecoBin), deploy graph canonicalization, tolerance provenance trail, ecosystem audit resolution, primal team handback. |
+| V140 | `handoffs/WETSPRING_V140_PRIMAL_EVOLUTION_HANDOFF_APR10_2026.md` | Apr 10 | Primal evolution: per-primal findings, composition patterns, deploy graph standard, ecoBin harvest path, gaps handed back. |
+| | *Superseded → `handoffs/archive/`* | | V139, V138, V137 and earlier are archived (**149** files). |
 
 ## Cross-Spring Documents
 
@@ -23,8 +23,8 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — **V137 and earlier** are archived (**147** files).  
-Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition.
+Superseded handoffs in `handoffs/archive/` — **V139 and earlier** are archived (**149** files).  
+Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → ecoBin harvest.
 
 ## Convention
 

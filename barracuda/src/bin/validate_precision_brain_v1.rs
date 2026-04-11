@@ -299,12 +299,16 @@ fn main() {
             let domain_names: Vec<String> = domains.iter().map(|d| format!("{d:?}")).collect();
             let domain_tiers: Vec<f64> = domains
                 .iter()
-                .map(|d| match brain.route(*d) {
-                    barracuda::device::PrecisionTier::F16 => 0.5,
-                    barracuda::device::PrecisionTier::F32 => 1.0,
-                    barracuda::device::PrecisionTier::DF64 => 2.0,
-                    barracuda::device::PrecisionTier::F64 => 3.0,
-                    barracuda::device::PrecisionTier::F64Precise => 4.0,
+                .map(|d| {
+                    use barracuda::device::PrecisionTier;
+                    match brain.route(*d) {
+                        PrecisionTier::F16 => 0.5,
+                        PrecisionTier::F32 => 1.0,
+                        PrecisionTier::DF64 => 2.0,
+                        PrecisionTier::F64 => 3.0,
+                        PrecisionTier::F64Precise => 4.0,
+                        _ => 0.0,
+                    }
                 })
                 .collect();
 

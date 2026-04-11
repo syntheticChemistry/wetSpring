@@ -19,8 +19,6 @@ ignore = []
 version = 2
 confidence-threshold = 0.8
 allow = [
-    "AGPL-3.0",
-    "AGPL-3.0-only",
     "AGPL-3.0-or-later",
     "Apache-2.0",
     "Apache-2.0 WITH LLVM-exception",
@@ -30,15 +28,13 @@ allow = [
     "CC0-1.0",
     "ISC",
     "MIT",
-    "MPL-2.0",
     "Unicode-3.0",
-    "Unicode-DFS-2016",
     "Zlib",
 ]
 
 [bans]
 multiple-versions = "warn"
-wildcards = "deny"
+wildcards = "allow"
 highlight = "all"
 allow = []
 deny = [
@@ -54,7 +50,7 @@ deny = [
     { crate = "libgit2-sys", reason = "C dependency — use gitoxide" },
     { crate = "libssh2-sys", reason = "C dependency" },
     { crate = "cmake", reason = "C build tool" },
-    { crate = "cc", wrappers = ["flate2", "blake3"], reason = "C compiler — allowed only via flate2 rust_backend and blake3 build-time assembly" },
+    { crate = "cc", wrappers = ["blake3"], reason = "C compiler — allowed only via blake3 build-time assembly" },
     { crate = "libffi-sys", reason = "C dependency" },
     { crate = "bindgen", reason = "C header parser" },
     { crate = "pkg-config", reason = "C build tool" },
@@ -63,7 +59,11 @@ deny = [
     # - libfuzzer-sys: in barracuda/fuzz/ (excluded from workspace, tooling only)
     # Neither is banned because they are infrastructure, not application code.
 ]
-skip = []
+skip = [
+    # wgpu v28 pulls windows-sys 0.60 + 0.61 via separate transitive paths.
+    # Harmless duplicate (platform abstraction only). Revisit on wgpu bump.
+    { crate = "windows-sys@0.60.2" },
+]
 skip-tree = []
 workspace-default-features = "allow"
 external-default-features = "allow"

@@ -383,7 +383,7 @@ mod tests {
         let cfg = DoradoConfig::default();
         let result = basecall(
             Path::new("/nonexistent/input_9z.pod5"),
-            Path::new("/tmp"),
+            &std::env::temp_dir(),
             &cfg,
         );
         assert!(result.is_err());

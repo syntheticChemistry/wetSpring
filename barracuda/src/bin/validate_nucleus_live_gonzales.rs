@@ -137,7 +137,7 @@ fn main() {
 
     let retrieved = retrieve_result.expect("vault.retrieve dispatch failed");
     let has_data = retrieved.get("data").is_some() && !retrieved["data"].is_null();
-    let data_matches = retrieved["data"].as_str().map_or(false, |s| s == test_data);
+    let data_matches = retrieved["data"].as_str().is_some_and(|s| s == test_data);
     println!(
         "  Retrieve status: {}",
         if data_matches {

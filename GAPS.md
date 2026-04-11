@@ -4,8 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-04-10 (V139 composition validation pass — no gaps closed, all
-7 remain as external team dependencies. V139 handoff cross-references these gaps.)
+Last updated: 2026-04-10 (V140 composition audit — no gaps closed, all
+7 remain as external team dependencies. V140 handoff cross-references these gaps.
+V140 resolved all internal code quality findings; remaining gaps are architectural
+and owned by external primal teams.)
 
 ---
 

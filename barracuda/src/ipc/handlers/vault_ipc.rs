@@ -147,7 +147,10 @@ pub fn handle_vault_consent_verify(params: &Value) -> Result<Value, RpcError> {
     }))
 }
 
-fn verify_consent_via_beardog(_owner_id: &str, _scope: &str, _token: &str) -> bool {
+fn verify_consent_via_beardog(owner_id: &str, scope: &str, token: &str) -> bool {
+    use std::io::{BufRead, BufReader, Write};
+    use std::os::unix::net::UnixStream;
+
     let Some(socket) = trio::neural_api_socket() else {
         return false;
     };
@@ -159,16 +162,13 @@ fn verify_consent_via_beardog(_owner_id: &str, _scope: &str, _token: &str) -> bo
             "capability": "security",
             "operation": "verify_consent",
             "args": {
-                "owner_id": _owner_id,
-                "scope": _scope,
-                "token": _token,
+                "owner_id": owner_id,
+                "scope": scope,
+                "token": token,
             },
         },
         "id": 1,
     });
-
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
 
     let Ok(mut stream) = UnixStream::connect(&socket) else {
         return false;
@@ -205,6 +205,9 @@ fn blake3_hash(input: &[u8]) -> String {
 }
 
 fn nestgate_store_vault(key: &str, data: &str, content_hash: &str) {
+    use std::io::{BufRead, BufReader, Write};
+    use std::os::unix::net::UnixStream;
+
     let Some(socket) = trio::neural_api_socket() else {
         return;
     };
@@ -223,9 +226,6 @@ fn nestgate_store_vault(key: &str, data: &str, content_hash: &str) {
         },
         "id": 1,
     });
-
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
 
     let Ok(mut stream) = UnixStream::connect(&socket) else {
         return;
@@ -246,6 +246,9 @@ fn nestgate_store_vault(key: &str, data: &str, content_hash: &str) {
 }
 
 fn nestgate_retrieve_vault(key: &str) -> Option<String> {
+    use std::io::{BufRead, BufReader, Write};
+    use std::os::unix::net::UnixStream;
+
     let socket = trio::neural_api_socket()?;
 
     let request = json!({
@@ -258,9 +261,6 @@ fn nestgate_retrieve_vault(key: &str) -> Option<String> {
         },
         "id": 1,
     });
-
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
 
     let mut stream = UnixStream::connect(&socket).ok()?;
     stream

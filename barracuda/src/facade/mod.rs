@@ -11,5 +11,9 @@ pub mod grammar;
 pub mod graph_validate;
 pub mod ipc_client;
 pub mod provenance;
+#[expect(
+    clippy::unused_async,
+    reason = "Axum handlers must be async; IPC backend migrates to async when toadStool adds streaming"
+)]
 pub mod routes;
 pub mod shaping;

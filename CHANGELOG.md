@@ -3,6 +3,87 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V140] — 2026-04-10
+
+### Composition Validation Audit + Schema Canonicalization
+
+Full ecosystem audit against wateringHole standards, proto-nucleate alignment,
+and primal composition readiness. This version marks the transition from
+"Rust validates Python" to "Rust + Python validate NUCLEUS composition patterns."
+
+#### Fixed
+- **C1**: `clippy::expect_used` violation in `wetspring_science_facade.rs` —
+  replaced panicking `.expect()` on CORS header parse with `?` error propagation
+- **C2**: Non-exhaustive `PrecisionTier` match in `validate_precision_brain_v1.rs` —
+  added wildcard arm for forward compatibility with upstream barraCuda variants
+- **H1**: Hardcoded `/tmp` path in `bio/dorado.rs` test — replaced with
+  `std::env::temp_dir()` for ecoBin platform-agnostic compliance
+- **H2**: 81 `unused_async` clippy warnings in `facade/routes.rs` — added
+  module-level `#[expect(clippy::unused_async)]` with reason (Axum handlers
+  are async by contract; IPC backend migrates to async when toadStool adds
+  streaming)
+- **H3**: `cargo-deny` bans failure from duplicate `windows-sys` — added skip
+  entry for `windows-sys@0.60.2` (wgpu v28 transitive; harmless platform
+  abstraction duplicate)
+- **H4**: Stale `deny.toml` license allowances — removed `AGPL-3.0`,
+  `AGPL-3.0-only`, `MPL-2.0`, `Unicode-DFS-2016` (not encountered in dep tree)
+- **H4b**: Stale `deny.toml` wrapper — removed `flate2` from `cc` wrappers
+  (only `blake3` wraps `cc` in current dep tree)
+- **M5**: Deploy graph schema inconsistency — migrated `wetspring_deploy.toml`
+  from non-canonical `[[nodes]]` to `[[graph.node]]` schema matching all 6
+  other deploy graphs and the `graph_validate.rs` structural validator
+
+#### Added
+- `barracuda/data/tolerance_provenance.toml` — machine-readable provenance
+  linking named tolerance constants to their derivation source (Python script,
+  package, experiment ID, exact command). Covers all tolerance categories:
+  IEEE 754, analytical, Python parity, GPU vs CPU, instrument, spectral.
+- `scripts/check_all.sh` — full CI-style audit orchestrator: fmt → clippy →
+  test → deny → coverage → Python baselines. Supports `--skip-cov` and
+  `--skip-py` flags.
+- V140 handoff to wateringHole documenting the composition validation
+  evolution tier
+
+#### Metrics
+- Tests: 1,940 (unit + integration + property + doc), 0 failed
+- Named tolerances: 242 with provenance trail
+- Validation binaries: 356 (334 barracuda + 22 forge)
+- IPC methods: 37 routed, 45 capabilities advertised
+- Proto-nucleate coverage: 11/11 primals
+- Composition health handlers: 5 (science, tower, node, nest, nucleus)
+- Deploy graphs: 7 (all canonical `[[graph.node]]` schema)
+- Coverage: 91.20% line / 90.30% function (gated at 90%)
+- Clippy: 0 warnings (pedantic + nursery, `-D warnings`)
+- Doc: 0 warnings
+- Format: clean
+- `#[allow()]`: 0 in production
+- Unsafe: 0 (workspace-level forbid)
+- LOC (Rust): ~215k across 709 source files, all under 1000 LOC
+
+## [V139] — 2026-04-10
+
+### Composition Validation + Capability Reconciliation
+
+Documented in: `wateringHole/handoffs/WETSPRING_V139_COMPOSITION_VALIDATION_HANDOFF_APR10_2026.md`
+
+New `validate_composition_nucleus_v1` binary validates the full NUCLEUS
+composition pattern (health triad, capability surface, deploy graph
+structure, proto-nucleate coverage, niche self-knowledge, bonding metadata).
+Three sources of capability truth synchronized (dispatch.rs, handlers/mod.rs,
+niche.rs, capability_registry.toml). Squirrel added to niche dependencies.
+Five new IPC round-trip tests for composition endpoints.
+
+## [V138] — 2026-04-07
+
+### Primal Composition Patterns
+
+Documented in: `wateringHole/handoffs/WETSPRING_V138_PRIMAL_COMPOSITION_PATTERNS_HANDOFF_APR07_2026.md`
+
+Deploy graph migration to proto-nucleate alignment. Composition health
+handlers wired. Niche dependency table expanded. Ecology semantic mappings
+for Gonzales/Anderson endpoints. Anderson biome atlas and disorder sweep
+facades. First composition validation binary.
+
 ## [V137] — 2026-03-24
 
 ### Full Provenance + Tolerance Centralization + IPC Modularization

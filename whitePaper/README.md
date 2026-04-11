@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** March 24, 2026
-**Status:** V137 — Validation study active — 5,707+ checks, **1,902** tests, 379 experiments indexed, **355** binaries (333 barracuda + 22 forge), 44 GPU modules, 49 CPU bio modules, standalone `barraCuda` **v0.3.7** (784+ f64-canonical WGSL shaders), 150+ primitives consumed, 0 local WGSL, **242** named tolerances (zero inline literals), clippy pedantic + nursery ZERO WARNINGS, **zero `#[allow()]` in entire codebase**, **workspace `forbid(unsafe_code)`**, **`//! Provenance:` on all 355 binaries**. **V137:** Full provenance headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. **V136:** thiserror derives, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit, CONTRIBUTING + SECURITY. **V135:** doc reconciliation. **V134:** drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `validate_all`, `GpuContext`/`TensorSession`, zero-copy I/O. 64 papers reproduced, 46 fully validated at CPU + GPU + metalForge tiers.
+**Date:** April 10, 2026
+**Status:** V140 — Three-tier validation active. **Tier 1:** Python→Rust (5,800+ checks, **1,942** tests, **356** binaries). **Tier 2:** Rust→Primal composition (97/97 proto-nucleate, 7 deploy graphs, 45 IPC capabilities). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. 380 experiments indexed, 44 GPU modules, 49 CPU bio modules, `barraCuda` v0.3.7 (150+ primitives consumed), **242** named tolerances with provenance trail, clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`, cargo-deny clean. 64 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---

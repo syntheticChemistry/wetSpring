@@ -276,7 +276,7 @@ fn main() {
     let dr_prov = &dr["provenance"];
     v.check_pass(
         "dose_response: provenance DOI citation present",
-        dr_prov.as_str().map_or(false, |s| s.contains("Gonzales")),
+        dr_prov.as_str().is_some_and(|s| s.contains("Gonzales")),
     );
 
     v.check_pass(

@@ -213,23 +213,20 @@ fn fetch_via_composition(
 ) -> Result<(Value, String, &'static str), GapReport> {
     let mut gaps: Vec<Value> = Vec::new();
 
-    let socket = match trio::neural_api_socket() {
-        Some(s) => s,
-        None => {
-            gaps.push(json!({
-                "primal": "biomeOS",
-                "capability": "Neural API socket",
-                "required_for": "capability.call routing",
-                "deploy": "start biomeOS orchestrator",
-            }));
-            gaps.push(json!({
-                "primal": "NestGate",
-                "capability": "storage.fetch_external",
-                "required_for": "TLS fetch + content-addressed caching",
-                "deploy": "start NestGate with fetch_external capability",
-            }));
-            return Err(GapReport { missing: gaps });
-        }
+    let Some(socket) = trio::neural_api_socket() else {
+        gaps.push(json!({
+            "primal": "biomeOS",
+            "capability": "Neural API socket",
+            "required_for": "capability.call routing",
+            "deploy": "start biomeOS orchestrator",
+        }));
+        gaps.push(json!({
+            "primal": "NestGate",
+            "capability": "storage.fetch_external",
+            "required_for": "TLS fetch + content-addressed caching",
+            "deploy": "start NestGate with fetch_external capability",
+        }));
+        return Err(GapReport { missing: gaps });
     };
 
     // Tier 1: biomeOS → NestGate fetch_external (NestGate owns TLS)
@@ -293,8 +290,7 @@ fn fetch_external_via_biomeos(
     let hash = result
         .get("content_hash")
         .and_then(Value::as_str)
-        .map(String::from)
-        .unwrap_or_else(|| blake3_hash_str(data_str));
+        .map_or_else(|| blake3_hash_str(data_str), String::from);
     let parsed: Value = serde_json::from_str(data_str).ok()?;
     Some((parsed, hash))
 }
@@ -415,7 +411,7 @@ mod tests {
         let result = handle_pubchem_fetch(&json!({"aid": "1234"})).unwrap();
         assert_eq!(result["aid"], "1234");
         assert_eq!(result["gap_report"], true);
-        assert!(result["missing_primals"].as_array().unwrap().len() > 0);
+        assert!(!result["missing_primals"].as_array().unwrap().is_empty());
     }
 
     #[test]

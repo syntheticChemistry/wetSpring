@@ -214,6 +214,10 @@ fn sha256(data: &[u8]) -> [u8; 32] {
                 .wrapping_add(s1);
         }
 
+        #[expect(
+            clippy::tuple_array_conversions,
+            reason = "SHA-256 round state: explicit destructure is standard cryptographic style"
+        )]
         let (mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut hh) =
             (h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]);
 

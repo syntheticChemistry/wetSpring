@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-04-10 (V139: 380 experiments indexed (377 completed + 3 PROPOSED), **356** binaries (**334** barracuda + **22** forge), 5,800+ checks, **1,580** library tests (0 failures). V139: NUCLEUS composition validation — Exp400 proto-nucleate alignment (97/97), composition health JSON shape fix, Squirrel niche wiring, dispatch proptest sync (37 methods), 5 composition IPC round-trip tests, plasmidBin v0.8.0. V138: primal composition patterns. V137: provenance headers, tolerance centralization, IPC modularization. V136: thiserror, named casts, contract pinning. V133–V135: GPU evolution, math delegation, doc reconciliation. Zero local math duplication, zero `#[allow()]`, zero clippy errors, zero unsafe.)
+**Updated**: 2026-04-10 (V140: 380 experiments indexed (377 completed + 3 PROPOSED), **356** binaries (**334** barracuda + **22** forge), 5,800+ checks, **1,942** tests (0 failures). Three-tier validation: Python→Rust (Tier 1), Rust→NUCLEUS composition (Tier 2, 97/97 proto-nucleate), Composition→ecoBin (Tier 3). Deploy graph canonical schema, tolerance provenance trail, zero clippy warnings, cargo-deny clean.)
 
 ---
 

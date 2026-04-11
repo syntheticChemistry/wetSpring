@@ -37,9 +37,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .allow_methods(Any)
             .allow_headers(Any)
     } else {
-        let origin: axum::http::HeaderValue = cors_origin
+        let fallback: axum::http::HeaderValue = "https://primals.eco"
             .parse()
-            .unwrap_or_else(|_| "https://primals.eco".parse().expect("valid header"));
+            .map_err(|e| format!("default CORS origin invalid: {e}"))?;
+        let origin: axum::http::HeaderValue = cors_origin.parse().unwrap_or(fallback);
         CorsLayer::new()
             .allow_origin(origin)
             .allow_methods(Any)
