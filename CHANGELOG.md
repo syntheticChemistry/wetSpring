@@ -3,6 +3,43 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V144] — 2026-04-12
+
+### Composition Evolution — biomeOS v3.04 Alignment
+
+Aligns wetSpring's composition health methods with biomeOS v3.04's
+`COMPOSITION_HEALTH_STANDARD.md`. Universal `composition.*_health` methods
+(tower, node, nest, nucleus) are now owned by biomeOS as the orchestration
+substrate. wetSpring retains only `composition.science_health` — the
+spring-specific method that reports science domain health. Fixes a blocking
+path case mismatch for the `akida-driver` dependency on case-sensitive
+filesystems.
+
+#### Changed
+- `barracuda/Cargo.toml`: `akida-driver` path corrected from `toadstool`
+  to `toadStool` (case-sensitive filesystem fix)
+- `barracuda/src/ipc/handlers/mod.rs`: removed `handle_composition_tower_health`,
+  `handle_composition_node_health`, `handle_composition_nest_health`,
+  `handle_composition_nucleus_health` and helper `probe_capability`
+- `CAPABILITIES` array: 46 → 42 (removed 4 universal composition methods)
+- `barracuda/src/ipc/dispatch.rs`: removed 4 universal composition dispatch arms;
+  dispatch method count 41 → 37
+- `barracuda/src/ipc/capability_domains.rs`: `composition` domain trimmed to
+  `science_health` only, updated description
+- `barracuda/src/niche.rs`: `CAPABILITIES` count 46 → 42
+- `capability_registry.toml`: removed universal composition health entries,
+  updated `science_health` description
+- Test assertions updated across dispatch, capability_domains, niche, and
+  ipc_roundtrip tests to reflect new method/capability counts
+
+#### Fixed
+- `akida-driver` optional dependency path: `toadstool` → `toadStool`
+  (builds failed on case-sensitive Linux filesystems)
+- `ipc_roundtrip.rs`: replaced universal composition health roundtrip tests
+  with explicit "method not found" assertion for universal methods
+
+---
+
 ## [V143] — 2026-04-11
 
 ### Deploy Graph Canonical Migration + Composition Validation Tier

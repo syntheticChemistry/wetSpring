@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V143:** Deploy graph canonical migration (`[[graph.nodes]]` per primalSpring NA-016), bonding policy + fragments metadata on all 7 graphs, capability string alignment to proto-nucleate, coralReef/barraCuda nodes in full-NUCLEUS graphs, Exp400 D07 deploy graph metadata compliance (44 new checks → 141/141 total), niche capability count fix (46). V142: Wire Standard L2+L3, `identity.get`, `WireWitnessRef`, 22 consumed capabilities, barraCuda 0.3.11. V141: audit remediation, capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns.
+**Current release — V144:** Composition evolution — biomeOS v3.04 alignment. Fixed `akida-driver` path case mismatch. Removed universal `composition.*_health` methods (biomeOS owns these per `COMPOSITION_HEALTH_STANDARD.md`). Retained `composition.science_health` (spring-specific). Capabilities: 42 niche, 37 dispatch. V143: Deploy graph canonical migration, D07 composition validation (141/141 Exp400). V142: Wire Standard L2+L3, `identity.get`, 22 consumed capabilities. V141: audit remediation. V140: ecosystem audit. V139: NUCLEUS composition.
 
 ## Role in the Ecosystem
 
@@ -25,9 +25,9 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 360 validation/benchmark binaries (338 barracuda + 22 forge)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 46 niche capabilities, 42 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,950 (unit + integration + property + doc), 0 failed
+- **Tests:** 1,949 (unit + integration + property + doc), 0 failed
 - **Validation checks:** 5,800+ across 356 binaries
 - **Composition:** 141/141 proto-nucleate alignment (Exp400 D01–D07), 9 niche dependencies (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
@@ -47,7 +47,7 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, molecular docking
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.3.11, 150+ primitives consumed
-- **IPC:** 42 JSON-RPC methods, 46 niche capabilities, 21 domains, 5 composition health handlers, 8 MCP tools, Wire Standard L2+L3
+- **IPC:** 37 JSON-RPC methods, 42 niche capabilities, 21 domains, 1 composition health handler (science_health), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 

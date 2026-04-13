@@ -18,11 +18,11 @@ Tier 3: Composition         →  ecoBin harvest to plasmidBin
 
 | | |
 |---|---|
-| **Tests** | 1,950 (unit + integration + property + doc), 0 failed |
+| **Tests** | 1,949 (unit + integration + property + doc), 0 failed |
 | **Validation checks** | 5,800+ across 360 binaries (338 barracuda + 22 forge) |
 | **Experiments** | 377 completed + 3 proposed (380 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 46 niche, 42 dispatch, 21 domains (Wire Standard L2+L3, V142) |
+| **IPC capabilities** | 42 niche, 37 dispatch, 21 domains (Wire Standard L2+L3, V144) |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -36,7 +36,7 @@ Tier 3: Composition         →  ecoBin harvest to plasmidBin
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V143:** Deploy graph canonical migration (`[[graph.nodes]]`), bonding policy + fragments metadata on all 7 graphs, capability string alignment to proto-nucleate, coralReef/barraCuda nodes in full-NUCLEUS graphs, composition validation D07 (44 new checks: metadata compliance, schema canonical, fragment declarations). 141/141 Exp400. V142: Wire Standard L2+L3, `identity.get`, `WireWitnessRef`, 22 consumed capabilities, barraCuda 0.3.11. V141: audit remediation, capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns.
+**Current release — V144:** Composition evolution — biomeOS v3.04 alignment. Fixed `akida-driver` path case mismatch (blocking on case-sensitive filesystems). Removed universal `composition.*_health` methods (now owned by biomeOS per `COMPOSITION_HEALTH_STANDARD.md`). Retained spring-specific `composition.science_health`. Capabilities trimmed from 46→42 niche, 42→37 dispatch. 1,949 tests, zero warnings. V143: Deploy graph canonical migration, D07 composition validation (141/141 Exp400). V142: Wire Standard L2+L3, `identity.get`, 22 consumed capabilities. V141: audit remediation. V140: ecosystem audit. V139: NUCLEUS composition.
 
 ---
 

@@ -4,10 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-04-11 (V143 — no architectural gaps closed, all 7 remain
-as external team dependencies. V143 handoff documents deploy graph canonical
-migration, bonding policy, fragments metadata, and D07 composition validation.
-V142 Wire Standard compliance. Internal code quality fully green.)
+Last updated: 2026-04-12 (V144 — no architectural gaps closed, all 7 remain
+as external team dependencies. V144: composition evolution, biomeOS v3.04
+alignment, universal composition methods moved to biomeOS. V143: deploy graph
+canonical migration, D07 composition validation. Internal code quality green.)
 
 ---
 
