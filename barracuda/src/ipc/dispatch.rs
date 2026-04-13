@@ -86,12 +86,9 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "vault.retrieve" => handlers::handle_vault_retrieve(params),
         "vault.consent.verify" => handlers::handle_vault_consent_verify(params),
 
-        // Composition health (cross-spring validation)
+        // Composition health (spring-specific domain health)
+        // Universal methods (tower, node, nest, nucleus) are owned by biomeOS v3.04+
         "composition.science_health" => handlers::handle_composition_science_health(params),
-        "composition.tower_health" => handlers::handle_composition_tower_health(params),
-        "composition.node_health" => handlers::handle_composition_node_health(params),
-        "composition.nest_health" => handlers::handle_composition_nest_health(params),
-        "composition.nucleus_health" => handlers::handle_composition_nucleus_health(params),
 
         _ => Err(RpcError::method_not_found(method)),
     }
@@ -317,7 +314,7 @@ mod tests {
         assert_eq!(result["domain"], "ecology");
 
         let methods = result["methods"].as_array().unwrap();
-        assert_eq!(methods.len(), 41, "Wire Standard L2: flat methods array");
+        assert_eq!(methods.len(), 37, "Wire Standard L2: flat methods array");
         assert!(methods.iter().any(|m| m == "science.diversity"));
         assert!(methods.iter().any(|m| m == "health.liveness"));
     }
@@ -357,7 +354,7 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 41);
+        assert_eq!(total_methods, 37);
     }
 
     #[test]
@@ -413,9 +410,7 @@ mod tests {
                     "ai.ecology_interpret",
                     "data.fetch.chembl", "data.fetch.pubchem", "data.fetch.register_table",
                     "vault.store", "vault.retrieve", "vault.consent.verify",
-                    "composition.science_health", "composition.tower_health",
-                    "composition.node_health", "composition.nest_health",
-                    "composition.nucleus_health",
+                    "composition.science_health",
                 ];
                 if !known.contains(&method.as_str()) {
                     let err = dispatch(&method, &json!({})).unwrap_err();

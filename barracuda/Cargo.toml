@@ -67,7 +67,7 @@ barracuda = { path = "../../../primals/barraCuda/crates/barracuda", default-feat
 # akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
 # Independent of barraCuda; sourced from toadStool neuromorphic crates.
 # Runtime discovery, capability-based dispatch, zero mocks.
-akida-driver = { path = "../../../primals/toadstool/crates/neuromorphic/akida-driver", optional = true }
+akida-driver = { path = "../../../primals/toadStool/crates/neuromorphic/akida-driver", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barraCuda to prevent duplicate symbol linking errors.

@@ -177,12 +177,8 @@ pub const CAPABILITIES: &[&str] = &[
     "vault.store",
     "vault.retrieve",
     "vault.consent.verify",
-    // ── composition health (cross-spring validation) ──
+    // ── composition health (spring-specific, biomeOS owns universal methods) ──
     "composition.science_health",
-    "composition.tower_health",
-    "composition.node_health",
-    "composition.nest_health",
-    "composition.nucleus_health",
     // ── ecosystem client integrations (optional primals) ──
     "integration.sweetgrass.braid",
     "integration.toadstool.performance_surface",
@@ -350,8 +346,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            46,
-            "5 health/meta + 19 science + 3 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 5 composition + 3 ecosystem integrations"
+            42,
+            "5 health/meta + 19 science + 3 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 3 ecosystem integrations"
         );
     }
 

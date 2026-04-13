@@ -221,32 +221,9 @@ gpu_accelerated = false
 [capabilities.composition_science_health]
 method = "composition.science_health"
 domain = "composition"
-description = "Science pipeline composition health probe"
+description = "Science pipeline composition health per COMPOSITION_HEALTH_STANDARD"
 gpu_accelerated = false
-
-[capabilities.composition_tower_health]
-method = "composition.tower_health"
-domain = "composition"
-description = "Tower atomic (BearDog + Songbird) health probe"
-gpu_accelerated = false
-
-[capabilities.composition_node_health]
-method = "composition.node_health"
-domain = "composition"
-description = "Node atomic (ToadStool + barraCuda + coralReef) health probe"
-gpu_accelerated = false
-
-[capabilities.composition_nest_health]
-method = "composition.nest_health"
-domain = "composition"
-description = "Nest atomic (NestGate + provenance trio) health probe"
-gpu_accelerated = false
-
-[capabilities.composition_nucleus_health]
-method = "composition.nucleus_health"
-domain = "composition"
-description = "Full NUCLEUS composition health probe"
-gpu_accelerated = false
+# Universal methods (tower, node, nest, nucleus) owned by biomeOS v3.04+
 
 # ── Health / discovery (biomeOS infrastructure) ──────────────────────
 

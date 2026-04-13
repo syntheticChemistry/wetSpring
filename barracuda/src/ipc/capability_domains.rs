@@ -164,16 +164,11 @@ pub const DOMAINS: &[CapabilityDomain] = &[
         methods: &["vault.store", "vault.retrieve", "vault.consent.verify"],
     },
     // ── composition health ──────────────────────────────────────────
+    // Universal methods (tower, node, nest, nucleus) owned by biomeOS v3.04+
     CapabilityDomain {
         name: "composition",
-        description: "Cross-spring NUCLEUS composition health probes (Tower, Node, Nest)",
-        methods: &[
-            "composition.science_health",
-            "composition.tower_health",
-            "composition.node_health",
-            "composition.nest_health",
-            "composition.nucleus_health",
-        ],
+        description: "Spring-specific science composition health per COMPOSITION_HEALTH_STANDARD",
+        methods: &["composition.science_health"],
     },
 ];
 
@@ -256,13 +251,13 @@ mod tests {
             "21 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 41, "41 total capability methods");
+        assert_eq!(total_methods, 37, "37 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 41);
+        assert_eq!(methods.len(), 37);
         assert!(methods.contains(&"science.diversity"));
         assert!(methods.contains(&"health.liveness"));
         assert!(methods.contains(&"health.readiness"));
@@ -275,7 +270,7 @@ mod tests {
         assert!(methods.contains(&"science.anderson.hormesis"));
         assert!(methods.contains(&"data.fetch.chembl"));
         assert!(methods.contains(&"vault.store"));
-        assert!(methods.contains(&"composition.nucleus_health"));
+        assert!(methods.contains(&"composition.science_health"));
     }
 
     /// Every handler-advertised capability must appear in at least one domain.

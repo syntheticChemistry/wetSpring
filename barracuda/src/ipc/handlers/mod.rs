@@ -97,10 +97,6 @@ pub const CAPABILITIES: &[&str] = &[
     "vault.retrieve",
     "vault.consent.verify",
     "composition.science_health",
-    "composition.tower_health",
-    "composition.node_health",
-    "composition.nest_health",
-    "composition.nucleus_health",
 ];
 
 #[cfg(feature = "gpu")]
@@ -282,138 +278,10 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
     }))
 }
 
-/// Canonical composition health: Tower (BearDog + Songbird).
-///
-/// Probes the security and discovery primals via Neural API to report
-/// whether the Tower atomic layer is operational.
-pub fn handle_composition_tower_health(_params: &Value) -> Result<Value, RpcError> {
-    let beardog = probe_capability("security");
-    let songbird = probe_capability("discovery");
-    let healthy = beardog.is_some() && songbird.is_some();
-
-    Ok(json!({
-        "healthy": healthy,
-        "atomic": "Tower",
-        "spring": "wetSpring",
-        "components": {
-            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
-            "songbird": songbird.unwrap_or_else(|| json!("unreachable")),
-        },
-    }))
-}
-
-/// Canonical composition health: Node (Tower + ToadStool).
-pub fn handle_composition_node_health(_params: &Value) -> Result<Value, RpcError> {
-    let beardog = probe_capability("security");
-    let toadstool = probe_capability("compute");
-    let healthy = beardog.is_some() && toadstool.is_some();
-
-    Ok(json!({
-        "healthy": healthy,
-        "atomic": "Node",
-        "spring": "wetSpring",
-        "components": {
-            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
-            "toadstool": toadstool.unwrap_or_else(|| json!("unreachable")),
-        },
-    }))
-}
-
-/// Canonical composition health: Nest (Tower + NestGate).
-pub fn handle_composition_nest_health(_params: &Value) -> Result<Value, RpcError> {
-    let beardog = probe_capability("security");
-    let nestgate = probe_capability("storage");
-    let healthy = beardog.is_some() && nestgate.is_some();
-
-    Ok(json!({
-        "healthy": healthy,
-        "atomic": "Nest",
-        "spring": "wetSpring",
-        "components": {
-            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
-            "nestgate": nestgate.unwrap_or_else(|| json!("unreachable")),
-        },
-    }))
-}
-
-/// Canonical composition health: full NUCLEUS.
-///
-/// Aggregates Tower + Node + Nest + provenance trio status.
-pub fn handle_composition_nucleus_health(_params: &Value) -> Result<Value, RpcError> {
-    let beardog = probe_capability("security");
-    let songbird = probe_capability("discovery");
-    let toadstool = probe_capability("compute");
-    let nestgate = probe_capability("storage");
-    let rhizocrypt = probe_capability("provenance");
-    let loamspine = probe_capability("ledger");
-    let sweetgrass = probe_capability("attribution");
-
-    let tower_ok = beardog.is_some() && songbird.is_some();
-    let node_ok = tower_ok && toadstool.is_some();
-    let nest_ok = beardog.is_some() && nestgate.is_some();
-    let trio_ok = rhizocrypt.is_some() && loamspine.is_some() && sweetgrass.is_some();
-    let nucleus_ok = tower_ok && nest_ok;
-
-    Ok(json!({
-        "healthy": nucleus_ok,
-        "atomic": "NUCLEUS",
-        "spring": "wetSpring",
-        "tiers": {
-            "tower": tower_ok,
-            "node": node_ok,
-            "nest": nest_ok,
-            "provenance_trio": trio_ok,
-        },
-        "components": {
-            "beardog": beardog.unwrap_or_else(|| json!("unreachable")),
-            "songbird": songbird.unwrap_or_else(|| json!("unreachable")),
-            "toadstool": toadstool.unwrap_or_else(|| json!("unreachable")),
-            "nestgate": nestgate.unwrap_or_else(|| json!("unreachable")),
-            "rhizocrypt": rhizocrypt.unwrap_or_else(|| json!("unreachable")),
-            "loamspine": loamspine.unwrap_or_else(|| json!("unreachable")),
-            "sweetgrass": sweetgrass.unwrap_or_else(|| json!("unreachable")),
-        },
-    }))
-}
-
-/// Probe a capability domain via Neural API capability.discover.
-fn probe_capability(domain: &str) -> Option<Value> {
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
-
-    let family_id = std::env::var("FAMILY_ID").ok()?;
-    let runtime = std::env::var("XDG_RUNTIME_DIR")
-        .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
-    let socket_path = std::path::PathBuf::from(runtime)
-        .join("biomeos")
-        .join(format!("neural-api-{family_id}.sock"));
-    if !socket_path.exists() {
-        return None;
-    }
-
-    let mut stream = UnixStream::connect(&socket_path).ok()?;
-    stream
-        .set_read_timeout(Some(std::time::Duration::from_secs(3)))
-        .ok();
-
-    let request = json!({
-        "jsonrpc": "2.0",
-        "method": "capability.discover",
-        "params": { "domain": domain },
-        "id": 1,
-    });
-    let mut line = serde_json::to_string(&request).ok()?;
-    line.push('\n');
-    stream.write_all(line.as_bytes()).ok()?;
-    stream.flush().ok()?;
-
-    let mut reader = BufReader::new(stream);
-    let mut resp_line = String::new();
-    reader.read_line(&mut resp_line).ok()?;
-
-    let resp: Value = serde_json::from_str(resp_line.trim()).ok()?;
-    resp.get("result").cloned()
-}
+// Universal composition health methods (tower, node, nest, nucleus) removed
+// in favor of biomeOS v3.04+ orchestrator-owned endpoints per
+// COMPOSITION_HEALTH_STANDARD.md. Springs provide only domain-specific
+// health (composition.science_health).
 
 /// Extract an `f64` array from a JSON params object by key.
 ///

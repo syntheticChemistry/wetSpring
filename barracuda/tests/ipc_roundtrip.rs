@@ -107,8 +107,8 @@ fn capability_list_includes_all_domains() {
             .as_array()
             .expect("methods flat array (Wire Standard L2)");
         assert!(
-            methods.len() >= 41,
-            "expected 41+ methods, got {}",
+            methods.len() >= 37,
+            "expected 37+ methods, got {}",
             methods.len()
         );
 
@@ -154,41 +154,25 @@ fn composition_science_health_roundtrip() {
 }
 
 #[test]
-fn composition_nucleus_health_roundtrip() {
-    with_server("comp_nucleus", |socket| {
+fn universal_composition_methods_return_not_found() {
+    with_server("comp_universal_gone", |socket| {
         let resp = rpc_roundtrip(
             socket,
             r#"{"jsonrpc":"2.0","method":"composition.nucleus_health","params":{},"id":11}"#,
         );
-
-        assert_eq!(resp["jsonrpc"], "2.0");
-        assert!(resp.get("error").is_none(), "unexpected error: {resp}");
-
-        let result = &resp["result"];
-        assert_eq!(result["atomic"], "NUCLEUS");
-        assert_eq!(result["spring"], "wetSpring");
-        assert!(result["tiers"].is_object());
-        assert!(result["components"].is_object());
         assert!(
-            result["components"]["beardog"].is_string()
-                || result["components"]["beardog"].is_object()
+            resp.get("error").is_some(),
+            "universal composition methods now owned by biomeOS: {resp}"
         );
-    });
-}
 
-#[test]
-fn composition_tower_health_roundtrip() {
-    with_server("comp_tower", |socket| {
-        let resp = rpc_roundtrip(
+        let resp2 = rpc_roundtrip(
             socket,
             r#"{"jsonrpc":"2.0","method":"composition.tower_health","params":{},"id":12}"#,
         );
-
-        let result = &resp["result"];
-        assert_eq!(result["atomic"], "Tower");
-        assert_eq!(result["spring"], "wetSpring");
-        assert!(result.get("healthy").is_some());
-        assert!(result["components"].is_object());
+        assert!(
+            resp2.get("error").is_some(),
+            "universal composition methods now owned by biomeOS: {resp2}"
+        );
     });
 }
 
