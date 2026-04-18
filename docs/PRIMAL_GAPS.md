@@ -13,7 +13,7 @@ Last updated: 2026-04-18 (V147 — guideStone Level 3, bare mode certified, N2 e
 - Gaps are **composition-specific**: missing primal capabilities, IPC
   misalignment, proto-nucleate drift, or bonding protocol holes.
 - Architectural gaps that are not composition-related live in
-  [GAPS.md](../GAPS.md) (7 documented as of V140).
+  [GAPS.md](../GAPS.md) (7 architectural gaps documented).
 - Each gap references the downstream proto-nucleate manifest:
   `primalSpring/graphs/downstream/downstream_manifest.toml` (wetspring:
   `spring_name = "wetspring"`)
@@ -278,6 +278,5 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 
 ---
 
-*This document is maintained by wetSpring and fed back to primalSpring
-(`docs/PRIMAL_GAPS.md`) and `infra/wateringHole/handoffs/` per the
-NUCLEUS_SPRING_ALIGNMENT.md feedback protocol.*
+*This document is maintained by wetSpring and fed back to primalSpring via
+`wateringHole/handoffs/` per the NUCLEUS_SPRING_ALIGNMENT.md feedback protocol.*

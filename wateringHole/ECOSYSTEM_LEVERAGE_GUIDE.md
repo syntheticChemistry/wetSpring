@@ -1,11 +1,11 @@
 # Ecosystem Leverage Guide — wetSpring V128
 
-> **V145 note (Apr 17, 2026):** This guide was written at V128. Current
-> metrics: **363** binaries, **1,700** tests, **150+** barraCuda primitives
-> (v0.3.12), **42** niche capabilities, **22** barraCuda IPC consumed
-> capabilities (primal proof Level 5). Exp403: Tier 2 IPC-WIRED validation
-> (live UDS to 5 primals). PG-09: barraCuda IPC evaporation surface.
-> See `handoffs/WETSPRING_V145_PRIMAL_PROOF_TIER2_HANDOFF_APR17_2026.md`
+> **V147 note (Apr 18, 2026):** This guide was written at V128. Current
+> metrics: **364** binaries, **1,702** tests, **150+** barraCuda primitives
+> (v0.3.12), **42** niche capabilities, **48** barraCuda IPC consumed
+> capabilities (33 v0.9.15 canonical + 15 legacy). **guideStone Level 3**
+> (bare certified, N2 v0.9.15 surface). **10** primal composition gaps
+> (PG-01–PG-12, 2 resolved). See `handoffs/WETSPRING_V147_GUIDESTONE_LEVEL3_HANDOFF_APR18_2026.md`
 > and `docs/PRIMAL_GAPS.md` for current composition status.
 
 **Date:** March 18, 2026

@@ -4,7 +4,7 @@
 
 **Date:** April 18, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V147 — guideStone Level 3 (bare certified) + primal proof + composition validation. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone`, Level 3 bare certified, N2 v0.9.15 surface: linalg, spectral, expanded stats). **383** experiments indexed. **48 consumed capabilities** (33 v0.9.15 canonical + 15 legacy). `niche::GUIDESTONE_READINESS = 3`. `barraCuda` v0.3.12. **10** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
+**Status:** V147 — guideStone Level 3 (bare certified) + primal proof + composition validation. **Tier 1:** Python→Rust (**1,594** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone`, Level 3 bare certified, N2 v0.9.15 surface: linalg, spectral, expanded stats). **383** experiments indexed. **48 consumed capabilities** (33 v0.9.15 canonical + 15 legacy). `niche::GUIDESTONE_READINESS = 3`. `barraCuda` v0.3.12. **10** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
 
 ---
 
@@ -81,7 +81,7 @@ deploy graph metadata compliance (44 new checks → 141/141 total, later refined
 **V144** completes the composition validation tier. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation compliance). Exp401 validates IPC science dispatch results against local Rust baselines and structurally validates all 7 deploy graphs. Exp402 validates every niche capability dispatches correctly (NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip integration tests. `metrics.snapshot` handler. Universal composition health methods removed — biomeOS v3.04+ owns orchestration health. barraCuda v0.3.12.
 
 This is the validation narrative crystallised:
-- **Python was the validation target for Rust** (58 scripts → 1,592+ lib tests).
+- **Python was the validation target for Rust** (58 scripts → 1,594 lib tests).
 - **Rust + Python are now validation targets for NUCLEUS composition** (136/136
   proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
 - **Composition self-describes via Wire Standard** (L2+L3: methods,

@@ -7,16 +7,16 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,592+ tests)      (47 GPU modules)
+           (58 scripts)        (1,594 tests)       (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
-           (341 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
+           (342 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
 
 Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
            (42 niche caps)     (18 IPC roundtrips)    (63/63 checks)
 
 Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
-           (22 consumed caps)   (5 primals, check_skip)    (plasmidBin)
+           (48 consumed caps)   (5 primals, check_skip)    (plasmidBin)
 
 Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 3)
            (wetspring_guidestone) (bare certified, N2 v0.9.15 surface)
@@ -24,7 +24,7 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 3)
 
 | | |
 |---|---|
-| **Tests** | 1,592 (lib) + 18 IPC roundtrip + integration, 0 failed |
+| **Tests** | 1,594 (lib) + 18 IPC roundtrip + integration, 0 failed |
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
@@ -77,7 +77,7 @@ WGSL      Python       in handoff   adds ops    upstream, delete local
 
 | Crate | Purpose | Modules |
 |-------|---------|---------|
-| `wetspring-barracuda` | Library: bio algorithms + I/O + validation | 47 CPU + 47 GPU + 6 I/O |
+| `wetspring-barracuda` | Library: bio algorithms + I/O + validation | 46 CPU + 44 GPU + 6 I/O |
 | `wetspring-forge` | Hardware discovery, dispatch, visualization | 13 modules |
 | `wetspring-barracuda-fuzz` | libFuzzer targets for parsers | 4 targets |
 

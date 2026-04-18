@@ -27,7 +27,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.15 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,592 lib + 18 IPC roundtrip + integration, 0 failed
+- **Tests:** 1,594 lib + 18 IPC roundtrip + integration, 0 failed
 - **Validation checks:** 5,900+ across 364 binaries
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 3, bare certified), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
@@ -46,7 +46,7 @@ evolution pipeline.
 - **LC-MS:** EIC extraction, peak detection, feature tables, spectral matching, KMD
 - **Math biology:** ODE systems (QS, bistable, cooperation, phage, capacitor)
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
-- **Drug repurposing:** NMF, TransE knowledge graph embedding, molecular docking
+- **Drug repurposing:** NMF, TransE knowledge graph embedding, drug-target scoring
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.3.12, 150+ primitives consumed
 - **IPC:** 37 JSON-RPC methods, 42 niche capabilities, 21 domains, 1 composition health handler (science_health), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
@@ -71,9 +71,9 @@ evolution pipeline.
 
 ```
 Tier 1: Python baseline  → Rust CPU parity  → GPU validation
-           (58 scripts)     (1,592+ tests)     (47 GPU modules)
+           (58 scripts)     (1,594 tests)      (44 GPU modules)
 Tier 2: Rust validation   → NUCLEUS composition patterns
-           (363 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
+           (364 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
 Tier 3: Composition       → IPC parity → Niche gate
            (L2+L3)          (Exp401)     (Exp402)
 Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest

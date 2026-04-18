@@ -156,6 +156,9 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "linalg.eigenvalues",
     "linalg.svd",
     "linalg.cholesky",
+    // HEALTH (2) — barraCuda ecobin liveness/readiness (used by CompositionContext)
+    "health.liveness",
+    "health.readiness",
     // ── barraCuda legacy (Exp403 Tier 2, pending migration to v0.9.15 surface) ──
     "tensor.scale",
     "tensor.clamp",

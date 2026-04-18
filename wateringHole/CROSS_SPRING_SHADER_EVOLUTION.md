@@ -1,10 +1,11 @@
 # Cross-Spring Shader Evolution
 
-> **V145 note (Apr 17, 2026):** This document preserves the V126 shader
-> provenance map. Current state: barraCuda v0.3.12, **800+** WGSL shaders,
-> **150+** primitives consumed, **zero** local WGSL (fully lean). wetSpring
-> is now at Level 5 primal proof — calling barraCuda over IPC, not just as
-> a library dependency. See `ABSORPTION_MANIFEST.md` and the V145 handoff.
+> **V147 note (Apr 18, 2026):** This document preserves the V126 shader
+> provenance map as a fossil record. Current state: barraCuda v0.3.12,
+> **800+** WGSL shaders, **150+** primitives consumed, **zero** local WGSL
+> (fully lean). wetSpring guideStone Level 3 — calling barraCuda over IPC
+> via `primalspring::composition` API (48 consumed methods). See the V147
+> handoff and `docs/PRIMAL_GAPS.md` for current composition status.
 
 **Last updated**: Mar 16, 2026 — V126
 **Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173), standalone barraCuda v0.3.5, 1,443+ tests

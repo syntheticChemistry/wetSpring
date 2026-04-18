@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V147** | `handoffs/WETSPRING_V147_GUIDESTONE_LEVEL3_HANDOFF_APR18_2026.md` | Apr 18 | **guideStone Level 3**: bare certified (9/9, exit 2). N2 expanded: stats.variance/median/correlation, linalg.determinant/eigenvalues, spectral.fft. CONSUMED_CAPABILITIES aligned to v0.9.15 (48 total). PG-10/11/12 documented. |
+| **V147** | `handoffs/WETSPRING_V147_ECOSYSTEM_EVOLUTION_HANDOFF_APR18_2026.md` | Apr 18 | **Ecosystem evolution**: primal use review, composition patterns, NUCLEUS deployment story, actionable feedback for all primal+spring teams. |
+| V147 | `handoffs/WETSPRING_V147_GUIDESTONE_LEVEL3_HANDOFF_APR18_2026.md` | Apr 18 | guideStone Level 3: bare certified (9/9, exit 2). N2 expanded. CONSUMED_CAPABILITIES aligned to v0.9.15 (48 total). PG-10/11/12 documented. |
 | V146 | `handoffs/WETSPRING_V146_GUIDESTONE_LEVEL2_HANDOFF_APR18_2026.md` | Apr 18 | guideStone Level 2: `wetspring_guidestone` binary via `primalspring::composition` API. Bare science + NUCLEUS IPC parity. 5 certified properties documented. |
 | V145 | `handoffs/WETSPRING_V145_ECOSYSTEM_EVOLUTION_HANDOFF_APR17_2026.md` | Apr 17 | Ecosystem evolution: composition patterns, NUCLEUS deployment, per-primal feedback, 7 gaps. |
 | V145 | `handoffs/WETSPRING_V145_PRIMAL_PROOF_TIER2_HANDOFF_APR17_2026.md` | Apr 17 | Primal proof Tier 2 (IPC-WIRED): Exp403, 22 consumed capabilities, PG-09. |

@@ -27,7 +27,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,592 lib + 18 IPC roundtrip + 90 integration = 1,700 tests, 364 binaries (342 barracuda + 22 forge) |
+| Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,594 lib + 18 IPC roundtrip + 90 integration = 1,702 tests, 364 binaries (342 barracuda + 22 forge) |
 | Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 3 (bare certified, N2 v0.9.15)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
