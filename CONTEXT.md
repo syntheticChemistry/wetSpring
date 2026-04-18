@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V144:** Composition validation tier — Python→Rust→Primal composition. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation). Exp400 136/136 proto-nucleate (biomeOS V144: universal composition health delegated). Exp401: IPC parity (43/43). Exp402: niche gate (63/63). 18 IPC roundtrip tests. `metrics.snapshot` handler. barraCuda v0.3.12. Capabilities 42 niche, 37 dispatch. V143: deploy graph canonical. V142: Wire Standard L2+L3.
+**Current release — V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC vs local Rust (barraCuda, NestGate, Squirrel, BearDog, toadStool over UDS with check_skip). 22 barraCuda consumed capabilities in niche.rs. PG-09 IPC evaporation surface documented. V144: composition validation tier (Exp400-402, 18 IPC roundtrips). V143: deploy graph canonical. V142: Wire Standard L2+L3.
 
 ## Role in the Ecosystem
 
@@ -24,18 +24,18 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 340 validation/benchmark binaries
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 37 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Architecture:** 2 library crates + 341 validation/benchmark binaries
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 22 consumed (barraCuda IPC), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,592 lib + 18 IPC roundtrip + integration, 0 failed
-- **Validation checks:** 5,900+ across 340 binaries
-- **Composition:** 136/136 proto-nucleate alignment (Exp400 D01–D07), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), 9 niche dependencies (5 required + 4 optional)
+- **Validation checks:** 5,900+ across 341 binaries
+- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 6 open (`docs/PRIMAL_GAPS.md`)
+- **Primal gaps:** 7 open (`docs/PRIMAL_GAPS.md`)
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities

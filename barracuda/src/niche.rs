@@ -97,19 +97,47 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 /// to validate composition completeness without hardcoded knowledge of
 /// which primals provide what.
 pub const CONSUMED_CAPABILITIES: &[&str] = &[
-    // Tower Atomic
+    // Tower Atomic (BearDog + Songbird)
+    "crypto.hash",
     "crypto.sign_ed25519",
     "crypto.verify_ed25519",
     "crypto.blake3_hash",
     "discovery.find_primals",
     "discovery.announce",
-    // Node Atomic
+    // Node Atomic — barraCuda IPC domain math (primal proof Level 5)
+    // These are the 22 barraCuda methods wetSpring calls over IPC for
+    // domain science validation (the remaining 10 are infrastructure
+    // probes handled by the validation harness directly).
+    "tensor.matmul",
+    "tensor.create",
+    "tensor.add",
+    "tensor.scale",
+    "tensor.clamp",
+    "tensor.reduce",
+    "tensor.sigmoid",
+    "tensor.batch.submit",
+    "stats.mean",
+    "stats.std_dev",
+    "stats.weighted_mean",
+    "compute.dispatch",
+    "noise.perlin2d",
+    "noise.perlin3d",
+    "math.sigmoid",
+    "math.log2",
+    "activation.fitts",
+    "activation.hick",
+    "fhe.ntt",
+    "fhe.pointwise_mul",
+    "tolerances.get",
+    "rng.uniform",
+    // Node Atomic — toadStool compute orchestration
     "compute.dispatch.submit",
     "math.tensor",
     "math.stats",
     "math.spectral",
+    // Node Atomic — coralReef sovereign shader compiler
     "shader.compile.wgsl",
-    // Nest Atomic
+    // Nest Atomic (NestGate + rhizoCrypt + loamSpine + sweetGrass)
     "storage.store",
     "storage.retrieve",
     "dag.session.create",
@@ -118,7 +146,7 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "entry.append",
     "braid.create",
     "braid.commit",
-    // Meta-tier
+    // Meta-tier (Squirrel + petalTongue)
     "ai.complete",
     "inference.complete",
     "inference.embed",

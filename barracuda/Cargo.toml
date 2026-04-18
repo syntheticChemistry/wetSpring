@@ -1940,6 +1940,12 @@ required-features = ["json", "ipc"]
 name = "wetspring_gonzales_guidestone"
 path = "src/bin/wetspring_gonzales_guidestone.rs"
 
+# ── Exp403: Primal Parity — Live NUCLEUS IPC vs Local Rust Baselines ──
+[[bin]]
+name = "validate_primal_parity_v1"
+path = "src/bin/validate_primal_parity_v1.rs"
+required-features = ["ipc"]
+
 # ── Science Facade: HTTP gateway for primals.eco live science ──
 [[bin]]
 name = "wetspring_science_facade"

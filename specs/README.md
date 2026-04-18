@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: April 17, 2026
-**Status**: V144 — 5,900+ checks (382 experiments, 340 binaries), 1,699 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities (biomeOS V144: universal composition methods delegated), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs (`[[graph.nodes]]` canonical, bonding + fragments metadata), 6 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). **Composition validation tier: Exp401 (IPC parity — science results vs local Rust baselines + graph structural validation), Exp402 (niche parity — NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip tests (Gonzales, Anderson, provenance, brain, metrics, AI).** V144: composition validation tier, Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation), barraCuda v0.3.12, `deny.toml` C-ban alignment, provenance `commit`/`date` fields, deploy graph V144 compliance. V143: deploy graph canonical migration, D07 metadata compliance. V142: Wire Standard L2+L3, `identity.get`, `WireWitnessRef`. V141: capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns. *(Detailed validation tables below reflect their respective phases.)*
+**Status**: V145 — 5,900+ checks (383 experiments, 341 binaries), 1,610 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 22 consumed barraCuda IPC capabilities (primal proof Level 5), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 7 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). **Primal proof tier: Exp403 (live NUCLEUS IPC vs local Rust — barraCuda, NestGate, Squirrel, BearDog, toadStool over UDS with check_skip). Composition validation: Exp401 (IPC parity), Exp402 (niche parity). 18 IPC roundtrip tests.** V145: Exp403 primal parity binary (Tier 2 IPC-WIRED), 22 barraCuda consumed capabilities in niche.rs, PG-09 barraCuda IPC evaporation surface documented. V144: composition validation tier, Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation), barraCuda v0.3.12. V143: deploy graph canonical migration. V142: Wire Standard L2+L3. V141: capability alignment. V140: ecosystem audit. *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -27,8 +27,8 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,591 lib + 18 IPC roundtrip + 90 integration = 1,699 tests, 340 binaries |
-| Composition validation | Exp400: 136/136 proto-nucleate alignment, Exp401: IPC parity (science + graph), Exp402: niche parity (NICHE_STARTER_PATTERNS gate) |
+| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,592 lib + 18 IPC roundtrip + 90 integration = 1,700 tests, 341 binaries |
+| Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, **Exp403: primal parity (Tier 2 IPC-WIRED, 6 domains across 5 primals)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 63/63 reproducible papers complete (Tracks 1-6 + Phase 37 extensions + cross-spring) |
@@ -51,7 +51,7 @@ Every paper in the queue goes through the full evolution path. Status:
 | **BarraCuda GPU** | GPU produces same answer as CPU | 1,783 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
 | **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 39/39 papers three-tier (Exp103/104/165/182) |
-| **Primal composition** | IPC dispatch matches local Rust baselines, graph + niche validated | Exp400 (136/136), Exp401 (parity), Exp402 (niche gate), 18 IPC roundtrips |
+| **Primal composition** | IPC dispatch matches local Rust baselines, graph + niche validated | Exp400 (136/136), Exp401 (parity), Exp402 (niche gate), **Exp403 (primal proof — Tier 2 IPC-WIRED, 5 primals)**, 18 IPC roundtrips |
 
 **Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
 wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only

@@ -4,7 +4,7 @@
 
 **Date:** April 17, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V144 — Three-tier validation complete + composition parity gate. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **340** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate D01–D07, **7** deploy graphs `[[graph.nodes]]` canonical with bonding policy + fragments metadata, **42** niche capabilities, **37** dispatch methods, **21** domains, Wire Standard L2+L3). **Tier 3:** Composition→IPC parity (Exp401, **43/43**) → Niche gate (Exp402, **63/63**) → ecoBin harvest to `plasmidBin`. **382** experiments indexed (379 completed + 3 PROPOSED). `barraCuda` v0.3.12 (150+ primitives). **242** named tolerances with provenance trail. **22** consumed capabilities declared. `WireWitnessRef` provenance events. `identity.get` handler. `metrics.snapshot` handler. **6** primal composition gaps remaining (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, cargo-deny clean, `forbid(unsafe_code)`, zero `#[allow()]`.
+**Status:** V145 — Primal proof Tier 2 (IPC-WIRED) + composition validation. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **341** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → **Primal proof (Exp403: live NUCLEUS IPC vs local Rust, 5 primals, check_skip)** → ecoBin harvest. **383** experiments indexed. **22 barraCuda consumed capabilities** (Level 5 primal proof). PG-09 IPC evaporation surface. `barraCuda` v0.3.12. **7** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
 
 ---
 
@@ -28,14 +28,18 @@ Tier 2 — Rust validates NUCLEUS composition (primal patterns)
     → IPC capability surface (42 niche capabilities, 21 domains)
       → Proto-nucleate alignment (14 primals, 136/136 D01–D07)
         → Deploy graph validation (7 graphs, [[graph.nodes]] canonical)
-          → Deploy graph metadata (bonding policy, fragments, composition model)
-            → IPC parity + niche gate (Exp401 43/43, Exp402 63/63, 18 IPC roundtrip tests)
-            → Composition health: `composition.science_health` (spring-specific; 4 universal methods → biomeOS V144+)
+          → IPC parity + niche gate (Exp401, Exp402, 18 IPC roundtrip tests)
 
-Tier 3 — Composition enables ecoBin harvest (deployment)
-  All checks green
-    → cargo build --release → infra/plasmidBin/
-      → biomeos deploy --graph wetspring_science_nucleus.toml
+Tier 3 — Primal proof (Level 5: live NUCLEUS IPC)  ← NEW V145
+  Exp403: validate_primal_parity_v1
+    → Live UDS calls to barraCuda, NestGate, Squirrel, BearDog, toadStool
+      → Compare IPC results vs local Rust baselines
+        → check_skip for absent primals (CI: exit 2 = skipped)
+
+Tier 4 — NUCLEUS deployment enables ecoBin harvest
+  plasmidBin ecobins on clean machine
+    → biomeos deploy --graph wetspring_science_nucleus.toml
+      → Spring validates externally → PASS / FAIL / SKIP
 ```
 
 Every stage is validated with explicit numerical checks. All data is open.

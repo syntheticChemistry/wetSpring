@@ -10,19 +10,22 @@ Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
            (71 scripts)        (1,592+ tests)      (47 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
-           (340 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
+           (341 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
 
-Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402) → ecoBin harvest
-           (42 niche caps)     (18 IPC roundtrips)    (63/63 checks)       (plasmidBin)
+Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
+           (42 niche caps)     (18 IPC roundtrips)    (63/63 checks)
+
+Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
+           (22 consumed caps)   (5 primals, check_skip)    (plasmidBin)
 ```
 
 | | |
 |---|---|
 | **Tests** | 1,592 (lib) + 18 IPC roundtrip + integration, 0 failed |
-| **Validation checks** | 5,900+ across 340 binaries (318 barracuda + 22 forge) |
-| **Experiments** | 379 completed + 3 proposed (382 indexed) |
+| **Validation checks** | 5,900+ across 341 binaries (319 barracuda + 22 forge) |
+| **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 42 niche, 37 dispatch, 21 domains (Wire Standard L2+L3, V144) |
+| **IPC capabilities** | 42 niche, 22 consumed (barraCuda IPC), 37 dispatch, 21 domains (V145) |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |

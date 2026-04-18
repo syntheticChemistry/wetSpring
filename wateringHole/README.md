@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V144** | `handoffs/WETSPRING_V144_COMPOSITION_VALIDATION_TIER_HANDOFF_APR17_2026.md` | Apr 17 | **Composition validation tier**: Python→Rust→Primal composition. Exp400 (136/136 proto-nucleate), Exp401 (43/43 IPC parity), Exp402 (63/63 niche gate). 18 IPC roundtrip tests. Ed25519→BLAKE3 keyed MAC. `metrics.snapshot` handler. biomeOS V144 composition health ownership. barraCuda v0.3.12. Patterns for primal + spring teams. |
+| **V145** | `handoffs/WETSPRING_V145_PRIMAL_PROOF_TIER2_HANDOFF_APR17_2026.md` | Apr 17 | **Primal proof Tier 2 (IPC-WIRED)**: Exp403 live NUCLEUS IPC vs local Rust (5 primals, 6 domains, check_skip). 22 barraCuda consumed capabilities in niche.rs. PG-09 IPC evaporation surface. |
+| V144 | `handoffs/WETSPRING_V144_COMPOSITION_VALIDATION_TIER_HANDOFF_APR17_2026.md` | Apr 17 | Composition validation tier: Exp400-402, 18 IPC roundtrip tests. |
 | | *Superseded → `handoffs/archive/`* | | V143 and earlier are archived (**155** files). |
 
 ## Cross-Spring Documents

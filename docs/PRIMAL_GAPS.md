@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-17 (V144 audit — PG-08 added, PG-01 manifest path updated)
+Last updated: 2026-04-17 (V145 — PG-09 added, barraCuda IPC evaporation surface documented)
 
 ---
 
@@ -150,6 +150,49 @@ binary name if it differs from the deploy/downstream manifests.
 
 ---
 
+## PG-09: barraCuda IPC Evaporation Surface — Domain Math via IPC
+
+**Owner:** wetSpring (internal)
+**Status:** In progress — Exp403 binary created, 22 consumed capabilities declared
+
+barraCuda is a full ecobin primal with 32 JSON-RPC methods over UDS. Today,
+wetSpring links barraCuda as a Rust library dependency (`path = "../../../primals/barraCuda"`)
+and calls math in-process. For the primal proof (Level 5), domain math must
+migrate from `barracuda::stats::mean()` library calls to
+`rpc_call(sock, "stats.mean", params)` IPC calls against the barraCuda ecobin.
+
+**What exists (V145):**
+- `niche::CONSUMED_CAPABILITIES` now declares 22 barraCuda domain math methods
+  (tensor.matmul, stats.mean, stats.std_dev, stats.weighted_mean, compute.dispatch,
+  rng.uniform, noise.perlin2d/3d, math.sigmoid/log2, activation.fitts/hick,
+  fhe.ntt/pointwise_mul, tolerances.get, tensor.create/add/scale/clamp/reduce/sigmoid,
+  tensor.batch.submit)
+- Exp403 (`validate_primal_parity_v1`) is a Tier 2 IPC-WIRED validation binary
+  that calls barraCuda, NestGate, Squirrel, BearDog, and toadStool over live UDS
+  sockets with `check_skip` for absent primals
+- Socket discovery uses `ipc::discover::discover_primal()` (env var → XDG → temp)
+
+**Evaporation candidates (library → IPC migration):**
+
+| Library call | IPC method | Priority |
+|-------------|-----------|----------|
+| `barracuda::stats::mean()` | `stats.mean` | High — used in diversity, QS |
+| `barracuda::stats::std_dev()` | `stats.std_dev` | High — used in diversity |
+| `barracuda::stats::weighted_mean()` | `stats.weighted_mean` | Medium |
+| `barracuda::linalg::matmul()` | `tensor.matmul` | High — core linear algebra |
+| `barracuda::ops::*` | `tensor.*` | Medium — tensor operations |
+| `barracuda::dispatch::*` | `compute.dispatch` | High — GPU workloads |
+| `barracuda::sample::noise_*()` | `noise.perlin2d/3d` | Low — visualization |
+
+**Impact:** The library dep remains for Level 2 Rust-proof comparison and CI.
+The IPC path is additive — Exp403 validates both paths produce identical results.
+Full evaporation happens when Tier 3 (NUCLEUS from plasmidBin) is deployed.
+
+**Blocked by:** Nothing — barraCuda already exposes all 32 methods. The gap is
+in wetSpring's wiring, not in barraCuda's capabilities.
+
+---
+
 ## Summary Table
 
 | # | Gap | Owner | Blocked By | Phase |
@@ -162,6 +205,7 @@ binary name if it differs from the deploy/downstream manifests.
 | PG-06 | Ionic bond protocol | primalSpring Track 4 | Bond negotiation spec | 2 |
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
 | PG-08 | Validate manifest binary name | primalSpring | Manifest alignment | 1 |
+| PG-09 | barraCuda IPC evaporation | wetSpring | Nothing — wiring gap | 1 |
 
 ---
 

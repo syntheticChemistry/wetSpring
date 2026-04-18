@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 24, 2026 (V144 update)
-**Author:** wetSpring V144 (ecoPrimals)
-**Foundation:** 382 experiments indexed (379 completed + 3 PROPOSED), 5,707+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,592+** lib tests, **340** binaries (333 barracuda + 22 forge), coverage **91.20%** line / **90.30%** function (gated at 90%). **V144:** Full provenance + tolerance centralization + IPC modularization — `//! Provenance:` headers on all 340 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction. **V136:** thiserror, named casts (~60), upstream contract pinning, determinism tests, CI pin, hardcoding audit. **V135:** Doc reconciliation. **V134:** Drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `validate_all`, `GpuContext`/`TensorSession`, 242 named tolerances. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, toadStool S155+, coralReef Phase 10.
+**Date:** April 17, 2026 (V145 update)
+**Author:** wetSpring V145 (ecoPrimals)
+**Foundation:** 383 experiments indexed (380 completed + 3 PROPOSED), 5,900+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,592+** lib tests, **341** binaries, coverage **91.20%** line / **90.30%** function (gated at 90%). **V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC vs local Rust, 22 barraCuda consumed capabilities, PG-09 IPC evaporation surface. **V144:** Composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC, `metrics.snapshot`. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, toadStool S155+, coralReef Phase 10.
 
 ---
 
