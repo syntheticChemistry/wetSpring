@@ -4,10 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-04-18 (V146 — guideStone Level 2 added, all 7 gaps remain
-as external team dependencies. V146: wetspring_guidestone binary (primalspring
-composition API). V145: primal proof Tier 2 (IPC-WIRED), PG-09. V144:
-deploy graph canonical. Internal code quality green.)
+Last updated: 2026-04-18 (V147 — guideStone Level 3, bare certified. N2 v0.9.15
+surface expansion. CONSUMED_CAPABILITIES aligned to 48 (33 canonical + 15 legacy).
+3 new composition gaps (PG-10/11/12). All 7 architectural gaps remain as external
+team dependencies. Internal code quality green.)
 
 ---
 

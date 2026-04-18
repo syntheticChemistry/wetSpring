@@ -23,7 +23,7 @@
 //! **NUCLEUS mode** (exit 0 or 1):
 //!   N0 — Liveness (primals discoverable via capability scan)
 //!   N1 — Manifest IPC parity (7 validation_capabilities)
-//!   N2 — Extended domain science IPC
+//!   N2 — Extended domain science IPC (v0.9.15 surface: stats, linalg, spectral)
 //!   N3 — Cross-atomic pipeline (hash → store → retrieve → verify)
 //!
 //! ## Layered Certification
@@ -94,9 +94,12 @@ fn main() {
 
     if alive == 0 {
         eprintln!("\n  No NUCLEUS primals discovered. Bare properties validated.");
-        eprintln!("  Deploy from plasmidBin and rerun for full certification.");
+        eprintln!("  Deploy from plasmidBin and rerun for full certification.\n");
         v.finish();
-        std::process::exit(v.exit_code_skip_aware());
+        // Bare-only: exit 2 if bare checks passed, exit 1 if any failed.
+        // Exit 0 is reserved for full NUCLEUS certification.
+        let code = if v.exit_code() == 0 { 2 } else { 1 };
+        std::process::exit(code);
     }
 
     // ═══ N1: Manifest IPC Parity ═══
@@ -199,9 +202,9 @@ fn validate_bare_science(v: &mut ValidationResult) {
 
 fn validate_tolerance_provenance(v: &mut ValidationResult) {
     v.check_bool(
-        "ANALYTICAL_F64 = 0.0",
-        tolerances::ANALYTICAL_F64 == 0.0,
-        "exact integer/rational arithmetic — zero tolerance",
+        "ANALYTICAL_F64 = 1e-12",
+        (tolerances::ANALYTICAL_F64 - 1e-12).abs() < f64::EPSILON,
+        "f64 accumulated rounding budget for analytical chains (Shannon, Simpson)",
     );
 
     v.check_bool(
@@ -314,31 +317,95 @@ fn validate_manifest_ipc(ctx: &mut CompositionContext, v: &mut ValidationResult)
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// N2 — Extended Domain Science IPC
+// N2 — Extended Domain Science IPC (v0.9.15 canonical surface)
 // ─────────────────────────────────────────────────────────────────────
+// Each check uses an analytically derivable baseline so the guideStone
+// is self-verifying (Property 3) without needing Python or file deps.
 
 fn validate_domain_science(ctx: &mut CompositionContext, v: &mut ValidationResult) {
+    // ── STATS domain ──
+
     validate_parity(
-        ctx,
-        v,
+        ctx, v,
         "stats.std_dev([10..50]) IPC = √200",
-        "tensor",
-        "stats.std_dev",
+        "tensor", "stats.std_dev",
         serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
-        "result",
-        (200.0_f64).sqrt(),
+        "result", (200.0_f64).sqrt(),
         ps_tol::IPC_ROUND_TRIP_TOL,
     );
 
+    // Population variance: σ² = Σ(x−μ)²/N = 200
     validate_parity(
-        ctx,
-        v,
-        "stats.weighted_mean IPC = 1.7",
-        "tensor",
-        "stats.weighted_mean",
+        ctx, v,
+        "stats.variance([10..50]) IPC = 200",
+        "tensor", "stats.variance",
+        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
+        "result", 200.0,
+        ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // Median of odd-length sorted array: middle element = 5.0
+    validate_parity(
+        ctx, v,
+        "stats.median([1,3,5,7,9]) IPC = 5",
+        "tensor", "stats.median",
+        serde_json::json!({"data": [1.0, 3.0, 5.0, 7.0, 9.0]}),
+        "result", 5.0,
+        ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // Pearson r of perfectly correlated vectors: r = 1.0
+    validate_parity(
+        ctx, v,
+        "stats.correlation(x, 2x) IPC = 1.0",
+        "tensor", "stats.correlation",
+        serde_json::json!({"x": [1.0, 2.0, 3.0, 4.0, 5.0], "y": [2.0, 4.0, 6.0, 8.0, 10.0]}),
+        "result", 1.0,
+        ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // ── LINALG domain (routed to "tensor" → barraCuda) ──
+
+    // det([[1,2],[3,4]]) = 1×4 − 2×3 = −2
+    validate_parity(
+        ctx, v,
+        "linalg.determinant([[1,2],[3,4]]) IPC = -2",
+        "tensor", "linalg.determinant",
+        serde_json::json!({"matrix": [[1.0, 2.0], [3.0, 4.0]]}),
+        "result", -2.0,
+        ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // Symmetric 2×2: eigenvalues of [[2,1],[1,2]] are {1, 3}; min = 1
+    validate_parity(
+        ctx, v,
+        "linalg.eigenvalues([[2,1],[1,2]]) IPC min = 1",
+        "tensor", "linalg.eigenvalues",
+        serde_json::json!({"matrix": [[2.0, 1.0], [1.0, 2.0]]}),
+        "result", 1.0,
+        ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // ── SPECTRAL domain (routed to "tensor" → barraCuda) ──
+
+    // DFT of unit impulse δ[0] = [1,0,0,0] → all bins = 1; X[0] = 1.0
+    validate_parity(
+        ctx, v,
+        "spectral.fft([1,0,0,0]) IPC [0] = 1",
+        "tensor", "spectral.fft",
+        serde_json::json!({"data": [1.0, 0.0, 0.0, 0.0]}),
+        "result", 1.0,
+        ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // ── Legacy (Exp403 surface, pending v0.9.15 migration) ──
+
+    validate_parity(
+        ctx, v,
+        "stats.weighted_mean IPC = 1.7 (legacy)",
+        "tensor", "stats.weighted_mean",
         serde_json::json!({"data": [1.0, 2.0, 3.0], "weights": [0.5, 0.3, 0.2]}),
-        "result",
-        1.7,
+        "result", 1.7,
         ps_tol::IPC_ROUND_TRIP_TOL,
     );
 }

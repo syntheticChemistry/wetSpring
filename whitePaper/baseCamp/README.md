@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** April 17, 2026
+**Date:** April 18, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V146 — guideStone Level 2 + primal proof + composition validation. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone` via `primalspring::composition` API, bare+IPC). **383** experiments indexed. **22 barraCuda consumed capabilities** (Level 5 primal proof). `niche::GUIDESTONE_READINESS = 2`. `barraCuda` v0.3.12. **7** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
+**Status:** V147 — guideStone Level 3 (bare certified) + primal proof + composition validation. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone`, Level 3 bare certified, N2 v0.9.15 surface: linalg, spectral, expanded stats). **383** experiments indexed. **48 consumed capabilities** (33 v0.9.15 canonical + 15 legacy). `niche::GUIDESTONE_READINESS = 3`. `barraCuda` v0.3.12. **10** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
 
 ---
 
@@ -36,11 +36,12 @@ Tier 3 — Primal proof (Level 5: live NUCLEUS IPC)
       → Compare IPC results vs local Rust baselines
         → check_skip for absent primals (CI: exit 2 = skipped)
 
-Tier 4 — guideStone (self-validating NUCLEUS node)  ← NEW V146
+Tier 4 — guideStone (self-validating NUCLEUS node)  ← Level 3 V147
   wetspring_guidestone (primalspring::composition API)
-    → Bare: local science baselines (5 certified properties)
-      → NUCLEUS: validate_parity + validate_liveness via IPC
-        → Exit 0 (certified) / 1 (failed) / 2 (bare-only)
+    → Bare: local science baselines (9/9 pass, exit 2)  ← CERTIFIED
+      → N2: v0.9.15 surface (stats, linalg, spectral)
+        → NUCLEUS: validate_parity + validate_liveness via IPC
+          → Exit 0 (certified) / 1 (failed) / 2 (bare-only)
 
 Tier 5 — NUCLEUS deployment enables ecoBin harvest
   plasmidBin ecobins on clean machine

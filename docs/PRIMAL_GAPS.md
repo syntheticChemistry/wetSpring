@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-18 (V146 — guideStone Level 2, wetspring_guidestone binary added)
+Last updated: 2026-04-18 (V147 — guideStone Level 3, bare mode certified, N2 expanded to v0.9.15 surface)
 
 ---
 
@@ -153,26 +153,22 @@ binary name if it differs from the deploy/downstream manifests.
 ## PG-09: barraCuda IPC Evaporation Surface — Domain Math via IPC
 
 **Owner:** wetSpring (internal)
-**Status:** In progress — Exp403 binary created, 22 consumed capabilities declared
+**Status:** In progress — guideStone Level 3, CONSUMED_CAPABILITIES aligned to v0.9.15
 
-barraCuda is a full ecobin primal with 32 JSON-RPC methods over UDS. Today,
-wetSpring links barraCuda as a Rust library dependency (`path = "../../../primals/barraCuda"`)
-and calls math in-process. For the primal proof (Level 5), domain math must
-migrate from `barracuda::stats::mean()` library calls to
-`rpc_call(sock, "stats.mean", params)` IPC calls against the barraCuda ecobin.
+barraCuda is a full ecobin primal. The v0.9.15 canonical surface defines 33
+JSON-RPC methods (TENSOR 9, STATS 9, COMPUTE 4, SPECTRAL 3, LINALG 6,
+HEALTH 2). Today, wetSpring links barraCuda as a Rust library dependency
+(`path = "../../../primals/barraCuda"`) and calls math in-process. For the
+primal proof (Level 5), domain math must migrate to IPC.
 
-**What exists (V146):**
-- `niche::CONSUMED_CAPABILITIES` declares 22 barraCuda domain math methods
-  (tensor.matmul, stats.mean, stats.std_dev, stats.weighted_mean, compute.dispatch,
-  rng.uniform, noise.perlin2d/3d, math.sigmoid/log2, activation.fitts/hick,
-  fhe.ntt/pointwise_mul, tolerances.get, tensor.create/add/scale/clamp/reduce/sigmoid,
-  tensor.batch.submit)
-- Exp403 (`validate_primal_parity_v1`) is a Tier 2 IPC-WIRED validation binary
-  that calls barraCuda, NestGate, Squirrel, BearDog, and toadStool over live UDS
-  sockets with `check_skip` for absent primals
-- `wetspring_guidestone` binary uses `primalspring::composition` API
-  (`validate_parity`, `validate_liveness`, `CompositionContext`) for standardized
-  IPC parity. guideStone Level 2 (`niche::GUIDESTONE_READINESS = 2`)
+**What exists (V147):**
+- `niche::CONSUMED_CAPABILITIES` declares full v0.9.15 canonical surface (33
+  methods) plus 15 legacy Exp403 methods pending migration
+- `wetspring_guidestone` binary (Level 3): bare mode certified (9/9, exit 2),
+  N2 expanded with stats.variance, stats.median, stats.correlation,
+  linalg.determinant, linalg.eigenvalues, spectral.fft
+- Exp403 (`validate_primal_parity_v1`) remains as Tier 2 IPC-WIRED validation
+  with the original 22-method surface
 - Socket discovery uses `ipc::discover::discover_primal()` (env var → XDG → temp)
 
 **Evaporation candidates (library → IPC migration):**
@@ -181,18 +177,85 @@ migrate from `barracuda::stats::mean()` library calls to
 |-------------|-----------|----------|
 | `barracuda::stats::mean()` | `stats.mean` | High — used in diversity, QS |
 | `barracuda::stats::std_dev()` | `stats.std_dev` | High — used in diversity |
-| `barracuda::stats::weighted_mean()` | `stats.weighted_mean` | Medium |
+| `barracuda::stats::weighted_mean()` | `stats.weighted_mean` | Medium (legacy surface) |
 | `barracuda::linalg::matmul()` | `tensor.matmul` | High — core linear algebra |
 | `barracuda::ops::*` | `tensor.*` | Medium — tensor operations |
 | `barracuda::dispatch::*` | `compute.dispatch` | High — GPU workloads |
-| `barracuda::sample::noise_*()` | `noise.perlin2d/3d` | Low — visualization |
+| `barracuda::sample::noise_*()` | `noise.perlin2d/3d` | Low — legacy surface |
 
 **Impact:** The library dep remains for Level 2 Rust-proof comparison and CI.
-The IPC path is additive — Exp403 validates both paths produce identical results.
-Full evaporation happens when Tier 3 (NUCLEUS from plasmidBin) is deployed.
+The IPC path is additive. Full evaporation happens when Tier 3 (NUCLEUS from
+plasmidBin) is deployed.
 
-**Blocked by:** Nothing — barraCuda already exposes all 32 methods. The gap is
+**Blocked by:** Nothing — barraCuda already exposes all methods. The gap is
 in wetSpring's wiring, not in barraCuda's capabilities.
+
+---
+
+## PG-10: spectral/linalg Routing Gap in primalSpring composition API
+
+**Owner:** primalSpring (composition API)
+**Status:** Open — discovered during V147 guideStone N2 expansion
+
+`primalspring::composition::method_to_capability_domain()` maps method
+prefixes to capability domains. Currently `tensor`, `stats`, `math`, `noise`,
+`activation`, `rng`, `fhe`, `tolerances`, `validate`, `device` all route to
+`"tensor"` (barraCuda). However, `spectral` and `linalg` prefixes fall through
+to the default `_ => prefix` branch, meaning `method_to_capability_domain("spectral.fft")`
+returns `"spectral"` instead of `"tensor"`.
+
+**Workaround:** wetSpring's guideStone explicitly passes `"tensor"` as the
+capability domain for spectral/linalg `validate_parity` calls, bypassing the
+helper. This works but defeats the purpose of centralized routing.
+
+**Fix:** Add `"spectral" | "linalg"` to the `"tensor"` match arm in
+`method_to_capability_domain()`.
+
+**Impact:** Any spring using `method_to_capability_domain` for spectral/linalg
+methods will get incorrect routing until this is fixed.
+
+---
+
+## PG-11: downstream_manifest.toml Drift — Missing N2 Methods
+
+**Owner:** primalSpring (manifest maintainer)
+**Status:** Open — discovered during V147 guideStone expansion
+
+wetSpring's `downstream_manifest.toml` entry lists 7 `validation_capabilities`:
+`tensor.matmul`, `stats.mean`, `compute.dispatch`, `storage.store`,
+`storage.retrieve`, `inference.complete`, `crypto.hash`.
+
+The guideStone N2 layer now also validates `stats.std_dev`, `stats.variance`,
+`stats.median`, `stats.correlation`, `linalg.determinant`, `linalg.eigenvalues`,
+`spectral.fft`, and `stats.weighted_mean`. These are not in the manifest.
+
+Additionally, `guidestone_readiness` in the manifest is `1` while
+`niche::GUIDESTONE_READINESS` is now `3`. These should be reconciled.
+
+**Impact:** biomeOS composition completeness checks may under-report wetSpring's
+actual capability requirements if only the manifest is consulted.
+
+---
+
+## PG-12: Exp403 Legacy Method Surface — Pending v0.9.15 Migration
+
+**Owner:** wetSpring (internal)
+**Status:** Open — documented V147
+
+Exp403 (`validate_primal_parity_v1`) uses 22 barraCuda methods from the
+pre-v0.9.15 surface. 15 of these are now "legacy" (not on the v0.9.15
+canonical list): `tensor.scale`, `tensor.clamp`, `tensor.sigmoid`,
+`tensor.batch.submit`, `stats.weighted_mean`, `noise.perlin2d/3d`,
+`math.sigmoid/log2`, `activation.fitts/hick`, `fhe.ntt/pointwise_mul`,
+`tolerances.get`, `rng.uniform`.
+
+These may still be served by barraCuda but are not part of the canonical
+33-method surface. Exp403 D01 tiers should be migrated to v0.9.15 method
+names, and legacy-only checks should be gated behind a feature or documented
+as extended surface.
+
+**Impact:** Low — Exp403 still works. But the dual surface (canonical + legacy)
+complicates reasoning about what wetSpring actually requires from barraCuda.
 
 ---
 
@@ -209,6 +272,9 @@ in wetSpring's wiring, not in barraCuda's capabilities.
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
 | PG-08 | Validate manifest binary name | primalSpring | Manifest alignment | 1 |
 | PG-09 | barraCuda IPC evaporation | wetSpring | Nothing — wiring gap | 1 |
+| PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
+| PG-11 | Manifest drift (N2 methods) | primalSpring | Manifest update | 1 |
+| PG-12 | Exp403 legacy surface | wetSpring | v0.9.15 migration | 2 |
 
 ---
 

@@ -18,8 +18,8 @@ Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
 Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (22 consumed caps)   (5 primals, check_skip)    (plasmidBin)
 
-Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 2)
-           (wetspring_guidestone) (bare+IPC, primalspring composition API)
+Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 3)
+           (wetspring_guidestone) (bare certified, N2 v0.9.15 surface)
 ```
 
 | | |
@@ -28,7 +28,7 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 2)
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 42 niche, 22 consumed (barraCuda IPC), 37 dispatch, 21 domains (V146) |
+| **IPC capabilities** | 42 niche, 48 consumed (33 v0.9.15 canonical + 15 legacy), 37 dispatch, 21 domains (V147) |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -37,12 +37,12 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 2)
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 7 open in `docs/PRIMAL_GAPS.md` (6 external + PG-09 internal), 2 resolved |
+| **Primal gaps** | 10 open in `docs/PRIMAL_GAPS.md` (7 external + 3 internal), 2 resolved |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V146:** guideStone Level 2 — `wetspring_guidestone` binary using `primalspring::composition` API (bare science properties + NUCLEUS IPC parity via `validate_parity`/`validate_liveness`). `niche::GUIDESTONE_READINESS = 2`. V145: Exp403 primal proof (Tier 2 IPC-WIRED), 22 consumed capabilities, PG-09. V144: composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC. V143: deploy graph canonical. V142: Wire Standard L2+L3. V141: audit remediation. V140: ecosystem audit.
+**Current release — V147:** guideStone Level 3 (bare certified, exit 2) — N2 expanded with v0.9.15 canonical surface (stats.variance, stats.median, stats.correlation, linalg.determinant, linalg.eigenvalues, spectral.fft). CONSUMED_CAPABILITIES aligned to 33 canonical + 15 legacy. 3 new gaps (PG-10/11/12). V146: guideStone Level 2. V145: Exp403, 22 consumed caps. V144: composition tier. V143: deploy graph canonical. V142: Wire Standard L2+L3.
 
 ---
 

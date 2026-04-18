@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V146** | `handoffs/WETSPRING_V146_GUIDESTONE_LEVEL2_HANDOFF_APR18_2026.md` | Apr 18 | **guideStone Level 2**: `wetspring_guidestone` binary via `primalspring::composition` API. Bare science + NUCLEUS IPC parity. 5 certified properties documented. |
+| **V147** | `handoffs/WETSPRING_V147_GUIDESTONE_LEVEL3_HANDOFF_APR18_2026.md` | Apr 18 | **guideStone Level 3**: bare certified (9/9, exit 2). N2 expanded: stats.variance/median/correlation, linalg.determinant/eigenvalues, spectral.fft. CONSUMED_CAPABILITIES aligned to v0.9.15 (48 total). PG-10/11/12 documented. |
+| V146 | `handoffs/WETSPRING_V146_GUIDESTONE_LEVEL2_HANDOFF_APR18_2026.md` | Apr 18 | guideStone Level 2: `wetspring_guidestone` binary via `primalspring::composition` API. Bare science + NUCLEUS IPC parity. 5 certified properties documented. |
 | V145 | `handoffs/WETSPRING_V145_ECOSYSTEM_EVOLUTION_HANDOFF_APR17_2026.md` | Apr 17 | Ecosystem evolution: composition patterns, NUCLEUS deployment, per-primal feedback, 7 gaps. |
 | V145 | `handoffs/WETSPRING_V145_PRIMAL_PROOF_TIER2_HANDOFF_APR17_2026.md` | Apr 17 | Primal proof Tier 2 (IPC-WIRED): Exp403, 22 consumed capabilities, PG-09. |
 | V144 | `handoffs/WETSPRING_V144_COMPOSITION_VALIDATION_TIER_HANDOFF_APR17_2026.md` | Apr 17 | Composition validation tier: Exp400-402, 18 IPC roundtrip tests. |

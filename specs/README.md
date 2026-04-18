@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: April 18, 2026
-**Status**: V146 — 5,900+ checks (383 experiments, 364 binaries), 1,700 tests (1,592 lib + 18 IPC + 90 integration), 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 22 consumed barraCuda IPC capabilities (primal proof Level 5), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 7 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). **guideStone Level 2: `wetspring_guidestone` binary using `primalspring::composition` API (bare science + NUCLEUS IPC parity via `validate_parity`/`validate_liveness`). `niche::GUIDESTONE_READINESS = 2`.** Primal proof tier: Exp403 (live NUCLEUS IPC, 5 primals). Composition: Exp401 (IPC parity), Exp402 (niche parity). 18 IPC roundtrip tests. V146: guideStone binary, primalspring dep, Level 2 readiness. V145: Exp403, 22 consumed caps, PG-09. V144: composition validation tier, Ed25519→BLAKE3 keyed MAC. V143: deploy graph canonical. V142: Wire Standard L2+L3. V141: capability alignment. V140: ecosystem audit. *(Detailed validation tables below reflect their respective phases.)*
+**Status**: V147 — 5,900+ checks (383 experiments, 364 binaries), 1,700 tests (1,592 lib + 18 IPC + 90 integration), 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 48 consumed (33 v0.9.15 canonical + 15 legacy), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 10 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). **guideStone Level 3: bare mode certified (9/9 pass, exit 2), N2 expanded with v0.9.15 surface (stats.variance/median/correlation, linalg.determinant/eigenvalues, spectral.fft). `niche::GUIDESTONE_READINESS = 3`.** V147: N2 expansion, CONSUMED_CAPABILITIES v0.9.15 aligned, PG-10/11/12, bare mode certified. V146: guideStone Level 2, primalspring dep. V145: Exp403, 22 consumed caps, PG-09. V144: composition validation tier. V143: deploy graph canonical. V142: Wire Standard L2+L3. *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -28,7 +28,7 @@
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
 | Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,592 lib + 18 IPC roundtrip + 90 integration = 1,700 tests, 364 binaries (342 barracuda + 22 forge) |
-| Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 2 (primalspring composition API)** |
+| Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 3 (bare certified, N2 v0.9.15)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 63/63 reproducible papers complete (Tracks 1-6 + Phase 37 extensions + cross-spring) |

@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** April 18, 2026 (V146 update)
-**Author:** wetSpring V146 (ecoPrimals)
-**Foundation:** 383 experiments indexed (380 completed + 3 PROPOSED), 5,900+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,592+** lib tests, **342** binaries, coverage **91.20%** line / **90.30%** function (gated at 90%). **V146:** guideStone Level 2 — `wetspring_guidestone` binary (primalspring::composition API, bare science + NUCLEUS IPC parity). `niche::GUIDESTONE_READINESS = 2`. **V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC, 22 barraCuda consumed capabilities, PG-09. **V144:** Composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, toadStool S155+, coralReef Phase 10.
+**Date:** April 18, 2026 (V147 update)
+**Author:** wetSpring V147 (ecoPrimals)
+**Foundation:** 383 experiments indexed (380 completed + 3 PROPOSED), 5,900+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,592+** lib tests, **342** binaries, coverage **91.20%** line / **90.30%** function (gated at 90%). **V147:** guideStone Level 3 — bare certified (9/9, exit 2), N2 expanded with v0.9.15 surface (stats.variance/median/correlation, linalg.determinant/eigenvalues, spectral.fft). `CONSUMED_CAPABILITIES` aligned to 48 (33 canonical + 15 legacy). `niche::GUIDESTONE_READINESS = 3`. PG-10/11/12 documented. **V146:** guideStone Level 2, primalspring dep. **V145:** Primal proof Tier 2 (IPC-WIRED). **V144:** Composition validation tier. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, toadStool S155+, coralReef Phase 10.
 
 ---
 

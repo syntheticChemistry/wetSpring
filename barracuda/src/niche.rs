@@ -35,7 +35,10 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 ///
 /// 0 = not started, 1 = validation exists, 2 = properties documented,
 /// 3 = bare guideStone works, 4 = NUCLEUS guideStone works, 5 = certified.
-pub const GUIDESTONE_READINESS: u8 = 2;
+///
+/// Promoted to 3: bare mode runs (9/9 pass, exit 2), 5 certified properties
+/// validated without NUCLEUS. N2 expanded with v0.9.15 surface (linalg, spectral, stats).
+pub const GUIDESTONE_READINESS: u8 = 3;
 
 use crate::primal_names::{
     BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SQUIRREL, SWEETGRASS,
@@ -105,6 +108,9 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 /// Declared per Capability Wire Standard v1.0 Level 3 — enables biomeOS
 /// to validate composition completeness without hardcoded knowledge of
 /// which primals provide what.
+///
+/// barraCuda surface aligned to primalSpring v0.9.15 canonical (33 methods).
+/// Legacy methods (Exp403 Tier 2) retained until Exp403 migrates.
 pub const CONSUMED_CAPABILITIES: &[&str] = &[
     // Tower Atomic (BearDog + Songbird)
     "crypto.hash",
@@ -113,22 +119,49 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "crypto.blake3_hash",
     "discovery.find_primals",
     "discovery.announce",
-    // Node Atomic — barraCuda IPC domain math (primal proof Level 5)
-    // These are the 22 barraCuda methods wetSpring calls over IPC for
-    // domain science validation (the remaining 10 are infrastructure
-    // probes handled by the validation harness directly).
-    "tensor.matmul",
+    // ── barraCuda v0.9.15 canonical surface (33 methods) ──
+    // TENSOR (9)
     "tensor.create",
+    "tensor.matmul",
+    "tensor.transpose",
     "tensor.add",
+    "tensor.element_wise_mul",
+    "tensor.reduce_sum",
+    "tensor.reshape",
+    "tensor.slice",
+    "tensor.concat",
+    // STATS (9)
+    "stats.mean",
+    "stats.variance",
+    "stats.std_dev",
+    "stats.median",
+    "stats.percentile",
+    "stats.correlation",
+    "stats.covariance",
+    "stats.histogram",
+    "stats.normalize",
+    // COMPUTE (4)
+    "compute.dispatch",
+    "compute.capabilities",
+    "compute.benchmark",
+    "compute.device_info",
+    // SPECTRAL (3) — routed to "tensor" capability (barraCuda serves all math)
+    "spectral.fft",
+    "spectral.ifft",
+    "spectral.power_spectrum",
+    // LINALG (6) — routed to "tensor" capability (barraCuda serves all math)
+    "linalg.solve",
+    "linalg.inverse",
+    "linalg.determinant",
+    "linalg.eigenvalues",
+    "linalg.svd",
+    "linalg.cholesky",
+    // ── barraCuda legacy (Exp403 Tier 2, pending migration to v0.9.15 surface) ──
     "tensor.scale",
     "tensor.clamp",
-    "tensor.reduce",
     "tensor.sigmoid",
     "tensor.batch.submit",
-    "stats.mean",
-    "stats.std_dev",
     "stats.weighted_mean",
-    "compute.dispatch",
     "noise.perlin2d",
     "noise.perlin3d",
     "math.sigmoid",
