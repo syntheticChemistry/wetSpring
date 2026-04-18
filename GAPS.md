@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-04-17 (V145 — no architectural gaps closed, all 7 remain
-as external team dependencies. V145: primal proof Tier 2 (IPC-WIRED), PG-09
-barraCuda IPC evaporation surface. V144: composition validation tier. V143:
+Last updated: 2026-04-18 (V146 — guideStone Level 2 added, all 7 gaps remain
+as external team dependencies. V146: wetspring_guidestone binary (primalspring
+composition API). V145: primal proof Tier 2 (IPC-WIRED), PG-09. V144:
 deploy graph canonical. Internal code quality green.)
 
 ---

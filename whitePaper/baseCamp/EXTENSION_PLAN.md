@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** April 17, 2026 (V145 update)
-**Author:** wetSpring V145 (ecoPrimals)
-**Foundation:** 383 experiments indexed (380 completed + 3 PROPOSED), 5,900+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,592+** lib tests, **341** binaries, coverage **91.20%** line / **90.30%** function (gated at 90%). **V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC vs local Rust, 22 barraCuda consumed capabilities, PG-09 IPC evaporation surface. **V144:** Composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC, `metrics.snapshot`. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, toadStool S155+, coralReef Phase 10.
+**Date:** April 18, 2026 (V146 update)
+**Author:** wetSpring V146 (ecoPrimals)
+**Foundation:** 383 experiments indexed (380 completed + 3 PROPOSED), 5,900+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,592+** lib tests, **342** binaries, coverage **91.20%** line / **90.30%** function (gated at 90%). **V146:** guideStone Level 2 — `wetspring_guidestone` binary (primalspring::composition API, bare science + NUCLEUS IPC parity). `niche::GUIDESTONE_READINESS = 2`. **V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC, 22 barraCuda consumed capabilities, PG-09. **V144:** Composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, toadStool S155+, coralReef Phase 10.
 
 ---
 
@@ -427,7 +427,7 @@ Phase 0 (Now — wetSpring standalone on Eastgate):
   NCBI via sovereign HTTP (no NestGate needed)
   GPU via wgpu (RTX 4070), NPU via akida-driver (AKD1000)
   IPC: local JSON-RPC 2.0 over Unix sockets, 42 niche capabilities
-  ✅ 150+ barraCuda primitives consumed, 363 binaries, 1,700 tests
+  ✅ 150+ barraCuda primitives consumed, 364 binaries, 1,700 tests
   ✅ Exp403: Tier 2 primal proof (live UDS to 5 primals, check_skip)
 
 Phase 1 (Next — biomeOS single-node on Eastgate):

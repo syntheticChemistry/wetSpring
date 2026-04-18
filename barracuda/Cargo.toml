@@ -33,6 +33,9 @@ json = ["dep:serde", "dep:serde_json"]
 # Adds JSON-RPC 2.0 over Unix socket, Songbird registration, Neural API metrics.
 # BLAKE3 for data ingestion content hashing (data.fetch, vault handlers).
 ipc = ["json", "dep:tracing-subscriber", "dep:blake3"]
+# guideStone: self-validating NUCLEUS composition node (Level 5 primal proof).
+# Depends on primalspring composition API + ipc feature for JSON-RPC.
+guidestone = ["ipc", "dep:primalspring"]
 # Nautilus Shell: evolutionary reservoir computing for bio sentinel monitoring.
 # Adds concept edge detection, drift monitoring, evolutionary adaptation.
 nautilus = ["dep:bingocube-nautilus", "bingocube-nautilus/json"]
@@ -103,6 +106,11 @@ bytemuck = { version = "1", features = ["derive"] }
 # Uses miniz_oxide (pure Rust) by default — no C zlib, ecoBin compliant.
 # XML parsing is sovereign (src/io/xml.rs); base64 is sovereign (src/encoding.rs).
 flate2 = { version = "1.0", default-features = false, features = ["rust_backend"] }
+
+# primalspring: composition API for guideStone (Level 5 primal proof).
+# Provides CompositionContext, validate_parity, validate_liveness, ValidationResult,
+# and named tolerances for NUCLEUS IPC certification.
+primalspring = { path = "../../primalSpring/ecoPrimal", optional = true }
 
 # toml: TOML parsing for deploy graph structural validation (facade startup).
 # Pure Rust, zero C deps, ecoBin compliant.
@@ -1939,6 +1947,12 @@ required-features = ["json", "ipc"]
 [[bin]]
 name = "wetspring_gonzales_guidestone"
 path = "src/bin/wetspring_gonzales_guidestone.rs"
+
+# ── wetSpring guideStone: Self-Validating NUCLEUS Composition Node ──
+[[bin]]
+name = "wetspring_guidestone"
+path = "src/bin/wetspring_guidestone.rs"
+required-features = ["guidestone"]
 
 # ── Exp403: Primal Parity — Live NUCLEUS IPC vs Local Rust Baselines ──
 [[bin]]

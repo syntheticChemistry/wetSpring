@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-17 (V145 — PG-09 added, barraCuda IPC evaporation surface documented)
+Last updated: 2026-04-18 (V146 — guideStone Level 2, wetspring_guidestone binary added)
 
 ---
 
@@ -161,8 +161,8 @@ and calls math in-process. For the primal proof (Level 5), domain math must
 migrate from `barracuda::stats::mean()` library calls to
 `rpc_call(sock, "stats.mean", params)` IPC calls against the barraCuda ecobin.
 
-**What exists (V145):**
-- `niche::CONSUMED_CAPABILITIES` now declares 22 barraCuda domain math methods
+**What exists (V146):**
+- `niche::CONSUMED_CAPABILITIES` declares 22 barraCuda domain math methods
   (tensor.matmul, stats.mean, stats.std_dev, stats.weighted_mean, compute.dispatch,
   rng.uniform, noise.perlin2d/3d, math.sigmoid/log2, activation.fitts/hick,
   fhe.ntt/pointwise_mul, tolerances.get, tensor.create/add/scale/clamp/reduce/sigmoid,
@@ -170,6 +170,9 @@ migrate from `barracuda::stats::mean()` library calls to
 - Exp403 (`validate_primal_parity_v1`) is a Tier 2 IPC-WIRED validation binary
   that calls barraCuda, NestGate, Squirrel, BearDog, and toadStool over live UDS
   sockets with `check_skip` for absent primals
+- `wetspring_guidestone` binary uses `primalspring::composition` API
+  (`validate_parity`, `validate_liveness`, `CompositionContext`) for standardized
+  IPC parity. guideStone Level 2 (`niche::GUIDESTONE_READINESS = 2`)
 - Socket discovery uses `ipc::discover::discover_primal()` (env var → XDG → temp)
 
 **Evaporation candidates (library → IPC migration):**

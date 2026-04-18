@@ -17,15 +17,18 @@ Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
 
 Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (22 consumed caps)   (5 primals, check_skip)    (plasmidBin)
+
+Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 2)
+           (wetspring_guidestone) (bare+IPC, primalspring composition API)
 ```
 
 | | |
 |---|---|
 | **Tests** | 1,592 (lib) + 18 IPC roundtrip + integration, 0 failed |
-| **Validation checks** | 5,900+ across 363 binaries (341 barracuda + 22 forge) |
+| **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 42 niche, 22 consumed (barraCuda IPC), 37 dispatch, 21 domains (V145) |
+| **IPC capabilities** | 42 niche, 22 consumed (barraCuda IPC), 37 dispatch, 21 domains (V146) |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -39,7 +42,7 @@ Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC validation (barraCuda, NestGate, Squirrel, BearDog, toadStool over UDS with check_skip). 22 barraCuda consumed capabilities in niche.rs. PG-09 IPC evaporation surface documented. V144: composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC. V143: deploy graph canonical. V142: Wire Standard L2+L3. V141: audit remediation. V140: ecosystem audit.
+**Current release — V146:** guideStone Level 2 — `wetspring_guidestone` binary using `primalspring::composition` API (bare science properties + NUCLEUS IPC parity via `validate_parity`/`validate_liveness`). `niche::GUIDESTONE_READINESS = 2`. V145: Exp403 primal proof (Tier 2 IPC-WIRED), 22 consumed capabilities, PG-09. V144: composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC. V143: deploy graph canonical. V142: Wire Standard L2+L3. V141: audit remediation. V140: ecosystem audit.
 
 ---
 

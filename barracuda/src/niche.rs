@@ -28,6 +28,15 @@ pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry valid
 /// Niche version (tracks the spring version, not the crate version).
 pub const NICHE_VERSION: &str = "1.0.0";
 
+/// guideStone binary name (matches `downstream_manifest.toml` entry).
+pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
+
+/// guideStone readiness level (0-5 per `GUIDESTONE_COMPOSITION_STANDARD.md`).
+///
+/// 0 = not started, 1 = validation exists, 2 = properties documented,
+/// 3 = bare guideStone works, 4 = NUCLEUS guideStone works, 5 = certified.
+pub const GUIDESTONE_READINESS: u8 = 2;
+
 use crate::primal_names::{
     BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SQUIRREL, SWEETGRASS,
     TOADSTOOL,
@@ -394,6 +403,17 @@ mod tests {
     fn niche_name_matches_convention() {
         assert_eq!(NICHE_NAME, "wetspring");
         assert!(NICHE_NAME.chars().all(|c| c.is_ascii_lowercase()));
+    }
+
+    #[test]
+    fn guidestone_readiness_is_valid() {
+        assert!(GUIDESTONE_READINESS <= 5);
+    }
+
+    #[test]
+    fn guidestone_binary_follows_naming() {
+        assert!(GUIDESTONE_BINARY.starts_with("wetspring"));
+        assert!(GUIDESTONE_BINARY.contains("guidestone"));
     }
 
     #[test]

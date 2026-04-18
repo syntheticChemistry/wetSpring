@@ -4,7 +4,7 @@
 
 **Date:** April 17, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V145 — Primal proof Tier 2 (IPC-WIRED) + composition validation. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **341** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → **Primal proof (Exp403: live NUCLEUS IPC vs local Rust, 5 primals, check_skip)** → ecoBin harvest. **383** experiments indexed. **22 barraCuda consumed capabilities** (Level 5 primal proof). PG-09 IPC evaporation surface. `barraCuda` v0.3.12. **7** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
+**Status:** V146 — guideStone Level 2 + primal proof + composition validation. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone` via `primalspring::composition` API, bare+IPC). **383** experiments indexed. **22 barraCuda consumed capabilities** (Level 5 primal proof). `niche::GUIDESTONE_READINESS = 2`. `barraCuda` v0.3.12. **7** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
 
 ---
 
@@ -30,13 +30,19 @@ Tier 2 — Rust validates NUCLEUS composition (primal patterns)
         → Deploy graph validation (7 graphs, [[graph.nodes]] canonical)
           → IPC parity + niche gate (Exp401, Exp402, 18 IPC roundtrip tests)
 
-Tier 3 — Primal proof (Level 5: live NUCLEUS IPC)  ← NEW V145
+Tier 3 — Primal proof (Level 5: live NUCLEUS IPC)
   Exp403: validate_primal_parity_v1
     → Live UDS calls to barraCuda, NestGate, Squirrel, BearDog, toadStool
       → Compare IPC results vs local Rust baselines
         → check_skip for absent primals (CI: exit 2 = skipped)
 
-Tier 4 — NUCLEUS deployment enables ecoBin harvest
+Tier 4 — guideStone (self-validating NUCLEUS node)  ← NEW V146
+  wetspring_guidestone (primalspring::composition API)
+    → Bare: local science baselines (5 certified properties)
+      → NUCLEUS: validate_parity + validate_liveness via IPC
+        → Exit 0 (certified) / 1 (failed) / 2 (bare-only)
+
+Tier 5 — NUCLEUS deployment enables ecoBin harvest
   plasmidBin ecobins on clean machine
     → biomeos deploy --graph wetspring_science_nucleus.toml
       → Spring validates externally → PASS / FAIL / SKIP
@@ -67,7 +73,9 @@ graphs, aligns capability strings to proto-nucleate canonical form, adds
 coralReef/barraCuda as Node Atomic graph nodes, and extends Exp400 with D07
 deploy graph metadata compliance (44 new checks → 141/141 total, later refined to 136/136 in V144).
 
-**V145** adds the primal proof tier (Level 5 IPC-WIRED). Exp403 (`validate_primal_parity_v1`) calls live NUCLEUS primals over UDS sockets — barraCuda, NestGate, Squirrel, BearDog, toadStool — and compares results against local Rust baselines. `check_skip` for absent primals (CI: exit 2 = skipped). `niche::CONSUMED_CAPABILITIES` now declares 22 barraCuda domain math methods consumed over IPC. PG-09 documents the library-to-IPC evaporation surface. This is the first binary in wetSpring that calls primals by capability over real Unix domain sockets.
+**V146** adds the guideStone binary (`wetspring_guidestone`) — a self-validating NUCLEUS composition node using `primalspring::composition` API. Bare mode validates 5 certified properties (deterministic, reference-traceable, self-verifying, environment-agnostic, tolerance-documented) locally. NUCLEUS mode uses `validate_parity` and `validate_liveness` for IPC parity against all 7 manifest `validation_capabilities`. Cross-atomic pipeline: BearDog hash → NestGate store → retrieve → verify. `niche::GUIDESTONE_READINESS = 2` (properties documented). Inherits primalSpring's 6-layer base certification.
+
+**V145** added the primal proof tier (Level 5 IPC-WIRED). Exp403 (`validate_primal_parity_v1`) calls live NUCLEUS primals over UDS sockets — barraCuda, NestGate, Squirrel, BearDog, toadStool — and compares results against local Rust baselines. `check_skip` for absent primals (CI: exit 2 = skipped). `niche::CONSUMED_CAPABILITIES` declares 22 barraCuda domain math methods consumed over IPC. PG-09 documents the library-to-IPC evaporation surface.
 
 **V144** completes the composition validation tier. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation compliance). Exp401 validates IPC science dispatch results against local Rust baselines and structurally validates all 7 deploy graphs. Exp402 validates every niche capability dispatches correctly (NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip integration tests. `metrics.snapshot` handler. Universal composition health methods removed — biomeOS v3.04+ owns orchestration health. barraCuda v0.3.12.
 

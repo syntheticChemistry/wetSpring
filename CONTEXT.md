@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC vs local Rust (barraCuda, NestGate, Squirrel, BearDog, toadStool over UDS with check_skip). 22 barraCuda consumed capabilities in niche.rs. PG-09 IPC evaporation surface documented. V144: composition validation tier (Exp400-402, 18 IPC roundtrips). V143: deploy graph canonical. V142: Wire Standard L2+L3.
+**Current release — V146:** guideStone Level 2 — `wetspring_guidestone` binary using `primalspring::composition` API (bare science baselines + NUCLEUS IPC parity via `validate_parity`/`validate_liveness`). `niche::GUIDESTONE_READINESS = 2`. V145: Exp403 primal proof (Tier 2 IPC-WIRED), 22 consumed capabilities, PG-09. V144: composition validation tier (Exp400-402, 18 IPC roundtrips). V143: deploy graph canonical. V142: Wire Standard L2+L3.
 
 ## Role in the Ecosystem
 
@@ -24,12 +24,12 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 363 validation/benchmark binaries (341 barracuda + 22 forge)
+- **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 22 consumed (barraCuda IPC), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,592 lib + 18 IPC roundtrip + integration, 0 failed
-- **Validation checks:** 5,900+ across 363 binaries
-- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), 9 niche deps (5 required + 4 optional)
+- **Validation checks:** 5,900+ across 364 binaries
+- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 2), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
@@ -78,6 +78,8 @@ Tier 3: Composition       → IPC parity → Niche gate
            (L2+L3)          (Exp401)     (Exp402)
 Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (22 consumed)     (5 primals, check_skip)    (plasmidBin)
+Tier 5: guideStone        → Self-validating NUCLEUS node (Level 2)
+           (wetspring_guidestone) (primalspring composition API)
 ```
 
 ## Design Philosophy
