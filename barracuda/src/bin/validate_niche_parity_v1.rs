@@ -78,14 +78,9 @@ fn main() {
             "science.gonzales.dose_response" => {
                 json!({"n_points": 10, "dose_max": 100.0, "hill_n": 1.0})
             }
-            "science.gonzales.pk_decay" => json!({}),
-            "science.gonzales.tissue_lattice" => json!({}),
             "science.anderson.disorder_sweep" => {
                 json!({"w_min": 1.0, "w_max": 30.0, "n_points": 10})
             }
-            "science.anderson.biome_atlas" => json!({}),
-            "science.anderson.hormesis" => json!({}),
-            "science.anderson.cross_species" => json!({}),
             "science.alignment" => {
                 json!({"seq_a": "ACGT", "seq_b": "ACGT"})
             }
@@ -96,15 +91,12 @@ fn main() {
             "science.nmf" => {
                 json!({"data": [[1.0, 2.0], [3.0, 4.0]], "rank": 2})
             }
-            "science.timeseries" => {
-                json!({"time_series": {"times": [0.0, 1.0], "values": [1.0, 2.0]}})
-            }
-            "science.timeseries_diversity" => {
+            "science.timeseries" | "science.timeseries_diversity" => {
                 json!({"time_series": {"times": [0.0, 1.0], "values": [1.0, 2.0]}})
             }
             "science.ncbi_fetch" => json!({"id": "NC_000913", "db": "nucleotide"}),
             "brain.observe" => {
-                let head_outputs: Vec<f64> = (0..36).map(|i| (i as f64) * 0.01).collect();
+                let head_outputs: Vec<f64> = (0..36).map(|i| f64::from(i) * 0.01).collect();
                 json!({"event": "niche_test", "value": 1.0, "head_outputs": head_outputs})
             }
             "provenance.begin" => json!({"context": "niche_parity_test"}),
@@ -180,18 +172,16 @@ fn main() {
                 &format!("graph: required dep '{}' ({}) in deploy graph", dep.name, dep.role),
                 present,
             );
+        } else if present {
+            v.check_pass(
+                &format!("graph: optional dep '{}' ({}) in deploy graph", dep.name, dep.role),
+                true,
+            );
         } else {
-            if present {
-                v.check_pass(
-                    &format!("graph: optional dep '{}' ({}) in deploy graph", dep.name, dep.role),
-                    true,
-                );
-            } else {
-                println!(
-                    "    [INFO] Optional dep '{}' ({}) not in graph — available via discovery",
-                    dep.name, dep.role
-                );
-            }
+            println!(
+                "    [INFO] Optional dep '{}' ({}) not in graph — available via discovery",
+                dep.name, dep.role
+            );
         }
     }
 
@@ -278,7 +268,7 @@ fn main() {
     let cap_list = dispatch("capability.list", &json!({})).expect("capability.list dispatch");
 
     // L2: flat methods array
-    let methods = cap_list["methods"].as_array().map(Vec::len).unwrap_or(0);
+    let methods = cap_list["methods"].as_array().map_or(0, Vec::len);
     v.check_pass("wire L2: methods array present", methods > 0);
 
     // L3: provided_capabilities with type + methods structure

@@ -154,11 +154,11 @@ fn main() {
 
     v.check_pass(
         "parity: Anderson biome_atlas returns atlas data",
-        atlas.is_object() && !atlas.as_object().unwrap_or(&serde_json::Map::new()).is_empty(),
+        atlas.is_object() && atlas.as_object().is_some_and(|m| !m.is_empty()),
     );
 
     // D01g: Brain observe/attention/urgency
-    let head_outputs: Vec<f64> = (0..36).map(|i| (i as f64) * 0.01).collect();
+    let head_outputs: Vec<f64> = (0..36).map(|i| f64::from(i) * 0.01).collect();
     let brain_obs = dispatch(
         "brain.observe",
         &json!({"event": "composition_parity_test", "value": 0.42, "head_outputs": head_outputs}),
@@ -304,16 +304,12 @@ fn main() {
         cap_result["primal"].as_str() == Some("wetspring"),
     );
 
-    let methods = cap_result["methods"]
-        .as_array()
-        .map(Vec::len)
-        .unwrap_or(0);
+    let methods = cap_result["methods"].as_array().map_or(0, Vec::len);
     v.check_pass("wire: methods >= 37 (L2 flat list)", methods >= 37);
 
     let provided = cap_result["provided_capabilities"]
         .as_array()
-        .map(Vec::len)
-        .unwrap_or(0);
+        .map_or(0, Vec::len);
     v.check_pass("wire: provided_capabilities >= 15 (L3)", provided >= 15);
 
     v.check_pass(

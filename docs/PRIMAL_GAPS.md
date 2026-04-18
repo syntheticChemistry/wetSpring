@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-17 (V145 audit — PG-08 added, PG-01 manifest path updated)
+Last updated: 2026-04-17 (V144 audit — PG-08 added, PG-01 manifest path updated)
 
 ---
 
@@ -138,7 +138,7 @@ tests in `capability_domains::tests`.
 ## PG-08: spring_validate_manifest Binary Name Inconsistency
 
 **Owner:** primalSpring (manifest maintainer)
-**Status:** Informational — discovered during V145 audit
+**Status:** Informational — discovered during V144 audit
 
 `primalSpring/graphs/spring_validation/spring_validate_manifest.toml` uses
 `spring_binary = "wetspring"` for the wetSpring entry, while

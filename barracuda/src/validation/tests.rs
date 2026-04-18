@@ -41,7 +41,7 @@ fn print_result_fail() {
 
 #[test]
 fn validator_accumulates() {
-    let mut v = Validator::with_sink("test", Box::new(SilentSink));
+    let mut v = Validator::silent("test");
     v.check("ok", 1.0, 1.0, 0.0);
     v.check("fail", 2.0, 1.0, 0.0);
     v.check_count("count_ok", 5, 5);
@@ -51,7 +51,7 @@ fn validator_accumulates() {
 
 #[test]
 fn validator_section_does_not_count() {
-    let mut v = Validator::with_sink("test", Box::new(SilentSink));
+    let mut v = Validator::silent("test");
     v.section("── some section ──");
     assert_eq!(v.counts(), (0, 0));
 }
@@ -196,7 +196,7 @@ fn print_result_zero_total_is_failure() {
 
 #[test]
 fn validator_all_pass() {
-    let mut v = Validator::with_sink("all-pass", Box::new(SilentSink));
+    let mut v = Validator::silent("all-pass");
     for i in 0..10 {
         v.check(&format!("check {i}"), 1.0, 1.0, 0.0);
     }
@@ -205,7 +205,7 @@ fn validator_all_pass() {
 
 #[test]
 fn validator_all_fail() {
-    let mut v = Validator::with_sink("all-fail", Box::new(SilentSink));
+    let mut v = Validator::silent("all-fail");
     for i in 0..5 {
         v.check(&format!("fail {i}"), 999.0, 0.0, 0.0);
     }
@@ -226,7 +226,7 @@ fn validator_silent_counts_without_stdout_side_effects() {
 fn collecting_sink_captures_check_results() {
     let sink = CollectingSink::default();
     let results = std::sync::Arc::clone(&sink.results);
-    let mut v = Validator::with_sink("collect", Box::new(sink));
+    let mut v = Validator::collecting("collect", sink);
     v.check("first", 1.0, 1.0, 0.0);
     v.check("second", 2.0, 1.0, 0.01);
     assert_eq!(v.counts(), (1, 2));

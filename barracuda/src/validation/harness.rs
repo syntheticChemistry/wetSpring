@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! [`Validator`] — structured check accumulator removing manual pass/fail bookkeeping.
 
-use super::sink::{SilentSink, StdoutSink, ValidationSink};
+use super::sink::{CollectingSink, SilentSink, StdoutSink, ValidationSink};
 
 /// Accumulated validation state, removing manual pass/fail bookkeeping.
 ///
@@ -20,7 +20,7 @@ pub struct Validator {
     name: String,
     passed: u32,
     total: u32,
-    sink: Box<dyn ValidationSink>,
+    sink: ValidationSink,
 }
 
 impl Validator {
@@ -37,13 +37,13 @@ impl Validator {
             name,
             passed: 0,
             total: 0,
-            sink: Box::new(StdoutSink),
+            sink: ValidationSink::Stdout(StdoutSink),
         }
     }
 
-    /// Create a validator with a custom [`ValidationSink`] (no opening banner).
+    /// Create a validator with a [`ValidationSink`] variant (no opening banner).
     #[must_use]
-    pub fn with_sink(name: impl Into<String>, sink: Box<dyn ValidationSink>) -> Self {
+    pub fn with_sink(name: impl Into<String>, sink: ValidationSink) -> Self {
         let name = name.into();
         Self {
             name,
@@ -56,7 +56,13 @@ impl Validator {
     /// Shorthand for [`Self::with_sink`] with [`SilentSink`].
     #[must_use]
     pub fn silent(name: impl Into<String>) -> Self {
-        Self::with_sink(name, Box::new(SilentSink))
+        Self::with_sink(name, ValidationSink::Silent(SilentSink))
+    }
+
+    /// Create a validator with [`CollectingSink`] for programmatic inspection.
+    #[must_use]
+    pub fn collecting(name: impl Into<String>, sink: CollectingSink) -> Self {
+        Self::with_sink(name, ValidationSink::Collecting(sink))
     }
 
     /// Print a section header (no check counted).
@@ -154,8 +160,7 @@ impl Validator {
     /// Print summary and exit with 0 (pass) or 1 (fail).
     pub fn finish(mut self) -> ! {
         let success = self.total > 0 && self.passed == self.total;
-        self.sink
-            .on_finish(&self.name, self.passed, self.total, success);
+        self.sink.on_finish(&self.name, self.passed, self.total);
         std::process::exit(i32::from(!success))
     }
 
@@ -166,8 +171,7 @@ impl Validator {
     #[must_use]
     pub fn finish_with_code(mut self) -> std::process::ExitCode {
         let success = self.total > 0 && self.passed == self.total;
-        self.sink
-            .on_finish(&self.name, self.passed, self.total, success);
+        self.sink.on_finish(&self.name, self.passed, self.total);
         if success {
             std::process::ExitCode::SUCCESS
         } else {

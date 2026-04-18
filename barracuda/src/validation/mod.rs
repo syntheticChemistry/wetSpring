@@ -17,8 +17,8 @@
 //!
 //! Prefer the [`Validator`] struct over bare [`check`] calls — it
 //! tracks pass/fail counts automatically and avoids manual bookkeeping.
-//! Route output with [`ValidationSink`] ([`StdoutSink`] by default, [`SilentSink`],
-//! or [`CollectingSink`]) when you need programmatic consumption instead of stdout.
+//! Route output with [`ValidationSink`] variants ([`StdoutSink`] by default,
+//! [`SilentSink`], or [`CollectingSink`]) for programmatic consumption instead of stdout.
 
 mod data_dir;
 mod domain;
