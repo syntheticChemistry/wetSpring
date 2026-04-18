@@ -1,9 +1,12 @@
 # Ecosystem Leverage Guide — wetSpring V128
 
-> **V141 note (Apr 11, 2026):** This guide was written at V128. Current
-> metrics, capability counts, and primal evolution status are in
-> `ABSORPTION_MANIFEST.md` (V141 banner) and
-> `handoffs/WETSPRING_V141_AUDIT_REMEDIATION_HANDOFF_APR11_2026.md`.
+> **V145 note (Apr 17, 2026):** This guide was written at V128. Current
+> metrics: **363** binaries, **1,700** tests, **150+** barraCuda primitives
+> (v0.3.12), **42** niche capabilities, **22** barraCuda IPC consumed
+> capabilities (primal proof Level 5). Exp403: Tier 2 IPC-WIRED validation
+> (live UDS to 5 primals). PG-09: barraCuda IPC evaporation surface.
+> See `handoffs/WETSPRING_V145_PRIMAL_PROOF_TIER2_HANDOFF_APR17_2026.md`
+> and `docs/PRIMAL_GAPS.md` for current composition status.
 
 **Date:** March 18, 2026
 **Scope:** What wetSpring absorbs from the ecoPrimals ecosystem and what it contributes back.

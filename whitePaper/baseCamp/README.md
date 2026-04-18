@@ -12,7 +12,7 @@
 
 Each document in this directory summarizes what wetSpring reproduced, evolved,
 and validated from one faculty member's published work. The evolution follows
-three validation tiers:
+four validation tiers:
 
 ```
 Tier 1 — Python validates Rust (science fidelity)
@@ -67,7 +67,9 @@ graphs, aligns capability strings to proto-nucleate canonical form, adds
 coralReef/barraCuda as Node Atomic graph nodes, and extends Exp400 with D07
 deploy graph metadata compliance (44 new checks → 141/141 total, later refined to 136/136 in V144).
 
-**V144** completes the composition validation tier. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation compliance). Exp401 validates IPC science dispatch results against local Rust baselines and structurally validates all 7 deploy graphs. Exp402 validates every niche capability dispatches correctly (NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip integration tests cover Gonzales, Anderson, provenance lifecycle, brain, metrics, and AI. `metrics.snapshot` handler wired to dispatch. Universal composition health methods (`composition.{tower,node,nest,nucleus}_health`) removed — biomeOS v3.04+ owns orchestration health. barraCuda v0.3.12. `deny.toml` C-dependency bans aligned with workspace root. Provenance registry extended with `commit`/`date` fields.
+**V145** adds the primal proof tier (Level 5 IPC-WIRED). Exp403 (`validate_primal_parity_v1`) calls live NUCLEUS primals over UDS sockets — barraCuda, NestGate, Squirrel, BearDog, toadStool — and compares results against local Rust baselines. `check_skip` for absent primals (CI: exit 2 = skipped). `niche::CONSUMED_CAPABILITIES` now declares 22 barraCuda domain math methods consumed over IPC. PG-09 documents the library-to-IPC evaporation surface. This is the first binary in wetSpring that calls primals by capability over real Unix domain sockets.
+
+**V144** completes the composition validation tier. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation compliance). Exp401 validates IPC science dispatch results against local Rust baselines and structurally validates all 7 deploy graphs. Exp402 validates every niche capability dispatches correctly (NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip integration tests. `metrics.snapshot` handler. Universal composition health methods removed — biomeOS v3.04+ owns orchestration health. barraCuda v0.3.12.
 
 This is the validation narrative crystallised:
 - **Python was the validation target for Rust** (58 scripts → 1,592+ lib tests).

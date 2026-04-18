@@ -53,11 +53,9 @@ if [ "$SKIP_COV" = false ]; then
 fi
 
 if [ "$SKIP_PY" = false ]; then
-    if [ -d scripts/baselines ] && command -v python3 &>/dev/null; then
-        step "Python baselines" python3 scripts/baselines/run_all.py
-    else
-        printf "\n══ Python baselines ══\n  ○ baselines dir or python3 not found, skipping\n"
-    fi
+    # Python baseline scripts live in scripts/*.py with provenance in
+    # barracuda/src/provenance_registry.rs — no scripts/baselines/ runner.
+    printf "\n══ Python baselines ══\n  ○ run individual scripts/*.py as needed (58 scripts, provenance registered)\n"
 fi
 
 printf "\n══════════════════════════════════════\n"

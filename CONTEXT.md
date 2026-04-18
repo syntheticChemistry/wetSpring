@@ -24,11 +24,11 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 341 validation/benchmark binaries
+- **Architecture:** 2 library crates + 363 validation/benchmark binaries (341 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 22 consumed (barraCuda IPC), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,592 lib + 18 IPC roundtrip + integration, 0 failed
-- **Validation checks:** 5,900+ across 341 binaries
+- **Validation checks:** 5,900+ across 363 binaries
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
@@ -71,11 +71,13 @@ evolution pipeline.
 
 ```
 Tier 1: Python baseline  → Rust CPU parity  → GPU validation
-           (71 scripts)     (1,592+ tests)     (47 GPU modules)
+           (58 scripts)     (1,592+ tests)     (47 GPU modules)
 Tier 2: Rust validation   → NUCLEUS composition patterns
-           (340 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
-Tier 3: Composition       → IPC parity → Niche gate → ecoBin harvest
-           (L2+L3)          (Exp401)     (Exp402)     (plasmidBin)
+           (363 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
+Tier 3: Composition       → IPC parity → Niche gate
+           (L2+L3)          (Exp401)     (Exp402)
+Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest
+           (22 consumed)     (5 primals, check_skip)    (plasmidBin)
 ```
 
 ## Design Philosophy

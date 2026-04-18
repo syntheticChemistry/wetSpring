@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V145** | `handoffs/WETSPRING_V145_PRIMAL_PROOF_TIER2_HANDOFF_APR17_2026.md` | Apr 17 | **Primal proof Tier 2 (IPC-WIRED)**: Exp403 live NUCLEUS IPC vs local Rust (5 primals, 6 domains, check_skip). 22 barraCuda consumed capabilities in niche.rs. PG-09 IPC evaporation surface. |
+| **V145** | `handoffs/WETSPRING_V145_ECOSYSTEM_EVOLUTION_HANDOFF_APR17_2026.md` | Apr 17 | **Ecosystem evolution**: composition patterns, NUCLEUS deployment, per-primal feedback, 7 gaps, code quality summary. For all primal + spring teams. |
+|| V145 | `handoffs/WETSPRING_V145_PRIMAL_PROOF_TIER2_HANDOFF_APR17_2026.md` | Apr 17 | Primal proof Tier 2 (IPC-WIRED): Exp403, 22 consumed capabilities, PG-09. |
 | V144 | `handoffs/WETSPRING_V144_COMPOSITION_VALIDATION_TIER_HANDOFF_APR17_2026.md` | Apr 17 | Composition validation tier: Exp400-402, 18 IPC roundtrip tests. |
 | | *Superseded → `handoffs/archive/`* | | V143 and earlier are archived (**155** files). |
 
@@ -18,7 +19,7 @@
 | File | Purpose |
 |------|---------|
 | `ECOSYSTEM_LEVERAGE_GUIDE.md` | What wetSpring absorbs from ecosystem and contributes back |
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (826+ barraCuda WGSL shaders) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (800+ barraCuda WGSL shaders, V126 snapshot) |
 | `TOADSTOOL_WETSPRING_GAP_ANALYSIS.md` | Gap analysis: barraCuda exports vs wetSpring usage |
 
 ## Archive

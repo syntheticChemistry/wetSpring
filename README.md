@@ -7,7 +7,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (71 scripts)        (1,592+ tests)      (47 GPU modules)
+           (58 scripts)        (1,592+ tests)      (47 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
            (341 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
@@ -22,7 +22,7 @@ Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
 | | |
 |---|---|
 | **Tests** | 1,592 (lib) + 18 IPC roundtrip + integration, 0 failed |
-| **Validation checks** | 5,900+ across 341 binaries (319 barracuda + 22 forge) |
+| **Validation checks** | 5,900+ across 363 binaries (341 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 42 niche, 22 consumed (barraCuda IPC), 37 dispatch, 21 domains (V145) |
@@ -34,12 +34,12 @@ Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 6 open in `docs/PRIMAL_GAPS.md` (all external), 2 resolved |
+| **Primal gaps** | 7 open in `docs/PRIMAL_GAPS.md` (6 external + PG-09 internal), 2 resolved |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V144:** Composition validation tier — Python→Rust→Primal composition. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation). Exp400 136/136 proto-nucleate alignment (biomeOS V144: universal composition methods delegated). Exp401: IPC science parity — dispatch results vs local Rust baselines + 7-graph structural validation. Exp402: 63/63 niche parity gate (NICHE_STARTER_PATTERNS). 18 IPC roundtrip tests (Gonzales, Anderson, provenance, brain, metrics, AI). `metrics.snapshot` handler wired. barraCuda v0.3.12. `deny.toml` C-ban alignment. Provenance registry `commit`/`date` fields. Capabilities 46→42 niche, 42→37 dispatch (biomeOS owns universal composition health). V143: deploy graph canonical. V142: Wire Standard L2+L3. V141: audit remediation. V140: ecosystem audit.
+**Current release — V145:** Primal proof Tier 2 (IPC-WIRED) — Exp403 live NUCLEUS IPC validation (barraCuda, NestGate, Squirrel, BearDog, toadStool over UDS with check_skip). 22 barraCuda consumed capabilities in niche.rs. PG-09 IPC evaporation surface documented. V144: composition validation tier (Exp400-402), Ed25519→BLAKE3 keyed MAC. V143: deploy graph canonical. V142: Wire Standard L2+L3. V141: audit remediation. V140: ecosystem audit.
 
 ---
 
@@ -74,7 +74,7 @@ WGSL      Python       in handoff   adds ops    upstream, delete local
 
 | Crate | Purpose | Modules |
 |-------|---------|---------|
-| `wetspring-barracuda` | Library: bio algorithms + I/O + validation | 49 CPU + 44 GPU + 6 I/O |
+| `wetspring-barracuda` | Library: bio algorithms + I/O + validation | 47 CPU + 47 GPU + 6 I/O |
 | `wetspring-forge` | Hardware discovery, dispatch, visualization | 13 modules |
 | `wetspring-barracuda-fuzz` | libFuzzer targets for parsers | 4 targets |
 
@@ -130,7 +130,7 @@ cargo llvm-cov --workspace --html
 
 ---
 
-## CPU Modules (49)
+## CPU Modules (46)
 
 | Module | Algorithm | Validated Against |
 |--------|-----------|-------------------|

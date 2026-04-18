@@ -415,7 +415,7 @@ brings multiple primals into the pipeline, coordinated through biomeOS.
 |--------|----------|------|-----------------|
 | **biomeOS** | phase2/biomeOS/ | Orchestrator | Graph execution, capability registry, Neural API (124+ capabilities), lifecycle management |
 | **NestGate** | Referenced in ncbi/nestgate/ | Data layer | Content-addressed storage, NCBI provider, SRA, ZFS cold storage (Westgate 76TB) |
-| **ToadStool** | phase1/toadstool/ | Compute | 844 WGSL shaders, MultiHeadEsn, spectral, 93+ primitives consumed by wetSpring |
+| **ToadStool** | primals/toadStool/ | Compute | 800+ WGSL shaders, MultiHeadEsn, spectral, 150+ primitives consumed by wetSpring (barraCuda v0.3.12) |
 | **Songbird** | Referenced in IPC | Discovery | Primal discovery, mesh routing, HTTPS stack |
 | **BearDog** | Referenced in IPC | Trust | Crypto, TLS 1.3, key hierarchy, SoloKey FIDO2 anchors |
 
@@ -423,11 +423,12 @@ brings multiple primals into the pipeline, coordinated through biomeOS.
 
 ```
 Phase 0 (Now — wetSpring standalone on Eastgate):
-  wetSpring consumes ToadStool as a Rust dependency (path dep)
+  wetSpring consumes barraCuda as a Rust dependency (path dep)
   NCBI via sovereign HTTP (no NestGate needed)
   GPU via wgpu (RTX 4070), NPU via akida-driver (AKD1000)
-  IPC: local JSON-RPC 2.0 over Unix sockets
-  ✅ Exp271 validates 93+ primitives, 73/73 checks
+  IPC: local JSON-RPC 2.0 over Unix sockets, 42 niche capabilities
+  ✅ 150+ barraCuda primitives consumed, 363 binaries, 1,700 tests
+  ✅ Exp403: Tier 2 primal proof (live UDS to 5 primals, check_skip)
 
 Phase 1 (Next — biomeOS single-node on Eastgate):
   biomeos nucleus start --mode node

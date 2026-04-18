@@ -1,8 +1,10 @@
 # Cross-Spring Shader Evolution
 
-> **V141 note (Apr 11, 2026):** Shader counts and absorption status current
-> in `barracuda/ABSORPTION_MANIFEST.md` and the V141 handoff. This document
-> preserves the V126 shader provenance map.
+> **V145 note (Apr 17, 2026):** This document preserves the V126 shader
+> provenance map. Current state: barraCuda v0.3.12, **800+** WGSL shaders,
+> **150+** primitives consumed, **zero** local WGSL (fully lean). wetSpring
+> is now at Level 5 primal proof — calling barraCuda over IPC, not just as
+> a library dependency. See `ABSORPTION_MANIFEST.md` and the V145 handoff.
 
 **Last updated**: Mar 16, 2026 — V126
 **Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173), standalone barraCuda v0.3.5, 1,443+ tests

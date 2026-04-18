@@ -166,16 +166,16 @@ should be updated to reflect:
 
 Every spring reaching the composition tier should:
 
-- [ ] Create Exp400-style static composition validator (niche + graph + proto-nucleate)
-- [ ] Create Exp401-style IPC parity validator (dispatch results vs local baselines)
-- [ ] Create Exp402-style niche parity validator (NICHE_STARTER_PATTERNS gate)
-- [ ] Expand IPC roundtrip integration tests (every science method end-to-end)
-- [ ] Remove universal `composition.*_health` handlers (biomeOS V144+)
-- [ ] Retain `composition.<domain>_health` (spring-specific)
-- [ ] Remove `ed25519-dalek` / `ring` / `rustls` direct deps (Tower Atomic delegation)
-- [ ] Align `deny.toml` with workspace root C-dependency bans
-- [ ] Update `upstream_contract.rs` or equivalent version pin
-- [ ] Update plasmidBin metadata with current test/binary counts
+- [x] Create Exp400-style static composition validator — **Exp400 (136/136) done V144**
+- [x] Create Exp401-style IPC parity validator — **Exp401 done V144**
+- [x] Create Exp402-style niche parity validator — **Exp402 done V144**
+- [x] Expand IPC roundtrip integration tests — **18 IPC roundtrips done V144**
+- [x] Remove universal `composition.*_health` handlers — **done V144 (biomeOS owns)**
+- [x] Retain `composition.<domain>_health` — **`composition.science_health` retained**
+- [x] Remove `ed25519-dalek` / `ring` / `rustls` direct deps — **done V144 (BLAKE3 keyed MAC)**
+- [x] Align `deny.toml` with workspace root C-dependency bans — **done V144**
+- [x] Update `upstream_contract.rs` or equivalent version pin — **barraCuda v0.3.12 pinned**
+- [x] Update plasmidBin metadata with current test/binary counts — **done V145**
 
 ### Brain Observer Pattern
 

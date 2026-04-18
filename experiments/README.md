@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-04-17 (V145: 383 experiments indexed (380 completed + 3 PROPOSED), **341** binaries (**319** barracuda + **22** forge), 5,900+ checks, **1,592+** lib tests **+ 18 IPC** roundtrip (0 failures). **Primal proof Tier 2**: Exp403 live NUCLEUS IPC vs local Rust (5 primals, 6 domains, check_skip). **22 barraCuda consumed capabilities** in niche.rs. PG-09 IPC evaporation surface. V144: composition validation tier (Exp400-402). barraCuda v0.3.12. Clippy 0 warnings all-features.)
+**Updated**: 2026-04-17 (V145: 383 experiments indexed (380 completed + 3 PROPOSED), **363** binaries (**341** barracuda + **22** forge), 5,900+ checks, **1,592+** lib tests **+ 18 IPC** roundtrip (0 failures). **Primal proof Tier 2**: Exp403 live NUCLEUS IPC vs local Rust (5 primals, 6 domains, check_skip). **22 barraCuda consumed capabilities** in niche.rs. PG-09 IPC evaporation surface. V144: composition validation tier (Exp400-402). barraCuda v0.3.12. Clippy 0 warnings all-features.)
 
 ---
 
@@ -646,7 +646,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V144):** 382 experiments indexed (379 completed + 3 PROPOSED), 340 binaries (318 barracuda + 22 forge), 5,800+ checks, 1,592+ lib tests + 18 IPC roundtrip (0 failures). barraCuda v0.3.12. Wire Standard L2+L3. 22 consumed capabilities.
+**Totals (V145):** 383 experiments indexed (380 completed + 3 PROPOSED), 363 binaries (341 barracuda + 22 forge), 5,900+ checks, 1,592+ lib tests + 18 IPC roundtrip (0 failures). barraCuda v0.3.12. 22 barraCuda consumed IPC capabilities. Exp403 primal proof Tier 2.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -676,7 +676,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V144): 382 experiments indexed, 340 binaries, 5,800+ checks, 1,592+ lib tests + 18 IPC roundtrip (0 failures).**
+**Totals (V145): 383 experiments indexed, 363 binaries, 5,900+ checks, 1,592+ lib tests + 18 IPC roundtrip (0 failures).**
 
 ---
 

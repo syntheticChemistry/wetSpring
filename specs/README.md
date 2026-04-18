@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: April 17, 2026
-**Status**: V145 — 5,900+ checks (383 experiments, 341 binaries), 1,610 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 22 consumed barraCuda IPC capabilities (primal proof Level 5), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 7 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). **Primal proof tier: Exp403 (live NUCLEUS IPC vs local Rust — barraCuda, NestGate, Squirrel, BearDog, toadStool over UDS with check_skip). Composition validation: Exp401 (IPC parity), Exp402 (niche parity). 18 IPC roundtrip tests.** V145: Exp403 primal parity binary (Tier 2 IPC-WIRED), 22 barraCuda consumed capabilities in niche.rs, PG-09 barraCuda IPC evaporation surface documented. V144: composition validation tier, Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation), barraCuda v0.3.12. V143: deploy graph canonical migration. V142: Wire Standard L2+L3. V141: capability alignment. V140: ecosystem audit. *(Detailed validation tables below reflect their respective phases.)*
+**Status**: V145 — 5,900+ checks (383 experiments, 363 binaries), 1,700 tests (1,592 lib + 18 IPC + 90 integration), 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 22 consumed barraCuda IPC capabilities (primal proof Level 5), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 7 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). **Primal proof tier: Exp403 (live NUCLEUS IPC vs local Rust — barraCuda, NestGate, Squirrel, BearDog, toadStool over UDS with check_skip). Composition validation: Exp401 (IPC parity), Exp402 (niche parity). 18 IPC roundtrip tests.** V145: Exp403 primal parity binary (Tier 2 IPC-WIRED), 22 barraCuda consumed capabilities in niche.rs, PG-09 barraCuda IPC evaporation surface documented. V144: composition validation tier, Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation), barraCuda v0.3.12. V143: deploy graph canonical migration. V142: Wire Standard L2+L3. V141: capability alignment. V140: ecosystem audit. *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -27,7 +27,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,592 lib + 18 IPC roundtrip + 90 integration = 1,700 tests, 341 binaries |
+| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,592 lib + 18 IPC roundtrip + 90 integration = 1,700 tests, 363 binaries (341 barracuda + 22 forge) |
 | Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, **Exp403: primal parity (Tier 2 IPC-WIRED, 6 domains across 5 primals)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
