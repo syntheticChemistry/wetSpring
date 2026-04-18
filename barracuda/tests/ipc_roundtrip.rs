@@ -227,3 +227,194 @@ fn qs_model_roundtrip() {
         );
     });
 }
+
+#[test]
+fn gonzales_dose_response_roundtrip() {
+    with_server("gonzales_dr", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"science.gonzales.dose_response","params":{"n_points":50,"dose_max":500.0,"hill_n":1.0},"id":20}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(resp.get("error").is_none(), "dose_response error: {resp}");
+
+        let result = &resp["result"];
+        assert!(
+            result["curves"].as_array().is_some(),
+            "dose_response should return curves array"
+        );
+    });
+}
+
+#[test]
+fn gonzales_pk_decay_roundtrip() {
+    with_server("gonzales_pk", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"science.gonzales.pk_decay","params":{},"id":21}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(resp.get("error").is_none(), "pk_decay error: {resp}");
+
+        let result = &resp["result"];
+        assert!(
+            result.get("dose_profiles").is_some(),
+            "pk_decay should return dose_profiles"
+        );
+    });
+}
+
+#[test]
+fn anderson_disorder_sweep_roundtrip() {
+    with_server("anderson_sweep", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"science.anderson.disorder_sweep","params":{"system_sizes":[6,8],"disorders":[2.0,8.0]},"id":22}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(
+            resp.get("error").is_none(),
+            "disorder_sweep error: {resp}"
+        );
+    });
+}
+
+#[test]
+fn anderson_biome_atlas_roundtrip() {
+    with_server("anderson_atlas", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"science.anderson.biome_atlas","params":{},"id":23}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(
+            resp.get("error").is_none(),
+            "biome_atlas error: {resp}"
+        );
+    });
+}
+
+#[test]
+fn provenance_lifecycle_roundtrip() {
+    with_server("provenance_life", |socket| {
+        let begin_resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"provenance.begin","params":{"context":"ipc_roundtrip_test"},"id":30}"#,
+        );
+        assert_eq!(begin_resp["jsonrpc"], "2.0");
+        assert!(
+            begin_resp.get("error").is_none(),
+            "provenance.begin error: {begin_resp}"
+        );
+
+        let session_id = begin_resp["result"]["session_id"]
+            .as_str()
+            .unwrap_or("fallback-session");
+
+        let record_req = format!(
+            r#"{{"jsonrpc":"2.0","method":"provenance.record","params":{{"session_id":"{session_id}","event":{{"step":"test"}}}},"id":31}}"#
+        );
+        let record_resp = rpc_roundtrip(socket, &record_req);
+        assert_eq!(record_resp["jsonrpc"], "2.0");
+        assert!(
+            record_resp.get("error").is_none(),
+            "provenance.record error: {record_resp}"
+        );
+
+        let complete_req = format!(
+            r#"{{"jsonrpc":"2.0","method":"provenance.complete","params":{{"session_id":"{session_id}"}},"id":32}}"#
+        );
+        let complete_resp = rpc_roundtrip(socket, &complete_req);
+        assert_eq!(complete_resp["jsonrpc"], "2.0");
+        assert!(
+            complete_resp.get("error").is_none(),
+            "provenance.complete error: {complete_resp}"
+        );
+    });
+}
+
+#[test]
+fn brain_observe_roundtrip() {
+    with_server("brain_obs", |socket| {
+        let head_outputs: Vec<f64> = (0..36).map(|i| (i as f64) * 0.01).collect();
+        let request = serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "brain.observe",
+            "params": {
+                "event": "ipc_test",
+                "value": 0.5,
+                "head_outputs": head_outputs
+            },
+            "id": 40
+        });
+        let resp = rpc_roundtrip(socket, &request.to_string());
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(resp.get("error").is_none(), "brain.observe error: {resp}");
+    });
+}
+
+#[test]
+fn brain_attention_roundtrip() {
+    with_server("brain_attn", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"brain.attention","params":{},"id":41}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(
+            resp.get("error").is_none(),
+            "brain.attention error: {resp}"
+        );
+    });
+}
+
+#[test]
+fn brain_urgency_roundtrip() {
+    with_server("brain_urg", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"brain.urgency","params":{},"id":42}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(resp.get("error").is_none(), "brain.urgency error: {resp}");
+    });
+}
+
+#[test]
+fn metrics_snapshot_roundtrip() {
+    with_server("metrics", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"metrics.snapshot","params":{},"id":50}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(
+            resp.get("error").is_none(),
+            "metrics.snapshot error: {resp}"
+        );
+    });
+}
+
+#[test]
+fn ai_ecology_interpret_roundtrip() {
+    with_server("ai_eco", |socket| {
+        let resp = rpc_roundtrip(
+            socket,
+            r#"{"jsonrpc":"2.0","method":"ai.ecology_interpret","params":{"context":"test","question":"What is Shannon diversity?"},"id":51}"#,
+        );
+
+        assert_eq!(resp["jsonrpc"], "2.0");
+        assert!(
+            resp.get("error").is_none(),
+            "ai.ecology_interpret error: {resp}"
+        );
+    });
+}

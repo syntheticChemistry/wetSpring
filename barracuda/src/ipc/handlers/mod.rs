@@ -24,6 +24,7 @@ mod drug;
 mod expanded;
 mod gonzales;
 mod kinetics;
+mod metrics;
 mod phylogenetics;
 mod science;
 mod taxonomy;
@@ -31,6 +32,7 @@ mod vault_ipc;
 
 pub use ai::handle_ai_ecology_interpret;
 pub use brain::{handle_brain_attention, handle_brain_observe, handle_brain_urgency};
+pub use metrics::handle_metrics_snapshot;
 pub use data_fetch::{handle_chembl_fetch, handle_pubchem_fetch, handle_register_table};
 pub use expanded::{
     handle_alignment, handle_kinetics, handle_nmf, handle_phylogenetics, handle_taxonomy,

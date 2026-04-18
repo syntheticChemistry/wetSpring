@@ -22,7 +22,7 @@
 //! | Key derivation | `BearDog` | `genetic.derive_lineage_key` | absorb target |
 //! | Blob storage | `NestGate` | `storage.store_blob` / `storage.retrieve_blob` | absorb target |
 //! | Consent | `Songbird` | `POST /consent/request` | absorb target |
-//! | Signing | `BearDog` | Ed25519 lineage certs | absorb target |
+//! | Signing | `BearDog` | `crypto.sign_ed25519` (asymmetric) | absorb target (currently BLAKE3 keyed MAC) |
 //!
 //! Local implementations here are sovereign (zero external deps). They
 //! validate the vault protocol so specific primals can absorb.

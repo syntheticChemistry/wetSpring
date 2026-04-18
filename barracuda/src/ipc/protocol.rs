@@ -9,7 +9,7 @@ use serde_json::Value;
 
 use crate::primal_names::LEGACY_SELF_METHOD_PREFIX;
 
-/// Normalize a JSON-RPC method name to the bare `{domain}.{operation}` form (barraCuda v0.3.7+).
+/// Normalize a JSON-RPC method name to the bare `{domain}.{operation}` form (barraCuda v0.3.12+).
 ///
 /// Strips legacy product prefixes (`wetspring.`, `barracuda.`) when present so clients using
 /// either prefixed or bare names reach the same dispatch table. Repeated prefixes are stripped

@@ -3,7 +3,7 @@
 # wetSpring White Paper
 
 **Date:** April 10, 2026
-**Status:** V140 — Three-tier validation active. **Tier 1:** Python→Rust (5,800+ checks, **1,942** tests, **356** binaries). **Tier 2:** Rust→Primal composition (97/97 proto-nucleate, 7 deploy graphs, 45 IPC capabilities). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. 380 experiments indexed, 44 GPU modules, 49 CPU bio modules, `barraCuda` v0.3.7 (150+ primitives consumed), **242** named tolerances with provenance trail, clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`, cargo-deny clean. 64 papers reproduced.
+**Status:** V140 — Three-tier validation active. **Tier 1:** Python→Rust (5,800+ checks, **1,942** tests, **356** binaries). **Tier 2:** Rust→Primal composition (97/97 proto-nucleate, 7 deploy graphs, 45 IPC capabilities). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. 380 experiments indexed, 44 GPU modules, 49 CPU bio modules, `barraCuda` v0.3.12 (150+ primitives consumed), **242** named tolerances with provenance trail, clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`, cargo-deny clean. 64 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -58,7 +58,7 @@ implementations into upstream `barraCuda` primitives:
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
 **Current status:** 44 GPU modules — Lean phase (fully absorbed). All 44 lean on
-upstream `barraCuda` primitives (150+ consumed, v0.3.7 standalone, 784+ WGSL shaders).
+upstream `barraCuda` primitives (150+ consumed, v0.3.12 standalone, 784+ WGSL shaders).
 11 compose `barraCuda` primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. The forge crate (`metalForge/forge/` v0.3.0) provides substrate
 discovery, capability-based dispatch, and shader origin tracking.

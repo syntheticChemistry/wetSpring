@@ -2,7 +2,7 @@
 
 **Date:** April 11, 2026 (V141, banner refreshed; detailed tables preserved from V137)
 **Pattern:** Write → Absorb → Lean (adopted from hotSpring)
-**barraCuda:** standalone v0.3.7 (pure Rust, default-features=false), **toadStool:** S155+
+**barraCuda:** standalone v0.3.12 (pure Rust, default-features=false), **toadStool:** S155+
 **Status:** 150+ primitives consumed, 44 GPU modules (all lean), 0 local WGSL, 0 local ODE/regression math, **1,946** tests, 380 indexed (377 completed + 3 proposed), 5,800+ checks, **356** binaries (334 barracuda + 22 forge), 242 named tolerances (8 with run commands), `forbid(unsafe_code)` at workspace level + per-crate, clippy pedantic+nursery CLEAN, **zero `#[allow()]`**. 91.20% coverage (gated at 90%). **45** niche capabilities across **21** domains (8 families). **97/97** proto-nucleate alignment (Exp400, guard constant). **7** deploy graphs (canonical schema). **7** composition gaps documented (`docs/PRIMAL_GAPS.md`). **V141:** Capability alignment (21 domains, 41 methods), cross-check tests, proto-nucleate test-time validation, provenance run commands, TensorSession PoC. **V140:** Ecosystem audit, deploy graph canonicalization. **V139:** NUCLEUS composition (Exp400). **V138:** Primal composition patterns. **V137:** Provenance headers, tolerance centralization. **See also:** `wateringHole/handoffs/WETSPRING_V141_AUDIT_REMEDIATION_HANDOFF_APR11_2026.md`.
 
 ---

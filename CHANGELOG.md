@@ -171,8 +171,8 @@ composition patterns, composition enables ecoBin harvest.
   and `niche_capabilities_superset_of_handlers` (`#[cfg(feature = "ipc")]`)
   enforce that niche, handlers, and domain registry stay synchronized
 - `proto_nucleate_node_names_match_niche_dependencies` test in `niche.rs` —
-  reads `primalSpring/graphs/downstream/wetspring_lifescience_proto_nucleate.toml`
-  at test time and validates all niche dependencies appear as nodes
+  reads `primalSpring/graphs/downstream/downstream_manifest.toml`
+  at test time and validates the wetspring `[[downstream]]` row (`spring_name = "wetspring"`)
 - `command` field on `BaselineProvenance` struct in `provenance_registry.rs` —
   8 key validation scripts now carry exact `python3 scripts/…` invocations
 - `provenance_registry_commands_reference_own_script` test enforcing command↔script

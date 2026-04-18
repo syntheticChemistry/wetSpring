@@ -234,11 +234,7 @@ by_capability = "life_science"
 security_model = "tower_delegated"
 args = ["server"]
 capabilities = [
-    "composition.nest_health",
-    "composition.node_health",
-    "composition.nucleus_health",
     "composition.science_health",
-    "composition.tower_health",
     "data.fetch.chembl",
     "data.fetch.pubchem",
     "data.fetch.register_table",

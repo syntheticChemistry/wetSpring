@@ -2,7 +2,7 @@
 
 **Date:** March 24, 2026
 **Pattern:** Write → Absorb → Lean (from hotSpring)
-**Status:** V137 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.7, toadStool S155+. 1,902 tests, 355 binaries (333 barracuda + 22 forge), 242 named tolerances, **zero `#[allow()]`**, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level. V137: provenance headers on all 355 binaries, tolerance centralization, IPC modularization. V136: thiserror, named casts, upstream contract, determinism tests. All primal names via `primal_names::*`.
+**Status:** V137 — 150+ primitives consumed (Lean), 0 local WGSL (fully lean), 44 GPU modules, 0 Tier B/C, 0 Passthrough, standalone barraCuda v0.3.12, toadStool S155+. 1,902 tests, 355 binaries (333 barracuda + 22 forge), 242 named tolerances, **zero `#[allow()]`**, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level. V137: provenance headers on all 355 binaries, tolerance centralization, IPC modularization. V136: thiserror, named casts, upstream contract, determinism tests. All primal names via `primal_names::*`.
 
 ---
 

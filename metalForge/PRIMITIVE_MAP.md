@@ -5,7 +5,7 @@
 GPU primitive (or explain why it stays CPU-only). This guides the
 absorption pipeline and identifies what ToadStool needs to build next.
 
-> **Mar 24 update (V137):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.7. 379 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0. 1,902 tests, 355 binaries (333 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%), clippy pedantic+nursery CLEAN. `forbid(unsafe_code)` at workspace level, zero `#[allow()]`. V137: provenance headers on all 355 binaries, tolerance centralization. V136: thiserror, named casts, upstream contract. V135: doc reconciliation.
+> **Mar 24 update (V137):** 150+ primitives consumed. 0 local WGSL, 0 local derivative math (fully lean). 28 petalTongue scenario builders. standalone barraCuda v0.3.12. 379 experiments, 5,707+ checks. All ODE shaders use `BatchedOdeRK4<S>::generate_shader()` (Absorbed). Forge crate v0.3.0. 1,902 tests, 355 binaries (333 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%), clippy pedantic+nursery CLEAN. `forbid(unsafe_code)` at workspace level, zero `#[allow()]`. V137: provenance headers on all 355 binaries, tolerance centralization. V136: thiserror, named casts, upstream contract. V135: doc reconciliation.
 
 ---
 

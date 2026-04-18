@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-11 (V142 Wire Standard + composition evolution)
+Last updated: 2026-04-17 (V145 audit — PG-08 added, PG-01 manifest path updated)
 
 ---
 
@@ -14,8 +14,9 @@ Last updated: 2026-04-11 (V142 Wire Standard + composition evolution)
   misalignment, proto-nucleate drift, or bonding protocol holes.
 - Architectural gaps that are not composition-related live in
   [GAPS.md](../GAPS.md) (7 documented as of V140).
-- Each gap references the proto-nucleate graph:
-  `primalSpring/graphs/downstream/wetspring_lifescience_proto_nucleate.toml`
+- Each gap references the downstream proto-nucleate manifest:
+  `primalSpring/graphs/downstream/downstream_manifest.toml` (wetspring:
+  `spring_name = "wetspring"`)
 
 ---
 
@@ -24,10 +25,12 @@ Last updated: 2026-04-11 (V142 Wire Standard + composition evolution)
 **Owner:** wetSpring (internal)
 **Status:** Resolved — `niche::tests::proto_nucleate_node_names_match_niche_dependencies`
 
-`niche.rs` now reads `primalSpring/graphs/downstream/wetspring_lifescience_proto_nucleate.toml`
-at test time via `std::fs::read_to_string` and cross-checks all niche dependency names,
-the `wetspring` application node, `pattern = "proto_nucleate"`, and `owner = "wetSpring"`
-against the canonical graph. Drift is caught in CI.
+`niche.rs` now reads `primalSpring/graphs/downstream/downstream_manifest.toml`
+at test time via `std::fs::read_to_string` and cross-checks the `[[downstream]]`
+entry keyed by `spring_name = "wetspring"`, the manifest’s
+`proto_nucleate_template.toml` reference, `owner = "wetSpring"`, and niche
+dependency names against that row’s `depends_on` (with IPC trio optional per
+PG-02). Drift is caught in CI.
 
 ---
 
@@ -132,6 +135,21 @@ tests in `capability_domains::tests`.
 
 ---
 
+## PG-08: spring_validate_manifest Binary Name Inconsistency
+
+**Owner:** primalSpring (manifest maintainer)
+**Status:** Informational — discovered during V145 audit
+
+`primalSpring/graphs/spring_validation/spring_validate_manifest.toml` uses
+`spring_binary = "wetspring"` for the wetSpring entry, while
+`downstream_manifest.toml` and `spring_deploy_manifest.toml` both use
+`spring_binary = "wetspring_primal"`. One of these should be canonical.
+
+**Impact:** Tooling that reads the validate manifest may invoke the wrong
+binary name if it differs from the deploy/downstream manifests.
+
+---
+
 ## Summary Table
 
 | # | Gap | Owner | Blocked By | Phase |
@@ -142,7 +160,8 @@ tests in `capability_domains::tests`.
 | PG-04 | NestGate not wired | NestGate | NestGate IPC readiness | 2 |
 | PG-05 | toadStool compute IPC | toadStool | NUCLEUS deployment | 3 |
 | PG-06 | Ionic bond protocol | primalSpring Track 4 | Bond negotiation spec | 2 |
-| PG-07 | Capability drift | wetSpring | Resolved V141 | -- |
+| PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
+| PG-08 | Validate manifest binary name | primalSpring | Manifest alignment | 1 |
 
 ---
 

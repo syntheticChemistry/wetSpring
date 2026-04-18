@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** April 11, 2026  
+**Date:** April 17, 2026  
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -9,8 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V143** | `handoffs/WETSPRING_V143_DEPLOY_GRAPH_EVOLUTION_HANDOFF_APR11_2026.md` | Apr 11 | **Deploy graph canonical migration**: `[[graph.nodes]]` schema (NA-016), bonding policy + fragments metadata, capability string alignment, coralReef/barraCuda Node Atomic nodes, Exp400 D07 metadata compliance (141/141), primal evolution asks. |
-| | *Superseded → `handoffs/archive/`* | | V142 and earlier are archived (**152** files). |
+| **V144** | `handoffs/WETSPRING_V144_COMPOSITION_VALIDATION_TIER_HANDOFF_APR17_2026.md` | Apr 17 | **Composition validation tier**: Python→Rust→Primal composition. Exp400 (136/136 proto-nucleate), Exp401 (43/43 IPC parity), Exp402 (63/63 niche gate). 18 IPC roundtrip tests. Ed25519→BLAKE3 keyed MAC. `metrics.snapshot` handler. biomeOS V144 composition health ownership. barraCuda v0.3.12. Patterns for primal + spring teams. |
+| | *Superseded → `handoffs/archive/`* | | V143 and earlier are archived (**155** files). |
 
 ## Cross-Spring Documents
 
@@ -22,7 +22,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — **V142 and earlier** are archived (**152** files).  
+Superseded handoffs in `handoffs/archive/` — **V143 and earlier** are archived (**155** files).  
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → ecoBin harvest.
 
 ## Convention

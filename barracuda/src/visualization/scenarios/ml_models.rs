@@ -225,7 +225,7 @@ pub fn esn_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         spectral_radius: 0.9,
         connectivity: 0.1,
         leak_rate: 0.3,
-        regularization: 1e-6,
+        regularization: crate::tolerances::ESN_REGULARIZATION,
         seed: 42,
     };
     let mut esn = LegacyEsn::new(config);

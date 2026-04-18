@@ -405,49 +405,62 @@ mod tests {
         }
     }
 
-    /// Cross-validate niche dependencies against the proto-nucleate graph.
+    /// Cross-validate niche dependencies against the downstream proto-nucleate manifest.
     ///
-    /// The canonical proto-nucleate lives in primalSpring. This test
-    /// `include_str!`s it at compile time so drift is caught in CI.
-    /// If the file is not reachable (different checkout layout), the test
-    /// is a no-op rather than a hard failure.
+    /// The canonical parameters live in primalSpring at
+    /// `graphs/downstream/downstream_manifest.toml`, keyed by
+    /// `spring_name = "wetspring"` under each `[[downstream]]` table. This test
+    /// reads that file at test time so drift is caught in CI. If the file is
+    /// not reachable (different checkout layout), the test is a no-op rather
+    /// than a hard failure.
     #[test]
     fn proto_nucleate_node_names_match_niche_dependencies() {
-        let proto_nucleate_path = concat!(
+        let manifest_path = concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../primalSpring/graphs/downstream/wetspring_lifescience_proto_nucleate.toml"
+            "/../../primalSpring/graphs/downstream/downstream_manifest.toml"
         );
-        let Ok(proto) = std::fs::read_to_string(proto_nucleate_path) else {
+        let Ok(manifest) = std::fs::read_to_string(manifest_path) else {
             eprintln!(
-                "proto-nucleate not found at {proto_nucleate_path} — \
+                "downstream manifest not found at {manifest_path} — \
                  clone primalSpring alongside wetSpring to enable this check"
             );
             return;
         };
 
+        assert!(
+            manifest.contains("template = \"proto_nucleate_template.toml\""),
+            "downstream manifest must reference proto_nucleate_template.toml"
+        );
+
+        let wetspring_section = manifest.split("[[downstream]]").find(|chunk| {
+            chunk.contains("spring_name = \"wetspring\"")
+        });
+
+        let Some(section) = wetspring_section else {
+            panic!(
+                "downstream_manifest.toml must contain a [[downstream]] entry with spring_name = \"wetspring\""
+            );
+        };
+
+        assert!(
+            section.contains("owner = \"wetSpring\""),
+            "wetspring downstream entry must declare owner = \"wetSpring\""
+        );
+
+        // IPC trio may be wired outside consolidated `depends_on`; optional there per PG-02.
+        const OPTIONAL_IN_DOWNSTREAM_DEPENDS_ON: &[&str] =
+            &["rhizocrypt", "loamspine", "sweetgrass"];
+
         for dep in DEPENDENCIES {
-            let pattern = format!("name = \"{}\"", dep.name);
+            if OPTIONAL_IN_DOWNSTREAM_DEPENDS_ON.contains(&dep.name) {
+                continue;
+            }
             assert!(
-                proto.contains(&pattern),
-                "niche dependency '{}' (role: {}) not found as a node in the proto-nucleate graph",
+                section.contains(&format!("\"{}\"", dep.name)),
+                "niche dependency '{}' (role: {}) not listed in wetspring downstream depends_on",
                 dep.name,
                 dep.role,
             );
         }
-
-        assert!(
-            proto.contains("name = \"wetspring\""),
-            "proto-nucleate must contain a 'wetspring' application node"
-        );
-
-        assert!(
-            proto.contains("pattern = \"proto_nucleate\""),
-            "proto-nucleate must declare pattern = \"proto_nucleate\""
-        );
-
-        assert!(
-            proto.contains("owner = \"wetSpring\""),
-            "proto-nucleate must declare owner = \"wetSpring\""
-        );
     }
 }

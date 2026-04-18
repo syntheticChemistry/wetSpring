@@ -15,8 +15,9 @@
 //! # Exp400: NUCLEUS Composition Validation — Proto-Nucleate Alignment
 //!
 //! Validates that wetSpring's niche self-knowledge, deploy graphs, and
-//! composition model align with the proto-nucleate graph defined in
-//! `primalSpring/graphs/downstream/wetspring_lifescience_proto_nucleate.toml`.
+//! composition model align with the downstream proto-nucleate manifest at
+//! `primalSpring/graphs/downstream/downstream_manifest.toml` (wetspring row:
+//! `spring_name = "wetspring"`).
 //!
 //! This is the **composition validation** tier: Python was the validation
 //! target for Rust, and now Rust + Python are the validation targets for
@@ -39,15 +40,15 @@
 //! |-------|-------|
 //! | Baseline | wetSpring niche + proto-nucleate graph |
 //! | Script | `validate_composition_nucleus_v1.rs` |
-//! | Date | 2026-04-10 |
+//! | Date | 2026-04-17 |
 //! | Command | `cargo run --features json --bin validate_composition_nucleus_v1` |
 
 use wetspring_barracuda::niche;
 use wetspring_barracuda::validation::Validator;
 
-/// Expected total checks — matches the "141/141" claim in README/CONTEXT.
+/// Expected total checks — matches the "136/136" claim in README/CONTEXT.
 /// Update this constant (and docs) whenever domains are added or removed.
-const EXPECTED_CHECKS: u32 = 141;
+const EXPECTED_CHECKS: u32 = 136;
 
 fn main() {
     let mut v = Validator::new("Exp400: NUCLEUS Composition — Proto-Nucleate Alignment");
@@ -108,12 +109,15 @@ fn main() {
     // ═══════════════════════════════════════════════════════════════
     // D02: Capability surface completeness
     // ═══════════════════════════════════════════════════════════════
+    // Universal composition health methods (tower/node/nest/nucleus) are
+    // biomeOS-owned (V144+); wetSpring advertises spring-specific capabilities
+    // only (e.g. composition.science_health).
     v.section("═══ D02: Capability Surface ═══");
 
     let caps = niche::CAPABILITIES;
     println!("  Total capabilities advertised: {}", caps.len());
 
-    v.check_pass("capabilities: 46 advertised", caps.len() == 46);
+    v.check_pass("capabilities: 42 advertised", caps.len() == 42);
 
     let required_caps = [
         "health.check",
@@ -139,10 +143,6 @@ fn main() {
         "ai.ecology_interpret",
         "metrics.snapshot",
         "composition.science_health",
-        "composition.tower_health",
-        "composition.node_health",
-        "composition.nest_health",
-        "composition.nucleus_health",
         "vault.store",
         "vault.retrieve",
         "vault.consent.verify",
@@ -284,10 +284,6 @@ fn main() {
     v.check_pass(
         "nucleus graph: wetspring has composition.science_health",
         nucleus_graph_src.contains("composition.science_health"),
-    );
-    v.check_pass(
-        "nucleus graph: wetspring has composition.nucleus_health",
-        nucleus_graph_src.contains("composition.nucleus_health"),
     );
 
     // ═══════════════════════════════════════════════════════════════

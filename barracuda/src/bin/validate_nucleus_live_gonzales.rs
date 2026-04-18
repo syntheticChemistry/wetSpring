@@ -27,6 +27,10 @@
 //! - **BearDog**: `security.verify_consent` for Dark Forest auth
 //! - **Full Pipeline**: register data → fetch → compute → provenance envelope with witnesses
 //!
+//! **V144:** Universal `composition.*_health` probes (tower/node/nest/nucleus) are
+//! biomeOS-owned; this harness uses wetSpring's `composition.science_health` for
+//! spring-local composition readiness.
+//!
 //! ## Exit Codes
 //!
 //! - `0`: All reachable subsystems pass
@@ -37,7 +41,7 @@
 //! | Item | Value |
 //! |------|-------|
 //! | Source | NUCLEUS deployment of wetspring_science_nucleus.toml |
-//! | Date | 2026-04-07 |
+//! | Date | 2026-04-17 |
 //! | Command | `cargo run --features ipc --bin validate_nucleus_live_gonzales` |
 
 use serde_json::json;
@@ -48,46 +52,58 @@ fn main() {
     let mut v = Validator::new("Exp311: Live NUCLEUS Gonzales — Full Stack Validation");
 
     // ═══════════════════════════════════════════════════════════════
-    // D01: NUCLEUS composition health
+    // D01: wetSpring science composition health (composition.science_health)
     // ═══════════════════════════════════════════════════════════════
-    v.section("═══ D01: NUCLEUS Composition Health ═══");
+    // Universal composition.*_health (tower/node/nest/nucleus) is biomeOS-owned
+    // (V144+); wetSpring IPC exposes composition.science_health only.
+    v.section("═══ D01: wetSpring Science Composition Health ═══");
 
-    let nucleus =
-        dispatch("composition.nucleus_health", &json!({})).expect("nucleus_health dispatch failed");
+    let science_health = dispatch("composition.science_health", &json!({}))
+        .expect("science_health dispatch failed");
 
-    let tower_ok = nucleus["tiers"]["tower"].as_bool().unwrap_or(false);
-    let node_ok = nucleus["tiers"]["node"].as_bool().unwrap_or(false);
-    let nest_ok = nucleus["tiers"]["nest"].as_bool().unwrap_or(false);
-    let trio_ok = nucleus["tiers"]["provenance_trio"]
+    let healthy = science_health["healthy"].as_bool().unwrap_or(false);
+    let spring = science_health["spring"].as_str().unwrap_or("");
+    let math_ok = science_health["subsystems"]["math"]
         .as_bool()
         .unwrap_or(false);
-    let nucleus_ok = nucleus["healthy"].as_bool().unwrap_or(false);
+    let ipc_ok = science_health["subsystems"]["ipc"]
+        .as_bool()
+        .unwrap_or(false);
+    let deploy_graph = science_health["deploy_graph"].as_str().unwrap_or("");
 
+    println!("  healthy:       {}", if healthy { "true" } else { "false" });
+    println!("  spring:        {spring}");
     println!(
-        "  Tower (BearDog+Songbird): {}",
-        if tower_ok { "UP" } else { "DOWN" }
+        "  subsystems:    math={}, ipc={}",
+        if math_ok { "UP" } else { "DOWN" },
+        if ipc_ok { "UP" } else { "DOWN" }
     );
     println!(
-        "  Node  (Tower+ToadStool):  {}",
-        if node_ok { "UP" } else { "DOWN" }
-    );
-    println!(
-        "  Nest  (Tower+NestGate):   {}",
-        if nest_ok { "UP" } else { "DOWN" }
-    );
-    println!(
-        "  Trio  (rhizo+loam+sweet): {}",
-        if trio_ok { "UP" } else { "DOWN" }
-    );
-    println!(
-        "  NUCLEUS:                  {}",
-        if nucleus_ok { "FULL" } else { "PARTIAL" }
+        "  deploy_graph:  {}",
+        if deploy_graph.is_empty() {
+            "(empty)"
+        } else {
+            deploy_graph
+        }
     );
 
-    // These are informational — we don't fail the whole suite if a primal isn't up yet
     v.check_pass(
-        "nucleus: health probe returns valid JSON",
-        nucleus.is_object(),
+        "science composition: health probe returns valid JSON",
+        science_health.is_object(),
+    );
+    v.check_pass(
+        "science: composition reports healthy=true",
+        healthy,
+    );
+    v.check_pass(
+        "science: spring identifies wetSpring",
+        spring == "wetSpring",
+    );
+    v.check_pass("science: math subsystem reports true", math_ok);
+    v.check_pass("science: ipc subsystem reports true", ipc_ok);
+    v.check_pass(
+        "science: deploy_graph is non-empty string",
+        !deploy_graph.is_empty(),
     );
 
     // ═══════════════════════════════════════════════════════════════

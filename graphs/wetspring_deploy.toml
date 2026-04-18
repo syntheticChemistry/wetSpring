@@ -27,7 +27,7 @@ description = "wetSpring life-science validation — full NUCLEUS with provenanc
 coordination = "sequential"
 
 [graph.metadata]
-pattern_version = "2026-04-11"
+pattern_version = "2026-04-17"
 schema = "canonical"
 witness_wire = "WireWitnessRef"
 encoding_standard = "wateringHole/ATTESTATION_ENCODING_STANDARD.md"
@@ -203,15 +203,13 @@ health_method = "health.liveness"
 by_capability = "life_science"
 security_model = "tower_delegated"
 capabilities = [
+    # V144: universal composition.*_health methods (nest, node, nucleus, tower)
+    # migrated to biomeOS v3.04. wetSpring retains science_health only.
     "ai.ecology_interpret",
     "brain.attention",
     "brain.observe",
     "brain.urgency",
-    "composition.nest_health",
-    "composition.node_health",
-    "composition.nucleus_health",
     "composition.science_health",
-    "composition.tower_health",
     "data.fetch.chembl",
     "data.fetch.pubchem",
     "data.fetch.register_table",

@@ -37,11 +37,16 @@ ipc = ["json", "dep:tracing-subscriber", "dep:blake3"]
 # Adds concept edge detection, drift monitoring, evolutionary adaptation.
 nautilus = ["dep:bingocube-nautilus", "bingocube-nautilus/json"]
 # Genomic vault: encrypted consent-gated data storage.
-# Adds ChaCha20-Poly1305 AEAD, Ed25519 signing, BLAKE3 hashing.
-vault = ["dep:chacha20poly1305", "dep:ed25519-dalek", "dep:blake3"]
+# Adds ChaCha20-Poly1305 AEAD, BLAKE3 keyed MAC signing.
+# Ed25519 asymmetric signing migrates to BearDog IPC (Tower Atomic delegation).
+vault = ["dep:chacha20poly1305", "dep:blake3"]
 # Science facade: HTTP gateway for primals.eco live interactive science.
 # Adds Axum web server, tower-http CORS, tokio async runtime, BLAKE3 hashing.
 facade = ["json", "dep:axum", "dep:tower-http", "dep:tokio", "dep:tracing-subscriber", "dep:blake3", "dep:toml"]
+# Sovereign dispatch: coralReef native GPU binary compilation + toadStool IPC.
+# Forwards to barraCuda's sovereign-dispatch feature for testing the
+# coralReef → native ISA pipeline from wetSpring validation binaries.
+sovereign-dispatch = ["barracuda/sovereign-dispatch", "gpu"]
 
 [dependencies]
 # serde: derive Serialize/Deserialize for visualization types (petalTongue schema).
@@ -51,7 +56,7 @@ serde_json = { version = "1", optional = true }
 # thiserror: derive Error + Display for all error types (ecosystem standard).
 thiserror = "2"
 
-# barraCuda — standalone math primal (v0.3.7). Pure math + GPU compute.
+# barraCuda — standalone math primal (v0.3.12). Pure math + GPU compute.
 # default-features = false: no wgpu/bytemuck pulled in for CPU builds.
 # When `gpu` feature is active, `barracuda/gpu` enables GPU ops.
 # 150+ primitives consumed. 694+ WGSL shaders. wgpu 28. MSRV 1.87.
@@ -67,7 +72,7 @@ barracuda = { path = "../../../primals/barraCuda/crates/barracuda", default-feat
 # akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
 # Independent of barraCuda; sourced from toadStool neuromorphic crates.
 # Runtime discovery, capability-based dispatch, zero mocks.
-akida-driver = { path = "../../../primals/toadStool/crates/neuromorphic/akida-driver", optional = true }
+akida-driver = { path = "../../../primals/toadstool/crates/neuromorphic/akida-driver", optional = true }
 
 # wgpu: WebGPU compute — hardware-agnostic GPU via Vulkan/Metal/DX12.
 # Same version as barraCuda to prevent duplicate symbol linking errors.
@@ -111,7 +116,6 @@ tower-http = { version = "0.6", optional = true, default-features = false, featu
 # ChaCha20-Poly1305 AEAD (RustCrypto), Ed25519 (dalek), BLAKE3 hashing.
 # Optional — only needed for `vault` feature (genomic vault + consent).
 chacha20poly1305 = { version = "0.10", optional = true }
-ed25519-dalek = { version = "2.2", optional = true }
 blake3 = { version = "1.8", optional = true, default-features = false, features = ["pure"] }
 
 [dev-dependencies]
@@ -1918,6 +1922,18 @@ required-features = ["ipc"]
 name = "validate_composition_nucleus_v1"
 path = "src/bin/validate_composition_nucleus_v1.rs"
 required-features = ["json"]
+
+# ── Exp401: Composition Parity — IPC Science vs Local Rust ──
+[[bin]]
+name = "validate_composition_parity_v1"
+path = "src/bin/validate_composition_parity_v1.rs"
+required-features = ["json", "ipc", "facade"]
+
+# ── Exp402: Niche Parity — NICHE_STARTER_PATTERNS Composition Gate ──
+[[bin]]
+name = "validate_niche_parity_v1"
+path = "src/bin/validate_niche_parity_v1.rs"
+required-features = ["json", "ipc"]
 
 # ── guideStone: Gonzales Interactive Science Artifact ──
 [[bin]]

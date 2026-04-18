@@ -45,7 +45,7 @@ pub fn handle_nmf(params: &Value) -> Result<Value, RpcError> {
     let config = NmfConfig {
         rank,
         max_iter,
-        tol: 1e-6,
+        tol: crate::tolerances::NMF_CONVERGENCE,
         objective: NmfObjective::Euclidean,
         seed: 42,
     };

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # cargo-deny configuration for wetSpring barracuda crate.
 #
+# Aligned with workspace root deny.toml — C-dep bans are identical.
 # Run: cargo deny check
 # Install: cargo install cargo-deny
 
@@ -40,7 +41,23 @@ multiple-versions = "warn"
 wildcards = "deny"
 highlight = "all"
 allow = []
-deny = []
+deny = [
+    # ecoBin compliance: zero C dependencies in application code.
+    { crate = "openssl-sys", reason = "C dependency — use rustls" },
+    { crate = "openssl", reason = "C dependency — use rustls" },
+    { crate = "libz-sys", reason = "C dependency — use flate2 rust_backend" },
+    { crate = "bzip2-sys", reason = "C dependency" },
+    { crate = "lzma-sys", reason = "C dependency" },
+    { crate = "zstd-sys", reason = "C dependency — use ruzstd" },
+    { crate = "curl-sys", reason = "C dependency — use ureq/reqwest" },
+    { crate = "libgit2-sys", reason = "C dependency — use gitoxide" },
+    { crate = "libssh2-sys", reason = "C dependency" },
+    { crate = "cmake", reason = "C build tool" },
+    { crate = "cc", wrappers = ["blake3"], reason = "C compiler — allowed only via blake3 build-time assembly" },
+    { crate = "libffi-sys", reason = "C dependency" },
+    { crate = "bindgen", reason = "C header parser" },
+    { crate = "pkg-config", reason = "C build tool" },
+]
 skip = []
 skip-tree = []
 workspace-default-features = "allow"

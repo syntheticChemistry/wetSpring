@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 24, 2026 (V137 — barraCuda v0.3.7 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,902 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V137: provenance headers on all 355 binaries, 8 new tolerance constants, `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: thiserror migration, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. V135: doc reconciliation, canonical metrics. V134: deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O.)
+**Updated:** March 24, 2026 (V137 — barraCuda v0.3.12 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,902 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V137: provenance headers on all 355 binaries, 8 new tolerance constants, `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: thiserror migration, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. V135: doc reconciliation, canonical metrics. V134: deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O.)
 
 ---
 
@@ -197,7 +197,7 @@ cargo run --features gpu --release --bin validate_barracuda_gpu_full
 
 ## Dependencies
 
-- `barracuda` — standalone math primal via path: `../../barraCuda/crates/barracuda` (v0.3.7, `2a6c072`)
+- `barracuda` — standalone math primal via path: `../../barraCuda/crates/barracuda` (v0.3.12, `2a6c072`)
 - `flate2` (pure Rust backend) — gzip decompression
 - `serde_json` (optional, `json` feature) — model import for 2 binaries
 - `wgpu` 28 (via `gpu` feature) — GPU device management

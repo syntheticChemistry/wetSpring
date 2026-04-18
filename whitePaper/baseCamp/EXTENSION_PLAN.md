@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** March 24, 2026 (V137 update)
-**Author:** wetSpring V137 (ecoPrimals)
-**Foundation:** 379 experiments indexed (376 completed + 3 PROPOSED), 5,707+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.7), Python parity proven, cross-spring provenance validated, **1,902** tests, **355** binaries (333 barracuda + 22 forge), coverage **91.20%** line / **90.30%** function (gated at 90%). **V137:** Full provenance + tolerance centralization + IPC modularization — `//! Provenance:` headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction. **V136:** thiserror, named casts (~60), upstream contract pinning, determinism tests, CI pin, hardcoding audit. **V135:** Doc reconciliation. **V134:** Drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `validate_all`, `GpuContext`/`TensorSession`, 242 named tolerances. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.7, toadStool S155+, coralReef Phase 10.
+**Date:** March 24, 2026 (V144 update)
+**Author:** wetSpring V144 (ecoPrimals)
+**Foundation:** 382 experiments indexed (379 completed + 3 PROPOSED), 5,707+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,592+** lib tests, **340** binaries (333 barracuda + 22 forge), coverage **91.20%** line / **90.30%** function (gated at 90%). **V144:** Full provenance + tolerance centralization + IPC modularization — `//! Provenance:` headers on all 340 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction. **V136:** thiserror, named casts (~60), upstream contract pinning, determinism tests, CI pin, hardcoding audit. **V135:** Doc reconciliation. **V134:** Drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `validate_all`, `GpuContext`/`TensorSession`, 242 named tolerances. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, toadStool S155+, coralReef Phase 10.
 
 ---
 

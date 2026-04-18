@@ -1,6 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Determinism tests: rerun identical inputs, expect bitwise-identical output
 //! via `to_bits()` equality.
+//!
+//! # Seed-fix strategy
+//!
+//! wetSpring uses **no `rand` crate** — all stochastic algorithms delegate to
+//! barraCuda's seeded implementations (LCG-based PRNG, `seed: 42` convention
+//! in NMF, ESN, Gillespie, ODE sweep configs). Synthetic test data uses
+//! deterministic formulas (`i * 37 + j * 13`, fixed seed LCG in
+//! `generate_16s_reads`). GPU determinism tests (feature-gated) verify that
+//! the GPU code path produces the same output as the CPU path for identical
+//! seeds. All tolerances for stochastic outputs are documented in
+//! `crate::tolerances`.
 
 #![expect(
     clippy::unwrap_used,

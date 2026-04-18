@@ -10,14 +10,23 @@
 //! Modeled on organ transplant consent: explicit, informed, revocable,
 //! scope-limited, audited.
 //!
+//! # Signing
+//!
+//! Ticket authentication uses BLAKE3 keyed MAC derived from the owner's
+//! lineage seed. This is a symmetric scheme appropriate for self-signed
+//! tickets verified within the same trust boundary.
+//!
+//! When BearDog reaches IPC maturity, signing migrates to
+//! `crypto.sign_ed25519` / `crypto.verify_ed25519` over JSON-RPC —
+//! Tower Atomic delegation. No code changes in callers needed (the
+//! `sign_with_lineage` / `verify_signature` API stays the same).
+//!
 //! # Absorb targets
 //!
-//! - `BearDog`: Ed25519 signing (`genetic.sign_lineage_certificate`)
+//! - `BearDog`: asymmetric signing (`crypto.sign_ed25519`) for cross-boundary tickets
 //! - `Songbird`: `ConsentManager` (`POST /consent/request`, approve/deny)
 
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-
-use ed25519_dalek::{Signer, SigningKey, Verifier, VerifyingKey};
 
 /// What the consent ticket authorizes.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -80,8 +89,8 @@ pub struct ConsentTicket {
     pub duration: Duration,
     /// Whether the ticket has been revoked.
     pub revoked: bool,
-    /// Ed25519 signature over the ticket contents (64 bytes).
-    pub signature: [u8; 64],
+    /// BLAKE3 keyed MAC over the ticket contents (32 bytes).
+    pub signature: [u8; 32],
 }
 
 impl ConsentTicket {
@@ -106,7 +115,7 @@ impl ConsentTicket {
             issued_at: now,
             duration,
             revoked: false,
-            signature: [0u8; 64],
+            signature: [0u8; 32],
         }
     }
 
@@ -140,35 +149,36 @@ impl ConsentTicket {
 
     /// Sign this ticket with a lineage seed.
     ///
-    /// Derives an Ed25519 keypair from the seed via BLAKE3 and signs the
-    /// ticket contents.
+    /// Derives a BLAKE3 keyed MAC from the seed and signs the ticket
+    /// contents. Sovereign (zero external crypto deps).
     pub fn sign_with_lineage(&mut self, lineage_seed: &[u8]) {
-        let mut hasher = blake3::Hasher::new();
-        hasher.update(b"wetspring-consent-signing-v1");
-        hasher.update(lineage_seed);
-        let key_bytes: [u8; 32] = *hasher.finalize().as_bytes();
-        let signing_key = SigningKey::from_bytes(&key_bytes);
+        let key = Self::derive_signing_key(lineage_seed);
         let msg = self.message_to_sign();
-        let sig = signing_key.sign(&msg);
-        self.signature = sig.to_bytes();
+        let mac = blake3::keyed_hash(&key, &msg);
+        self.signature = *mac.as_bytes();
     }
 
     /// Verify the ticket signature against a lineage seed.
     ///
-    /// Returns `true` if the signature is valid (or zeroed for legacy).
+    /// Returns `true` if the signature is valid (or zeroed for unsigned
+    /// legacy tickets). Uses constant-time comparison via BLAKE3's
+    /// `Hash::eq` implementation.
     #[must_use]
     pub fn verify_signature(&self, lineage_seed: &[u8]) -> bool {
-        if self.signature == [0u8; 64] {
+        if self.signature == [0u8; 32] {
             return true;
         }
+        let key = Self::derive_signing_key(lineage_seed);
+        let expected = blake3::keyed_hash(&key, &self.message_to_sign());
+        expected.as_bytes() == &self.signature
+    }
+
+    /// Derive the 32-byte signing key from a lineage seed via BLAKE3.
+    fn derive_signing_key(lineage_seed: &[u8]) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"wetspring-consent-signing-v1");
         hasher.update(lineage_seed);
-        let key_bytes: [u8; 32] = *hasher.finalize().as_bytes();
-        let signing_key = SigningKey::from_bytes(&key_bytes);
-        let verifying_key: VerifyingKey = signing_key.verifying_key();
-        let sig = ed25519_dalek::Signature::from_bytes(&self.signature);
-        verifying_key.verify(&self.message_to_sign(), &sig).is_ok()
+        *hasher.finalize().as_bytes()
     }
 
     /// Check whether this ticket is currently valid.

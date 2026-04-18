@@ -7,20 +7,20 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,950 tests)       (44 GPU modules)
+           (71 scripts)        (1,592+ tests)      (47 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
-           (360 binaries)      (141/141 proto-nucleate, 7 deploy graphs)
+           (340 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
 
-Tier 3: Composition         →  ecoBin harvest to plasmidBin
-           (all checks green)  (cargo build --release → infra/plasmidBin/)
+Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402) → ecoBin harvest
+           (42 niche caps)     (18 IPC roundtrips)    (63/63 checks)       (plasmidBin)
 ```
 
 | | |
 |---|---|
-| **Tests** | 1,949 (unit + integration + property + doc), 0 failed |
-| **Validation checks** | 5,800+ across 360 binaries (338 barracuda + 22 forge) |
-| **Experiments** | 377 completed + 3 proposed (380 indexed) |
+| **Tests** | 1,592 (lib) + 18 IPC roundtrip + integration, 0 failed |
+| **Validation checks** | 5,900+ across 340 binaries (318 barracuda + 22 forge) |
+| **Experiments** | 379 completed + 3 proposed (382 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 42 niche, 37 dispatch, 21 domains (Wire Standard L2+L3, V144) |
 | **Named tolerances** | 242 with machine-readable provenance trail |
@@ -29,14 +29,14 @@ Tier 3: Composition         →  ecoBin harvest to plasmidBin
 | **`#[allow()]`** | 0 in production (uses `#[expect(reason)]` exclusively) |
 | **Local WGSL** | 0 — fully lean on barraCuda |
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
-| **Composition** | 141/141 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
+| **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 5 open in `docs/PRIMAL_GAPS.md` (all external), 2 resolved |
+| **Primal gaps** | 6 open in `docs/PRIMAL_GAPS.md` (all external), 2 resolved |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V144:** Composition evolution — biomeOS v3.04 alignment. Fixed `akida-driver` path case mismatch (blocking on case-sensitive filesystems). Removed universal `composition.*_health` methods (now owned by biomeOS per `COMPOSITION_HEALTH_STANDARD.md`). Retained spring-specific `composition.science_health`. Capabilities trimmed from 46→42 niche, 42→37 dispatch. 1,949 tests, zero warnings. V143: Deploy graph canonical migration, D07 composition validation (141/141 Exp400). V142: Wire Standard L2+L3, `identity.get`, 22 consumed capabilities. V141: audit remediation. V140: ecosystem audit. V139: NUCLEUS composition.
+**Current release — V144:** Composition validation tier — Python→Rust→Primal composition. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation). Exp400 136/136 proto-nucleate alignment (biomeOS V144: universal composition methods delegated). Exp401: IPC science parity — dispatch results vs local Rust baselines + 7-graph structural validation. Exp402: 63/63 niche parity gate (NICHE_STARTER_PATTERNS). 18 IPC roundtrip tests (Gonzales, Anderson, provenance, brain, metrics, AI). `metrics.snapshot` handler wired. barraCuda v0.3.12. `deny.toml` C-ban alignment. Provenance registry `commit`/`date` fields. Capabilities 46→42 niche, 42→37 dispatch (biomeOS owns universal composition health). V143: deploy graph canonical. V142: Wire Standard L2+L3. V141: audit remediation. V140: ecosystem audit.
 
 ---
 

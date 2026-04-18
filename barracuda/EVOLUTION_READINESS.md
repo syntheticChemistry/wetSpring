@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 24, 2026 (V137 — barraCuda v0.3.7 + toadStool S155+ + coralReef Phase 10)
+**Date:** March 24, 2026 (V137 — barraCuda v0.3.12 + toadStool S155+ + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 44 `bio/*_gpu.rs` modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.7, wgpu 28). 1,902 tests (0 failures), 379 experiments, 5,700+ checks, 242 named tolerances (zero inline literals), 355 binaries (333 barracuda + 22 forge), 109 bio modules. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in entire codebase**. `forbid(unsafe_code)` at workspace level + all crate roots. All primal names via `primal_names::*` constants. 91.20% line coverage (gated at 90%). **V137:** Provenance headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. **V136:** thiserror migration, named cast helpers (60+ casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. **V135:** Doc reconciliation, V135 handoff. **V134:** Deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `GpuContext`/`TensorSession`, `validate_all`, zero-copy I/O. **See also:** `wateringHole/handoffs/WETSPRING_V137_PROVENANCE_TOLERANCE_IPC_HANDOFF_MAR24_2026.md`.
+**Status:** 44 `bio/*_gpu.rs` modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.12, wgpu 28). 1,902 tests (0 failures), 379 experiments, 5,700+ checks, 242 named tolerances (zero inline literals), 355 binaries (333 barracuda + 22 forge), 109 bio modules. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in entire codebase**. `forbid(unsafe_code)` at workspace level + all crate roots. All primal names via `primal_names::*` constants. 91.20% line coverage (gated at 90%). **V137:** Provenance headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. **V136:** thiserror migration, named cast helpers (60+ casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. **V135:** Doc reconciliation, V135 handoff. **V134:** Deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `GpuContext`/`TensorSession`, `validate_all`, zero-copy I/O. **See also:** `wateringHole/handoffs/WETSPRING_V137_PROVENANCE_TOLERANCE_IPC_HANDOFF_MAR24_2026.md`.
 
 ### Full Lean Phase
 
@@ -537,7 +537,7 @@ All production dependencies are pure Rust or have pure Rust backends.
 
 | Dependency | Version | Pure Rust? | Notes |
 |------------|---------|:----------:|-------|
-| `barracuda` | path (v0.3.7) | **Yes** | Standalone math primal, zero FFI |
+| `barracuda` | path (v0.3.12) | **Yes** | Standalone math primal, zero FFI |
 | `flate2` | 1.0 | **Yes** | `rust_backend` feature → miniz_oxide (no C zlib) |
 | `bytemuck` | 1 | **Yes** | Zero-copy GPU buffer casting |
 | `serde` | 1 (optional) | **Yes** | Derive only |

@@ -451,7 +451,7 @@ Current status: **1,476/1,476 CPU pass (historical milestone).** 1,776 total tes
 | `validate_cross_substrate` | 20 | metalForge cross-substrate CPU↔GPU parity (Exp060) |
 | `validate_gpu_rf` | 13 | RF batch inference shader (Exp063) |
 
-Current status: **702+/702+ pass (historical milestone).** 150+ barraCuda primitives consumed (v0.3.7).
+Current status: **702+/702+ pass (historical milestone).** 150+ barraCuda primitives consumed (v0.3.12).
 0 local WGSL shaders (all absorbed) + 12 Compose + 35 Lean = 47 GPU modules total.
 
 ### Grand Total: 5,707+/5,707+ quantitative checks pass
@@ -488,7 +488,7 @@ results, then exceed them via Rust + GPU.
 | asari | 1.13.1 | LC-MS feature extraction |
 | `PFΔScreen` | Latest | PFAS non-target screening |
 | flate2 | 1.0 | Pure Rust backend (`rust_backend`), no C dependencies |
-| barraCuda | v0.3.7 (standalone) | 150+ primitives consumed, 784+ WGSL shaders |
+| barraCuda | v0.3.12 (standalone) | 150+ primitives consumed, 784+ WGSL shaders |
 
 ---
 

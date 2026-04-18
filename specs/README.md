@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: April 11, 2026
-**Status**: V143 — 5,800+ checks (380 experiments, 360 binaries), 1,950 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 46 niche capabilities, 21 domains (8 families), 141/141 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs (`[[graph.nodes]]` canonical, bonding + fragments metadata), 5 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). V143: deploy graph canonical migration, D07 metadata compliance. V142: Wire Standard L2+L3, `identity.get`, `WireWitnessRef`. V141: capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns. *(Detailed validation tables below reflect their respective phases.)*
+**Last Updated**: April 17, 2026
+**Status**: V144 — 5,900+ checks (382 experiments, 340 binaries), 1,699 tests, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities (biomeOS V144: universal composition methods delegated), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs (`[[graph.nodes]]` canonical, bonding + fragments metadata), 6 composition gaps open in `docs/PRIMAL_GAPS.md` (2 resolved). **Composition validation tier: Exp401 (IPC parity — science results vs local Rust baselines + graph structural validation), Exp402 (niche parity — NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip tests (Gonzales, Anderson, provenance, brain, metrics, AI).** V144: composition validation tier, Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation), barraCuda v0.3.12, `deny.toml` C-ban alignment, provenance `commit`/`date` fields, deploy graph V144 compliance. V143: deploy graph canonical migration, D07 metadata compliance. V142: Wire Standard L2+L3, `identity.get`, `WireWitnessRef`. V141: capability alignment, TensorSession PoC. V140: ecosystem audit. V139: NUCLEUS composition. V138: primal composition patterns. *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -13,7 +13,7 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 47 modules, 379 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.7, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
+| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.12, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 546/546 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
@@ -27,7 +27,8 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,330 lib + 234 forge + 89 integration + 9 doc = 1,662 tests, 354 binaries |
+| Rust modules | 47 CPU + 47 GPU + 1 IPC + 1 vault + 1 visualization, 1,591 lib + 18 IPC roundtrip + 90 integration = 1,699 tests, 340 binaries |
+| Composition validation | Exp400: 136/136 proto-nucleate alignment, Exp401: IPC parity (science + graph), Exp402: niche parity (NICHE_STARTER_PATTERNS gate) |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 63/63 reproducible papers complete (Tracks 1-6 + Phase 37 extensions + cross-spring) |
@@ -50,6 +51,7 @@ Every paper in the queue goes through the full evolution path. Status:
 | **BarraCuda GPU** | GPU produces same answer as CPU | 1,783 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
 | **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 39/39 papers three-tier (Exp103/104/165/182) |
+| **Primal composition** | IPC dispatch matches local Rust baselines, graph + niche validated | Exp400 (136/136), Exp401 (parity), Exp402 (niche gate), 18 IPC roundtrips |
 
 **Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
 wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only
@@ -166,7 +168,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 47 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.7, always-on, zero fallback, 264 ComputeDispatch ops)
+- **Sovereign Rust bioinformatics** — 47 CPU + 47 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.12, always-on, zero fallback, 264 ComputeDispatch ops)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

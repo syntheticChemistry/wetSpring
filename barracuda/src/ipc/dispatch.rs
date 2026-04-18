@@ -86,6 +86,9 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "vault.retrieve" => handlers::handle_vault_retrieve(params),
         "vault.consent.verify" => handlers::handle_vault_consent_verify(params),
 
+        // Metrics
+        "metrics.snapshot" => handlers::handle_metrics_snapshot(params),
+
         // Composition health (spring-specific domain health)
         // Universal methods (tower, node, nest, nucleus) are owned by biomeOS v3.04+
         "composition.science_health" => handlers::handle_composition_science_health(params),

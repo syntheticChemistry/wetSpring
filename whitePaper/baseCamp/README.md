@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** April 11, 2026
+**Date:** April 17, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V143 — Three-tier validation complete + deploy graph canonical evolution. **Tier 1:** Python→Rust (**1,950** tests, **5,800+** validation checks, **360** binaries). **Tier 2:** Rust→Primal composition (**141/141** proto-nucleate D01–D07, **7** deploy graphs `[[graph.nodes]]` canonical with bonding policy + fragments metadata, **46** niche capabilities, **42** dispatch methods, **21** domains, Wire Standard L2+L3). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. **380** experiments indexed (377 completed + 3 PROPOSED). `barraCuda` v0.3.11 (150+ primitives). **242** named tolerances with provenance trail (90+ with TOML provenance). **22** consumed capabilities declared. `WireWitnessRef` provenance events. `identity.get` handler. **5** primal composition gaps remaining (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings (all-features), cargo-deny clean, `forbid(unsafe_code)`, zero `#[allow()]`. **V143:** Deploy graph canonical, D07 metadata compliance, bonding + fragments. **V142:** Wire Standard, WireWitnessRef, barraCuda 0.3.11. **V141:** audit remediation. **V140:** ecosystem audit. **V139:** NUCLEUS composition.
+**Status:** V144 — Three-tier validation complete + composition parity gate. **Tier 1:** Python→Rust (**1,592+** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **340** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate D01–D07, **7** deploy graphs `[[graph.nodes]]` canonical with bonding policy + fragments metadata, **42** niche capabilities, **37** dispatch methods, **21** domains, Wire Standard L2+L3). **Tier 3:** Composition→IPC parity (Exp401, **43/43**) → Niche gate (Exp402, **63/63**) → ecoBin harvest to `plasmidBin`. **382** experiments indexed (379 completed + 3 PROPOSED). `barraCuda` v0.3.12 (150+ primitives). **242** named tolerances with provenance trail. **22** consumed capabilities declared. `WireWitnessRef` provenance events. `identity.get` handler. `metrics.snapshot` handler. **6** primal composition gaps remaining (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, cargo-deny clean, `forbid(unsafe_code)`, zero `#[allow()]`.
 
 ---
 
@@ -25,11 +25,12 @@ Tier 1 — Python validates Rust (science fidelity)
 
 Tier 2 — Rust validates NUCLEUS composition (primal patterns)
   Rust validation binaries
-    → IPC capability surface (46 methods, 21 domains)
-      → Proto-nucleate alignment (14 primals, 141/141 D01–D07)
+    → IPC capability surface (42 niche capabilities, 21 domains)
+      → Proto-nucleate alignment (14 primals, 136/136 D01–D07)
         → Deploy graph validation (7 graphs, [[graph.nodes]] canonical)
           → Deploy graph metadata (bonding policy, fragments, composition model)
-            → Composition health handlers (5: science, tower, node, nest, nucleus)
+            → IPC parity + niche gate (Exp401 43/43, Exp402 63/63, 18 IPC roundtrip tests)
+            → Composition health: `composition.science_health` (spring-specific; 4 universal methods → biomeOS V144+)
 
 Tier 3 — Composition enables ecoBin harvest (deployment)
   All checks green
@@ -40,7 +41,7 @@ Tier 3 — Composition enables ecoBin harvest (deployment)
 Every stage is validated with explicit numerical checks. All data is open.
 All code is AGPL-3.0-or-later.
 
-## V138–V143 — Primal composition validation, Wire Standard, deploy graph evolution
+## V138–V144 — Primal composition validation, Wire Standard, deploy graph evolution
 
 **V142** completes Capability Wire Standard v1.0 compliance and composition
 self-description. `capabilities.list` now returns a canonical L2+L3 envelope:
@@ -60,11 +61,13 @@ aligned (21 domains, 41 methods). Proto-nucleate validated at test time.
 schema (NA-016), adds bonding policy and fragments metadata to full-NUCLEUS
 graphs, aligns capability strings to proto-nucleate canonical form, adds
 coralReef/barraCuda as Node Atomic graph nodes, and extends Exp400 with D07
-deploy graph metadata compliance (44 new checks → 141/141 total).
+deploy graph metadata compliance (44 new checks → 141/141 total, later refined to 136/136 in V144).
+
+**V144** completes the composition validation tier. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation compliance). Exp401 validates IPC science dispatch results against local Rust baselines and structurally validates all 7 deploy graphs. Exp402 validates every niche capability dispatches correctly (NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip integration tests cover Gonzales, Anderson, provenance lifecycle, brain, metrics, and AI. `metrics.snapshot` handler wired to dispatch. Universal composition health methods (`composition.{tower,node,nest,nucleus}_health`) removed — biomeOS v3.04+ owns orchestration health. barraCuda v0.3.12. `deny.toml` C-dependency bans aligned with workspace root. Provenance registry extended with `commit`/`date` fields.
 
 This is the validation narrative crystallised:
-- **Python was the validation target for Rust** (58 scripts → 1,950 tests).
-- **Rust + Python are now validation targets for NUCLEUS composition** (141/141
+- **Python was the validation target for Rust** (58 scripts → 1,592+ lib tests).
+- **Rust + Python are now validation targets for NUCLEUS composition** (136/136
   proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
 - **Composition self-describes via Wire Standard** (L2+L3: methods,
   provided/consumed capabilities, identity, witnesses).
@@ -207,7 +210,7 @@ Every paper goes through the full evolution. Status across all 64 papers:
 | biomeOS IPC integration | JSON-RPC science primal, GPU-aware dispatch, Songbird registration | 321 checks (Exp203-208) |
 | petalTongue visualization | 9 DataChannel types, 33 scenario builders, StreamSession, Songbird capabilities, IPC science→viz wiring | 78 checks (Exp333-334) |
 | **V110 live viz + Anderson H3** | petalTongue live dashboards (IPC push + JSON export), all 9 DataChannel types validated with real math, stream_ecology module, Anderson QS O₂-modulated W model (H3, r=0.851 vs 10 environments), biomeOS/NUCLEUS readiness probing | 111 checks (Exp353-356) |
-| Code quality audit | 91.20% line / 90.30% fn (gated at 90%), **streaming-only I/O** (buffering `parse_*` removed), 0 production mocks, standalone `barraCuda` v0.3.7 (150+ primitives consumed), `forbid(unsafe_code)` at workspace level + per-crate, clippy pedantic + nursery ZERO WARNINGS, **242** named tolerances (zero inline literals, 8 with run commands), **44** GPU modules, **49** CPU bio modules, **capability-based runtime discovery** (7+ ecosystem primals), **21 capability domains in 8 families** (cross-check enforced), **TensorSession PoC**, typed error enums, validation harness refactored into domain submodules, `proptest` property-based testing, **zero `#[allow()]` in entire codebase** — all `#[expect(reason)]`, **`//! Provenance:` headers on all 355 workspace binaries** | **1,946** tests |
+| Code quality audit | 91.20% line / 90.30% fn (gated at 90%), **streaming-only I/O** (buffering `parse_*` removed), 0 production mocks, standalone `barraCuda` v0.3.12 (150+ primitives consumed), `forbid(unsafe_code)` at workspace level + per-crate, clippy pedantic + nursery ZERO WARNINGS, **242** named tolerances (zero inline literals, 8 with run commands), **44** GPU modules, **49** CPU bio modules, **capability-based runtime discovery** (7+ ecosystem primals), **21 capability domains in 8 families** (cross-check enforced), **TensorSession PoC**, typed error enums, validation harness refactored into domain submodules, `proptest` property-based testing, **zero `#[allow()]` in entire codebase** — all `#[expect(reason)]`, **`//! Provenance:` headers on all 355 workspace binaries** | **1,946** tests |
 | V66 dispatch evolution | Forge dispatch routing (29 workloads), streaming topology (PCIe bypass), NUCLEUS Tower/Node/Nest model, absorption audit (0 local WGSL) | 49 checks (Exp213) |
 | V66 NUCLEUS V8 | IPC dispatch with V66 I/O evolution (byte-native FASTQ, bytemuck nanopore, streaming MS2), Nest metrics, CPU fallback parity, full pipeline chain | 49 checks (Exp214) |
 | **V84 pipeline buildout** | Paper→CPU→GPU→Streaming proven end-to-end: 32 papers, 26 CPU domains, 21 GPU domains, Python parity, 0.10ms streaming overhead | 172 checks (Exp251-255) |
