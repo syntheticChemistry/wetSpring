@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** April 18, 2026
+**Date:** April 19, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V148 — guideStone Level 3 (bare certified 16/16, exit 2) + primal proof + composition validation. **Tier 1:** Python→Rust (**1,594** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone`, Level 3 bare certified, N1 expanded to 15 manifest capabilities per v0.9.16 downstream_manifest, BLAKE3 checksums). **383** experiments indexed. **48 consumed capabilities** (33 v0.9.16 canonical + 15 legacy). `niche::GUIDESTONE_READINESS = 3`. `barraCuda` v0.3.12. **10** primal composition gaps (`docs/PRIMAL_GAPS.md`, 2 resolved). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
+**Status:** V148 — guideStone **Level 4** (NUCLEUS validated, 31/31 pass, exit 0) + bare mode (16/16 pass, exit 2). Live IPC parity against barraCuda, BearDog, NestGate, ToadStool. **Tier 1:** Python→Rust (**1,594** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone`, Level 4 NUCLEUS validated, 15 manifest capabilities, BLAKE3 checksums, handle-based matmul, cross-atomic pipeline). **383** experiments indexed. **48 consumed capabilities** (33 v0.9.16 canonical + 15 legacy). `niche::GUIDESTONE_READINESS = 4`. `barraCuda` v0.3.12. **14** primal composition gaps open (`docs/PRIMAL_GAPS.md`, 3 resolved, PG-01–PG-17). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
 
 ---
 
@@ -36,12 +36,14 @@ Tier 3 — Primal proof (Level 5: live NUCLEUS IPC)
       → Compare IPC results vs local Rust baselines
         → check_skip for absent primals (CI: exit 2 = skipped)
 
-Tier 4 — guideStone (self-validating NUCLEUS node)  ← Level 3 V148
+Tier 4 — guideStone (self-validating NUCLEUS node)  ← Level 4 V148
   wetspring_guidestone (primalspring::composition API)
-    → Bare: local science baselines (9/9 pass, exit 2)  ← CERTIFIED
-      → N1: 15 manifest capabilities (v0.9.16), N2: extended domain science
-        → NUCLEUS: validate_parity + validate_liveness via IPC
-          → Exit 0 (certified) / 1 (failed) / 2 (bare-only)
+    → Bare: local science baselines (16/16 pass, exit 2)  ← CERTIFIED
+      → N0: liveness (4/5 primals alive, Squirrel BTSP-gated)
+        → N1: 15 manifest capabilities (v0.9.16), 4 pass + 6 skip + 5 services
+          → N2: domain science (3 extended checks, 2 skip)
+            → N3: cross-atomic pipeline (hash→store→retrieve→verify)
+              → NUCLEUS: 31/31 pass (11 skip), exit 0  ← VALIDATED
 
 Tier 5 — NUCLEUS deployment enables ecoBin harvest
   plasmidBin ecobins on clean machine

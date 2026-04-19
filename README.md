@@ -37,7 +37,7 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4)
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 15 open in `docs/PRIMAL_GAPS.md` (12 external + 3 internal), 3 resolved |
+| **Primal gaps** | 14 open in `docs/PRIMAL_GAPS.md` (11 external + 3 internal), 3 resolved (PG-01–PG-17) |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |

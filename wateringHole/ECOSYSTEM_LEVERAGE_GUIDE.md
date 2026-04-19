@@ -1,12 +1,12 @@
 # Ecosystem Leverage Guide — wetSpring V128
 
-> **V148 note (Apr 20, 2026):** This guide was written at V128. Current
+> **V148 note (Apr 19, 2026):** This guide was written at V128. Current
 > metrics: **364** binaries, **1,702** tests, **150+** barraCuda primitives
 > (v0.3.12), **42** niche capabilities, **48** barraCuda IPC consumed
-> capabilities (33 v0.9.16 canonical + 15 legacy). **guideStone Level 3**
-> (bare certified 16/16, v0.9.16 manifest alignment). **10** primal
-> composition gaps (PG-01–PG-12, 3 resolved). See
-> `handoffs/WETSPRING_V148_PRIMALSPRING_V0916_ALIGNMENT_HANDOFF_APR20_2026.md`
+> capabilities (33 v0.9.16 canonical + 15 legacy). **guideStone Level 4**
+> (NUCLEUS validated 31/31, bare 16/16, v0.9.16 manifest). **14** primal
+> composition gaps open (PG-01–PG-17, 3 resolved). See
+> `handoffs/WETSPRING_V148_GUIDESTONE_LEVEL4_NUCLEUS_HANDOFF_APR19_2026.md`
 > and `docs/PRIMAL_GAPS.md` for current composition status.
 
 **Date:** March 18, 2026

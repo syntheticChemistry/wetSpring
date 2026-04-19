@@ -35,7 +35,7 @@ evolution pipeline.
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 10 open (`docs/PRIMAL_GAPS.md`) — 7 external + 3 internal, 2 resolved
+- **Primal gaps:** 14 open (`docs/PRIMAL_GAPS.md`) — 11 external + 3 internal, 3 resolved (PG-01–PG-17)
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities

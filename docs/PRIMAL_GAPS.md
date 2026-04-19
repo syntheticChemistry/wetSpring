@@ -153,7 +153,7 @@ binary name if it differs from the deploy/downstream manifests.
 ## PG-09: barraCuda IPC Evaporation Surface — Domain Math via IPC
 
 **Owner:** wetSpring (internal)
-**Status:** In progress — guideStone Level 3, CONSUMED_CAPABILITIES aligned to v0.9.16
+**Status:** In progress — guideStone Level 4, CONSUMED_CAPABILITIES aligned to v0.9.16
 
 barraCuda is a full ecobin primal. The v0.9.16 canonical surface defines 33
 JSON-RPC methods (TENSOR 9, STATS 9, COMPUTE 4, SPECTRAL 3, LINALG 6,
@@ -164,9 +164,9 @@ primal proof (Level 5), domain math must migrate to IPC.
 **What exists (V147):**
 - `niche::CONSUMED_CAPABILITIES` declares full v0.9.16 canonical surface (33
   methods) plus 15 legacy Exp403 methods pending migration
-- `wetspring_guidestone` binary (Level 3): bare mode certified (9/9, exit 2),
-  N2 expanded with stats.variance, stats.median, stats.correlation,
-  linalg.determinant, linalg.eigenvalues, spectral.fft
+- `wetspring_guidestone` binary (Level 4): NUCLEUS validated (31/31 pass, exit 0),
+  bare mode (16/16 pass, exit 2), handle-based matmul, sample std_dev, cross-atomic pipeline.
+  N1 expanded to 15 manifest capabilities, 11 skipped pending ecobin expansion
 - Exp403 (`validate_primal_parity_v1`) remains as Tier 2 IPC-WIRED validation
   with the original 22-method surface
 - Socket discovery uses `ipc::discover::discover_primal()` (env var → XDG → temp)

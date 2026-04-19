@@ -74,27 +74,38 @@ Total bare:                    16/16 pass, exit 2
 
 | Field | Value |
 |-------|-------|
-| `niche::GUIDESTONE_READINESS` | 3 |
-| Bare checks | 16/16 |
-| NUCLEUS checks | Pending (Tier 2/3 requires live NUCLEUS) |
+| `niche::GUIDESTONE_READINESS` | **4** |
+| Bare checks | 16/16 pass, exit 2 |
+| NUCLEUS checks | **31/31 pass (11 skip), exit 0** |
 | Validation layers | B0, B1, B2 (bare) + N0, N1, N2, N3 (NUCLEUS) |
 | Exit codes | 0 = certified, 1 = failed, 2 = bare-only |
+
+**Level 4 achieved April 19, 2026.** Live NUCLEUS deployed from source-built
+binaries (barraCuda, BearDog, NestGate, ToadStool, Squirrel) with
+`FAMILY_ID=wetspring-validation`. 11 skips are PG-13 (6 barraCuda methods),
+PG-14 (Squirrel BTSP), PG-15 (ToadStool compute.dispatch), plus 2 domain
+science methods not yet in ecobin.
 
 ## Gaps Update
 
 | Gap | Status | Notes |
 |-----|--------|-------|
 | PG-10 | Open | spectral/linalg routing in `method_to_capability_domain` (primalSpring) |
-| PG-11 | **Resolved V148** | Manifest reconciled: 15 capabilities, `guidestone_readiness = 3` |
+| PG-11 | **Resolved V148** | Manifest reconciled: 15 capabilities, `guidestone_readiness = 4` |
 | PG-12 | Open | Exp403 legacy surface (15 methods pending v0.9.16 migration) |
+| PG-13 | **New** | barraCuda missing 6 manifest methods (blocks Level 5) |
+| PG-14 | **New** | Squirrel BTSP-only socket (no plain JSON-RPC) |
+| PG-15 | **New** | ToadStool compute.dispatch not registered |
+| PG-16 | **New** | stats.std_dev N-1 vs N convention |
+| PG-17 | **New** | tensor.matmul handle-based only |
 
-## Next Steps (wetSpring → Level 4)
+## Next Steps (wetSpring → Level 5)
 
-1. Deploy live NUCLEUS from plasmidBin with `FAMILY_ID=wetspring-validation`
-2. Run `wetspring_guidestone` against live NUCLEUS (N0–N3 activate)
-3. Iterate on parity failures (barraCuda response format, tolerance alignment)
-4. Promote `GUIDESTONE_READINESS` to 4 when N0–N3 pass
-5. Target Level 5 when cross-substrate (Python/CPU/GPU) parity is certified
+1. **barraCuda team** implements 6 missing manifest methods (PG-13)
+2. **Squirrel team** adds plain JSON-RPC fallback (PG-14)
+3. **ToadStool team** registers compute.dispatch on JSON-RPC socket (PG-15)
+4. When 11 skips → 0, wetSpring achieves full N1/N2 parity
+5. Cross-substrate validation (Python/CPU/GPU) for Level 5 certification
 
 ## Verification
 

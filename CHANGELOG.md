@@ -3,6 +3,35 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V148] — 2026-04-19
+
+### guideStone Level 4 — Live NUCLEUS Validation
+
+wetSpring's `wetspring_guidestone` passes 31/31 checks (11 skipped) against
+a live 5-primal NUCLEUS composition (barraCuda, BearDog, NestGate, ToadStool,
+Squirrel) with exit 0. Promotes guideStone from Level 3 (bare) to Level 4
+(NUCLEUS validated).
+
+#### Added
+- Handle-based `tensor.matmul` via create→matmul→check-shape flow
+- `validate_parity_or_skip` helper for graceful degradation on unimplemented methods
+- `validate_tensor_matmul` helper for handle-based tensor API
+- 5 new primal gaps (PG-13 through PG-17) documenting live NUCLEUS findings
+- Ecosystem evolution handoff for all primal and spring teams
+- BLAKE3 checksum self-verification (Property 3) via `primalspring::checksums`
+- v0.9.16 manifest alignment (15 validation_capabilities)
+- Family-aware socket discovery (`FAMILY_ID` namespacing)
+
+#### Changed
+- `niche::GUIDESTONE_READINESS`: 3 → 4
+- `stats.std_dev` expected: population (√200) → sample (√250) to match barraCuda
+- `stats.weighted_mean` param: `"data"` → `"values"` to match barraCuda API
+- `crypto.hash` input: raw string → base64-encoded (BearDog requirement)
+- All docs updated to reflect Level 4 status, 14 open gaps, 3 resolved
+
+#### Fixed
+- Clippy: `map_or` → `is_some_and`, removed redundant clones/closures
+
 ## [V144] — 2026-04-12
 
 ### Composition Evolution — biomeOS v3.04 Alignment

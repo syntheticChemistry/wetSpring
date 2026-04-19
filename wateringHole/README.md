@@ -9,9 +9,10 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V148** | `handoffs/WETSPRING_V148_GUIDESTONE_LEVEL4_NUCLEUS_HANDOFF_APR19_2026.md` | Apr 19 | **guideStone Level 4**: 31/31 live NUCLEUS, 4 primals over IPC. Handle-based matmul, sample std_dev, cross-atomic pipeline. 5 new gaps (PG-13–17). |
-| V148 | `handoffs/WETSPRING_V148_PRIMALSPRING_V0916_ALIGNMENT_HANDOFF_APR20_2026.md` | Apr 20 | v0.9.16 manifest alignment: 15 validation_capabilities, BLAKE3 checksums (Property 3), family-aware discovery, N1 expanded, PG-11 resolved. |
-| V147 | `handoffs/WETSPRING_V147_ECOSYSTEM_EVOLUTION_HANDOFF_APR18_2026.md` | Apr 18 | Ecosystem evolution: primal use review, composition patterns, NUCLEUS deployment story, actionable feedback for all primal+spring teams. |
+| **V148** | `handoffs/WETSPRING_V148_ECOSYSTEM_EVOLUTION_HANDOFF_APR19_2026.md` | Apr 19 | **Ecosystem handoff**: per-primal feedback (barraCuda, BearDog, NestGate, ToadStool, Squirrel, biomeOS), patterns for spring teams, NUCLEUS deployment recipes, 14 gaps (5 new). |
+| V148 | `handoffs/WETSPRING_V148_GUIDESTONE_LEVEL4_NUCLEUS_HANDOFF_APR19_2026.md` | Apr 19 | **guideStone Level 4**: 31/31 live NUCLEUS, 4 primals over IPC. Handle-based matmul, sample std_dev, cross-atomic pipeline. 5 new gaps (PG-13–17). |
+| V148 | `handoffs/WETSPRING_V148_PRIMALSPRING_V0916_ALIGNMENT_HANDOFF_APR20_2026.md` | Apr 20 | v0.9.16 manifest alignment: 15 validation_capabilities, BLAKE3 checksums (Property 3), family-aware discovery, Level 4 achieved. |
+| V147 | `handoffs/WETSPRING_V147_ECOSYSTEM_EVOLUTION_HANDOFF_APR18_2026.md` | Apr 18 | Ecosystem evolution (pre-NUCLEUS): primal use review, composition patterns. Superseded by V148 ecosystem handoff. |
 | V147 | `handoffs/WETSPRING_V147_GUIDESTONE_LEVEL3_HANDOFF_APR18_2026.md` | Apr 18 | guideStone Level 3: bare certified (9/9, exit 2). N2 expanded. CONSUMED_CAPABILITIES aligned to v0.9.15 (48 total). PG-10/11/12 documented. |
 | V146 | `handoffs/WETSPRING_V146_GUIDESTONE_LEVEL2_HANDOFF_APR18_2026.md` | Apr 18 | guideStone Level 2: `wetspring_guidestone` binary via `primalspring::composition` API. Bare science + NUCLEUS IPC parity. 5 certified properties documented. |
 | V145 | `handoffs/WETSPRING_V145_ECOSYSTEM_EVOLUTION_HANDOFF_APR17_2026.md` | Apr 17 | Ecosystem evolution: composition patterns, NUCLEUS deployment, per-primal feedback, 7 gaps. |
