@@ -18,8 +18,8 @@ Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
 Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (48 consumed caps)   (5 primals, check_skip)    (plasmidBin)
 
-Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 3)
-           (wetspring_guidestone) (bare certified 16/16, v0.9.16 manifest)
+Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4)
+           (wetspring_guidestone) (31/31 live NUCLEUS, v0.9.16 manifest)
 ```
 
 | | |
@@ -37,12 +37,12 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 3)
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 10 open in `docs/PRIMAL_GAPS.md` (7 external + 3 internal), 2 resolved |
+| **Primal gaps** | 15 open in `docs/PRIMAL_GAPS.md` (12 external + 3 internal), 3 resolved |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V148:** guideStone Level 3 (bare certified 16/16, exit 2) — primalSpring v0.9.16 manifest alignment (15 validation_capabilities), BLAKE3 checksum verification (Property 3), N1 expanded from 7 to 15 manifest parity checks, family-aware discovery support. V147: N2 v0.9.15 surface, CONSUMED_CAPABILITIES 33+15. V146: guideStone Level 2. V145: Exp403, 22 consumed caps. V144: composition tier. V143: deploy graph canonical.
+**Current release — V148:** guideStone **Level 4** (NUCLEUS validated, 31/31 pass, exit 0) — live IPC parity against barraCuda, BearDog, NestGate, ToadStool. Handle-based tensor.matmul, sample std_dev parity, cross-atomic pipeline (hash→store→retrieve→verify). BLAKE3 checksums, v0.9.16 manifest (15 capabilities, 11 skipped pending ecobin expansion). 5 new gaps (PG-13–17). V147: N2 v0.9.15 surface. V146: guideStone Level 2. V145: Exp403. V144: composition tier.
 
 ---
 

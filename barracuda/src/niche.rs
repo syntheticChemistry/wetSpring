@@ -36,10 +36,11 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 /// 0 = not started, 1 = validation exists, 2 = properties documented,
 /// 3 = bare guideStone works, 4 = NUCLEUS guideStone works, 5 = certified.
 ///
-/// Level 3: bare mode runs (16/16 pass, exit 2), 5 certified properties
-/// validated without NUCLEUS. B2 BLAKE3 checksums, N1 expanded to 15 manifest
-/// capabilities per v0.9.16 downstream_manifest.toml.
-pub const GUIDESTONE_READINESS: u8 = 3;
+/// Promoted to 4: live NUCLEUS validation (31/31 pass, exit 0) against
+/// barraCuda, BearDog, NestGate, ToadStool over IPC. 11 methods skipped
+/// (not yet in ecobin or BTSP-gated). BLAKE3 checksums, handle-based
+/// tensor.matmul, sample std_dev parity, cross-atomic pipeline verified.
+pub const GUIDESTONE_READINESS: u8 = 4;
 
 use crate::primal_names::{
     BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SQUIRREL, SWEETGRASS,

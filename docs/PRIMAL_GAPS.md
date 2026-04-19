@@ -275,6 +275,82 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
 | PG-11 | Manifest drift (N2 methods) | primalSpring | **Resolved V148** | -- |
 | PG-12 | Exp403 legacy surface | wetSpring | v0.9.16 migration | 2 |
+| PG-13 | barraCuda missing 6 manifest methods | barraCuda | ecobin expansion | 1 |
+| PG-14 | Squirrel BTSP-only socket | Squirrel | plain JSON-RPC fallback | 2 |
+| PG-15 | ToadStool compute.dispatch missing | ToadStool | method registration | 1 |
+| PG-16 | stats.std_dev N-1 vs N divisor | barraCuda/wetSpring | document convention | 1 |
+| PG-17 | tensor.matmul handle-based only | barraCuda | inline data path or document | 1 |
+
+---
+
+## PG-13: barraCuda Missing 6 Manifest Methods
+
+**Owner:** barraCuda
+**Status:** Open — discovered V148 live NUCLEUS validation
+
+The downstream manifest lists `stats.variance`, `stats.correlation`,
+`linalg.solve`, `linalg.eigenvalues`, `spectral.fft`, `spectral.power_spectrum`
+as wetSpring `validation_capabilities`. The barraCuda ecobin responds
+"Unknown method" for all six. These are in the v0.9.16 canonical surface
+definition but not yet implemented in the binary.
+
+**Impact:** 6 of 15 manifest methods are SKIP in wetSpring's guideStone.
+Blocks Level 5 certification.
+
+---
+
+## PG-14: Squirrel BTSP-Only Socket
+
+**Owner:** Squirrel
+**Status:** Open — discovered V148 live NUCLEUS validation
+
+Squirrel's UDS server requires BTSP handshake for all connections. Plain
+JSON-RPC clients (including `primalspring::composition::CompositionContext`)
+get "Connection reset by peer". The v0.9.16 blurb documents this as a
+known issue ("BearDog resets connection without BTSP"). `validate_liveness`
+classifies it as SKIP (reachable, incompatible protocol).
+
+**Impact:** `inference.complete` and Squirrel liveness are always SKIP.
+
+---
+
+## PG-15: ToadStool compute.dispatch Missing
+
+**Owner:** ToadStool
+**Status:** Open — discovered V148 live NUCLEUS validation
+
+`compute.dispatch` is in the manifest but ToadStool responds "Method not found".
+ToadStool's JSON-RPC socket is on `toadstool-{family}.sock` (BTSP-mode);
+the tarpc socket is separate (`compute-{family}-tarpc.sock`).
+
+**Impact:** compute.dispatch always SKIP.
+
+---
+
+## PG-16: stats.std_dev N-1 vs N Divisor Convention
+
+**Owner:** barraCuda + wetSpring
+**Status:** Open — discovered V148 live NUCLEUS validation
+
+barraCuda's `stats.std_dev` uses sample standard deviation (Bessel's
+correction, N-1 divisor). wetSpring's B0 bare check uses population
+std_dev (N divisor). Both are mathematically correct but test different
+conventions. The guideStone now uses √250 (sample) for IPC and √200
+(population) for bare — this asymmetry should be documented as intentional.
+
+---
+
+## PG-17: tensor.matmul Handle-Based API
+
+**Owner:** barraCuda
+**Status:** Open — discovered V148 live NUCLEUS validation
+
+`tensor.matmul` requires pre-created tensor handles (`lhs_id`, `rhs_id`)
+rather than accepting inline data. The guideStone works around this with
+create→matmul→check-shape, but `validate_parity` (which expects a scalar
+`result` field) cannot be used. Either barraCuda should add an inline-data
+convenience path, or `primalspring::composition` should gain a handle-aware
+parity helper.
 
 ---
 
