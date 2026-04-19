@@ -19,11 +19,12 @@
 //! **Bare mode** (no NUCLEUS, exit 2):
 //!   B0 — Local science baselines (deterministic, reference-traceable)
 //!   B1 — Tolerance provenance audit
+//!   B2 — BLAKE3 checksum verification (Property 3, primalspring::checksums)
 //!
 //! **NUCLEUS mode** (exit 0 or 1):
-//!   N0 — Liveness (primals discoverable via capability scan)
-//!   N1 — Manifest IPC parity (7 validation_capabilities)
-//!   N2 — Extended domain science IPC (v0.9.15 surface: stats, linalg, spectral)
+//!   N0 — Liveness (primals discoverable via capability scan, family-aware)
+//!   N1 — Manifest IPC parity (15 validation_capabilities per v0.9.16 manifest)
+//!   N2 — Extended domain science IPC (v0.9.16 surface: stats, linalg, spectral)
 //!   N3 — Cross-atomic pipeline (hash → store → retrieve → verify)
 //!
 //! ## Layered Certification
@@ -48,21 +49,25 @@
 //! - `1` — at least one check failed
 //! - `2` — bare-only mode (no primals discovered)
 //!
-//! ## Downstream Manifest
+//! ## Downstream Manifest (v0.9.16)
 //!
 //! From `primalSpring/graphs/downstream/downstream_manifest.toml`:
-//!   validation_capabilities = tensor.matmul, stats.mean, compute.dispatch,
-//!     storage.store, storage.retrieve, inference.complete, crypto.hash
+//!   validation_capabilities = tensor.matmul, tensor.create, stats.mean,
+//!     stats.std_dev, stats.variance, stats.correlation, linalg.solve,
+//!     linalg.eigenvalues, spectral.fft, spectral.power_spectrum,
+//!     compute.dispatch, storage.store, storage.retrieve, inference.complete,
+//!     crypto.hash
 //!
 //! ## Provenance
 //!
 //! | Field | Value |
 //! |-------|-------|
 //! | Binary | `wetspring_guidestone` |
-//! | Date | 2026-04-18 |
+//! | Date | 2026-04-20 |
 //! | Command | `cargo run --features guidestone --bin wetspring_guidestone` |
-//! | Reference | hotSpring-guideStone-v0.7.0 (Level 5 certified pattern) |
+//! | Reference | primalSpring v0.9.16 guideStone (Level 4, 67/67 live NUCLEUS) |
 
+use primalspring::checksums;
 use primalspring::composition::{CompositionContext, validate_liveness, validate_parity};
 use primalspring::tolerances as ps_tol;
 use primalspring::validation::ValidationResult;
@@ -82,6 +87,10 @@ fn main() {
     // ═══ B1: Tolerance Provenance (Property 5) ═══
     v.section("B1 — Tolerance Provenance");
     validate_tolerance_provenance(&mut v);
+
+    // ═══ B2: Checksum Verification (Property 3) ═══
+    v.section("B2 — Checksum Verification");
+    validate_checksums(&mut v);
 
     // ═══ N0: NUCLEUS Liveness ═══
     v.section("N0 — NUCLEUS Liveness");
@@ -103,7 +112,7 @@ fn main() {
     }
 
     // ═══ N1: Manifest IPC Parity ═══
-    v.section("N1 — Manifest IPC Parity (7 validation_capabilities)");
+    v.section("N1 — Manifest IPC Parity (15 validation_capabilities)");
     validate_manifest_ipc(&mut ctx, &mut v);
 
     // ═══ N2: Extended Domain Science ═══
@@ -215,39 +224,111 @@ fn validate_tolerance_provenance(v: &mut ValidationResult) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// B2 — Checksum Verification (Property 3: Self-Verifying)
+// ─────────────────────────────────────────────────────────────────────
+// Uses primalspring::checksums to verify BLAKE3 hashes of critical files.
+// If the manifest file does not exist, the check is skipped (bare builds
+// without the manifest are still valid for P3 via self-verify in B0).
+
+fn validate_checksums(v: &mut ValidationResult) {
+    let manifest = "validation/CHECKSUMS";
+    if std::path::Path::new(manifest).exists() {
+        checksums::verify_manifest(v, manifest);
+    } else {
+        v.check_skip(
+            "p3:checksums_manifest",
+            "validation/CHECKSUMS not found (run from repo root to enable)",
+        );
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // N1 — Manifest IPC Parity
 // ─────────────────────────────────────────────────────────────────────
 
 fn validate_manifest_ipc(ctx: &mut CompositionContext, v: &mut ValidationResult) {
-    // ── stats.mean (tensor → barraCuda) ──
-    validate_parity(
-        ctx,
-        v,
-        "stats.mean([10..50]) IPC = 30.0",
-        "tensor",
-        "stats.mean",
-        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
-        "result",
-        30.0,
-        ps_tol::IPC_ROUND_TRIP_TOL,
-    );
+    validate_manifest_math(ctx, v);
+    validate_manifest_services(ctx, v);
+}
 
-    // ── tensor.matmul (tensor → barraCuda) ──
+/// N1a: barraCuda domain math parity (10 of 15 manifest capabilities).
+fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult) {
     validate_parity(
-        ctx,
-        v,
-        "tensor.matmul 2×2 IPC [0]=19",
-        "tensor",
-        "tensor.matmul",
+        ctx, v, "tensor.matmul 2×2 IPC [0]=19",
+        "tensor", "tensor.matmul",
         serde_json::json!({
             "a": {"data": [1.0, 2.0, 3.0, 4.0], "shape": [2, 2]},
             "b": {"data": [5.0, 6.0, 7.0, 8.0], "shape": [2, 2]}
         }),
-        "result",
-        19.0,
-        ps_tol::IPC_ROUND_TRIP_TOL,
+        "result", 19.0, ps_tol::IPC_ROUND_TRIP_TOL,
     );
 
+    match ctx.call("tensor", "tensor.create",
+        serde_json::json!({"data": [1.0, 2.0, 3.0], "shape": [3]}),
+    ) {
+        Ok(_) => v.check_bool("tensor.create accepted", true, "barraCuda tensor creation"),
+        Err(e) => v.check_skip("tensor.create", &format!("{e}")),
+    }
+
+    validate_parity(
+        ctx, v, "stats.mean([10..50]) IPC = 30.0",
+        "tensor", "stats.mean",
+        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
+        "result", 30.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    validate_parity(
+        ctx, v, "stats.std_dev([10..50]) IPC = √200",
+        "tensor", "stats.std_dev",
+        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
+        "result", (200.0_f64).sqrt(), ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    validate_parity(
+        ctx, v, "stats.variance([10..50]) IPC = 200",
+        "tensor", "stats.variance",
+        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
+        "result", 200.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    validate_parity(
+        ctx, v, "stats.correlation(x, 2x) IPC = 1.0",
+        "tensor", "stats.correlation",
+        serde_json::json!({"x": [1.0, 2.0, 3.0, 4.0, 5.0], "y": [2.0, 4.0, 6.0, 8.0, 10.0]}),
+        "result", 1.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    validate_parity(
+        ctx, v, "linalg.solve([2,1;1,2],[3,3]) IPC x[0]=1",
+        "tensor", "linalg.solve",
+        serde_json::json!({"matrix": [[2.0, 1.0], [1.0, 2.0]], "rhs": [3.0, 3.0]}),
+        "result", 1.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    validate_parity(
+        ctx, v, "linalg.eigenvalues([[2,1],[1,2]]) IPC min=1",
+        "tensor", "linalg.eigenvalues",
+        serde_json::json!({"matrix": [[2.0, 1.0], [1.0, 2.0]]}),
+        "result", 1.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    validate_parity(
+        ctx, v, "spectral.fft([1,0,0,0]) IPC [0]=1",
+        "tensor", "spectral.fft",
+        serde_json::json!({"data": [1.0, 0.0, 0.0, 0.0]}),
+        "result", 1.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    validate_parity(
+        ctx, v, "spectral.power_spectrum([1,0,0,0]) IPC [0]=1",
+        "tensor", "spectral.power_spectrum",
+        serde_json::json!({"data": [1.0, 0.0, 0.0, 0.0]}),
+        "result", 1.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+}
+
+/// N1b: non-math manifest services (compute, storage, inference, crypto).
+fn validate_manifest_services(ctx: &mut CompositionContext, v: &mut ValidationResult) {
     // ── compute.dispatch (compute → toadStool) ──
     match ctx.call(
         "compute",
@@ -317,34 +398,13 @@ fn validate_manifest_ipc(ctx: &mut CompositionContext, v: &mut ValidationResult)
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// N2 — Extended Domain Science IPC (v0.9.15 canonical surface)
+// N2 — Extended Domain Science IPC (beyond manifest)
 // ─────────────────────────────────────────────────────────────────────
-// Each check uses an analytically derivable baseline so the guideStone
-// is self-verifying (Property 3) without needing Python or file deps.
+// Checks beyond the 15 manifest capabilities — extended stats, linalg,
+// and legacy methods that exercise deeper domain math.
 
 fn validate_domain_science(ctx: &mut CompositionContext, v: &mut ValidationResult) {
-    // ── STATS domain ──
-
-    validate_parity(
-        ctx, v,
-        "stats.std_dev([10..50]) IPC = √200",
-        "tensor", "stats.std_dev",
-        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
-        "result", (200.0_f64).sqrt(),
-        ps_tol::IPC_ROUND_TRIP_TOL,
-    );
-
-    // Population variance: σ² = Σ(x−μ)²/N = 200
-    validate_parity(
-        ctx, v,
-        "stats.variance([10..50]) IPC = 200",
-        "tensor", "stats.variance",
-        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
-        "result", 200.0,
-        ps_tol::IPC_ROUND_TRIP_TOL,
-    );
-
-    // Median of odd-length sorted array: middle element = 5.0
+    // stats.median: odd-length sorted array, middle element = 5.0
     validate_parity(
         ctx, v,
         "stats.median([1,3,5,7,9]) IPC = 5",
@@ -354,19 +414,7 @@ fn validate_domain_science(ctx: &mut CompositionContext, v: &mut ValidationResul
         ps_tol::IPC_ROUND_TRIP_TOL,
     );
 
-    // Pearson r of perfectly correlated vectors: r = 1.0
-    validate_parity(
-        ctx, v,
-        "stats.correlation(x, 2x) IPC = 1.0",
-        "tensor", "stats.correlation",
-        serde_json::json!({"x": [1.0, 2.0, 3.0, 4.0, 5.0], "y": [2.0, 4.0, 6.0, 8.0, 10.0]}),
-        "result", 1.0,
-        ps_tol::IPC_ROUND_TRIP_TOL,
-    );
-
-    // ── LINALG domain (routed to "tensor" → barraCuda) ──
-
-    // det([[1,2],[3,4]]) = 1×4 − 2×3 = −2
+    // linalg.determinant: det([[1,2],[3,4]]) = 1×4 − 2×3 = −2
     validate_parity(
         ctx, v,
         "linalg.determinant([[1,2],[3,4]]) IPC = -2",
@@ -376,30 +424,7 @@ fn validate_domain_science(ctx: &mut CompositionContext, v: &mut ValidationResul
         ps_tol::IPC_ROUND_TRIP_TOL,
     );
 
-    // Symmetric 2×2: eigenvalues of [[2,1],[1,2]] are {1, 3}; min = 1
-    validate_parity(
-        ctx, v,
-        "linalg.eigenvalues([[2,1],[1,2]]) IPC min = 1",
-        "tensor", "linalg.eigenvalues",
-        serde_json::json!({"matrix": [[2.0, 1.0], [1.0, 2.0]]}),
-        "result", 1.0,
-        ps_tol::IPC_ROUND_TRIP_TOL,
-    );
-
-    // ── SPECTRAL domain (routed to "tensor" → barraCuda) ──
-
-    // DFT of unit impulse δ[0] = [1,0,0,0] → all bins = 1; X[0] = 1.0
-    validate_parity(
-        ctx, v,
-        "spectral.fft([1,0,0,0]) IPC [0] = 1",
-        "tensor", "spectral.fft",
-        serde_json::json!({"data": [1.0, 0.0, 0.0, 0.0]}),
-        "result", 1.0,
-        ps_tol::IPC_ROUND_TRIP_TOL,
-    );
-
-    // ── Legacy (Exp403 surface, pending v0.9.15 migration) ──
-
+    // Legacy: stats.weighted_mean [1,2,3] × [0.5,0.3,0.2] → 1.7
     validate_parity(
         ctx, v,
         "stats.weighted_mean IPC = 1.7 (legacy)",

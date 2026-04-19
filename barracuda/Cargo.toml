@@ -1965,3 +1965,9 @@ required-features = ["ipc"]
 name = "wetspring_science_facade"
 path = "src/bin/wetspring_science_facade.rs"
 required-features = ["facade"]
+
+# ── Checksum generation for guideStone Property 3 ──
+[[example]]
+name = "gen_checksums"
+path = "examples/gen_checksums.rs"
+required-features = ["guidestone"]

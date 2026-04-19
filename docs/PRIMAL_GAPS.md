@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-18 (V147 — guideStone Level 3, bare mode certified, N2 expanded to v0.9.15 surface)
+Last updated: 2026-04-20 (V148 — primalSpring v0.9.16 manifest alignment, 15 validation_capabilities, BLAKE3 checksums)
 
 ---
 
@@ -153,16 +153,16 @@ binary name if it differs from the deploy/downstream manifests.
 ## PG-09: barraCuda IPC Evaporation Surface — Domain Math via IPC
 
 **Owner:** wetSpring (internal)
-**Status:** In progress — guideStone Level 3, CONSUMED_CAPABILITIES aligned to v0.9.15
+**Status:** In progress — guideStone Level 3, CONSUMED_CAPABILITIES aligned to v0.9.16
 
-barraCuda is a full ecobin primal. The v0.9.15 canonical surface defines 33
+barraCuda is a full ecobin primal. The v0.9.16 canonical surface defines 33
 JSON-RPC methods (TENSOR 9, STATS 9, COMPUTE 4, SPECTRAL 3, LINALG 6,
 HEALTH 2). Today, wetSpring links barraCuda as a Rust library dependency
 (`path = "../../../primals/barraCuda"`) and calls math in-process. For the
 primal proof (Level 5), domain math must migrate to IPC.
 
 **What exists (V147):**
-- `niche::CONSUMED_CAPABILITIES` declares full v0.9.15 canonical surface (33
+- `niche::CONSUMED_CAPABILITIES` declares full v0.9.16 canonical surface (33
   methods) plus 15 legacy Exp403 methods pending migration
 - `wetspring_guidestone` binary (Level 3): bare mode certified (9/9, exit 2),
   N2 expanded with stats.variance, stats.median, stats.correlation,
@@ -219,38 +219,38 @@ methods will get incorrect routing until this is fixed.
 ## PG-11: downstream_manifest.toml Drift — Missing N2 Methods
 
 **Owner:** primalSpring (manifest maintainer)
-**Status:** Open — discovered during V147 guideStone expansion
+**Status:** Resolved (V148) — primalSpring v0.9.16 reconciled manifest
 
-wetSpring's `downstream_manifest.toml` entry lists 7 `validation_capabilities`:
-`tensor.matmul`, `stats.mean`, `compute.dispatch`, `storage.store`,
-`storage.retrieve`, `inference.complete`, `crypto.hash`.
+**V147 state:** Manifest listed 7 `validation_capabilities`, guideStone validated
+more. `guidestone_readiness` was `1` while code was `3`.
 
-The guideStone N2 layer now also validates `stats.std_dev`, `stats.variance`,
-`stats.median`, `stats.correlation`, `linalg.determinant`, `linalg.eigenvalues`,
-`spectral.fft`, and `stats.weighted_mean`. These are not in the manifest.
+**V148 resolution:** primalSpring v0.9.16 updated the wetSpring `[[downstream]]`
+entry to 15 `validation_capabilities` (`tensor.matmul`, `tensor.create`,
+`stats.mean`, `stats.std_dev`, `stats.variance`, `stats.correlation`,
+`linalg.solve`, `linalg.eigenvalues`, `spectral.fft`, `spectral.power_spectrum`,
+`compute.dispatch`, `storage.store`, `storage.retrieve`, `inference.complete`,
+`crypto.hash`) and set `guidestone_readiness = 3`. wetSpring N1 now exercises
+all 15 manifest capabilities.
 
-Additionally, `guidestone_readiness` in the manifest is `1` while
-`niche::GUIDESTONE_READINESS` is now `3`. These should be reconciled.
-
-**Impact:** biomeOS composition completeness checks may under-report wetSpring's
-actual capability requirements if only the manifest is consulted.
+**Remaining:** N2 extended checks (`stats.median`, `linalg.determinant`,
+`stats.weighted_mean`) are beyond the manifest and exercised opportunistically.
 
 ---
 
-## PG-12: Exp403 Legacy Method Surface — Pending v0.9.15 Migration
+## PG-12: Exp403 Legacy Method Surface — Pending v0.9.16 Migration
 
 **Owner:** wetSpring (internal)
-**Status:** Open — documented V147
+**Status:** Open — documented V147, unchanged V148
 
 Exp403 (`validate_primal_parity_v1`) uses 22 barraCuda methods from the
-pre-v0.9.15 surface. 15 of these are now "legacy" (not on the v0.9.15
+pre-v0.9.16 surface. 15 of these are now "legacy" (not on the v0.9.16
 canonical list): `tensor.scale`, `tensor.clamp`, `tensor.sigmoid`,
 `tensor.batch.submit`, `stats.weighted_mean`, `noise.perlin2d/3d`,
 `math.sigmoid/log2`, `activation.fitts/hick`, `fhe.ntt/pointwise_mul`,
 `tolerances.get`, `rng.uniform`.
 
 These may still be served by barraCuda but are not part of the canonical
-33-method surface. Exp403 D01 tiers should be migrated to v0.9.15 method
+33-method surface. Exp403 D01 tiers should be migrated to v0.9.16 method
 names, and legacy-only checks should be gated behind a feature or documented
 as extended surface.
 
@@ -273,8 +273,8 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-08 | Validate manifest binary name | primalSpring | Manifest alignment | 1 |
 | PG-09 | barraCuda IPC evaporation | wetSpring | Nothing — wiring gap | 1 |
 | PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
-| PG-11 | Manifest drift (N2 methods) | primalSpring | Manifest update | 1 |
-| PG-12 | Exp403 legacy surface | wetSpring | v0.9.15 migration | 2 |
+| PG-11 | Manifest drift (N2 methods) | primalSpring | **Resolved V148** | -- |
+| PG-12 | Exp403 legacy surface | wetSpring | v0.9.16 migration | 2 |
 
 ---
 

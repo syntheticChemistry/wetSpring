@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-04-18 (V147 — guideStone Level 3, bare certified. N2 v0.9.15
-surface expansion. CONSUMED_CAPABILITIES aligned to 48 (33 canonical + 15 legacy).
-3 new composition gaps (PG-10/11/12). All 7 architectural gaps remain as external
+Last updated: 2026-04-20 (V148 — primalSpring v0.9.16 manifest alignment. N1 expanded
+to 15 manifest capabilities, BLAKE3 checksums. PG-11 resolved (manifest reconciled).
+CONSUMED_CAPABILITIES 48 (33 canonical + 15 legacy). Architectural gaps remain external
 team dependencies. Internal code quality green.)
 
 ---

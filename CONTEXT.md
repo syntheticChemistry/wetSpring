@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V147:** guideStone Level 3 (bare certified, exit 2) — N2 expanded with v0.9.15 canonical surface (stats.variance/median/correlation, linalg.determinant/eigenvalues, spectral.fft). CONSUMED_CAPABILITIES: 48 (33 canonical + 15 legacy). 3 new gaps (PG-10/11/12). V146: guideStone Level 2. V145: Exp403 (22 consumed caps). V144: composition tier. V143: deploy graph canonical. V142: Wire Standard L2+L3.
+**Current release — V148:** guideStone Level 3 (bare certified 16/16, exit 2) — primalSpring v0.9.16 manifest alignment (15 validation_capabilities), BLAKE3 checksum verification (Property 3), N1 expanded from 7 to 15 manifest parity checks. V147: N2 v0.9.15 surface, CONSUMED_CAPABILITIES 33+15. V146: guideStone Level 2. V145: Exp403 (22 consumed caps). V144: composition tier. V143: deploy graph canonical.
 
 ## Role in the Ecosystem
 
@@ -25,7 +25,7 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.15 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.16 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,594 lib + 18 IPC roundtrip + integration, 0 failed
 - **Validation checks:** 5,900+ across 364 binaries
@@ -79,7 +79,7 @@ Tier 3: Composition       → IPC parity → Niche gate
 Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (48 consumed)     (5 primals, check_skip)    (plasmidBin)
 Tier 5: guideStone        → Self-validating NUCLEUS node (Level 3)
-           (wetspring_guidestone) (bare certified, N2 v0.9.15 surface)
+           (wetspring_guidestone) (bare certified 16/16, v0.9.16 manifest)
 ```
 
 ## Design Philosophy

@@ -31,13 +31,14 @@ pub const NICHE_VERSION: &str = "1.0.0";
 /// guideStone binary name (matches `downstream_manifest.toml` entry).
 pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 
-/// guideStone readiness level (0-5 per `GUIDESTONE_COMPOSITION_STANDARD.md`).
+/// guideStone readiness level (0-5 per `GUIDESTONE_COMPOSITION_STANDARD.md` v1.1.0).
 ///
 /// 0 = not started, 1 = validation exists, 2 = properties documented,
 /// 3 = bare guideStone works, 4 = NUCLEUS guideStone works, 5 = certified.
 ///
-/// Promoted to 3: bare mode runs (9/9 pass, exit 2), 5 certified properties
-/// validated without NUCLEUS. N2 expanded with v0.9.15 surface (linalg, spectral, stats).
+/// Level 3: bare mode runs (16/16 pass, exit 2), 5 certified properties
+/// validated without NUCLEUS. B2 BLAKE3 checksums, N1 expanded to 15 manifest
+/// capabilities per v0.9.16 downstream_manifest.toml.
 pub const GUIDESTONE_READINESS: u8 = 3;
 
 use crate::primal_names::{
