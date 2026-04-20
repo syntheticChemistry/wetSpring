@@ -3,8 +3,8 @@
 # Files: 6
 #
 # Verify: primalspring::checksums::verify_manifest()
-dd82c49b8c86a1332c4900c5fc82997e3407e16856461c19d8bdf244464ef15a  barracuda/src/bin/wetspring_guidestone.rs
-aa736b8f71403928d1a46e4fa401e1677b4cead1be0c5b18d13df59816316f92  barracuda/src/niche.rs
+f62fc409e13f4bb21e36b36291faf65172af8afb37aecb8c4bec8baf1b8c2d44  barracuda/src/bin/wetspring_guidestone.rs
+f8db1e288b97f100eb896c9278ca3f769b7c6576e1aec5c477171660525a7bdf  barracuda/src/niche.rs
 f085f4f95801cfe6ac29f16c12979b66e5610bebe517228df6fea8b2c946e4cf  barracuda/src/tolerances/mod.rs
 911522016a5a8218d43ac26b7a98433d578c3a2f260141471ad622edf12e16ac  barracuda/src/lib.rs
 d3647c0b29b2a40e3f9ae53ce0a45ddcc8d02056b52f1cce09bb9688a6a5f2f7  barracuda/Cargo.toml

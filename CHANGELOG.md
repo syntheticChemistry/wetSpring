@@ -32,6 +32,14 @@ proper launcher configuration.
 - BLAKE3 checksum regenerated for updated guideStone source
 - Open gaps: 14 → 10 (7 resolved)
 
+#### Refactored
+- Adopted upstream `is_skip_error` from `primalspring::composition` (v0.9.17)
+  for all error classification — matches ludoSpring V47 / neuralSpring V136 pattern
+- Removed all manual `Err(e) => v.check_skip(...)` arms in favor of
+  `Err(e) if is_skip_error(&e)` with explicit FAIL for unexpected errors
+- Documented upstream drift: `downstream_manifest.toml` has `guidestone_readiness = 3`
+  (should be 4) and missing `guidestone_properties` field
+
 #### Remaining Skips (4)
 - `compute.dispatch`: ToadStool requires compiled GPU binary (legitimate)
 - `inference.complete`: Squirrel needs Ollama backend (infrastructure)

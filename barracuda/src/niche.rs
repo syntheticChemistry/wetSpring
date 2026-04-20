@@ -41,7 +41,8 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 /// v0.9.17: stats.variance, stats.correlation, linalg.solve,
 /// linalg.eigenvalues, spectral.fft, spectral.power_spectrum now PASS.
 /// 4 remaining skips: compute.dispatch, inference.complete,
-/// stats.median, linalg.determinant.
+/// stats.median, linalg.determinant. Uses upstream `is_skip_error`
+/// from `primalspring::composition` (v0.9.17) for error classification.
 pub const GUIDESTONE_READINESS: u8 = 4;
 
 use crate::primal_names::{

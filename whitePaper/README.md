@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** April 10, 2026
-**Status:** V140 — Three-tier validation active. **Tier 1:** Python→Rust (5,800+ checks, **1,942** tests, **356** binaries). **Tier 2:** Rust→Primal composition (97/97 proto-nucleate, 7 deploy graphs, 45 IPC capabilities). **Tier 3:** Composition→ecoBin harvest to `plasmidBin`. 380 experiments indexed, 44 GPU modules, 49 CPU bio modules, `barraCuda` v0.3.12 (150+ primitives consumed), **242** named tolerances with provenance trail, clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`, cargo-deny clean. 64 papers reproduced.
+**Date:** April 20, 2026
+**Status:** V149 — **guideStone Level 4** (NUCLEUS validated, 38/38 pass, 4 skip, exit 0). Three-tier validation active. **Tier 1:** Python→Rust (5,900+ checks, **1,594** lib tests + **18** IPC roundtrip, **364** binaries). **Tier 2:** Rust→Primal composition (136/136 proto-nucleate, 7 deploy graphs, 48 IPC capabilities — 33 v0.9.17 canonical + 15 legacy). **Tier 3:** Live NUCLEUS IPC parity against 5 primals via `nucleus_launcher.sh`, `is_skip_error` from v0.9.17. 383 experiments indexed, 44 GPU modules, 49 CPU bio modules, `barraCuda` v0.3.12 (150+ primitives consumed), **242** named tolerances with provenance trail, clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`, cargo-deny clean. 64 papers reproduced. 10 primal gaps open (7 resolved).
 **License:** AGPL-3.0-or-later
 
 ---

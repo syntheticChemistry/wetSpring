@@ -153,20 +153,20 @@ binary name if it differs from the deploy/downstream manifests.
 ## PG-09: barraCuda IPC Evaporation Surface — Domain Math via IPC
 
 **Owner:** wetSpring (internal)
-**Status:** In progress — guideStone Level 4, CONSUMED_CAPABILITIES aligned to v0.9.16
+**Status:** In progress — guideStone Level 4, CONSUMED_CAPABILITIES aligned to v0.9.17
 
-barraCuda is a full ecobin primal. The v0.9.16 canonical surface defines 33
+barraCuda is a full ecobin primal. The v0.9.17 canonical surface defines 33
 JSON-RPC methods (TENSOR 9, STATS 9, COMPUTE 4, SPECTRAL 3, LINALG 6,
 HEALTH 2). Today, wetSpring links barraCuda as a Rust library dependency
 (`path = "../../../primals/barraCuda"`) and calls math in-process. For the
 primal proof (Level 5), domain math must migrate to IPC.
 
-**What exists (V147):**
-- `niche::CONSUMED_CAPABILITIES` declares full v0.9.16 canonical surface (33
+**What exists (V149):**
+- `niche::CONSUMED_CAPABILITIES` declares full v0.9.17 canonical surface (33
   methods) plus 15 legacy Exp403 methods pending migration
-- `wetspring_guidestone` binary (Level 4): NUCLEUS validated (31/31 pass, exit 0),
-  bare mode (16/16 pass, exit 2), handle-based matmul, sample std_dev, cross-atomic pipeline.
-  N1 expanded to 15 manifest capabilities, 11 skipped pending ecobin expansion
+- `wetspring_guidestone` binary (Level 4): NUCLEUS validated (38/38 pass, 4 skip,
+  exit 0), bare mode (16/16 pass, exit 2), handle-based matmul, all stats/linalg/
+  spectral methods passing, cross-atomic pipeline. `is_skip_error` from v0.9.17
 - Exp403 (`validate_primal_parity_v1`) remains as Tier 2 IPC-WIRED validation
   with the original 22-method surface
 - Socket discovery uses `ipc::discover::discover_primal()` (env var → XDG → temp)
@@ -237,20 +237,20 @@ all 15 manifest capabilities.
 
 ---
 
-## PG-12: Exp403 Legacy Method Surface — Pending v0.9.16 Migration
+## PG-12: Exp403 Legacy Method Surface — Pending v0.9.17 Migration
 
 **Owner:** wetSpring (internal)
-**Status:** Open — documented V147, unchanged V148
+**Status:** Open — documented V147, unchanged V149
 
 Exp403 (`validate_primal_parity_v1`) uses 22 barraCuda methods from the
-pre-v0.9.16 surface. 15 of these are now "legacy" (not on the v0.9.16
+pre-v0.9.17 surface. 15 of these are now "legacy" (not on the v0.9.17
 canonical list): `tensor.scale`, `tensor.clamp`, `tensor.sigmoid`,
 `tensor.batch.submit`, `stats.weighted_mean`, `noise.perlin2d/3d`,
 `math.sigmoid/log2`, `activation.fitts/hick`, `fhe.ntt/pointwise_mul`,
 `tolerances.get`, `rng.uniform`.
 
 These may still be served by barraCuda but are not part of the canonical
-33-method surface. Exp403 D01 tiers should be migrated to v0.9.16 method
+33-method surface. Exp403 D01 tiers should be migrated to v0.9.17 method
 names, and legacy-only checks should be gated behind a feature or documented
 as extended surface.
 
@@ -274,7 +274,7 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-09 | barraCuda IPC evaporation | wetSpring | Nothing — wiring gap | 1 |
 | PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
 | PG-11 | Manifest drift (N2 methods) | primalSpring | **Resolved V148** | -- |
-| PG-12 | Exp403 legacy surface | wetSpring | v0.9.16 migration | 2 |
+| PG-12 | Exp403 legacy surface | wetSpring | v0.9.17 migration | 2 |
 | PG-13 | barraCuda missing 6 manifest methods | barraCuda | **Resolved V149** — param names corrected | -- |
 | PG-14 | Squirrel BTSP-only socket | Squirrel | **Partial V149** — liveness ok, inference needs Ollama | 2 |
 | PG-15 | ToadStool compute.dispatch missing | ToadStool | **Updated V149** — registered, needs GPU binary | 2 |

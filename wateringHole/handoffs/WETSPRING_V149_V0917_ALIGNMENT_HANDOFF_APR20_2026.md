@@ -131,4 +131,23 @@ documented exceptions.
 
 ---
 
+## Upstream Drift — Requests for primalSpring
+
+1. **downstream_manifest.toml**: `guidestone_readiness = 3` for wetspring — should
+   be `4`. Also missing `guidestone_properties` field (ludoSpring has it).
+   Requested update:
+   ```toml
+   guidestone_readiness = 4
+   guidestone_properties = { deterministic = true, traceable = true, self_verifying = true, env_agnostic = true, tolerance_documented = true }
+   ```
+
+2. **NUCLEUS_SPRING_ALIGNMENT.md**: Lists wetSpring at V147, Level 3. Should be
+   V149, Level 4 (38/38 pass, 4 skip).
+
+3. **`is_skip_error` adopted**: wetSpring now uses
+   `primalspring::composition::is_skip_error` (v0.9.17) for all error
+   classification, matching ludoSpring and neuralSpring patterns.
+
+---
+
 *Handed back to primalSpring per NUCLEUS_SPRING_ALIGNMENT.md feedback protocol.*

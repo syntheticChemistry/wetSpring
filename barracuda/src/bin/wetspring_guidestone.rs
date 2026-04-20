@@ -70,7 +70,9 @@
 //! | NUCLEUS | 38/38 pass (4 skip), exit 0 — 5 primals alive over IPC |
 
 use primalspring::checksums;
-use primalspring::composition::{CompositionContext, validate_liveness, validate_parity};
+use primalspring::composition::{
+    CompositionContext, is_skip_error, validate_liveness, validate_parity,
+};
 use primalspring::tolerances as ps_tol;
 use primalspring::validation::ValidationResult;
 
@@ -315,7 +317,8 @@ fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult
             v.check_bool("linalg.solve Ax=b IPC", ok,
                 "barraCuda: [[2,1],[1,3]]x=[5,7] → [1.6,1.8]");
         }
-        Err(e) => v.check_skip("linalg.solve", &format!("not in ecobin: {e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("linalg.solve", &format!("{e}")),
+        Err(e) => v.check_bool("linalg.solve", false, &format!("{e}")),
     }
 
     // linalg.eigenvalues — symmetric [[2,1],[1,2]] → eigenvalues [3, 1]
@@ -328,7 +331,8 @@ fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult
             v.check_bool("linalg.eigenvalues 2×2 IPC", ok,
                 "barraCuda: [[2,1],[1,2]] → [3, 1]");
         }
-        Err(e) => v.check_skip("linalg.eigenvalues", &format!("not in ecobin: {e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("linalg.eigenvalues", &format!("{e}")),
+        Err(e) => v.check_bool("linalg.eigenvalues", false, &format!("{e}")),
     }
 
     // spectral.fft — alternating [1,0,1,0,...] → check result array returned
@@ -340,7 +344,8 @@ fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult
             v.check_bool("spectral.fft IPC", has_result,
                 "barraCuda: 8-point FFT returns result array");
         }
-        Err(e) => v.check_skip("spectral.fft", &format!("not in ecobin: {e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("spectral.fft", &format!("{e}")),
+        Err(e) => v.check_bool("spectral.fft", false, &format!("{e}")),
     }
 
     // spectral.power_spectrum — same input, check normalized power
@@ -352,7 +357,8 @@ fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult
             v.check_bool("spectral.power_spectrum IPC", has_result,
                 "barraCuda: 8-point power spectrum returns result array");
         }
-        Err(e) => v.check_skip("spectral.power_spectrum", &format!("not in ecobin: {e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("spectral.power_spectrum", &format!("{e}")),
+        Err(e) => v.check_bool("spectral.power_spectrum", false, &format!("{e}")),
     }
 }
 
@@ -403,7 +409,8 @@ fn validate_manifest_services(ctx: &mut CompositionContext, v: &mut ValidationRe
             true,
             "toadStool acknowledged dispatch",
         ),
-        Err(e) => v.check_skip("compute.dispatch", &format!("{e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("compute.dispatch", &format!("{e}")),
+        Err(e) => v.check_bool("compute.dispatch", false, &format!("{e}")),
     }
 
     // ── storage.store + storage.retrieve (storage → NestGate) ──
@@ -425,10 +432,12 @@ fn validate_manifest_services(ctx: &mut CompositionContext, v: &mut ValidationRe
                     let has_value = ret.get("value").is_some() || ret.get("data").is_some();
                     v.check_bool("storage.retrieve roundtrip", has_value, "NestGate returned data");
                 }
-                Err(e) => v.check_skip("storage.retrieve", &format!("{e}")),
+                Err(e) if is_skip_error(&e) => v.check_skip("storage.retrieve", &format!("{e}")),
+                Err(e) => v.check_bool("storage.retrieve", false, &format!("{e}")),
             }
         }
-        Err(e) => v.check_skip("storage.store", &format!("{e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("storage.store", &format!("{e}")),
+        Err(e) => v.check_bool("storage.store", false, &format!("{e}")),
     }
 
     // ── inference.complete (ai → Squirrel) ──
@@ -443,11 +452,11 @@ fn validate_manifest_services(ctx: &mut CompositionContext, v: &mut ValidationRe
                 || ret.get("content").is_some();
             v.check_bool("inference.complete returns text", has_text, "Squirrel responded");
         }
-        Err(e) => v.check_skip("inference.complete", &format!("{e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("inference.complete", &format!("{e}")),
+        Err(e) => v.check_bool("inference.complete", false, &format!("{e}")),
     }
 
     // ── crypto.hash (security → BearDog) ──
-    // BearDog expects base64-encoded data.
     match ctx.call(
         "security",
         "crypto.hash",
@@ -457,7 +466,8 @@ fn validate_manifest_services(ctx: &mut CompositionContext, v: &mut ValidationRe
             let has_hash = ret.get("hash").is_some() || ret.get("digest").is_some();
             v.check_bool("crypto.hash returns digest", has_hash, "BearDog blake3");
         }
-        Err(e) => v.check_skip("crypto.hash", &format!("{e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("crypto.hash", &format!("{e}")),
+        Err(e) => v.check_bool("crypto.hash", false, &format!("{e}")),
     }
 }
 
@@ -494,8 +504,9 @@ fn validate_domain_science(ctx: &mut CompositionContext, v: &mut ValidationResul
     );
 }
 
-/// Like `validate_parity` but degrades to `check_skip` on connection/protocol
-/// errors. Used for methods that may not exist in the ecobin yet.
+/// Like `validate_parity` but degrades to `check_skip` via upstream
+/// `is_skip_error` (v0.9.17). Covers absent primals, protocol mismatches,
+/// and transport dialect differences.
 #[expect(clippy::too_many_arguments, reason = "mirrors validate_parity signature from primalspring")]
 fn validate_parity_or_skip(
     ctx: &mut CompositionContext, v: &mut ValidationResult,
@@ -503,7 +514,8 @@ fn validate_parity_or_skip(
     params: serde_json::Value, expected: f64, tolerance: f64,
 ) {
     match ctx.call(capability, method, params) {
-        Err(e) => v.check_skip(label, &format!("not in ecobin: {e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip(label, &format!("not in ecobin: {e}")),
+        Err(e) => v.check_bool(label, false, &format!("{e}")),
         Ok(resp) => match resp.get("result").and_then(serde_json::Value::as_f64) {
             Some(actual) => {
                 let diff = (actual - expected).abs();
@@ -527,8 +539,12 @@ fn validate_cross_atomic(ctx: &mut CompositionContext, v: &mut ValidationResult)
             v.check_bool("cross-atomic: BearDog hash", true, "blake3 hash computed");
             Some(h)
         }
-        Err(e) => {
+        Err(e) if is_skip_error(&e) => {
             v.check_skip("cross-atomic: hash", &format!("{e}"));
+            None
+        }
+        Err(e) => {
+            v.check_bool("cross-atomic: hash", false, &format!("{e}"));
             None
         }
     };
@@ -563,9 +579,11 @@ fn validate_cross_atomic(ctx: &mut CompositionContext, v: &mut ValidationResult)
                         "BearDog→NestGate→retrieve integrity",
                     );
                 }
-                Err(e) => v.check_skip("cross-atomic: retrieve", &format!("{e}")),
+                Err(e) if is_skip_error(&e) => v.check_skip("cross-atomic: retrieve", &format!("{e}")),
+                Err(e) => v.check_bool("cross-atomic: retrieve", false, &format!("{e}")),
             }
         }
-        Err(e) => v.check_skip("cross-atomic: store", &format!("{e}")),
+        Err(e) if is_skip_error(&e) => v.check_skip("cross-atomic: store", &format!("{e}")),
+        Err(e) => v.check_bool("cross-atomic: store", false, &format!("{e}")),
     }
 }
