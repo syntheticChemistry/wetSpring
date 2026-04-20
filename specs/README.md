@@ -51,7 +51,7 @@ Every paper in the queue goes through the full evolution path. Status:
 | **BarraCuda GPU** | GPU produces same answer as CPU | 1,783 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
 | **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 39/39 papers three-tier (Exp103/104/165/182) |
-| **Primal composition** | IPC dispatch matches local Rust baselines, graph + niche validated | Exp400 (136/136), Exp401 (parity), Exp402 (niche gate), Exp403 (primal proof, 5 primals), **wetspring_guidestone (Level 4, NUCLEUS 31/31)**, 18 IPC roundtrips |
+| **Primal composition** | IPC dispatch matches local Rust baselines, graph + niche validated | Exp400 (136/136), Exp401 (parity), Exp402 (niche gate), Exp403 (primal proof, 5 primals), **wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip)**, 18 IPC roundtrips |
 
 **Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
 wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only
