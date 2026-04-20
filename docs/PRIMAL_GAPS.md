@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-20 (V148 — primalSpring v0.9.16 manifest alignment, 15 validation_capabilities, BLAKE3 checksums)
+Last updated: 2026-04-20 (V149 — primalSpring v0.9.17 alignment, 38/38 pass, 4 skip, nucleus_launcher.sh deployment)
 
 ---
 
@@ -275,9 +275,9 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
 | PG-11 | Manifest drift (N2 methods) | primalSpring | **Resolved V148** | -- |
 | PG-12 | Exp403 legacy surface | wetSpring | v0.9.16 migration | 2 |
-| PG-13 | barraCuda missing 6 manifest methods | barraCuda | ecobin expansion | 1 |
-| PG-14 | Squirrel BTSP-only socket | Squirrel | plain JSON-RPC fallback | 2 |
-| PG-15 | ToadStool compute.dispatch missing | ToadStool | method registration | 1 |
+| PG-13 | barraCuda missing 6 manifest methods | barraCuda | **Resolved V149** — param names corrected | -- |
+| PG-14 | Squirrel BTSP-only socket | Squirrel | **Partial V149** — liveness ok, inference needs Ollama | 2 |
+| PG-15 | ToadStool compute.dispatch missing | ToadStool | **Updated V149** — registered, needs GPU binary | 2 |
 | PG-16 | stats.std_dev N-1 vs N divisor | barraCuda/wetSpring | document convention | 1 |
 | PG-17 | tensor.matmul handle-based only | barraCuda | inline data path or document | 1 |
 
@@ -286,44 +286,54 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 ## PG-13: barraCuda Missing 6 Manifest Methods
 
 **Owner:** barraCuda
-**Status:** Open — discovered V148 live NUCLEUS validation
+**Status:** Resolved (V149) — all 6 methods now work with correct parameters
 
-The downstream manifest lists `stats.variance`, `stats.correlation`,
-`linalg.solve`, `linalg.eigenvalues`, `spectral.fft`, `spectral.power_spectrum`
-as wetSpring `validation_capabilities`. The barraCuda ecobin responds
-"Unknown method" for all six. These are in the v0.9.16 canonical surface
-definition but not yet implemented in the binary.
+V148 state: barraCuda responded "Unknown method" for all six. V149 discovery:
+the methods ARE registered but require specific parameter names that differed
+from what the guideStone was sending. Corrected parameter mappings:
+- `stats.variance`: `{"data": [...]}` (not `{}`) → returns `{result, convention, denominator}`
+- `stats.correlation`: `{"x": [...], "y": [...]}` (not `{}`) → returns `{result}`
+- `linalg.solve`: `{"matrix": [...], "b": [...]}` (not `rhs`) → returns `{result}`
+- `linalg.eigenvalues`: `{"matrix": [...]}` → returns `{result: [eigenvalues]}`
+- `spectral.fft`: `{"data": [...]}` → returns `{real, imag, result, n}`
+- `spectral.power_spectrum`: `{"data": [...]}` → returns `{result, n}`
 
-**Impact:** 6 of 15 manifest methods are SKIP in wetSpring's guideStone.
-Blocks Level 5 certification.
+All 6 now PASS in guideStone (38/38). The gap was in parameter naming, not
+in barraCuda's capabilities.
 
 ---
 
 ## PG-14: Squirrel BTSP-Only Socket
 
 **Owner:** Squirrel
-**Status:** Open — discovered V148 live NUCLEUS validation
+**Status:** Partially resolved (V149) — liveness PASS, inference SKIP
 
-Squirrel's UDS server requires BTSP handshake for all connections. Plain
-JSON-RPC clients (including `primalspring::composition::CompositionContext`)
-get "Connection reset by peer". The v0.9.16 blurb documents this as a
-known issue ("BearDog resets connection without BTSP"). `validate_liveness`
-classifies it as SKIP (reachable, incompatible protocol).
+V148 state: Squirrel liveness was SKIP (connection reset). V149: the
+`nucleus_launcher.sh` properly configures Squirrel with provider sockets
+and environment variables. Squirrel liveness now PASSES via the `ai`
+capability domain. However, `inference.complete` still SKIPs because no
+Ollama backend is configured (`AI_PROVIDER_SOCKETS` or `dev-direct-http`
+feature required).
 
-**Impact:** `inference.complete` and Squirrel liveness are always SKIP.
+**Remaining:** inference.complete requires an Ollama instance or AI provider
+socket. This is an infrastructure dependency, not a code gap.
 
 ---
 
-## PG-15: ToadStool compute.dispatch Missing
+## PG-15: ToadStool compute.dispatch — Requires GPU Binary
 
 **Owner:** ToadStool
-**Status:** Open — discovered V148 live NUCLEUS validation
+**Status:** Updated (V149) — method registered, needs compiled binary input
 
-`compute.dispatch` is in the manifest but ToadStool responds "Method not found".
-ToadStool's JSON-RPC socket is on `toadstool-{family}.sock` (BTSP-mode);
-the tarpc socket is separate (`compute-{family}-tarpc.sock`).
+V148 state: ToadStool responded "Method not found". V149: `compute.dispatch`
+IS registered and responds with a proper error: "Missing 'binary' array
+(compiled GPU binary bytes)". The method exists but requires actual compiled
+GPU binary data, which is a legitimate constraint (not a missing capability).
+ToadStool liveness PASSES via the `compute` capability domain.
 
-**Impact:** compute.dispatch always SKIP.
+**Impact:** compute.dispatch SKIP in guideStone is expected — the noop probe
+cannot provide compiled GPU binary bytes. A real dispatch test would require
+a coralReef-compiled shader binary.
 
 ---
 

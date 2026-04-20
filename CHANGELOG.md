@@ -3,6 +3,41 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V149] — 2026-04-20
+
+### guideStone Level 4+ — v0.9.17 Alignment, 38/38 PASS
+
+wetSpring's `wetspring_guidestone` passes 38/38 checks (4 skipped) against
+a live 12-primal NUCLEUS deployed via `nucleus_launcher.sh` with exit 0.
+Resolves 7 of 11 skips from V148 through corrected parameter names and
+proper launcher configuration.
+
+#### Added
+- `stats.variance` parity (sample, N-1): `{"data": [...]}` → 250.0
+- `stats.correlation` parity (Pearson r): `{"x": [...], "y": [...]}` → 1.0
+- `linalg.solve` parity: `{"matrix": [...], "b": [...]}` → [1.6, 1.8]
+- `linalg.eigenvalues` check: `{"matrix": [...]}` → eigenvalue array
+- `spectral.fft` check: 8-point FFT with real/imag result arrays
+- `spectral.power_spectrum` check: normalized power spectrum array
+- Squirrel liveness via `ai` capability (was SKIP in V148)
+- biomeOS now compiles (upstream fix in v0.9.17)
+
+#### Changed
+- primalSpring dep: v0.9.16 → v0.9.17 (genomeBin v5.1, launcher, CLI audit)
+- guideStone results: 31/31 pass (11 skip) → 38/38 pass (4 skip)
+- Primals alive: 4 → 5 (added Squirrel via ai capability)
+- PG-13: Resolved — methods exist, parameter names corrected
+- PG-14: Partially resolved — liveness PASS, inference needs Ollama
+- PG-15: Updated — compute.dispatch registered, needs GPU binary
+- BLAKE3 checksum regenerated for updated guideStone source
+- Open gaps: 14 → 10 (7 resolved)
+
+#### Remaining Skips (4)
+- `compute.dispatch`: ToadStool requires compiled GPU binary (legitimate)
+- `inference.complete`: Squirrel needs Ollama backend (infrastructure)
+- `stats.median`: Not yet registered in barraCuda
+- `linalg.determinant`: Not yet registered in barraCuda
+
 ## [V148] — 2026-04-19
 
 ### guideStone Level 4 — Live NUCLEUS Validation

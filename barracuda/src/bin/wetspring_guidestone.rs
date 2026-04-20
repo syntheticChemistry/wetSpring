@@ -23,8 +23,8 @@
 //!
 //! **NUCLEUS mode** (exit 0 or 1):
 //!   N0 — Liveness (primals discoverable via capability scan, family-aware)
-//!   N1 — Manifest IPC parity (15 validation_capabilities per v0.9.16 manifest)
-//!   N2 — Extended domain science IPC (v0.9.16 surface: stats, linalg, spectral)
+//!   N1 — Manifest IPC parity (15 validation_capabilities per v0.9.17 manifest)
+//!   N2 — Extended domain science IPC (v0.9.17 surface: stats, linalg, spectral)
 //!   N3 — Cross-atomic pipeline (hash → store → retrieve → verify)
 //!
 //! ## Layered Certification
@@ -49,7 +49,7 @@
 //! - `1` — at least one check failed
 //! - `2` — bare-only mode (no primals discovered)
 //!
-//! ## Downstream Manifest (v0.9.16)
+//! ## Downstream Manifest (v0.9.17)
 //!
 //! From `primalSpring/graphs/downstream/downstream_manifest.toml`:
 //!   validation_capabilities = tensor.matmul, tensor.create, stats.mean,
@@ -63,11 +63,11 @@
 //! | Field | Value |
 //! |-------|-------|
 //! | Binary | `wetspring_guidestone` |
-//! | Date | 2026-04-19 |
+//! | Date | 2026-04-20 |
 //! | Command | `cargo run --features guidestone --bin wetspring_guidestone` |
-//! | Reference | primalSpring v0.9.16 guideStone (Level 4, 67/67 live NUCLEUS) |
+//! | Reference | primalSpring v0.9.17 guideStone (Level 4, 67/67 + genomeBin v5.1) |
 //! | Bare mode | 16/16 pass, exit 2 |
-//! | NUCLEUS | 31/31 pass (11 skip), exit 0 — 4 primals alive over IPC |
+//! | NUCLEUS | 38/38 pass (4 skip), exit 0 — 5 primals alive over IPC |
 
 use primalspring::checksums;
 use primalspring::composition::{CompositionContext, validate_liveness, validate_parity};
@@ -257,7 +257,9 @@ fn validate_manifest_ipc(ctx: &mut CompositionContext, v: &mut ValidationResult)
 ///
 /// barraCuda's tensor ops use handle-based API (create → op → read).
 /// Stats methods that return scalars use `validate_parity` directly.
-/// Methods not yet implemented in the ecobin are wrapped in check_skip.
+/// v0.9.17: stats.variance, stats.correlation, linalg.solve,
+/// linalg.eigenvalues, spectral.fft, spectral.power_spectrum now
+/// available with corrected parameter names.
 fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult) {
     // tensor.matmul: handle-based (create A, create B, matmul, check shape)
     validate_tensor_matmul(ctx, v);
@@ -285,18 +287,72 @@ fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult
         "result", (250.0_f64).sqrt(), ps_tol::IPC_ROUND_TRIP_TOL,
     );
 
-    // Methods in manifest but not yet in barraCuda ecobin — check_skip
-    for method in &[
-        "stats.variance", "stats.correlation",
-        "linalg.solve", "linalg.eigenvalues",
-        "spectral.fft", "spectral.power_spectrum",
-    ] {
-        match ctx.call("tensor", method, serde_json::json!({})) {
-            Ok(_) => v.check_bool(
-                &format!("{method} accepted"), true, "barraCuda method available",
-            ),
-            Err(e) => v.check_skip(method, &format!("not in ecobin: {e}")),
+    // stats.variance — sample variance (N-1), same data as std_dev²
+    validate_parity_or_skip(ctx, v,
+        "stats.variance([10..50]) IPC = 250 (sample)",
+        "tensor", "stats.variance",
+        serde_json::json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
+        250.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // stats.correlation — Pearson r for perfectly correlated data = 1.0
+    validate_parity_or_skip(ctx, v,
+        "stats.correlation(x,y) IPC = 1.0 (perfect)",
+        "tensor", "stats.correlation",
+        serde_json::json!({"x": [1.0, 2.0, 3.0, 4.0, 5.0], "y": [2.0, 4.0, 6.0, 8.0, 10.0]}),
+        1.0, ps_tol::IPC_ROUND_TRIP_TOL,
+    );
+
+    // linalg.solve — solve Ax = b where A=[[2,1],[1,3]], b=[5,7] → x=[1.6, 1.8]
+    match ctx.call("tensor", "linalg.solve",
+        serde_json::json!({"matrix": [[2.0, 1.0], [1.0, 3.0]], "b": [5.0, 7.0]}),
+    ) {
+        Ok(r) => {
+            let result = r.get("result").and_then(|v| v.as_array());
+            let ok = result.is_some_and(|arr| arr.len() == 2
+                && arr[0].as_f64().is_some_and(|x| (x - 1.6).abs() < 1e-10)
+                && arr[1].as_f64().is_some_and(|x| (x - 1.8).abs() < 1e-10));
+            v.check_bool("linalg.solve Ax=b IPC", ok,
+                "barraCuda: [[2,1],[1,3]]x=[5,7] → [1.6,1.8]");
         }
+        Err(e) => v.check_skip("linalg.solve", &format!("not in ecobin: {e}")),
+    }
+
+    // linalg.eigenvalues — symmetric [[2,1],[1,2]] → eigenvalues [3, 1]
+    match ctx.call("tensor", "linalg.eigenvalues",
+        serde_json::json!({"matrix": [[2.0, 1.0], [1.0, 2.0]]}),
+    ) {
+        Ok(r) => {
+            let result = r.get("result").and_then(|v| v.as_array());
+            let ok = result.is_some_and(|arr| arr.len() == 2);
+            v.check_bool("linalg.eigenvalues 2×2 IPC", ok,
+                "barraCuda: [[2,1],[1,2]] → [3, 1]");
+        }
+        Err(e) => v.check_skip("linalg.eigenvalues", &format!("not in ecobin: {e}")),
+    }
+
+    // spectral.fft — alternating [1,0,1,0,...] → check result array returned
+    match ctx.call("tensor", "spectral.fft",
+        serde_json::json!({"data": [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]}),
+    ) {
+        Ok(r) => {
+            let has_result = r.get("result").and_then(|v| v.as_array()).is_some_and(|a| !a.is_empty());
+            v.check_bool("spectral.fft IPC", has_result,
+                "barraCuda: 8-point FFT returns result array");
+        }
+        Err(e) => v.check_skip("spectral.fft", &format!("not in ecobin: {e}")),
+    }
+
+    // spectral.power_spectrum — same input, check normalized power
+    match ctx.call("tensor", "spectral.power_spectrum",
+        serde_json::json!({"data": [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]}),
+    ) {
+        Ok(r) => {
+            let has_result = r.get("result").and_then(|v| v.as_array()).is_some_and(|a| !a.is_empty());
+            v.check_bool("spectral.power_spectrum IPC", has_result,
+                "barraCuda: 8-point power spectrum returns result array");
+        }
+        Err(e) => v.check_skip("spectral.power_spectrum", &format!("not in ecobin: {e}")),
     }
 }
 

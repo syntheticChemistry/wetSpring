@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V148** | `handoffs/WETSPRING_V148_ECOSYSTEM_EVOLUTION_HANDOFF_APR19_2026.md` | Apr 19 | **Ecosystem handoff**: per-primal feedback (barraCuda, BearDog, NestGate, ToadStool, Squirrel, biomeOS), patterns for spring teams, NUCLEUS deployment recipes, 14 gaps (5 new). |
+| **V149** | `handoffs/WETSPRING_V149_V0917_ALIGNMENT_HANDOFF_APR20_2026.md` | Apr 20 | **v0.9.17 alignment**: 38/38 pass (4 skip), 6 new parity checks, PG-13 resolved (param names), Squirrel alive, nucleus_launcher.sh deployment. |
+| V148 | `handoffs/WETSPRING_V148_ECOSYSTEM_EVOLUTION_HANDOFF_APR19_2026.md` | Apr 19 | Ecosystem handoff: per-primal feedback, patterns for spring teams, NUCLEUS deployment recipes. Superseded by V149 alignment. |
 | V148 | `handoffs/WETSPRING_V148_GUIDESTONE_LEVEL4_NUCLEUS_HANDOFF_APR19_2026.md` | Apr 19 | **guideStone Level 4**: 31/31 live NUCLEUS, 4 primals over IPC. Handle-based matmul, sample std_dev, cross-atomic pipeline. 5 new gaps (PG-13–17). |
 | V148 | `handoffs/WETSPRING_V148_PRIMALSPRING_V0916_ALIGNMENT_HANDOFF_APR20_2026.md` | Apr 20 | v0.9.16 manifest alignment: 15 validation_capabilities, BLAKE3 checksums (Property 3), family-aware discovery, Level 4 achieved. |
 | V147 | `handoffs/WETSPRING_V147_ECOSYSTEM_EVOLUTION_HANDOFF_APR18_2026.md` | Apr 18 | Ecosystem evolution (pre-NUCLEUS): primal use review, composition patterns. Superseded by V148 ecosystem handoff. |

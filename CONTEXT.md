@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V148:** guideStone **Level 4** (NUCLEUS validated, 31/31 pass, exit 0) — live IPC parity against barraCuda, BearDog, NestGate, ToadStool. Handle-based tensor.matmul, sample std_dev parity, cross-atomic pipeline verified. BLAKE3 checksums, v0.9.16 manifest (15 capabilities, 11 skipped pending ecobin expansion). 5 new gaps (PG-13–17). V147: N2 v0.9.15 surface. V146: guideStone Level 2. V145: Exp403. V144: composition tier.
+**Current release — V149:** guideStone **Level 4** (NUCLEUS validated, 38/38 pass, 4 skip, exit 0) — live IPC parity against barraCuda (stats, linalg, spectral, tensor), BearDog, NestGate, ToadStool, Squirrel (5 primals). primalSpring v0.9.17 alignment, nucleus_launcher.sh deployment. 6 previously-skipped methods now PASS (corrected params). V148: Level 4 initial (31/31). V147: N2 v0.9.15 surface.
 
 ## Role in the Ecosystem
 
@@ -25,17 +25,17 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.16 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,594 lib + 18 IPC roundtrip + integration, 0 failed
 - **Validation checks:** 5,900+ across 364 binaries
-- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 4, NUCLEUS 31/31), 9 niche deps (5 required + 4 optional)
+- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 14 open (`docs/PRIMAL_GAPS.md`) — 11 external + 3 internal, 3 resolved (PG-01–PG-17)
+- **Primal gaps:** 10 open (`docs/PRIMAL_GAPS.md`) — 7 external + 3 internal, 7 resolved (PG-01–PG-17)
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities
@@ -78,8 +78,8 @@ Tier 3: Composition       → IPC parity → Niche gate
            (L2+L3)          (Exp401)     (Exp402)
 Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (48 consumed)     (5 primals, check_skip)    (plasmidBin)
-Tier 5: guideStone        → Self-validating NUCLEUS node (Level 4)
-           (wetspring_guidestone) (31/31 live NUCLEUS, v0.9.16 manifest)
+Tier 5: guideStone        → Self-validating NUCLEUS node (Level 4+)
+           (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
 ```
 
 ## Design Philosophy

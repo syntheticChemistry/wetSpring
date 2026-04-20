@@ -36,10 +36,12 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 /// 0 = not started, 1 = validation exists, 2 = properties documented,
 /// 3 = bare guideStone works, 4 = NUCLEUS guideStone works, 5 = certified.
 ///
-/// Promoted to 4: live NUCLEUS validation (31/31 pass, exit 0) against
-/// barraCuda, BearDog, NestGate, ToadStool over IPC. 11 methods skipped
-/// (not yet in ecobin or BTSP-gated). BLAKE3 checksums, handle-based
-/// tensor.matmul, sample std_dev parity, cross-atomic pipeline verified.
+/// Promoted to 4: live NUCLEUS validation (38/38 pass, 4 skip, exit 0)
+/// against barraCuda, BearDog, NestGate, ToadStool, Squirrel over IPC.
+/// v0.9.17: stats.variance, stats.correlation, linalg.solve,
+/// linalg.eigenvalues, spectral.fft, spectral.power_spectrum now PASS.
+/// 4 remaining skips: compute.dispatch, inference.complete,
+/// stats.median, linalg.determinant.
 pub const GUIDESTONE_READINESS: u8 = 4;
 
 use crate::primal_names::{

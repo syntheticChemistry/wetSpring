@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: April 19, 2026
-**Status**: V148 — 5,900+ checks (383 experiments, 364 binaries), 1,702 tests (1,594 lib + 18 IPC + 90 integration), 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 48 consumed (33 v0.9.16 canonical + 15 legacy), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 14 composition gaps open in `docs/PRIMAL_GAPS.md` (3 resolved, PG-01–PG-17). **guideStone Level 4: NUCLEUS validated (31/31 pass, exit 0), bare mode (16/16 pass, exit 2). Live IPC parity against barraCuda, BearDog, NestGate, ToadStool. `niche::GUIDESTONE_READINESS = 4`.** V148: v0.9.16 manifest alignment, BLAKE3 checksums, handle-based matmul, sample std_dev, cross-atomic pipeline, 5 new gaps (PG-13–17). V147: N2 expansion, PG-10/11/12. V146: guideStone Level 2. V145: Exp403. V144: composition validation tier. *(Detailed validation tables below reflect their respective phases.)*
+**Last Updated**: April 20, 2026
+**Status**: V149 — 5,900+ checks (383 experiments, 364 binaries), 1,702 tests (1,594 lib + 18 IPC + 90 integration), 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 10 composition gaps open in `docs/PRIMAL_GAPS.md` (7 resolved, PG-01–PG-17). **guideStone Level 4: NUCLEUS validated (38/38 pass, 4 skip, exit 0), bare mode (16/16 pass, exit 2). Live IPC parity against barraCuda (stats, linalg, spectral, tensor), BearDog, NestGate, ToadStool, Squirrel — 5 primals. `niche::GUIDESTONE_READINESS = 4`.** V149: v0.9.17 alignment, 6 previously-skipped methods now PASS, nucleus_launcher.sh deployment, biomeOS compiles. V148: Level 4 initial (31/31). V147: N2 expansion, PG-10/11/12. V146: guideStone Level 2. *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -28,7 +28,7 @@
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
 | Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,594 lib + 18 IPC roundtrip + 90 integration = 1,702 tests, 364 binaries (342 barracuda + 22 forge) |
-| Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 4 (NUCLEUS 31/31 pass, bare 16/16, v0.9.16 manifest)** |
+| Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 4 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 63/63 reproducible papers complete (Tracks 1-6 + Phase 37 extensions + cross-spring) |

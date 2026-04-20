@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-04-19 (V148: 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,594** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4**: NUCLEUS validated (31/31 pass, exit 0), bare mode (16/16 pass, exit 2). Live IPC against barraCuda, BearDog, NestGate, ToadStool. **48 barraCuda consumed capabilities** (33 v0.9.16 canonical + 15 legacy). **14 primal gaps open** (PG-01–PG-17, 3 resolved). BLAKE3 checksums, v0.9.16 manifest. V147: N2 v0.9.15 surface. V146: guideStone Level 2. V145: Exp403 primal proof Tier 2. barraCuda v0.3.12, primalSpring v0.9.16. Clippy 0 warnings all-features.)
+**Updated**: 2026-04-20 (V149: 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,594** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4**: NUCLEUS validated (38/38 pass, 4 skip, exit 0), bare mode (16/16 pass, exit 2). Live IPC against barraCuda, BearDog, NestGate, ToadStool. **48 barraCuda consumed capabilities** (33 v0.9.17 canonical + 15 legacy). **10 primal gaps open** (PG-01–PG-17, 7 resolved). BLAKE3 checksums, v0.9.17 manifest. V148: guideStone 31/31 + 11 skip. V147: N2 v0.9.15 surface. V146: guideStone Level 2. V145: Exp403 primal proof Tier 2. barraCuda v0.3.12, primalSpring v0.9.17. NUCLEUS via `nucleus_launcher.sh`; biomeOS compiles. Clippy 0 warnings all-features.)
 
 ---
 
@@ -646,7 +646,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V148):** 383 experiments indexed (380 completed + 3 PROPOSED), 364 binaries (342 barracuda + 22 forge), 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.16. 48 barraCuda consumed IPC capabilities. guideStone Level 4 (NUCLEUS 31/31 pass, bare 16/16, v0.9.16 manifest).
+**Totals (V149):** 383 experiments indexed (380 completed + 3 PROPOSED), 364 binaries (342 barracuda + 22 forge), 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.17. 48 barraCuda consumed IPC capabilities. guideStone Level 4 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest).
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -676,7 +676,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V148): 383 experiments indexed, 364 binaries, 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). guideStone Level 4 (31/31 NUCLEUS, v0.9.16).**
+**Totals (V149): 383 experiments indexed, 364 binaries, 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). guideStone Level 4 (38/38 NUCLEUS, 4 skip, v0.9.17).**
 
 ---
 

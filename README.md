@@ -18,8 +18,8 @@ Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
 Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (48 consumed caps)   (5 primals, check_skip)    (plasmidBin)
 
-Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4)
-           (wetspring_guidestone) (31/31 live NUCLEUS, v0.9.16 manifest)
+Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4+)
+           (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
 ```
 
 | | |
@@ -28,7 +28,7 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4)
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 42 niche, 48 consumed (33 v0.9.16 canonical + 15 legacy), 37 dispatch, 21 domains (V148) |
+| **IPC capabilities** | 42 niche, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch, 21 domains (V149) |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -37,12 +37,12 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4)
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 14 open in `docs/PRIMAL_GAPS.md` (11 external + 3 internal), 3 resolved (PG-01–PG-17) |
+| **Primal gaps** | 10 open in `docs/PRIMAL_GAPS.md` (7 external + 3 internal), 7 resolved (PG-01–PG-17) |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V148:** guideStone **Level 4** (NUCLEUS validated, 31/31 pass, exit 0) — live IPC parity against barraCuda, BearDog, NestGate, ToadStool. Handle-based tensor.matmul, sample std_dev parity, cross-atomic pipeline (hash→store→retrieve→verify). BLAKE3 checksums, v0.9.16 manifest (15 capabilities, 11 skipped pending ecobin expansion). 5 new gaps (PG-13–17). V147: N2 v0.9.15 surface. V146: guideStone Level 2. V145: Exp403. V144: composition tier.
+**Current release — V149:** guideStone **Level 4** (NUCLEUS validated, 38/38 pass, 4 skip, exit 0) — live IPC parity against barraCuda (stats, linalg, spectral, tensor), BearDog, NestGate, ToadStool, Squirrel (5 primals). primalSpring v0.9.17 alignment, nucleus_launcher.sh deployment, corrected parameter names for 6 previously-skipped methods. biomeOS now compiles. 4 remaining skips: compute.dispatch (needs GPU binary), inference.complete (no Ollama), stats.median, linalg.determinant. V148: Level 4 initial (31/31). V147: N2 v0.9.15 surface. V146: guideStone Level 2.
 
 ---
 
