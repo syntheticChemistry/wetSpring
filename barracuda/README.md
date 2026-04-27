@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** March 24, 2026 (V137 — barraCuda v0.3.12 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,902 tests (0 failures), 355 binaries (333 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. V137: provenance headers on all 355 binaries, 8 new tolerance constants, `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. V136: thiserror migration, named cast helpers (~60 casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. V135: doc reconciliation, canonical metrics. V134: deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. V133: `validate_all`, `GpuContext`/`TensorSession`, `performance_surface`, zero-copy I/O.)
+**Updated:** April 27, 2026 (V151 — Deep debt evolution. barraCuda v0.3.12 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,594 lib + 18 IPC tests (0 failures), 364 binaries (342 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, **zero `dyn` dispatch**, clippy ZERO WARNINGS pedantic+nursery. V151: `FastqReader` enum (FASTQ), `BufReader<File>` (MS2), generic `write_ctx` (NRS), `Write`-based validation output, shared `BenchRow`/`bench_print`/`gpu_or_skip_sync`, concrete `FacadeError`, env-var discovery, tolerance centralization. V150: Phase 46 composition explorer. V149: guideStone Level 4 (38/38, 4 skip). V148: Level 4 initial. V137: provenance headers on all binaries, tolerance constants.)
 
 ---
 

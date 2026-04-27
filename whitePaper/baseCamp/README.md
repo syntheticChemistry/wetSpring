@@ -4,7 +4,16 @@
 
 **Date:** April 27, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V150 — Phase 46 composition explorer: data exploration & visualization lane. `wetspring_composition.sh` (gene panel explorer) + `composition_nucleus.sh` + `nucleus_composition_lib.sh`. petalTongue scene graphs (100 nodes, <1ms), barraCuda IPC math (all pass), provenance trio connection reset (PG-18). guideStone **Level 4** (38/38 pass, 4 skip, exit 0). **Tier 1:** Python→Rust (1,594 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition (Phase 46). 383 experiments, 48 consumed capabilities (33 v0.9.17 + 15 legacy). **15** primal gaps open (PG-01–PG-22, 7 resolved).
+**Status:** V151 — Deep debt evolution: modern idiomatic Rust. Zero `dyn` dispatch in I/O (FASTQ `FastqReader` enum, MS2 `BufReader<File>`, NRS generic `write_ctx`). `Write`-based output in validation layer. Hardcoded paths → env-var discovery. Shared helpers extracted (`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Concrete `FacadeError` replaces `Box<dyn Error>`. Tolerance literals centralized. 1,209 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip, exit 0). **Tier 1:** Python→Rust (1,594 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition (Phase 46). 383 experiments, 48 consumed capabilities (33 v0.9.17 + 15 legacy). **15** primal gaps open (PG-01–PG-22, 7 resolved).
+
+This is the validation narrative crystallized:
+- **Python was the validation target for Rust** (58 scripts → 1,594 lib tests).
+- **Rust + Python are now validation targets for NUCLEUS composition** (136/136
+  proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
+- **NUCLEUS composition enables the primal proof** (38/38 guideStone, IPC parity,
+  capability-based discovery, check_skip for absent primals).
+- **Code quality is interstadial-compliant** (zero `dyn`, zero `async-trait`,
+  Edition 2024, `#[expect]` only, `forbid(unsafe_code)`, zero `#[allow()]`).
 
 ---
 
@@ -82,12 +91,44 @@ deploy graph metadata compliance (44 new checks → 141/141 total, later refined
 
 **V144** completes the composition validation tier. Ed25519→BLAKE3 keyed MAC (Tower Atomic delegation compliance). Exp401 validates IPC science dispatch results against local Rust baselines and structurally validates all 7 deploy graphs. Exp402 validates every niche capability dispatches correctly (NICHE_STARTER_PATTERNS gate). 18 IPC roundtrip integration tests. `metrics.snapshot` handler. Universal composition health methods removed — biomeOS v3.04+ owns orchestration health. barraCuda v0.3.12.
 
-This is the validation narrative crystallised:
+## V145–V151 — guideStone, NUCLEUS validation, deep debt evolution
+
+**V145** added the primal proof tier (Level 5 IPC-WIRED): Exp403 calls live
+NUCLEUS primals over UDS. `check_skip` for absent primals. 22 consumed
+capabilities over IPC. PG-09: library-to-IPC evaporation surface.
+
+**V146** adds the guideStone binary — self-validating NUCLEUS composition node
+using `primalspring::composition` API. 5 certified properties. Cross-atomic
+pipeline: BearDog hash → NestGate store → retrieve → verify.
+
+**V147** expanded NUCLEUS surface (N2), aligned to v0.9.15 (48 consumed
+capabilities). PG-10/11/12 documented.
+
+**V148** achieved **guideStone Level 4**: 31/31 live NUCLEUS. v0.9.16 manifest
+alignment. Handle-based matmul. 5 new gaps (PG-13–17). BLAKE3 Property 3.
+
+**V149** aligned to primalSpring v0.9.17: 38/38 pass, 4 skip. `is_skip_error`
+adopted. 6 parity methods resolved. PG-13 resolved.
+
+**V150** absorbed Phase 46 composition template: `wetspring_composition.sh`
+for interactive NUCLEUS data exploration via petalTongue scene graphs, barraCuda
+IPC math, provenance trio. 5 new gaps (PG-18..22).
+
+**V151** deep debt evolution: zero `dyn` dispatch (concrete `FastqReader` enum,
+`BufReader<File>`, generic `write_ctx`). `Write`-based output in validation
+layer. Hardcoded paths → env-var discovery. Shared helpers extracted
+(`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Concrete `FacadeError`. 1,209
+lib tests pass. Interstadial-compliant: Edition 2024, `#[expect]` only,
+`forbid(unsafe_code)`, zero `#[allow()]`.
+
+This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,594 lib tests).
 - **Rust + Python are now validation targets for NUCLEUS composition** (136/136
   proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
-- **Composition self-describes via Wire Standard** (L2+L3: methods,
-  provided/consumed capabilities, identity, witnesses).
+- **NUCLEUS composition enables the primal proof** (guideStone 38/38, IPC
+  parity, capability-based discovery, `check_skip` for absent primals).
+- **Code quality is interstadial-compliant** (zero `dyn`, zero `async-trait`,
+  Edition 2024, `#[expect]` only, `forbid(unsafe_code)`).
 - **Composition enables ecoBin harvest** to `infra/plasmidBin/` and deployment
   via `biomeOS deploy --graph`.
 

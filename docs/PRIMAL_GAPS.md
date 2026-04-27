@@ -4,9 +4,10 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-27 (V150 — Phase 46 composition explorer. 15 gaps open (PG-18..22
-new from composition testing), 7 resolved. Provenance trio UDS reset (PG-18), petalTongue
-scene format documented (PG-19), socat dependency (PG-20/21), Songbird timeout (PG-22))
+Last updated: 2026-04-27 (V151 — Deep debt evolution. 15 gaps open (PG-18..22
+from composition testing), 7 resolved. Provenance trio UDS reset (PG-18), petalTongue
+scene format documented (PG-19), socat dependency (PG-20/21), Songbird timeout (PG-22).
+V151: code quality debt cleared — zero `dyn` dispatch, `Write`-based output, shared helpers.)
 
 ---
 

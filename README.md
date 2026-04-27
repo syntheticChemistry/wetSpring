@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V150:** Phase 46 composition explorer — data exploration & visualization lane. `wetspring_composition.sh` exercises interactive NUCLEUS via petalTongue scene graphs (100-node scenes accepted, ~41KB payload, <1ms), barraCuda IPC math (stats.mean/std_dev/correlation/fft all pass), rhizoCrypt/loamSpine/sweetGrass DAG/ledger/braid (connection reset — PG-18). `composition_nucleus.sh` launcher, `nucleus_composition_lib.sh` library, Python UDS shim for socat-free environments. 5 new gaps documented (PG-18..22). guideStone **Level 4** (38/38 pass, 4 skip, exit 0) unchanged. V149: `is_skip_error` adoption, upstream drift noted. V148: Level 4 initial (31/31). V147: N2 v0.9.15 surface.
+**Current release — V151:** Deep debt evolution — modern idiomatic Rust. Eliminated `dyn` dispatch in I/O parsers (FASTQ, MS2, NRS). Replaced `println!` with `Write`-based output in validation layer. Removed hardcoded paths (`$WETSPRING_DORADO_SEARCH_DIRS`, `$XDG_RUNTIME_DIR`). Extracted shared validation helpers (`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Concrete `FacadeError` enum replaces `Box<dyn Error>`. Centralized remaining tolerance literals to `tolerances::ANALYTICAL_LOOSE`. 1,209 lib tests pass. V150: Phase 46 composition explorer. V149: `is_skip_error`, Level 4. V148: Level 4 initial (31/31). guideStone **Level 4** (38/38 pass, 4 skip, exit 0).
 
 ---
 

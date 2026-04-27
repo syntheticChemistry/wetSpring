@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-04-27 (V150: Phase 46 composition explorer. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,594** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). **Composition explorer**: `wetspring_composition.sh` — interactive NUCLEUS via petalTongue (100-node scenes <1ms), barraCuda IPC math (all pass), provenance trio UDS reset (PG-18). `composition_nucleus.sh` launcher + Python UDS shim. **15 primal gaps** (PG-01–PG-22, 7 resolved). V149: `is_skip_error`, 6 methods. V148: Level 4 initial. barraCuda v0.3.12, primalSpring v0.9.17. Clippy 0 warnings.)
+**Updated**: 2026-04-27 (V151: Deep debt evolution — modern idiomatic Rust. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,594** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). V151: zero `dyn` dispatch, `Write`-based output, shared helpers, concrete error types. V150: composition explorer. V149: `is_skip_error`. V148: Level 4 initial. barraCuda v0.3.12, primalSpring v0.9.17. Clippy 0 warnings.)
 
 ---
 
@@ -646,7 +646,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V149):** 383 experiments indexed (380 completed + 3 PROPOSED), 364 binaries (342 barracuda + 22 forge), 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.17. 48 barraCuda consumed IPC capabilities. guideStone Level 4 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest).
+**Totals (V151):** 383 experiments indexed (380 completed + 3 PROPOSED), 364 binaries (342 barracuda + 22 forge), 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.17. 48 barraCuda consumed IPC capabilities. guideStone Level 4 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest). V151: zero `dyn` dispatch, `Write`-based output, shared helpers, concrete error types, tolerance centralization. 1,209 lib tests pass.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -676,7 +676,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V149): 383 experiments indexed, 364 binaries, 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). guideStone Level 4 (38/38 NUCLEUS, 4 skip, v0.9.17).**
+**Totals (V151): 383 experiments indexed, 364 binaries, 5,900+ checks, 1,594 lib tests + 18 IPC roundtrip (0 failures). guideStone Level 4 (38/38 NUCLEUS, 4 skip, v0.9.17). V151: interstadial-compliant code quality.**
 
 ---
 
