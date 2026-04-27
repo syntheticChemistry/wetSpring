@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Validation output sinks — route check results to stdout, a buffer, or `/dev/null`.
 
+use std::io::Write as _;
+
 /// One float [`super::Validator`] check outcome for inspection.
 #[derive(Clone, Debug, PartialEq)]
 pub struct CheckResult {
@@ -57,7 +59,7 @@ impl ValidationSink {
         match self {
             Self::Stdout(_) => {
                 let tag = if passed { "OK" } else { "FAIL" };
-                println!("  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
+                let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
             }
             Self::Silent(_) => {}
             Self::Collecting(c) => {
@@ -85,7 +87,7 @@ impl ValidationSink {
         match self {
             Self::Stdout(_) => {
                 let tag = if passed { "OK" } else { "FAIL" };
-                println!("  [{tag}]  {label}: {actual} (expected {expected})");
+                let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual} (expected {expected})");
             }
             Self::Silent(_) | Self::Collecting(_) => {}
         }
@@ -103,7 +105,8 @@ impl ValidationSink {
         match self {
             Self::Stdout(_) => {
                 let tag = if passed { "OK" } else { "FAIL" };
-                println!(
+                let _ = writeln!(
+                    std::io::stdout().lock(),
                     "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, rel_tol {tolerance:.6})"
                 );
             }
@@ -135,7 +138,8 @@ impl ValidationSink {
         match self {
             Self::Stdout(_) => {
                 let tag = if passed { "OK" } else { "FAIL" };
-                println!(
+                let _ = writeln!(
+                    std::io::stdout().lock(),
                     "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, abs_tol {abs_tol:.6}, rel_tol {rel_tol:.6})"
                 );
             }
@@ -158,23 +162,24 @@ impl ValidationSink {
     /// A section header (not counted as a check).
     pub fn on_section(&mut self, label: &str) {
         if let Self::Stdout(_) = self {
-            println!("\n{label}");
+            let _ = writeln!(std::io::stdout().lock(), "\n{label}");
         }
     }
 
     /// Validation run finished; prints summary for [`Stdout`](Self::Stdout).
     pub fn on_finish(&mut self, name: &str, passed: u32, total: u32) {
         if let Self::Stdout(_) = self {
-            println!("\n═══════════════════════════════════════════════════════════");
-            println!("  {name}: {passed}/{total} checks passed");
+            let mut out = std::io::stdout().lock();
+            let _ = writeln!(out, "\n═══════════════════════════════════════════════════════════");
+            let _ = writeln!(out, "  {name}: {passed}/{total} checks passed");
             if total == 0 {
-                println!("  RESULT: FAIL (no checks executed)");
+                let _ = writeln!(out, "  RESULT: FAIL (no checks executed)");
             } else if passed == total {
-                println!("  RESULT: PASS");
+                let _ = writeln!(out, "  RESULT: PASS");
             } else {
-                println!("  RESULT: FAIL ({} checks failed)", total - passed);
+                let _ = writeln!(out, "  RESULT: FAIL ({} checks failed)", total - passed);
             }
-            println!("═══════════════════════════════════════════════════════════");
+            let _ = writeln!(out, "═══════════════════════════════════════════════════════════");
         }
     }
 }

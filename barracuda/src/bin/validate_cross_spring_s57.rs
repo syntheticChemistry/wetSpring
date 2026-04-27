@@ -64,7 +64,7 @@ use std::sync::Arc;
 use std::time::Instant;
 use wgpu::util::DeviceExt;
 
-use wetspring_barracuda::gpu::GpuF64;
+
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::{self, Validator};
@@ -149,14 +149,7 @@ async fn main() {
 
     let mut v = Validator::new("Exp162: Cross-Spring S57 Evolution");
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
-        }
-    };
-    gpu.print_info();
+    let gpu = validation::gpu_or_skip().await;
     let device = gpu.to_wgpu_device();
     let d = device.device();
 

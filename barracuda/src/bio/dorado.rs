@@ -91,8 +91,11 @@ const DORADO_ENV_VAR: &str = "WETSPRING_DORADO_BIN";
 /// Binary name to search for on `$PATH`.
 const DORADO_BIN_NAME: &str = "dorado";
 
-/// Standard ONT install locations (checked after `$PATH`).
-const STANDARD_DORADO_DIRS: &[&str] = &["/opt/ont/dorado/bin"];
+/// Environment variable override for additional Dorado search directories (colon-separated).
+const DORADO_SEARCH_DIRS_ENV: &str = "WETSPRING_DORADO_SEARCH_DIRS";
+
+/// Default ONT install locations (checked after `$PATH` and env-var dirs).
+const DEFAULT_DORADO_DIRS: &[&str] = &["/opt/ont/dorado/bin"];
 
 /// Discover the Dorado binary using capability-based resolution.
 ///
@@ -100,7 +103,8 @@ const STANDARD_DORADO_DIRS: &[&str] = &["/opt/ont/dorado/bin"];
 ///
 /// 1. **`$WETSPRING_DORADO_BIN`** — explicit override (gate operators, CI).
 /// 2. **`$PATH` search** — pure Rust directory scan, no subprocess.
-/// 3. **Standard install locations** — `/opt/ont/dorado/bin/dorado`,
+/// 3. **`$WETSPRING_DORADO_SEARCH_DIRS`** — colon-separated extra directories.
+/// 4. **Default install locations** — `/opt/ont/dorado/bin/dorado`,
 ///    `$HOME/.local/bin/dorado`.
 ///
 /// Returns `None` if Dorado is not found. No subprocess is spawned
@@ -119,9 +123,18 @@ pub fn discover_dorado() -> Option<PathBuf> {
         return Some(found);
     }
 
-    STANDARD_DORADO_DIRS
-        .iter()
-        .map(|d| Path::new(d).join(DORADO_BIN_NAME))
+    let env_dirs = std::env::var(DORADO_SEARCH_DIRS_ENV)
+        .ok()
+        .into_iter()
+        .flat_map(|v| v.split(':').map(String::from).collect::<Vec<_>>())
+        .map(|d| Path::new(&d).join(DORADO_BIN_NAME));
+
+    env_dirs
+        .chain(
+            DEFAULT_DORADO_DIRS
+                .iter()
+                .map(|d| Path::new(d).join(DORADO_BIN_NAME)),
+        )
         .chain(dirs_home().map(|h| h.join(".local/bin").join(DORADO_BIN_NAME)))
         .find(|p| p.is_file())
 }

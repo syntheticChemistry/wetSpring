@@ -182,34 +182,34 @@ fn read_one_nrs_record(reader: &mut impl BufRead, path: &Path) -> Result<Nanopor
     })
 }
 
+fn write_ctx(writer: &mut impl std::io::Write, data: &[u8], path: &Path) -> Result<()> {
+    writer.write_all(data).map_err(|e| Error::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })
+}
+
 fn write_one_nrs_record(
     writer: &mut impl std::io::Write,
     read: &NanoporeRead,
     path: &Path,
 ) -> Result<()> {
-    let w = |writer: &mut dyn std::io::Write, data: &[u8]| -> Result<()> {
-        writer.write_all(data).map_err(|e| Error::Io {
-            path: path.to_path_buf(),
-            source: e,
-        })
-    };
-
-    w(writer, &read.read_id)?;
-    w(writer, &read.channel.to_le_bytes())?;
-    w(writer, &read.sample_rate.to_le_bytes())?;
-    w(writer, &read.calibration_offset.to_le_bytes())?;
-    w(writer, &read.calibration_scale.to_le_bytes())?;
-    w(writer, &usize_u64(read.signal.len()).to_le_bytes())?;
+    write_ctx(writer, &read.read_id, path)?;
+    write_ctx(writer, &read.channel.to_le_bytes(), path)?;
+    write_ctx(writer, &read.sample_rate.to_le_bytes(), path)?;
+    write_ctx(writer, &read.calibration_offset.to_le_bytes(), path)?;
+    write_ctx(writer, &read.calibration_scale.to_le_bytes(), path)?;
+    write_ctx(writer, &usize_u64(read.signal.len()).to_le_bytes(), path)?;
 
     #[cfg(target_endian = "little")]
     {
         let byte_slice: &[u8] = bytemuck::cast_slice(&read.signal);
-        w(writer, byte_slice)?;
+        write_ctx(writer, byte_slice, path)?;
     }
     #[cfg(target_endian = "big")]
     {
         for &sample in &read.signal {
-            w(writer, &sample.to_le_bytes())?;
+            write_ctx(writer, &sample.to_le_bytes(), path)?;
         }
     }
 

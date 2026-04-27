@@ -221,8 +221,8 @@ fn validate_tolerance_provenance(v: &mut ValidationResult) {
     );
 
     v.check_bool(
-        "IPC_ROUND_TRIP_TOL ∈ (0, 1e-10]",
-        ps_tol::IPC_ROUND_TRIP_TOL > 0.0 && ps_tol::IPC_ROUND_TRIP_TOL <= 1e-10,
+        "IPC_ROUND_TRIP_TOL ∈ (0, ANALYTICAL_LOOSE]",
+        ps_tol::IPC_ROUND_TRIP_TOL > 0.0 && ps_tol::IPC_ROUND_TRIP_TOL <= tolerances::ANALYTICAL_LOOSE,
         "JSON f64 serialization round-trip precision loss",
     );
 }
@@ -312,8 +312,8 @@ fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult
         Ok(r) => {
             let result = r.get("result").and_then(|v| v.as_array());
             let ok = result.is_some_and(|arr| arr.len() == 2
-                && arr[0].as_f64().is_some_and(|x| (x - 1.6).abs() < 1e-10)
-                && arr[1].as_f64().is_some_and(|x| (x - 1.8).abs() < 1e-10));
+                && arr[0].as_f64().is_some_and(|x| (x - 1.6).abs() < tolerances::ANALYTICAL_LOOSE)
+                && arr[1].as_f64().is_some_and(|x| (x - 1.8).abs() < tolerances::ANALYTICAL_LOOSE));
             v.check_bool("linalg.solve Ax=b IPC", ok,
                 "barraCuda: [[2,1],[1,3]]x=[5,7] → [1.6,1.8]");
         }

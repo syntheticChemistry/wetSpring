@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Zero-panic error handling for validation binaries.
 
+use std::io::Write as _;
+
 /// [`Result::unwrap`]/[`Option::expect`] replacement via stderr + exit 1.
 pub trait OrExit<T> {
     /// Unwrap or print to stderr and `process::exit(1)`.
@@ -12,7 +14,7 @@ impl<T, E: std::fmt::Display> OrExit<T> for Result<T, E> {
         match self {
             Ok(v) => v,
             Err(e) => {
-                eprintln!("FATAL: {context}: {e}");
+                let _ = writeln!(std::io::stderr().lock(), "FATAL: {context}: {e}");
                 std::process::exit(1)
             }
         }
@@ -28,7 +30,7 @@ impl<T> OrExit<T> for Option<T> {
         if let Some(v) = self {
             v
         } else {
-            eprintln!("FATAL: {context}");
+            let _ = writeln!(std::io::stderr().lock(), "FATAL: {context}");
             std::process::exit(1)
         }
     }

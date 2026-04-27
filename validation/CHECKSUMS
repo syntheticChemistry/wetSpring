@@ -1,11 +1,11 @@
 # wetSpring guideStone CHECKSUMS — BLAKE3
-# Generated: 2026-04-20
+# Generated: 2026-04-27
 # Files: 6
 #
 # Verify: primalspring::checksums::verify_manifest()
-f62fc409e13f4bb21e36b36291faf65172af8afb37aecb8c4bec8baf1b8c2d44  barracuda/src/bin/wetspring_guidestone.rs
+fb2e7e1231fc519a2ec7a3be35c8f20db500b05a275dfa68325988d60632f5e3  barracuda/src/bin/wetspring_guidestone.rs
 f8db1e288b97f100eb896c9278ca3f769b7c6576e1aec5c477171660525a7bdf  barracuda/src/niche.rs
 f085f4f95801cfe6ac29f16c12979b66e5610bebe517228df6fea8b2c946e4cf  barracuda/src/tolerances/mod.rs
 911522016a5a8218d43ac26b7a98433d578c3a2f260141471ad622edf12e16ac  barracuda/src/lib.rs
-d3647c0b29b2a40e3f9ae53ce0a45ddcc8d02056b52f1cce09bb9688a6a5f2f7  barracuda/Cargo.toml
+e7a05a52133c53b42d3373a32abb919e27d31e975cc961092216caabd0b0ee28  barracuda/Cargo.toml
 ddb592092ec5a4fe9501e0d1a117bc53d6898dc7b13e4ea7c80324f95e1b4db7  Cargo.toml

@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V150** | `handoffs/WETSPRING_V150_PHASE46_COMPOSITION_EXPLORER_HANDOFF_APR27_2026.md` | Apr 27 | **Phase 46 composition explorer**: data visualization lane. petalTongue 100-node scenes (<1ms), barraCuda IPC math, provenance trio UDS reset (PG-18). 5 new gaps (PG-18..22). Python UDS shim. |
+| **V151** | `handoffs/WETSPRING_V151_DEEP_DEBT_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Deep debt evolution**: zero `dyn` dispatch in I/O, `Write`-based validation output, hardcoded paths removed, shared helpers extracted, concrete error types, tolerance centralization. 1209 lib tests pass. |
+| V150 | `handoffs/WETSPRING_V150_PHASE46_COMPOSITION_EXPLORER_HANDOFF_APR27_2026.md` | Apr 27 | Phase 46 composition explorer: data visualization lane. Superseded by V151 debt evolution. |
 | V149 | `handoffs/WETSPRING_V149_V0917_ALIGNMENT_HANDOFF_APR20_2026.md` | Apr 20 | v0.9.17 alignment: 38/38 pass (4 skip), 6 new parity checks, PG-13 resolved, `is_skip_error` adopted. Superseded by V150 composition. |
 | V148 | `handoffs/WETSPRING_V148_ECOSYSTEM_EVOLUTION_HANDOFF_APR19_2026.md` | Apr 19 | Ecosystem handoff: per-primal feedback, patterns for spring teams, NUCLEUS deployment recipes. Superseded by V149 alignment. |
 | V148 | `handoffs/WETSPRING_V148_GUIDESTONE_LEVEL4_NUCLEUS_HANDOFF_APR19_2026.md` | Apr 19 | **guideStone Level 4**: 31/31 live NUCLEUS, 4 primals over IPC. Handle-based matmul, sample std_dev, cross-atomic pipeline. 5 new gaps (PG-13–17). |

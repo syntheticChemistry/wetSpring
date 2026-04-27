@@ -4,7 +4,7 @@
 use super::types::Ms2Spectrum;
 use crate::error::{Error, Result};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead as _, BufReader};
 use std::path::Path;
 use std::sync::Arc;
 
@@ -14,7 +14,7 @@ use std::sync::Arc;
 /// Uses `read_line` into a reusable buffer to avoid per-line allocation
 /// (unlike `Lines` which allocates a fresh `String` per line).
 pub struct Ms2Iter {
-    reader: Box<dyn BufRead>,
+    reader: BufReader<File>,
     line_buf: String,
     path: Arc<Path>,
     pending: Option<Ms2Spectrum>,
@@ -33,7 +33,7 @@ impl Ms2Iter {
             path: arc_path.to_path_buf(),
             source: e,
         })?;
-        let reader: Box<dyn BufRead> = Box::new(BufReader::new(file));
+        let reader = BufReader::new(file);
         Ok(Self {
             reader,
             line_buf: String::new(),

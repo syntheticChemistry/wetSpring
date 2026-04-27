@@ -30,8 +30,42 @@ pub use stats::{compute_stats, stats_from_file};
 use crate::error::{Error, Result};
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
+
+/// Concrete reader that handles both plain and gzip-compressed FASTQ files
+/// without `dyn` dispatch. Branches on `.gz` extension at open time.
+pub(crate) enum FastqReader {
+    /// Uncompressed FASTQ.
+    Plain(BufReader<File>),
+    /// Gzip-compressed FASTQ.
+    Gz(BufReader<flate2::read::GzDecoder<File>>),
+}
+
+impl Read for FastqReader {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        match self {
+            Self::Plain(r) => r.read(buf),
+            Self::Gz(r) => r.read(buf),
+        }
+    }
+}
+
+impl BufRead for FastqReader {
+    fn fill_buf(&mut self) -> std::io::Result<&[u8]> {
+        match self {
+            Self::Plain(r) => r.fill_buf(),
+            Self::Gz(r) => r.fill_buf(),
+        }
+    }
+
+    fn consume(&mut self, amt: usize) {
+        match self {
+            Self::Plain(r) => r.consume(amt),
+            Self::Gz(r) => r.consume(amt),
+        }
+    }
+}
 
 /// Summary statistics from parsing a FASTQ file.
 #[derive(Debug, Clone)]
@@ -87,7 +121,7 @@ pub struct FastqRecord {
 ///
 /// Detects gzip compression from the `.gz` file extension and
 /// wraps the stream with [`flate2::read::GzDecoder`] when needed.
-pub(crate) fn open_reader(path: &Path) -> Result<Box<dyn BufRead>> {
+pub(crate) fn open_reader(path: &Path) -> Result<FastqReader> {
     let file = File::open(path).map_err(|e| Error::Io {
         path: path.to_path_buf(),
         source: e,
@@ -98,16 +132,16 @@ pub(crate) fn open_reader(path: &Path) -> Result<Box<dyn BufRead>> {
         .unwrap_or("");
     if ext.eq_ignore_ascii_case("gz") {
         let decoder = flate2::read::GzDecoder::new(file);
-        Ok(Box::new(BufReader::new(decoder)))
+        Ok(FastqReader::Gz(BufReader::new(decoder)))
     } else {
-        Ok(Box::new(BufReader::new(file)))
+        Ok(FastqReader::Plain(BufReader::new(file)))
     }
 }
 
 /// Read one byte-line into `buf`, returning bytes read. Wraps I/O errors
 /// with path context. Uses `read_until(b'\n')` — no UTF-8 requirement.
 pub(crate) fn read_byte_line(
-    reader: &mut dyn BufRead,
+    reader: &mut impl BufRead,
     buf: &mut Vec<u8>,
     path: &Path,
 ) -> Result<usize> {
@@ -196,7 +230,7 @@ where
 
     loop {
         buf_header.clear();
-        if read_byte_line(reader.as_mut(), &mut buf_header, path)? == 0 {
+        if read_byte_line(&mut reader, &mut buf_header, path)? == 0 {
             break;
         }
         if trim_end(&buf_header).is_empty() {
@@ -208,13 +242,13 @@ where
         let id = extract_id(&buf_header);
 
         buf_sequence.clear();
-        read_byte_line(reader.as_mut(), &mut buf_sequence, path)?;
+        read_byte_line(&mut reader, &mut buf_sequence, path)?;
 
         buf_sep.clear();
-        read_byte_line(reader.as_mut(), &mut buf_sep, path)?;
+        read_byte_line(&mut reader, &mut buf_sep, path)?;
 
         buf_quality.clear();
-        read_byte_line(reader.as_mut(), &mut buf_quality, path)?;
+        read_byte_line(&mut reader, &mut buf_quality, path)?;
 
         let record = FastqRefRecord {
             id,
@@ -252,7 +286,7 @@ where
 /// }
 /// ```
 pub struct FastqIter {
-    reader: Box<dyn BufRead>,
+    reader: FastqReader,
     path: std::path::PathBuf,
     header_buf: Vec<u8>,
     buf: Vec<u8>,
@@ -288,7 +322,7 @@ impl Iterator for FastqIter {
         // Line 1: @identifier — read into dedicated header buffer so the
         // id slice remains valid while we reuse `self.buf` for data lines.
         self.header_buf.clear();
-        match read_byte_line(self.reader.as_mut(), &mut self.header_buf, &self.path) {
+        match read_byte_line(&mut self.reader, &mut self.header_buf, &self.path) {
             Ok(0) => {
                 self.done = true;
                 return None;
@@ -311,7 +345,7 @@ impl Iterator for FastqIter {
 
         // Line 2: sequence
         self.buf.clear();
-        if let Err(e) = read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        if let Err(e) = read_byte_line(&mut self.reader, &mut self.buf, &self.path) {
             self.done = true;
             return Some(Err(e));
         }
@@ -319,14 +353,14 @@ impl Iterator for FastqIter {
 
         // Line 3: + separator
         self.buf.clear();
-        if let Err(e) = read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        if let Err(e) = read_byte_line(&mut self.reader, &mut self.buf, &self.path) {
             self.done = true;
             return Some(Err(e));
         }
 
         // Line 4: quality scores
         self.buf.clear();
-        if let Err(e) = read_byte_line(self.reader.as_mut(), &mut self.buf, &self.path) {
+        if let Err(e) = read_byte_line(&mut self.reader, &mut self.buf, &self.path) {
             self.done = true;
             return Some(Err(e));
         }

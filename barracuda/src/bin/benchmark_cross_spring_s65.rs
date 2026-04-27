@@ -49,7 +49,7 @@
 //! Provenance: Cross-spring benchmark (S65 baseline)
 
 use std::sync::Arc;
-use std::time::Instant;
+
 
 use wetspring_barracuda::bio::bistable::BistableParams;
 use wetspring_barracuda::bio::bistable_gpu::{BistableGpu, N_VARS as BIST_VARS};
@@ -60,30 +60,14 @@ use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::bio::multi_signal_gpu::{MultiSignalGpu, MultiSignalOdeConfig};
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
 use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
-use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{OrExit, Validator};
-
-struct Timing {
-    label: &'static str,
-    origin: &'static str,
-    ms: f64,
-}
-
-fn bench<F: FnOnce() -> R, R>(label: &str, f: F) -> (R, f64) {
-    let t0 = Instant::now();
-    let r = f();
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("  {label}: {ms:.3} ms");
-    (r, ms)
-}
+use wetspring_barracuda::validation::{BenchRow, OrExit, Validator, bench_print, print_bench_table};
 
 fn main() {
     let mut v = Validator::new("Exp183: Cross-Spring Evolution Benchmark (ToadStool S65)");
-    let mut timings: Vec<Timing> = Vec::new();
+    let mut timings: Vec<BenchRow> = Vec::new();
 
-    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
-    let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
+    let gpu = wetspring_barracuda::validation::gpu_or_skip_sync();
     let device = gpu.to_wgpu_device();
     let ctx = gpu.tensor_context().clone();
 
@@ -98,7 +82,7 @@ fn main() {
     let n_batches: u32 = 128;
     let nb = n_batches as usize;
 
-    let (bist_res, bist_ms) = bench("Bistable GPU (128 batches)", || {
+    let (bist_res, bist_ms) = bench_print("Bistable GPU (128 batches)", || {
         let gpu_ode = BistableGpu::new(Arc::clone(&device)).or_exit("BistableGpu");
         let params: Vec<BistableParams> = (0..nb)
             .map(|i| BistableParams {
@@ -115,13 +99,13 @@ fn main() {
         "Bistable: 128 batches finite",
         bist_res.iter().all(|r| r.iter().all(|x| x.is_finite())),
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "Bistable GPU 128×",
         origin: "wetSpring→S58",
         ms: bist_ms,
     });
 
-    let (coop_res, coop_ms) = bench("Cooperation GPU (128 batches)", || {
+    let (coop_res, coop_ms) = bench_print("Cooperation GPU (128 batches)", || {
         let gpu_ode = CooperationGpu::new(Arc::clone(&device)).or_exit("CooperationGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [0.01, 0.0, 0.0, 0.0].iter().copied())
@@ -149,13 +133,13 @@ fn main() {
         "Cooperation: 128 batches finite",
         coop_res.iter().all(|x| x.is_finite()),
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "Cooperation GPU 128×",
         origin: "wetSpring→S58",
         ms: coop_ms,
     });
 
-    let (phage_res, phage_ms) = bench("PhageDefense GPU (128 batches)", || {
+    let (phage_res, phage_ms) = bench_print("PhageDefense GPU (128 batches)", || {
         let gpu_ode = PhageDefenseGpu::new(Arc::clone(&device)).or_exit("PhageDefenseGpu");
         let flat_y0: Vec<f64> = (0..nb)
             .flat_map(|_| [1.0, 0.001, 0.01, 10.0].iter().copied())
@@ -186,13 +170,13 @@ fn main() {
         "PhageDefense: 128 batches finite",
         phage_res.iter().all(|x| x.is_finite()),
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "PhageDefense GPU 128×",
         origin: "wetSpring→S58",
         ms: phage_ms,
     });
 
-    let (cap_res, cap_ms) = bench("Capacitor GPU (128 batches)", || {
+    let (cap_res, cap_ms) = bench_print("Capacitor GPU (128 batches)", || {
         use wetspring_barracuda::bio::capacitor::{CapacitorParams, N_VARS as CAP_V};
         let gpu_ode = CapacitorGpu::new(Arc::clone(&device)).or_exit("CapacitorGpu");
         let flat_y0: Vec<f64> = (0..nb)
@@ -225,13 +209,13 @@ fn main() {
         "Capacitor: 128 batches finite",
         cap_res.iter().all(|x| x.is_finite()),
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "Capacitor GPU 128×",
         origin: "wetSpring→S58",
         ms: cap_ms,
     });
 
-    let (multi_res, multi_ms) = bench("MultiSignal GPU (128 batches)", || {
+    let (multi_res, multi_ms) = bench_print("MultiSignal GPU (128 batches)", || {
         use wetspring_barracuda::bio::multi_signal::{MultiSignalParams, N_VARS as MS_V};
         let gpu_ode = MultiSignalGpu::new(Arc::clone(&device)).or_exit("MultiSignalGpu");
         let flat_y0: Vec<f64> = (0..nb)
@@ -264,7 +248,7 @@ fn main() {
         "MultiSignal: 128 batches finite",
         multi_res.iter().all(|x| x.is_finite()),
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "MultiSignal GPU 128×",
         origin: "wetSpring→S58",
         ms: multi_ms,
@@ -284,7 +268,7 @@ fn main() {
         .map(|i| ((i * 7 + 3) % 50) as f64 + 1.0)
         .collect();
 
-    let (fusion_gpu, fusion_gpu_ms) = bench("DiversityFusionGpu (256 samples, 10 spp)", || {
+    let (fusion_gpu, fusion_gpu_ms) = bench_print("DiversityFusionGpu (256 samples, 10 spp)", || {
         let fusion = wetspring_barracuda::bio::diversity_fusion_gpu::DiversityFusionGpu::new(
             Arc::clone(&device),
         )
@@ -294,7 +278,7 @@ fn main() {
             .or_exit("compute")
     });
 
-    let (fusion_cpu, fusion_cpu_ms) = bench("diversity_fusion_cpu (256 samples, 10 spp)", || {
+    let (fusion_cpu, fusion_cpu_ms) = bench_print("diversity_fusion_cpu (256 samples, 10 spp)", || {
         wetspring_barracuda::bio::diversity_fusion_gpu::diversity_fusion_cpu(&abundances, n_species)
     });
 
@@ -321,12 +305,12 @@ fn main() {
         "DiversityFusion: all Shannon > 0",
         fusion_gpu.iter().all(|r| r.shannon > 0.0),
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "DiversityFusion GPU 256×",
         origin: "wetSpring→S63",
         ms: fusion_gpu_ms,
     });
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "DiversityFusion CPU 256×",
         origin: "wetSpring→S63",
         ms: fusion_cpu_ms,
@@ -342,7 +326,7 @@ fn main() {
 
     let community: Vec<f64> = (0..50).map(|i| 1.0 + f64::from(i * 7 % 30)).collect();
 
-    let (sh_local, sh_ms) = bench("diversity::shannon (→ barracuda::stats)", || {
+    let (sh_local, sh_ms) = bench_print("diversity::shannon (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::shannon(&community)
     });
     let sh_upstream = barracuda::stats::shannon(&community);
@@ -354,7 +338,7 @@ fn main() {
     );
     v.check_pass("Shannon > 0", sh_local > 0.0);
 
-    let (si_local, si_ms) = bench("diversity::simpson (→ barracuda::stats)", || {
+    let (si_local, si_ms) = bench_print("diversity::simpson (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::simpson(&community)
     });
     let si_upstream = barracuda::stats::simpson(&community);
@@ -366,7 +350,7 @@ fn main() {
     );
     v.check_pass("Simpson ∈ (0,1]", si_local > 0.0 && si_local <= 1.0);
 
-    let (ch_local, _) = bench("diversity::chao1 (→ barracuda::stats)", || {
+    let (ch_local, _) = bench_print("diversity::chao1 (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::chao1(&community)
     });
     let ch_upstream = barracuda::stats::chao1(&community);
@@ -377,7 +361,7 @@ fn main() {
         tolerances::EXACT,
     );
 
-    let (pe_local, _) = bench("diversity::pielou_evenness (→ barracuda::stats)", || {
+    let (pe_local, _) = bench_print("diversity::pielou_evenness (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::pielou_evenness(&community)
     });
     let pe_upstream = barracuda::stats::pielou_evenness(&community);
@@ -390,7 +374,7 @@ fn main() {
 
     let samples_a = vec![10.0, 20.0, 30.0, 0.0, 5.0];
     let samples_b = vec![15.0, 10.0, 25.0, 5.0, 0.0];
-    let (bc_local, _) = bench("diversity::bray_curtis (→ barracuda::stats)", || {
+    let (bc_local, _) = bench_print("diversity::bray_curtis (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::bray_curtis(&samples_a, &samples_b)
     });
     let bc_upstream = barracuda::stats::bray_curtis(&samples_a, &samples_b);
@@ -406,7 +390,7 @@ fn main() {
         vec![15.0, 10.0, 25.0],
         vec![0.0, 50.0, 0.0],
     ];
-    let (bc_cond_local, _) = bench("bray_curtis_condensed (→ barracuda::stats)", || {
+    let (bc_cond_local, _) = bench_print("bray_curtis_condensed (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::bray_curtis_condensed(&multi_samples)
     });
     let bc_cond_upstream = barracuda::stats::bray_curtis_condensed(&multi_samples);
@@ -417,7 +401,7 @@ fn main() {
     v.check_pass("bray_curtis_condensed delegation parity", bc_cond_parity);
 
     let depths: Vec<f64> = (1..=50).map(f64::from).collect();
-    let (rare_local, _) = bench("rarefaction_curve (→ barracuda::stats)", || {
+    let (rare_local, _) = bench_print("rarefaction_curve (→ barracuda::stats)", || {
         wetspring_barracuda::bio::diversity::rarefaction_curve(&community, &depths)
     });
     let rare_upstream = barracuda::stats::rarefaction_curve(&community, &depths);
@@ -426,12 +410,12 @@ fn main() {
         .zip(&rare_upstream)
         .all(|(a, b)| (a - b).abs() <= tolerances::EXACT);
     v.check_pass("rarefaction_curve delegation parity", rare_parity);
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "Shannon delegation",
         origin: "S64 cross-spring",
         ms: sh_ms,
     });
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "Simpson delegation",
         origin: "S64 cross-spring",
         ms: si_ms,
@@ -450,7 +434,7 @@ fn main() {
         .map(|i| f64::from(i).mul_add(-0.001, 1.0))
         .collect();
 
-    let (dot_local, dot_ms) = bench("special::dot (→ barracuda::stats::dot)", || {
+    let (dot_local, dot_ms) = bench_print("special::dot (→ barracuda::stats::dot)", || {
         wetspring_barracuda::special::dot(&vec_a, &vec_b)
     });
     let dot_upstream = barracuda::stats::dot(&vec_a, &vec_b);
@@ -461,7 +445,7 @@ fn main() {
         tolerances::EXACT,
     );
 
-    let (l2_local, l2_ms) = bench("special::l2_norm (→ barracuda::stats::l2_norm)", || {
+    let (l2_local, l2_ms) = bench_print("special::l2_norm (→ barracuda::stats::l2_norm)", || {
         wetspring_barracuda::special::l2_norm(&vec_a)
     });
     let l2_upstream = barracuda::stats::l2_norm(&vec_a);
@@ -471,12 +455,12 @@ fn main() {
         l2_upstream,
         tolerances::EXACT,
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "dot(1000) delegation",
         origin: "S64 cross-spring",
         ms: dot_ms,
     });
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "l2_norm(1000) delegation",
         origin: "S64 cross-spring",
         ms: l2_ms,
@@ -489,7 +473,7 @@ fn main() {
 
     v.section("§5 CPU Special Functions: hotSpring precision → ToadStool");
 
-    let (erf_val, erf_ms) = bench("erf(1.0) — barracuda::special", || {
+    let (erf_val, erf_ms) = bench_print("erf(1.0) — barracuda::special", || {
         barracuda::special::erf(1.0)
     });
     v.check(
@@ -498,13 +482,13 @@ fn main() {
         0.842_700_792_949_715,
         tolerances::ERF_PARITY,
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "erf(1.0)",
         origin: "hotSpring→ToadStool",
         ms: erf_ms,
     });
 
-    let (lng_val, lng_ms) = bench("ln_gamma(5.0) — barracuda::special", || {
+    let (lng_val, lng_ms) = bench_print("ln_gamma(5.0) — barracuda::special", || {
         barracuda::special::ln_gamma(5.0).or_exit("ln_gamma")
     });
     v.check(
@@ -513,13 +497,13 @@ fn main() {
         3.178_053_830_347_95,
         tolerances::PYTHON_PARITY,
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "ln_gamma(5.0)",
         origin: "hotSpring→ToadStool",
         ms: lng_ms,
     });
 
-    let (ncdf_val, ncdf_ms) = bench("norm_cdf(1.96) — barracuda::stats", || {
+    let (ncdf_val, ncdf_ms) = bench_print("norm_cdf(1.96) — barracuda::stats", || {
         barracuda::stats::norm_cdf(1.96)
     });
     v.check(
@@ -528,13 +512,13 @@ fn main() {
         0.975,
         tolerances::NORM_CDF_PARITY,
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "norm_cdf(1.96)",
         origin: "hotSpring→ToadStool",
         ms: ncdf_ms,
     });
 
-    let (trapz_val, trapz_ms) = bench("trapz(1000 pts) — barracuda::numerical", || {
+    let (trapz_val, trapz_ms) = bench_print("trapz(1000 pts) — barracuda::numerical", || {
         let x: Vec<f64> = (0..1000).map(|i| f64::from(i) * 0.001).collect();
         let y: Vec<f64> = x.iter().map(|&xi| xi * xi).collect();
         barracuda::numerical::trapz(&y, &x).or_exit("trapz")
@@ -545,18 +529,18 @@ fn main() {
         0.332_334,
         tolerances::ODE_METHOD_PARITY,
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "trapz(1000)",
         origin: "ToadStool native",
         ms: trapz_ms,
     });
 
-    let (pear_val, pear_ms) = bench("pearson_correlation — barracuda::stats", || {
+    let (pear_val, pear_ms) = bench_print("pearson_correlation — barracuda::stats", || {
         barracuda::stats::pearson_correlation(&vec_a, &vec_b).or_exit("pearson")
     });
     v.check_pass("pearson is finite", pear_val.is_finite());
     v.check_pass("pearson is negative (inverse data)", pear_val < 0.0);
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "pearson(1000)",
         origin: "ToadStool native",
         ms: pear_ms,
@@ -569,10 +553,10 @@ fn main() {
 
     v.section("§6 GEMM Pipeline: wetSpring → ToadStool GemmF64 (S62 BGL)");
 
-    let (_, gemm_setup_ms) = bench("GemmCached pipeline compile", || {
+    let (_, gemm_setup_ms) = bench_print("GemmCached pipeline compile", || {
         GemmCached::new(Arc::clone(&device), Arc::clone(&ctx))
     });
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "GEMM pipeline compile",
         origin: "wetSpring→S62",
         ms: gemm_setup_ms,
@@ -589,7 +573,7 @@ fn main() {
         .map(|i| ((i * 11 + 5) % 100) as f64 / 100.0)
         .collect();
 
-    let (gemm_res, first_ms) = bench("GEMM first dispatch (64×32 × 32×64)", || {
+    let (gemm_res, first_ms) = bench_print("GEMM first dispatch (64×32 × 32×64)", || {
         gemm.execute(&a_mat, &b_mat, m, k, n, 1).or_exit("GEMM")
     });
     v.check_pass("GEMM result finite", gemm_res.iter().all(|x| x.is_finite()));
@@ -600,20 +584,20 @@ fn main() {
         expected_00,
         tolerances::GPU_VS_CPU_F64,
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "GEMM first dispatch 64×64",
         origin: "wetSpring→S62",
         ms: first_ms,
     });
 
-    let ((), repeat_ms) = bench("GEMM ×100 (cached pipeline)", || {
+    let ((), repeat_ms) = bench_print("GEMM ×100 (cached pipeline)", || {
         for _ in 0..100 {
             let _ = gemm.execute(&a_mat, &b_mat, m, k, n, 1).or_exit("GEMM");
         }
     });
     let per_dispatch = repeat_ms / 100.0;
     v.check_pass("cached dispatch faster", per_dispatch < first_ms);
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "GEMM cached dispatch",
         origin: "wetSpring→S62",
         ms: per_dispatch,
@@ -629,7 +613,7 @@ fn main() {
     {
         v.section("§7 Anderson Spectral: hotSpring lattice → ToadStool → wetSpring Track 4");
 
-        let (anderson_res, anderson_ms) = bench("anderson_3d(L=8, W=2.0) + lanczos(50)", || {
+        let (anderson_res, anderson_ms) = bench_print("anderson_3d(L=8, W=2.0) + lanczos(50)", || {
             let csr = barracuda::spectral::anderson_3d(8, 8, 8, 2.0, 42);
             let tri = barracuda::spectral::lanczos(&csr, 50, 42);
             let eigs = barracuda::spectral::lanczos_eigenvalues(&tri);
@@ -643,14 +627,14 @@ fn main() {
             "Anderson: r in valid range (0, 1)",
             r_val > 0.0 && r_val < 1.0,
         );
-        timings.push(Timing {
+        timings.push(BenchRow {
             label: "Anderson 3D + Lanczos",
             origin: "hotSpring→ToadStool",
             ms: anderson_ms,
         });
 
         let midpoint = f64::midpoint(barracuda::spectral::GOE_R, barracuda::spectral::POISSON_R);
-        let (find_wc_res, find_wc_ms) = bench("anderson_sweep + find_w_c(L=6)", || {
+        let (find_wc_res, find_wc_ms) = bench_print("anderson_sweep + find_w_c(L=6)", || {
             let sweep = barracuda::spectral::anderson_sweep_averaged(6, 1.0, 30.0, 5, 2, 42);
             barracuda::spectral::find_w_c(&sweep, midpoint)
         });
@@ -659,7 +643,7 @@ fn main() {
             "find_w_c: W_c > 0 (or None if no crossing)",
             wc_ok || find_wc_res.is_none(),
         );
-        timings.push(Timing {
+        timings.push(BenchRow {
             label: "sweep+find_w_c(L=6)",
             origin: "hotSpring→ToadStool",
             ms: find_wc_ms,
@@ -679,7 +663,7 @@ fn main() {
         objective: barracuda::linalg::nmf::NmfObjective::Euclidean,
         ..barracuda::linalg::nmf::NmfConfig::default()
     };
-    let (nmf_res, nmf_ms) = bench("NMF (10×8, k=3) — barracuda::linalg::nmf", || {
+    let (nmf_res, nmf_ms) = bench_print("NMF (10×8, k=3) — barracuda::linalg::nmf", || {
         let data: Vec<f64> = (0..80)
             .map(|i| f64::from((i * 17 + 3) % 50) / 50.0 + 0.01)
             .collect();
@@ -690,13 +674,13 @@ fn main() {
         .map(|r| r.w.iter().all(|&x| x >= 0.0) && r.h.iter().all(|&x| x >= 0.0))
         .unwrap_or(false);
     v.check_pass("NMF W, H non-negative", nmf_ok);
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "NMF 10×8 k=3",
         origin: "wetSpring→S58",
         ms: nmf_ms,
     });
 
-    let (ridge_res, ridge_ms) = bench("ridge regression (20×5→2) — barracuda::linalg", || {
+    let (ridge_res, ridge_ms) = bench_print("ridge regression (20×5→2) — barracuda::linalg", || {
         let x_data: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
         let y_data: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
         barracuda::linalg::ridge_regression(
@@ -714,7 +698,7 @@ fn main() {
             .map(|r| r.weights.iter().all(|w| w.is_finite()))
             .unwrap_or(false),
     );
-    timings.push(Timing {
+    timings.push(BenchRow {
         label: "Ridge 20×5→2",
         origin: "wetSpring→S58",
         ms: ridge_ms,
@@ -822,14 +806,7 @@ fn main() {
 
     v.section("§11 Timing Table");
 
-    println!();
-    println!("  ┌────────────────────────────────┬────────────────────────┬──────────┐");
-    println!("  │ Primitive                      │ Origin                 │ Time     │");
-    println!("  ├────────────────────────────────┼────────────────────────┼──────────┤");
-    for t in &timings {
-        println!("  │ {:30} │ {:22} │ {:7.3}ms│", t.label, t.origin, t.ms);
-    }
-    println!("  └────────────────────────────────┴────────────────────────┴──────────┘");
+    print_bench_table(&timings);
 
     let total_gpu_ode = bist_ms + coop_ms + phage_ms + cap_ms + multi_ms;
     println!();

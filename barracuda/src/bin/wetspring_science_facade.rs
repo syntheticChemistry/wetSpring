@@ -24,10 +24,45 @@ use tower_http::cors::{Any, CorsLayer};
 
 use wetspring_barracuda::facade::{dark_forest, routes};
 
+#[derive(Debug)]
+enum FacadeError {
+    Io(std::io::Error),
+    Config(String),
+}
+
+impl std::fmt::Display for FacadeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Io(e) => write!(f, "{e}"),
+            Self::Config(msg) => f.write_str(msg),
+        }
+    }
+}
+
+impl From<std::io::Error> for FacadeError {
+    fn from(e: std::io::Error) -> Self {
+        Self::Io(e)
+    }
+}
+
+impl From<String> for FacadeError {
+    fn from(s: String) -> Self {
+        Self::Config(s)
+    }
+}
+
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> std::process::ExitCode {
     tracing_subscriber::fmt::init();
 
+    if let Err(e) = run().await {
+        tracing::error!("{e}");
+        return std::process::ExitCode::FAILURE;
+    }
+    std::process::ExitCode::SUCCESS
+}
+
+async fn run() -> Result<(), FacadeError> {
     let cors_origin =
         std::env::var("FACADE_CORS_ORIGIN").unwrap_or_else(|_| "https://primals.eco".to_string());
 

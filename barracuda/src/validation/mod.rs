@@ -28,6 +28,8 @@ pub mod sink;
 pub mod test_data;
 mod timing;
 
+use std::io::Write as _;
+
 pub use data_dir::{data_dir, discover_bench_dir, resolve_data_dir};
 pub use domain::{DomainResult, print_domain_summary};
 pub use harness::Validator;
@@ -35,7 +37,7 @@ pub use or_exit::OrExit;
 pub use sink::{
     CheckAbsOrRelResult, CheckResult, CollectingSink, SilentSink, StdoutSink, ValidationSink,
 };
-pub use timing::{bench, bench_n_us, print_timing_table, timed_us};
+pub use timing::{BenchRow, bench, bench_n_us, bench_print, print_bench_table, print_timing_table, timed_us};
 
 // ── Standalone helpers (for one-off use) ──────────────────────
 
@@ -54,7 +56,7 @@ pub use timing::{bench, bench_n_us, print_timing_table, timed_us};
 pub fn check(label: &str, actual: f64, expected: f64, tolerance: f64) -> bool {
     let pass = (actual - expected).abs() <= tolerance;
     let tag = if pass { "OK" } else { "FAIL" };
-    println!("  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
+    let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
     pass
 }
 
@@ -72,7 +74,7 @@ pub fn check(label: &str, actual: f64, expected: f64, tolerance: f64) -> bool {
 pub fn check_count(label: &str, actual: usize, expected: usize) -> bool {
     let pass = actual == expected;
     let tag = if pass { "OK" } else { "FAIL" };
-    println!("  [{tag}]  {label}: {actual} (expected {expected})");
+    let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual} (expected {expected})");
     pass
 }
 
@@ -82,16 +84,17 @@ pub fn check_count(label: &str, actual: usize, expected: usize) -> bool {
 /// is a failure (prevents silent pass-through when data is missing).
 #[must_use]
 pub fn print_result(name: &str, passed: u32, total: u32) -> bool {
-    println!("\n═══════════════════════════════════════════════════════════");
-    println!("  {name}: {passed}/{total} checks passed");
+    let mut out = std::io::stdout().lock();
+    let _ = writeln!(out, "\n═══════════════════════════════════════════════════════════");
+    let _ = writeln!(out, "  {name}: {passed}/{total} checks passed");
     if total == 0 {
-        println!("  RESULT: FAIL (no checks executed)");
+        let _ = writeln!(out, "  RESULT: FAIL (no checks executed)");
     } else if passed == total {
-        println!("  RESULT: PASS");
+        let _ = writeln!(out, "  RESULT: PASS");
     } else {
-        println!("  RESULT: FAIL ({} checks failed)", total - passed);
+        let _ = writeln!(out, "  RESULT: FAIL ({} checks failed)", total - passed);
     }
-    println!("═══════════════════════════════════════════════════════════");
+    let _ = writeln!(out, "═══════════════════════════════════════════════════════════");
     total > 0 && passed == total
 }
 
@@ -117,8 +120,10 @@ pub const SKIP_CODE: u8 = 2;
 /// [`skip_with_code`] which returns `ExitCode` without calling
 /// `process::exit`.
 pub fn exit_skipped(reason: &str) -> ! {
-    println!("  SKIP: {reason}");
-    println!("  (exit 2 = skipped, not a failure)");
+    let mut out = std::io::stdout().lock();
+    let _ = writeln!(out, "  SKIP: {reason}");
+    let _ = writeln!(out, "  (exit 2 = skipped, not a failure)");
+    drop(out);
     std::process::exit(2)
 }
 
@@ -128,8 +133,9 @@ pub fn exit_skipped(reason: &str) -> ! {
 /// pattern.
 #[must_use]
 pub fn skip_with_code(reason: &str) -> std::process::ExitCode {
-    println!("  SKIP: {reason}");
-    println!("  (exit 2 = skipped, not a failure)");
+    let mut out = std::io::stdout().lock();
+    let _ = writeln!(out, "  SKIP: {reason}");
+    let _ = writeln!(out, "  (exit 2 = skipped, not a failure)");
     std::process::ExitCode::from(SKIP_CODE)
 }
 
@@ -146,7 +152,28 @@ pub async fn gpu_or_skip() -> crate::gpu::GpuF64 {
     let gpu = match crate::gpu::GpuF64::new().await {
         Ok(g) => g,
         Err(e) => {
-            eprintln!("No GPU: {e}");
+            let _ = writeln!(std::io::stderr().lock(), "No GPU: {e}");
+            exit_skipped("No GPU available");
+        }
+    };
+    gpu.print_info();
+    if !gpu.has_f64 {
+        exit_skipped("No SHADER_F64 support on this GPU");
+    }
+    gpu
+}
+
+/// Initialize GPU synchronously via a tokio runtime, exiting with code 2 if unavailable or lacking f64.
+///
+/// Combines `Runtime::new()` + `block_on(GpuF64::new())` + skip logic.
+/// Prints device info on success.
+#[cfg(feature = "gpu")]
+pub fn gpu_or_skip_sync() -> crate::gpu::GpuF64 {
+    let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
+    let gpu = match rt.block_on(crate::gpu::GpuF64::new()) {
+        Ok(g) => g,
+        Err(e) => {
+            let _ = writeln!(std::io::stderr().lock(), "No GPU: {e}");
             exit_skipped("No GPU available");
         }
     };

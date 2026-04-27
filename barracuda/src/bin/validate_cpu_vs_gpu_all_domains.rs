@@ -828,18 +828,7 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
 async fn main() {
     let mut v = Validator::new("Exp092: BarraCuda CPU vs GPU — All 16 Domains Head-to-Head");
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
-        }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-
+    let gpu = validation::gpu_or_skip().await;
     let device = gpu.to_wgpu_device();
     let t0 = Instant::now();
     let mut timings: Vec<Timing> = Vec::new();

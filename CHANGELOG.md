@@ -3,6 +3,41 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V151] — 2026-04-27
+
+### Deep Debt Evolution — Modern Idiomatic Rust
+
+Systematic technical debt elimination across the codebase, targeting
+interstadial standards compliance.
+
+#### Changed
+- **Zero dyn dispatch** in I/O parsers: FASTQ `open_reader` returns concrete
+  `FastqReader` enum (Plain/Gz) instead of `Box<dyn BufRead>`. MS2 parser
+  uses `BufReader<File>` directly. NRS writer uses generic `write_ctx` helper
+  instead of `&mut dyn Write` closure. gillespie.rs `PropensityFn` documented
+  as justified exception (heterogeneous reaction vec).
+- **Write-based output** in validation layer: all `println!`/`eprintln!` in
+  `validation/{mod,sink,harness,domain,timing,or_exit}.rs` replaced with
+  `writeln!(stdout().lock(), ...)` for testability and tracing compatibility.
+- **Hardcoded paths removed**: `dorado.rs` discovery now checks
+  `$WETSPRING_DORADO_SEARCH_DIRS` (colon-separated) before defaults.
+  Doc comment in `dump_wetspring_scenarios.rs` updated from `/tmp/` to
+  `$XDG_RUNTIME_DIR/`.
+- **Facade error type**: `wetspring_science_facade` uses concrete `FacadeError`
+  enum + `ExitCode` pattern instead of `Box<dyn Error>`.
+- **Shared validation helpers** extracted to `validation/timing.rs`:
+  `BenchRow`, `bench_print`, `print_bench_table`. `gpu_or_skip_sync()` added
+  to `validation/mod.rs` for sync GPU bootstrap.
+- **Benchmark binaries** (s65, s68) refactored to use shared timing helpers,
+  eliminating duplicated `Timing` struct and `bench` function.
+- **GPU bootstrap** centralized: s57 and cpu_vs_gpu use `gpu_or_skip()`,
+  s65 and s68 use `gpu_or_skip_sync()`.
+- **Tolerance literals**: remaining hardcoded `1e-10` in `wetspring_guidestone.rs`
+  replaced with `tolerances::ANALYTICAL_LOOSE`.
+
+#### Library tests
+- 1209 pass, 0 fail, 1 ignored.
+
 ## [V150] — 2026-04-27
 
 ### Phase 46 Composition Explorer — Data Exploration & Visualization Lane

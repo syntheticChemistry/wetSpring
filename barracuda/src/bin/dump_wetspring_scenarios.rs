@@ -12,7 +12,7 @@
 //! cargo run --features json --bin dump_wetspring_scenarios
 //!
 //! # Push to petalTongue via IPC (if socket is available)
-//! PETALTONGUE_SOCKET=/tmp/petaltongue.sock cargo run --features json --bin dump_wetspring_scenarios
+//! PETALTONGUE_SOCKET=$XDG_RUNTIME_DIR/petaltongue.sock cargo run --features json --bin dump_wetspring_scenarios
 //! ```
 //!
 //! Provenance: Scenario dump utility for petalTongue visualization

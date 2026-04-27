@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V150:** Phase 46 composition explorer — data exploration & visualization lane. Interactive NUCLEUS via `wetspring_composition.sh` (petalTongue scene graphs up to 100 nodes, barraCuda IPC math, gene panel navigation). Python UDS shim for socat-free environments. 5 new gaps (PG-18..22): provenance trio UDS reset, scene format, socat dependency, Songbird timeout. guideStone Level 4 (38/38 pass, 4 skip, exit 0). 15 primal gaps open (7 resolved). V149: `is_skip_error`, 6 methods resolved. V148: Level 4 initial.
+**Current release — V151:** Deep debt evolution — modern idiomatic Rust. Eliminated `dyn` dispatch in I/O parsers (FASTQ, MS2, NRS). Replaced `println!` with `Write`-based output in validation layer. Removed hardcoded paths. Extracted shared validation helpers (`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Centralized remaining tolerance literals. Concrete error types in facade binary. 1209 lib tests pass. V150: Phase 46 composition explorer. V149: `is_skip_error`, Level 4. guideStone Level 4 (38/38 pass, 4 skip, exit 0). 15 primal gaps open (7 resolved).
 
 ## Role in the Ecosystem
 

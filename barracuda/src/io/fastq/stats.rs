@@ -148,7 +148,7 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
 
     loop {
         buf.clear();
-        if read_byte_line(reader.as_mut(), &mut buf, path)? == 0 {
+        if read_byte_line(&mut reader, &mut buf, path)? == 0 {
             break;
         }
         if trim_end(&buf).is_empty() {
@@ -160,7 +160,7 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
 
         // Sequence line — borrow directly from buf, no .to_vec()
         buf.clear();
-        read_byte_line(reader.as_mut(), &mut buf, path)?;
+        read_byte_line(&mut reader, &mut buf, path)?;
         let seq_len = trim_end(&buf).len();
         let seq_gc = trim_end(&buf)
             .iter()
@@ -169,11 +169,11 @@ pub fn stats_from_file(path: &Path) -> Result<FastqStats> {
 
         // Separator line
         buf.clear();
-        read_byte_line(reader.as_mut(), &mut buf, path)?;
+        read_byte_line(&mut reader, &mut buf, path)?;
 
         // Quality line
         buf.clear();
-        read_byte_line(reader.as_mut(), &mut buf, path)?;
+        read_byte_line(&mut reader, &mut buf, path)?;
         let qual = trim_end(&buf);
 
         acc.add_record_borrowed(seq_len, seq_gc, qual);

@@ -2,6 +2,7 @@
 //! [`Validator`] — structured check accumulator removing manual pass/fail bookkeeping.
 
 use super::sink::{CollectingSink, SilentSink, StdoutSink, ValidationSink};
+use std::io::Write as _;
 
 /// Accumulated validation state, removing manual pass/fail bookkeeping.
 ///
@@ -30,9 +31,12 @@ impl Validator {
     #[must_use]
     pub fn new(name: impl Into<String>) -> Self {
         let name = name.into();
-        println!("═══════════════════════════════════════════════════════════");
-        println!("  {name}");
-        println!("═══════════════════════════════════════════════════════════\n");
+        {
+            let mut out = std::io::stdout().lock();
+            let _ = writeln!(out, "═══════════════════════════════════════════════════════════");
+            let _ = writeln!(out, "  {name}");
+            let _ = writeln!(out, "═══════════════════════════════════════════════════════════\n");
+        }
         Self {
             name,
             passed: 0,

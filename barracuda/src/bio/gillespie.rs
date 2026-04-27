@@ -82,6 +82,8 @@ impl Lcg64 {
 ///   user-defined or model-specific reactions would not fit.
 /// - The cost of dynamic dispatch is negligible vs. the SSA loop (propensity eval
 ///   is O(reactions), not O(state)); the flexibility is worth it.
+// AUDIT: dyn dispatch retained — heterogeneous reaction vec requires type erasure per SSA design.
+// See doc comment above for full justification. Ecosystem exception documented.
 pub type PropensityFn = Box<dyn Fn(&[i64]) -> f64>;
 
 /// A single reaction in the system.
