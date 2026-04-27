@@ -20,6 +20,9 @@ Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
 
 Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4+)
            (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
+
+Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
+           (wetspring_composition.sh) (Phase 46 template, data viz lane)
 ```
 
 | | |
@@ -28,7 +31,7 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4+)
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 42 niche, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch, 21 domains (V149) |
+| **IPC capabilities** | 42 niche, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch, 21 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -37,12 +40,12 @@ Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 4+)
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 10 open in `docs/PRIMAL_GAPS.md` (7 external + 3 internal), 7 resolved (PG-01–PG-17) |
+| **Primal gaps** | 15 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 7 resolved), 5 new from Phase 46 composition |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V149:** guideStone **Level 4** (NUCLEUS validated, 38/38 pass, 4 skip, exit 0) — live IPC parity against barraCuda (stats, linalg, spectral, tensor), BearDog, NestGate, ToadStool, Squirrel (5 primals). primalSpring v0.9.17 alignment, nucleus_launcher.sh deployment, corrected parameter names for 6 previously-skipped methods. biomeOS now compiles. 4 remaining skips: compute.dispatch (needs GPU binary), inference.complete (no Ollama), stats.median, linalg.determinant. V148: Level 4 initial (31/31). V147: N2 v0.9.15 surface. V146: guideStone Level 2.
+**Current release — V150:** Phase 46 composition explorer — data exploration & visualization lane. `wetspring_composition.sh` exercises interactive NUCLEUS via petalTongue scene graphs (100-node scenes accepted, ~41KB payload, <1ms), barraCuda IPC math (stats.mean/std_dev/correlation/fft all pass), rhizoCrypt/loamSpine/sweetGrass DAG/ledger/braid (connection reset — PG-18). `composition_nucleus.sh` launcher, `nucleus_composition_lib.sh` library, Python UDS shim for socat-free environments. 5 new gaps documented (PG-18..22). guideStone **Level 4** (38/38 pass, 4 skip, exit 0) unchanged. V149: `is_skip_error` adoption, upstream drift noted. V148: Level 4 initial (31/31). V147: N2 v0.9.15 surface.
 
 ---
 

@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-04-20 (V149: 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,594** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4**: NUCLEUS validated (38/38 pass, 4 skip, exit 0), bare mode (16/16 pass, exit 2). Live IPC against barraCuda, BearDog, NestGate, ToadStool. **48 barraCuda consumed capabilities** (33 v0.9.17 canonical + 15 legacy). **10 primal gaps open** (PG-01–PG-17, 7 resolved). BLAKE3 checksums, v0.9.17 manifest. V148: guideStone 31/31 + 11 skip. V147: N2 v0.9.15 surface. V146: guideStone Level 2. V145: Exp403 primal proof Tier 2. barraCuda v0.3.12, primalSpring v0.9.17. NUCLEUS via `nucleus_launcher.sh`; biomeOS compiles. Clippy 0 warnings all-features.)
+**Updated**: 2026-04-27 (V150: Phase 46 composition explorer. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,594** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). **Composition explorer**: `wetspring_composition.sh` — interactive NUCLEUS via petalTongue (100-node scenes <1ms), barraCuda IPC math (all pass), provenance trio UDS reset (PG-18). `composition_nucleus.sh` launcher + Python UDS shim. **15 primal gaps** (PG-01–PG-22, 7 resolved). V149: `is_skip_error`, 6 methods. V148: Level 4 initial. barraCuda v0.3.12, primalSpring v0.9.17. Clippy 0 warnings.)
 
 ---
 

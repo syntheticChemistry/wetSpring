@@ -4,7 +4,9 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-20 (V149 — primalSpring v0.9.17 alignment, 38/38 pass, 4 skip, nucleus_launcher.sh deployment)
+Last updated: 2026-04-27 (V150 — Phase 46 composition explorer. 15 gaps open (PG-18..22
+new from composition testing), 7 resolved. Provenance trio UDS reset (PG-18), petalTongue
+scene format documented (PG-19), socat dependency (PG-20/21), Songbird timeout (PG-22))
 
 ---
 
@@ -280,6 +282,11 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-15 | ToadStool compute.dispatch missing | ToadStool | **Updated V149** — registered, needs GPU binary | 2 |
 | PG-16 | stats.std_dev N-1 vs N divisor | barraCuda/wetSpring | document convention | 1 |
 | PG-17 | tensor.matmul handle-based only | barraCuda | inline data path or document | 1 |
+| PG-18 | Provenance trio UDS connection reset | rhizoCrypt/loamSpine/sweetGrass | Trio JSON-RPC on UDS | 2 |
+| PG-19 | petalTongue scene primitive format | petalTongue/primalSpring | **Informational V150** — documented | -- |
+| PG-20 | socat dependency in composition lib | primalSpring | Python shim workaround | 1 |
+| PG-21 | Health check uses socat | primalSpring | Same fallback as send_rpc | 1 |
+| PG-22 | Songbird socket timeout | Songbird | Socket naming convention | 2 |
 
 ---
 
@@ -361,6 +368,88 @@ create→matmul→check-shape, but `validate_parity` (which expects a scalar
 `result` field) cannot be used. Either barraCuda should add an inline-data
 convenience path, or `primalspring::composition` should gain a handle-aware
 parity helper.
+
+---
+
+## PG-18: Provenance Trio UDS Connection Reset (Composition-Discovered)
+
+**Owner:** rhizoCrypt / loamSpine / sweetGrass
+**Status:** Open — discovered V150 composition exploration (Phase 46)
+
+All three provenance trio primals (rhizoCrypt, loamSpine, sweetGrass) accept
+UDS connections but immediately reset them when JSON-RPC is sent. This matches
+upstream PG-45 (primalSpring composition testing). The sockets are created and
+the primals are running (`pgrep` confirms), but they do not speak JSON-RPC on
+UDS out of the box.
+
+**Impact:** DAG session creation, ledger spine creation, and braid recording
+all fail. The composition degrades gracefully (logs empty responses, continues
+without provenance tracking). However, the **entire provenance layer is
+non-functional** for interactive compositions.
+
+**Workaround:** The composition lib handles empty responses gracefully; DAG,
+ledger, and braid features are disabled but the composition still runs.
+
+---
+
+## PG-19: petalTongue Scene Primitive Format — Text Node Schema
+
+**Owner:** petalTongue / primalSpring (composition lib)
+**Status:** Informational — documented V150 composition exploration
+
+`visualization.render.scene` requires the Text primitive format:
+```json
+{"Text": {"x": 50.0, "y": 50.0, "content": "...", "font_size": 14.0,
+  "color": {"r": 0.7, "g": 0.7, "b": 0.8, "a": 1.0},
+  "anchor": "Center", "bold": false, "italic": false, "data_id": null}}
+```
+
+This is correctly implemented in `nucleus_composition_lib.sh` `make_text_node`,
+but the format differs from what a naive JSON builder might produce (e.g.
+`{"type":"text","text":"..."}` is rejected). Springs must use the single-key
+enum-variant pattern (`"Text": {...}`) with explicit `x`/`y`/`content` fields.
+
+**Impact:** Low — documented, lib handles it. First-time users may be confused.
+
+---
+
+## PG-20: socat Dependency for Composition Library
+
+**Owner:** primalSpring (composition lib)
+**Status:** Open — discovered V150 composition exploration
+
+`nucleus_composition_lib.sh` `send_rpc` requires `socat` for UDS JSON-RPC
+transport. On systems without `socat` (no sudo access, minimal containers),
+the composition cannot run without a shim.
+
+**Workaround:** wetSpring added `tools/uds_send.py` — a 45-line Python UDS
+shim used as a `socat` fallback. The local lib is patched to try `socat`
+first, then `python3 uds_send.py`. Candidate for upstream promotion.
+
+---
+
+## PG-21: composition_nucleus.sh Health Check Uses socat
+
+**Owner:** primalSpring (composition launcher)
+**Status:** Open — discovered V150 composition exploration
+
+`composition_nucleus.sh` health check always reports "no response" when
+`socat` is unavailable, even though primals are healthy (confirmed via
+Python/direct socket). The launcher should use the same fallback strategy
+as `send_rpc`.
+
+---
+
+## PG-22: Songbird Socket Timeout During Composition Launch
+
+**Owner:** Songbird
+**Status:** Open — discovered V149/V150 composition launches
+
+Songbird consistently times out during Phase 1 of `composition_nucleus.sh`
+launch. The socket never appears at `songbird-{FAMILY_ID}.sock`. Songbird
+may not support the `--family-id` / `FAMILY_ID` socket naming convention,
+or may bind to a different path. Discovery still works via capability
+aliases.
 
 ---
 

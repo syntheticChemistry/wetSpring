@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** April 20, 2026
+**Date:** April 27, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V149 — guideStone **Level 4** (NUCLEUS validated, 38/38 pass, 4 skip, exit 0) + bare mode (16/16 pass, exit 2). Live IPC parity against barraCuda, BearDog, NestGate, ToadStool. **Tier 1:** Python→Rust (**1,594** lib tests + **18** IPC roundtrip, **5,900+** validation checks, **342** binaries). **Tier 2:** Rust→Primal composition (**136/136** proto-nucleate, **7** deploy graphs, **42** niche capabilities, **37** dispatch, **21** domains). **Tier 3:** Composition→IPC parity (Exp401) → Niche gate (Exp402) → Primal proof (Exp403) → ecoBin harvest. **Tier 4:** guideStone (`wetspring_guidestone`, Level 4 NUCLEUS validated, 15 manifest capabilities, BLAKE3 checksums, handle-based matmul, cross-atomic pipeline). **383** experiments indexed. **48 consumed capabilities** (33 v0.9.17 canonical + 15 legacy). `niche::GUIDESTONE_READINESS = 4`. `barraCuda` v0.3.12. **10** primal composition gaps open (`docs/PRIMAL_GAPS.md`, 7 resolved, PG-01–PG-17). Clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`.
+**Status:** V150 — Phase 46 composition explorer: data exploration & visualization lane. `wetspring_composition.sh` (gene panel explorer) + `composition_nucleus.sh` + `nucleus_composition_lib.sh`. petalTongue scene graphs (100 nodes, <1ms), barraCuda IPC math (all pass), provenance trio connection reset (PG-18). guideStone **Level 4** (38/38 pass, 4 skip, exit 0). **Tier 1:** Python→Rust (1,594 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition (Phase 46). 383 experiments, 48 consumed capabilities (33 v0.9.17 + 15 legacy). **15** primal gaps open (PG-01–PG-22, 7 resolved).
 
 ---
 

@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** April 20, 2026
-**Status:** V149 — **guideStone Level 4** (NUCLEUS validated, 38/38 pass, 4 skip, exit 0). Three-tier validation active. **Tier 1:** Python→Rust (5,900+ checks, **1,594** lib tests + **18** IPC roundtrip, **364** binaries). **Tier 2:** Rust→Primal composition (136/136 proto-nucleate, 7 deploy graphs, 48 IPC capabilities — 33 v0.9.17 canonical + 15 legacy). **Tier 3:** Live NUCLEUS IPC parity against 5 primals via `nucleus_launcher.sh`, `is_skip_error` from v0.9.17. 383 experiments indexed, 44 GPU modules, 49 CPU bio modules, `barraCuda` v0.3.12 (150+ primitives consumed), **242** named tolerances with provenance trail, clippy zero warnings, `forbid(unsafe_code)`, zero `#[allow()]`, cargo-deny clean. 64 papers reproduced. 10 primal gaps open (7 resolved).
+**Date:** April 27, 2026
+**Status:** V150 — Phase 46 composition explorer: data visualization lane. **guideStone Level 4** (38/38 pass, 4 skip). Interactive NUCLEUS via `wetspring_composition.sh` + `composition_nucleus.sh` + `nucleus_composition_lib.sh`. petalTongue 100-node scenes (<1ms), barraCuda IPC math passes, provenance trio UDS reset (PG-18). **Tier 1:** Python→Rust (5,900+ checks, 1,594 lib + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 15 primal gaps open (7 resolved). Clippy zero warnings, `forbid(unsafe_code)`, cargo-deny clean. 64 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---

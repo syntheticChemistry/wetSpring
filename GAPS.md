@@ -4,10 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-04-20 (V149 — primalSpring v0.9.17 alignment. guideStone Level 4
-(38/38 pass, 4 skip, exit 0). PG-11 resolved, PG-13 resolved, PG-14 partially resolved.
-CONSUMED_CAPABILITIES 48 (33 v0.9.17 canonical + 15 legacy). `is_skip_error` adopted.
-10 gaps open, 7 resolved. Architectural gaps remain external team dependencies.)
+Last updated: 2026-04-27 (V150 — Phase 46 composition explorer. 15 gaps open (PG-01–PG-22),
+7 resolved. PG-18..22 new from composition testing: provenance trio UDS reset, petalTongue
+scene format, socat dependency, health check, Songbird timeout. guideStone Level 4
+(38/38, 4 skip). CONSUMED_CAPABILITIES 48 (33 v0.9.17 + 15 legacy).)
 
 ---
 

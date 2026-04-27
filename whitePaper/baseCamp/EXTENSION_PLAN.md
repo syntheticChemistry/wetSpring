@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** April 20, 2026 (V149 update)
-**Author:** wetSpring V149 (ecoPrimals)
-**Foundation:** 383 experiments indexed (380 completed + 3 PROPOSED), 5,900+ checks, 64 papers reproduced, 150+ primitives (standalone barraCuda v0.3.12), Python parity proven, cross-spring provenance validated, **1,594** lib tests, **342** binaries, coverage **91.20%** line / **90.30%** function (gated at 90%). **V149:** guideStone **Level 4** — NUCLEUS validated (38/38 pass, 4 skip, exit 0), bare mode (16/16 pass, exit 2). Live IPC against barraCuda, BearDog, NestGate, ToadStool. Handle-based matmul, sample std_dev, cross-atomic pipeline. `niche::GUIDESTONE_READINESS = 4`. 10 gaps open (PG-01–PG-17, 7 resolved). BLAKE3 checksums, v0.9.17 manifest (15 capabilities; barraCuda stats/linalg/spectral IPC parity expanded). Deployed via `nucleus_launcher.sh`; biomeOS compiles. Zero local WGSL, zero unsafe code (`forbid` at workspace level), `cargo clippy` **ZERO WARNINGS** (pedantic + nursery). Ecosystem: barraCuda v0.3.12, primalSpring v0.9.17, toadStool S155+, coralReef Phase 10.
+**Date:** April 27, 2026 (V150 update)
+**Author:** wetSpring V150 (ecoPrimals)
+**Foundation:** 383 experiments, 5,900+ checks, 64 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,594 lib tests, 342 binaries, 91.20% coverage. **V150:** Phase 46 composition explorer — data exploration & visualization lane. `wetspring_composition.sh` with gene panel explorer, petalTongue scene graphs (100 nodes, <1ms), barraCuda IPC math (all pass). Provenance trio UDS reset (PG-18). guideStone Level 4 (38/38, 4 skip). 15 gaps open (PG-01–PG-22, 7 resolved). `composition_nucleus.sh` launcher, Python UDS shim. primalSpring v0.9.17. Zero local WGSL, zero unsafe code, clippy **ZERO WARNINGS**.
 
 ---
 

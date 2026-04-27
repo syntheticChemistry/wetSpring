@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: April 20, 2026
-**Status**: V149 — 5,900+ checks (383 experiments, 364 binaries), 1,702 tests (1,594 lib + 18 IPC + 90 integration), 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 21 domains (8 families), 136/136 proto-nucleate (Exp400 D01–D07 guard constant), 7 deploy graphs, 10 composition gaps open in `docs/PRIMAL_GAPS.md` (7 resolved, PG-01–PG-17). **guideStone Level 4: NUCLEUS validated (38/38 pass, 4 skip, exit 0), bare mode (16/16 pass, exit 2). Live IPC parity against barraCuda (stats, linalg, spectral, tensor), BearDog, NestGate, ToadStool, Squirrel — 5 primals. `niche::GUIDESTONE_READINESS = 4`.** V149: v0.9.17 alignment, 6 previously-skipped methods now PASS, nucleus_launcher.sh deployment, biomeOS compiles. V148: Level 4 initial (31/31). V147: N2 expansion, PG-10/11/12. V146: guideStone Level 2. *(Detailed validation tables below reflect their respective phases.)*
+**Last Updated**: April 27, 2026
+**Status**: V150 — Phase 46 composition explorer. `wetspring_composition.sh` + `composition_nucleus.sh` + `nucleus_composition_lib.sh` + `uds_send.py` in `tools/`. 5,900+ checks (383 experiments, 364 binaries), 1,702 tests (1,594 lib + 18 IPC + 90 integration), 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 21 domains (8 families), 136/136 proto-nucleate, 7 deploy graphs, 15 composition gaps open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 7 resolved). **guideStone Level 4** unchanged (38/38 pass, 4 skip, exit 0). **Composition explorer**: petalTongue 100-node scenes (<1ms), barraCuda IPC math passes, provenance trio UDS reset (PG-18). V149: `is_skip_error`, 6 methods resolved. V148: Level 4 initial (31/31). *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

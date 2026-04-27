@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V149:** guideStone **Level 4** (NUCLEUS validated, 38/38 pass, 4 skip, exit 0) — live IPC parity against barraCuda (stats, linalg, spectral, tensor), BearDog, NestGate, ToadStool, Squirrel (5 primals). primalSpring v0.9.17 alignment, nucleus_launcher.sh deployment. 6 previously-skipped methods now PASS (corrected params). V148: Level 4 initial (31/31). V147: N2 v0.9.15 surface.
+**Current release — V150:** Phase 46 composition explorer — data exploration & visualization lane. Interactive NUCLEUS via `wetspring_composition.sh` (petalTongue scene graphs up to 100 nodes, barraCuda IPC math, gene panel navigation). Python UDS shim for socat-free environments. 5 new gaps (PG-18..22): provenance trio UDS reset, scene format, socat dependency, Songbird timeout. guideStone Level 4 (38/38 pass, 4 skip, exit 0). 15 primal gaps open (7 resolved). V149: `is_skip_error`, 6 methods resolved. V148: Level 4 initial.
 
 ## Role in the Ecosystem
 

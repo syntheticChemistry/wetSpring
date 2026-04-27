@@ -1,12 +1,11 @@
 # Cross-Spring Shader Evolution
 
-> **V149 note (Apr 20, 2026):** This document preserves the V126 shader
+> **V150 note (Apr 27, 2026):** This document preserves the V126 shader
 > provenance map as a fossil record. Current state: barraCuda v0.3.12,
 > **800+** WGSL shaders, **150+** primitives consumed, **zero** local WGSL
-> (fully lean). wetSpring guideStone Level 4+ — NUCLEUS validated (38/38
-> pass, 4 skip, exit 0), calling barraCuda over IPC via `primalspring::composition`
-> API (48 consumed methods, v0.9.17 manifest). **10** open primal gaps (7 resolved).
-> See `docs/PRIMAL_GAPS.md` for composition status.
+> (fully lean). guideStone Level 4 (38/38, 4 skip). Phase 46 composition
+> explorer: petalTongue 100-node scenes, barraCuda IPC math passes.
+> **15** open primal gaps (7 resolved). See `docs/PRIMAL_GAPS.md`.
 
 **Last updated**: Mar 16, 2026 — V126
 **Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173), standalone barraCuda v0.3.5, 1,443+ tests

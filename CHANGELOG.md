@@ -3,6 +3,44 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V150] — 2026-04-27
+
+### Phase 46 Composition Explorer — Data Exploration & Visualization Lane
+
+Adopted primalSpring Phase 46 composition template library. Built
+`wetspring_composition.sh` for interactive NUCLEUS exploration of
+gene/protein data via petalTongue scene graphs, barraCuda IPC math,
+and provenance trio (DAG/ledger/braid).
+
+#### Added
+- `tools/wetspring_composition.sh`: domain composition with gene panel
+  visualization (8-gene cancer panel), keyboard/click navigation, DAG-linked
+  exploration, NestGate storage probes, barraCuda math probes, braid lineage
+- `tools/nucleus_composition_lib.sh`: upstream composition library (41 functions)
+- `tools/composition_nucleus.sh`: parameterized NUCLEUS launcher
+- `tools/uds_send.py`: Python UDS shim for socat-free environments (PG-20)
+
+#### Composition Test Results
+- **petalTongue**: 50-node (23KB) and 100-node (41KB) scenes accepted in ~1ms.
+  Nested 3-level hierarchies work. Scene format: `"Text":{"x","y","content"}`.
+- **barraCuda**: stats.mean, std_dev, correlation, spectral.fft all return
+  correct results via IPC.
+- **Provenance trio**: rhizoCrypt, loamSpine, sweetGrass all reset UDS
+  connections (PG-18, matches upstream PG-45). Composition degrades gracefully.
+- **Songbird**: socket timeout during launch (PG-22).
+- **7/9 capabilities discovered** (missing: ai/Squirrel, storage/NestGate —
+  not in default PRIMAL_LIST).
+
+#### New Gaps (PG-18..22)
+- PG-18: Provenance trio UDS connection reset
+- PG-19: petalTongue scene primitive format (informational)
+- PG-20: socat dependency in composition lib (Python shim workaround)
+- PG-21: Health check uses socat (same fallback needed)
+- PG-22: Songbird socket timeout during composition launch
+
+#### Refactored
+- Local `nucleus_composition_lib.sh` patched with socat/python3 fallback
+
 ## [V149] — 2026-04-20
 
 ### guideStone Level 4+ — v0.9.17 Alignment, 38/38 PASS
