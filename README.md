@@ -260,6 +260,28 @@ Detailed version history: [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
+## Public Notebooks
+
+The `notebooks/` directory contains 5 public-facing Jupyter notebooks that
+visualize frozen experiment data and tell the baseCamp science story. These
+are rendered with embedded charts on [primals.eco/lab/notebooks/](https://primals.eco/lab/notebooks/).
+
+| Notebook | Story |
+|----------|-------|
+| `01-16s-pipeline-validation` | Flagship 16S pipeline, Galaxy/QIIME2/R parity |
+| `02-benchmark-python-vs-rust` | Python vs Rust vs GPU performance |
+| `03-paper-reproductions` | 63/63 papers, 5 researchers, 6 tracks |
+| `04-cross-spring-connections` | 79 barraCuda primitives, ecosystem flows |
+| `05-soil-anderson-deep-dive` | Anderson localization in soil biology |
+
+Run locally: `cd notebooks/ && jupyter lab`. Or access via
+[JupyterHub](https://primals.eco/lab/compute-access/).
+
+See `notebooks/NOTEBOOK_PATTERN.md` for the convention and how other springs
+should create their own notebooks.
+
+---
+
 ## Part of ecoPrimals
 
 This repo is a domain validation spring in the

@@ -63,6 +63,22 @@ Tier 5 — NUCLEUS deployment enables ecoBin harvest
 Every stage is validated with explicit numerical checks. All data is open.
 All code is AGPL-3.0-or-later.
 
+## Public Science Visibility
+
+wetSpring baseCamp science is publicly viewable on [primals.eco](https://primals.eco):
+
+- **5 public notebooks** rendered with embedded charts at [primals.eco/lab/notebooks/](https://primals.eco/lab/notebooks/):
+  - 16S Pipeline Validation — flagship DADA2/taxonomy/diversity pipeline, Galaxy/QIIME2/R parity
+  - Python vs Rust vs GPU Benchmarks — timing, energy, speedup across three tiers
+  - 63/63 Paper Reproductions — 5 researchers, 6 tracks, full evidence map
+  - Cross-Spring Connections — 79 barraCuda primitives, constraint-driven discoveries
+  - Soil Anderson Deep Dive — Anderson localization in soil biology
+- **`sporeprint/` directory** wired to auto-refresh CI — validation summaries pushed to primals.eco on every commit
+- **Frozen experiment data** in `experiments/results/*.json` loaded by notebooks for reproducibility
+- See `notebooks/NOTEBOOK_PATTERN.md` for the convention other springs should follow
+
+---
+
 ## V138–V144 — Primal composition validation, Wire Standard, deploy graph evolution
 
 **V142** completes Capability Wire Standard v1.0 compliance and composition

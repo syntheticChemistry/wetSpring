@@ -202,6 +202,16 @@ Rust CPU and Rust GPU implementations against that baseline.
 
 ---
 
+## Public Notebook Integration
+
+Frozen experiment results in `results/` are loaded by the public notebooks in
+`../notebooks/`. These notebooks visualize the science story and are rendered
+on [primals.eco/lab/notebooks/](https://primals.eco/lab/notebooks/) with
+embedded matplotlib charts. The data paths use relative references
+(`../experiments/results/*.json`) so notebooks can execute locally or in CI.
+
+---
+
 ## Results Directory Structure
 
 ```
