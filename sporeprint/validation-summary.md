@@ -1,33 +1,59 @@
 +++
 title = "wetSpring Validation Summary"
-description = "16S metagenomics, LC-MS, PFAS screening — 5,707+ checks across 376 experiments, 63/63 papers reproduced"
-date = 2026-05-06
+description = "Life-science and analytical-chemistry spring — 1,902+ tests, 19 science methods, 342 binaries, pure primal composition"
+date = 2026-05-07
 
 [taxonomies]
-primals = ["barracuda", "toadstool", "biomeos", "nestgate", "squirrel", "coralreef"]
-springs = ["wetspring", "hotspring", "neuralspring", "groundspring"]
+primals = ["biomeos", "barracuda", "toadstool", "nestgate", "beardog", "songbird", "squirrel", "rhizocrypt", "loamspine", "sweetgrass", "petaltongue", "coralreef"]
+springs = ["wetspring"]
 +++
 
 ## Status
 
-- **5,707+ checks** across 376 experiments — all passing
-- **63/63 papers** reproduced (Waters, Liu, Cahill/Smallwood, Jones, Anderson)
-- **1,077x GPU speedup** for spectral cosine matching
-- **30 sovereign bio modules**, 1 runtime dependency (flate2)
+- **1,902+ tests** passing, 0 failed (unit + integration + property + doc)
+- **342 binaries** (313 validators + 1 guidestone + 28 other)
+- **19 science IPC methods** across 6 domain categories
+- **56 experiment directories** with 64+ frozen JSON baselines
+- **Zero sovereign HTTP fallbacks** — pure primal composition
+- **Structured gap reports** when deployment primals are unavailable
+- **BLAKE3 content hashing** on all data paths
 
 ## Key Validation Binaries
 
-<!-- TODO: List your actual validation binary names here -->
-- `validate_16s_pipeline` — full 16S from FASTQ to taxonomy
-- `validate_diversity` — Shannon, Simpson, UniFrac
-- `validate_gonzales_cpu_parity` — 43 cross-validated checks
-- `validate_algae_16s` — real NCBI data (11.9M reads)
+- `validate_gonzales_ic50_s79` — 35/35 checks, Gonzales 2014 Table 1 IC50 parity
+- `validate_gonzales_provenance_chain` — 19/19 checks, end-to-end provenance chain
+- `validate_nucleus_live_gonzales` — 11/11 checks, NUCLEUS component validation
+- `wetspring_gonzales_guidestone` — 29/29 domain scenario checks
 
-## Workload TOMLs
+## Notebooks (5)
 
-Available in `projectNUCLEUS/workloads/wetspring/` (11 workloads).
+| # | Notebook | Focus |
+|---|----------|-------|
+| 01 | Science Validation | 19 IPC methods, validation chain, test distribution |
+| 02 | Benchmark Comparison | 23-domain timing, Rust vs Galaxy/QIIME2, energy |
+| 03 | Gonzales Deep Dive | IC50, PK decay, tissue lattice, ChEMBL cross-validation |
+| 04 | Cross-Spring Connections | Primal consumption matrix, ecosystem flows, sporePrint readiness |
+| 05 | Primal Composition Patterns | Pure composition, gap reports, provenance lifecycle, Tier 3 vision |
+
+## Evolution Model
+
+- **Tier 1 (current)**: Frozen JSON + matplotlib — works offline, in CI, on GitHub Pages
+- **Tier 2 (stubbed)**: Live IPC parity checks via `WETSPRING_IPC_SOCKET`
+- **Tier 3 (vision)**: Full primal composition, provenance-wrapped, petalTongue rendering
+
+## Science Domains
+
+| Domain | Methods | Key Paper |
+|--------|---------|-----------|
+| Microbial ecology | 4 | Community diversity, quorum sensing |
+| Bioinformatics | 5 | Alignment, taxonomy, phylogenetics |
+| Gonzales immunology | 3 | Gonzales 2014 (DOI: 10.1111/jvp.12065) |
+| Anderson physics | 5 | Localization, disorder, hormesis |
+| Kinetics | 1 | Gompertz, first-order decay |
+| Integrated pipeline | 1 | Full diversity + QS + Anderson |
 
 ## See Also
 
-- [wetSpring Science Hub](https://primals.eco/lab/springs/wetspring/) on primals.eco
-- [baseCamp Papers 01, 03, 04, 05, 06](https://primals.eco/science/)
+- [Spring Catalog](https://primals.eco/architecture/spring-catalog-status-science-and-evolution/) on primals.eco
+- [Lab Notebooks](https://primals.eco/lab/notebooks/) for rendered notebook views
+- [V138 Handoff](../wateringHole/handoffs/archive/WETSPRING_V138_PRIMAL_COMPOSITION_PATTERNS_HANDOFF_APR07_2026.md) for composition patterns

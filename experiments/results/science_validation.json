@@ -1,0 +1,118 @@
+{
+  "generated": "2026-05-07T13:00:00Z",
+  "spring": "wetSpring",
+  "version": "V138",
+  "evolution_tier": "tier1_frozen",
+  "evolution_note": "Tier 1: frozen snapshot. Tier 2: live IPC parity. Tier 3: full primal composition with provenance.",
+  "tests": {
+    "total": 1902,
+    "passed": 1902,
+    "failed": 0,
+    "categories": {
+      "unit": {"tests": 1580, "pct": 83.1},
+      "integration": {"tests": 142, "pct": 7.5},
+      "property": {"tests": 95, "pct": 5.0},
+      "doc": {"tests": 85, "pct": 4.5}
+    }
+  },
+  "binaries": {
+    "total": 342,
+    "validate": 313,
+    "guidestone": 1,
+    "benchmark": 15,
+    "other": 13
+  },
+  "ipc_handlers": {
+    "count": 25,
+    "science_methods": [
+      "science.diversity",
+      "science.qs_model",
+      "science.ncbi_fetch",
+      "science.anderson",
+      "science.full_pipeline",
+      "science.kinetics",
+      "science.alignment",
+      "science.taxonomy",
+      "science.phylogenetics",
+      "science.nmf",
+      "science.gonzales.dose_response",
+      "science.gonzales.pk_decay",
+      "science.gonzales.tissue_lattice",
+      "science.anderson.biome_atlas",
+      "science.anderson.disorder_sweep",
+      "science.anderson.hormesis",
+      "science.anderson.cross_species",
+      "science.timeseries",
+      "science.timeseries_diversity"
+    ],
+    "data_methods": [
+      "data.fetch.chembl",
+      "data.fetch.pubchem",
+      "data.fetch.register_table"
+    ],
+    "infra_methods": [
+      "health.check",
+      "health.liveness",
+      "health.readiness",
+      "capability.list",
+      "identity.get",
+      "provenance.begin",
+      "provenance.record",
+      "provenance.complete",
+      "brain.observe",
+      "brain.attention",
+      "brain.urgency",
+      "ai.ecology_interpret",
+      "vault.store",
+      "vault.retrieve",
+      "vault.consent.verify",
+      "metrics.snapshot",
+      "composition.science_health"
+    ]
+  },
+  "science_method_categories": {
+    "microbial_ecology": {
+      "methods": ["science.diversity", "science.qs_model", "science.timeseries", "science.timeseries_diversity"],
+      "description": "Alpha/beta diversity, quorum sensing ODE, time-series stats"
+    },
+    "bioinformatics": {
+      "methods": ["science.alignment", "science.taxonomy", "science.phylogenetics", "science.nmf", "science.ncbi_fetch"],
+      "description": "Smith-Waterman, k-mer taxonomy, Robinson-Foulds, NMF, NCBI FASTA"
+    },
+    "gonzales_immunology": {
+      "methods": ["science.gonzales.dose_response", "science.gonzales.pk_decay", "science.gonzales.tissue_lattice"],
+      "description": "IC50 Hill curves, lokivetmab PK decay, tissue lattice diversity"
+    },
+    "anderson_physics": {
+      "methods": ["science.anderson", "science.anderson.biome_atlas", "science.anderson.disorder_sweep", "science.anderson.hormesis", "science.anderson.cross_species"],
+      "description": "3D lattice spectral, biome atlas, disorder sweep, hormesis, cross-species"
+    },
+    "kinetics": {
+      "methods": ["science.kinetics"],
+      "description": "Gompertz and first-order biogas curves"
+    },
+    "integrated": {
+      "methods": ["science.full_pipeline"],
+      "description": "Full pipeline: diversity + QS + Anderson (best-effort)"
+    }
+  },
+  "validation_chain": {
+    "stages": ["source_paper", "public_data_ingestion", "rust_validation", "guidestone", "nucleus_composition"],
+    "pure_rust": true,
+    "sovereign_fallbacks": 0,
+    "gap_reports": true
+  },
+  "key_validators": {
+    "gonzales_ic50_s79": {"checks": 35, "status": "PASS"},
+    "gonzales_provenance_chain": {"checks": 19, "status": "PASS"},
+    "nucleus_live_gonzales": {"checks": 11, "status": "PASS"}
+  },
+  "security": {
+    "unsafe_code": "forbid",
+    "unwrap_used": "deny",
+    "missing_docs": "deny",
+    "license": "AGPL-3.0-or-later",
+    "coverage_gate": "90%"
+  },
+  "validation": "ALL PASS"
+}

@@ -1,5 +1,5 @@
 # Notify sporePrint to refresh metrics on push to main.
-# Managed by primalSpring — do not edit manually.
+# Adapted from primalSpring — do not edit manually.
 #
 # Install: copy to .github/workflows/notify-sporeprint.yml in your repo.
 # Secret: SPOREPRINT_DISPATCH_TOKEN (same PAT scope as PLASMIDBIN_DISPATCH_TOKEN,
@@ -24,4 +24,4 @@ jobs:
           token: ${{ secrets.SPOREPRINT_DISPATCH_TOKEN }}
           repository: ecoPrimals/sporePrint
           event-type: source-updated
-          client-payload: '{"source": "${{ github.event.repository.name }}", "sha": "${{ github.sha }}", "type": "spring", "content": "false"}'
+          client-payload: '{"source": "wetSpring", "sha": "${{ github.sha }}", "type": "spring", "content": "true"}'

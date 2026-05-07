@@ -1,0 +1,117 @@
+{
+  "generated": "2026-05-07T13:00:00Z",
+  "spring": "wetSpring",
+  "evolution_tier": "tier1_frozen",
+  "path_dependencies": {
+    "barracuda": {
+      "path": "primals/barraCuda/crates/barracuda",
+      "role": "GPU math primitives (tensor, spectral, FFT, Lanczos)",
+      "required": true
+    },
+    "toadstool": {
+      "path": "primals/toadstool/crates/neuromorphic/akida-driver",
+      "role": "NPU compute dispatch (Akida neuromorphic)",
+      "required": false,
+      "feature": "npu"
+    },
+    "bingocube": {
+      "path": "primals/bingoCube/nautilus",
+      "role": "Nautilus data pipeline integration",
+      "required": false,
+      "feature": "nautilus"
+    },
+    "primalspring": {
+      "path": "springs/primalSpring/ecoPrimal",
+      "role": "guideStone validation framework",
+      "required": false,
+      "feature": "guidestone"
+    }
+  },
+  "primal_consumption": {
+    "biomeOS": {
+      "role": "Orchestration and capability routing",
+      "capabilities_used": ["capability.discover", "capability.call", "graph.deploy"],
+      "status": "deployment_gap",
+      "gap_impact": "Cannot route through Neural API — falls back to gap report"
+    },
+    "NestGate": {
+      "role": "Content-addressed storage, TLS fetch proxy",
+      "capabilities_used": ["storage.store", "storage.retrieve", "storage.fetch_external"],
+      "status": "deployment_gap",
+      "gap_impact": "Cannot fetch ChEMBL/PubChem live — gap report"
+    },
+    "BearDog": {
+      "role": "Ed25519 signing, BLAKE3 hashing, crypto identity",
+      "capabilities_used": ["crypto.sign_ed25519", "crypto.verify_ed25519", "crypto.blake3_hash"],
+      "status": "deployment_gap",
+      "gap_impact": "Cannot sign provenance witnesses — unsigned fallback"
+    },
+    "rhizoCrypt": {
+      "role": "Ephemeral DAG sessions for provenance",
+      "capabilities_used": ["dag.session.create", "dag.event.append", "dag.merkle.root"],
+      "status": "deployment_gap"
+    },
+    "loamSpine": {
+      "role": "Immutable ledger commit for provenance",
+      "capabilities_used": ["session.commit", "spine.create", "entry.append"],
+      "status": "deployment_gap"
+    },
+    "sweetGrass": {
+      "role": "Semantic provenance braids (PROV-O aligned)",
+      "capabilities_used": ["braid.create", "braid.commit", "provenance.graph"],
+      "status": "deployment_gap"
+    },
+    "Squirrel": {
+      "role": "AI ecology interpretation",
+      "capabilities_used": ["ai.query", "inference.complete"],
+      "status": "optional"
+    },
+    "petalTongue": {
+      "role": "Server-side visualization, grammar rendering",
+      "capabilities_used": ["render.dashboard", "tui.push"],
+      "status": "optional"
+    },
+    "coralReef": {
+      "role": "WGSL/SPIR-V shader compilation for GPU compute",
+      "capabilities_used": ["shader.compile.wgsl"],
+      "status": "optional"
+    },
+    "toadStool": {
+      "role": "Compute dispatch (GPU/NPU workloads)",
+      "capabilities_used": ["compute.dispatch.submit"],
+      "status": "optional"
+    }
+  },
+  "cross_spring_data_exchange": {
+    "healthSpring": {
+      "direction": "inbound",
+      "data": "Python baselines (exp093 ChEMBL JAK panel)",
+      "purpose": "Historical cross-reference for Gonzales IC50 validation"
+    },
+    "hotSpring": {
+      "direction": "bidirectional",
+      "data": "Anderson localization parameters, spectral physics",
+      "purpose": "Physics simulation patterns applicable to tissue disorder models"
+    },
+    "coralSpring": {
+      "direction": "outbound",
+      "data": "PFAS screening patterns, EPA ML models",
+      "purpose": "Environmental chemistry pipeline patterns"
+    },
+    "primalSpring": {
+      "direction": "bidirectional",
+      "data": "Gap reports, composition patterns, V138 handoff",
+      "purpose": "Pattern evolution — wetSpring finds gaps, primalSpring evolves primals"
+    }
+  },
+  "sporePrint_readiness": {
+    "wetSpring": true,
+    "primalSpring": true,
+    "hotSpring": false,
+    "healthSpring": false,
+    "neuralSpring": false,
+    "airSpring": false,
+    "ludoSpring": false,
+    "coralSpring": false
+  }
+}

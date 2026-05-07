@@ -1,0 +1,113 @@
+{
+  "generated": "2026-05-07T13:00:00Z",
+  "spring": "wetSpring",
+  "evolution_tier": "tier1_frozen",
+  "gonzales_2014": {
+    "doi": "10.1111/jvp.12065",
+    "title": "Oclacitinib (APOQUEL) — JAK inhibitor with activity against allergy cytokines",
+    "journal": "J Vet Pharmacol Ther",
+    "year": 2014,
+    "table_1_ic50": {
+      "JAK1_enzyme": {"ic50_nm": 10.0, "pathway": "JAK/STAT"},
+      "IL-2": {"ic50_nm": 36.0, "pathway": "JAK1/JAK3 → STAT5"},
+      "IL-31": {"ic50_nm": 71.0, "pathway": "JAK1/JAK2 → STAT3"},
+      "IL-6": {"ic50_nm": 80.0, "pathway": "JAK1/JAK2 → STAT3"},
+      "IL-4": {"ic50_nm": 150.0, "pathway": "JAK1/JAK3 → STAT6"},
+      "IL-13": {"ic50_nm": 249.0, "pathway": "JAK1/TYK2 → STAT6"}
+    },
+    "ordering": ["JAK1_enzyme", "IL-2", "IL-31", "IL-6", "IL-4", "IL-13"],
+    "selectivity_ratios": {
+      "IL-31_over_JAK1": 7.1,
+      "IL-4_over_JAK1": 15.0,
+      "IL-13_over_JAK1": 24.9,
+      "IL-6_over_JAK1": 8.0,
+      "IL-2_over_JAK1": 3.6
+    },
+    "dose_response_params": {
+      "hill_coefficient": 1.0,
+      "dose_range_nm": [0.1, 10000],
+      "dose_points": 50,
+      "barrier_w": 4.5
+    },
+    "validation": {
+      "binary": "validate_gonzales_ic50_s79",
+      "checks": 35,
+      "status": "35/35 PASS"
+    }
+  },
+  "fleck_gonzales_2021": {
+    "doi": "10.1111/vde.13028",
+    "title": "Pharmacokinetics of lokivetmab (Cytopoint) in healthy dogs",
+    "journal": "Vet Dermatol",
+    "year": 2021,
+    "pk_parameters": {
+      "low_dose": {"dose_mg_kg": 0.125, "duration_days": 14, "k_decay": 0.0495},
+      "mid_dose": {"dose_mg_kg": 0.5, "duration_days": 28, "k_decay": 0.0248},
+      "high_dose": {"dose_mg_kg": 2.0, "duration_days": 42, "k_decay": 0.0165}
+    },
+    "decay_model": "exponential",
+    "time_points": 100
+  },
+  "tissue_lattice": {
+    "description": "AD severity profiles with synthetic cell-type distributions",
+    "profiles": {
+      "healthy": {
+        "severity": 0,
+        "keratinocytes": 0.70,
+        "t_cells": 0.05,
+        "mast_cells": 0.03,
+        "dendritic": 0.02,
+        "fibroblasts": 0.15,
+        "other": 0.05
+      },
+      "mild_ad": {
+        "severity": 1,
+        "keratinocytes": 0.55,
+        "t_cells": 0.15,
+        "mast_cells": 0.08,
+        "dendritic": 0.05,
+        "fibroblasts": 0.12,
+        "other": 0.05
+      },
+      "moderate_ad": {
+        "severity": 2,
+        "keratinocytes": 0.40,
+        "t_cells": 0.25,
+        "mast_cells": 0.12,
+        "dendritic": 0.08,
+        "fibroblasts": 0.10,
+        "other": 0.05
+      },
+      "severe_ad": {
+        "severity": 3,
+        "keratinocytes": 0.30,
+        "t_cells": 0.30,
+        "mast_cells": 0.15,
+        "dendritic": 0.10,
+        "fibroblasts": 0.10,
+        "other": 0.05
+      }
+    },
+    "diversity_metrics": {
+      "healthy": {"shannon": 1.12, "pielou": 0.62},
+      "mild_ad": {"shannon": 1.52, "pielou": 0.85},
+      "moderate_ad": {"shannon": 1.64, "pielou": 0.91},
+      "severe_ad": {"shannon": 1.68, "pielou": 0.94}
+    }
+  },
+  "chembl_cross_validation": {
+    "compound_id": "CHEMBL2103874",
+    "compound_name": "oclacitinib",
+    "reference_artifact_hash_blake3": "d78b2140a1bad88b3c13a3ddaea8205174953445beb7f956802f4ba6acebb6ea",
+    "jak1_ic50_nm_chembl": [9.53, 9.53, 10.0, 10.0],
+    "jak1_ic50_nm_paper": 10.0,
+    "match": true
+  },
+  "pubchem_cross_validation": {
+    "cid": 44631938,
+    "molecular_formula": "C15H23N5O2S",
+    "molecular_weight": 337.4,
+    "inchi_key": "HJWLJNBZVZDLAQ-UHFFFAOYSA-N",
+    "reference_artifact_hash_blake3": "b35704d8b67f2d8a56556cc6029fb67eb3e7b901cdfbf271ce21313709791220"
+  }
+}

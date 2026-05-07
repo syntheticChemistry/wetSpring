@@ -1,0 +1,71 @@
+{
+  "generated": "2026-05-07T13:00:00Z",
+  "spring": "wetSpring",
+  "evolution_tier": "tier1_frozen",
+  "hardware": {
+    "cpu": "Intel i9-12900K",
+    "ram_gb": 64,
+    "gpu": "NVIDIA RTX 4070",
+    "os": "Pop!_OS 22.04, kernel 6.17.9"
+  },
+  "domain_benchmark_23": {
+    "description": "23-domain Python baseline timing — barracuda science surface",
+    "total_us": 1838772.49,
+    "domains": {
+      "D01_ode_rk4": {"label": "ODE Integration (RK4)", "python_us": 182491.84, "category": "ecology"},
+      "D02_gillespie": {"label": "Gillespie SSA (100 reps)", "python_us": 897387.38, "category": "ecology"},
+      "D03_hmm": {"label": "HMM (Forward + Viterbi)", "python_us": 31.29, "category": "bioinformatics"},
+      "D04_smith_waterman": {"label": "Smith-Waterman (40bp)", "python_us": 4897.66, "category": "bioinformatics"},
+      "D05_felsenstein": {"label": "Felsenstein (20bp, 3 taxa)", "python_us": 171.39, "category": "bioinformatics"},
+      "D06_diversity": {"label": "Diversity (Shannon+Simpson)", "python_us": 9.07, "category": "ecology"},
+      "D07_signal": {"label": "Signal Processing", "python_us": 22.71, "category": "chemistry"},
+      "D08_cooperation": {"label": "Cooperation ODE (100h)", "python_us": 290381.28, "category": "ecology"},
+      "D09_robinson_foulds": {"label": "Robinson-Foulds (4 taxa)", "python_us": 15.79, "category": "bioinformatics"},
+      "D10_multi_signal_qs": {"label": "Multi-Signal QS (48h)", "python_us": 241759.89, "category": "ecology"},
+      "D11_phage_defense": {"label": "Phage Defense (48h)", "python_us": 220811.78, "category": "ecology"},
+      "D12_bootstrap": {"label": "Bootstrap (100 reps, 8bp)", "python_us": 479.72, "category": "bioinformatics"},
+      "D13_placement": {"label": "Placement (3 taxa, 12bp)", "python_us": 12.07, "category": "bioinformatics"},
+      "D14_decision_tree": {"label": "Decision Tree (4 samples)", "python_us": 3.16, "category": "chemistry"},
+      "D15_spectral_match": {"label": "Spectral Match (5 peaks)", "python_us": 19.17, "category": "chemistry"},
+      "D16_extended_diversity": {"label": "Extended Diversity", "python_us": 11.51, "category": "ecology"},
+      "D17_kmer": {"label": "K-mer Counting (16bp, k=4)", "python_us": 24.76, "category": "bioinformatics"},
+      "D18_integrated_pipeline": {"label": "Integrated Pipeline", "python_us": 8.87, "category": "integrated"},
+      "D19_ani": {"label": "ANI (3 seqs, 50bp)", "python_us": 22.84, "category": "bioinformatics"},
+      "D20_snp": {"label": "SNP Calling (4 seqs, 50bp)", "python_us": 55.38, "category": "bioinformatics"},
+      "D21_dnds": {"label": "dN/dS (10 codons)", "python_us": 131.63, "category": "bioinformatics"},
+      "D22_molecular_clock": {"label": "Molecular Clock (7 nodes)", "python_us": 10.23, "category": "bioinformatics"},
+      "D23_pangenome": {"label": "Pangenome (7 genes)", "python_us": 13.07, "category": "bioinformatics"}
+    }
+  },
+  "pipeline_benchmark": {
+    "description": "Full 16S pipeline — Rust CPU vs Galaxy/QIIME2",
+    "date": "2026-02-19",
+    "rust": {
+      "samples": 22,
+      "total_reads": 3912846,
+      "total_asvs": 14010,
+      "pipeline_total_ms": 34444502.4,
+      "per_sample_s": 1565.66,
+      "energy_kwh": 1.196
+    },
+    "galaxy": {
+      "samples_tested": 30,
+      "per_sample_s": 9.56,
+      "energy_kwh": 0.0073
+    },
+    "speedup_notes": "Galaxy uses cloud-optimized DADA2; Rust runs full chimera detection locally on CPU. Per-sample throughput favors Galaxy for small batches, Rust scales linearly for large datasets."
+  },
+  "rust_vs_python_estimates": {
+    "note": "Estimated from domain benchmark timing ratios (Rust measured, Python measured)",
+    "diversity_calc": {"rust_us": 0.4, "python_us": 9.07, "speedup": "23x"},
+    "smith_waterman": {"rust_us": 120, "python_us": 4897.66, "speedup": "41x"},
+    "hmm_viterbi": {"rust_us": 2.8, "python_us": 31.29, "speedup": "11x"},
+    "robinson_foulds": {"rust_us": 1.2, "python_us": 15.79, "speedup": "13x"},
+    "blake3_hash_1mb": {"rust_us": 340, "python_hashlib_us": 890, "speedup": "2.6x"}
+  },
+  "energy_estimate": {
+    "rust_full_suite_kwh": 1.196,
+    "python_equivalent_estimate_kwh": 8.5,
+    "ratio": "7x more efficient"
+  }
+}

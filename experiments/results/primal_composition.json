@@ -1,0 +1,70 @@
+{
+  "generated": "2026-05-07T13:00:00Z",
+  "spring": "wetSpring",
+  "evolution_tier": "tier1_frozen",
+  "composition_model": "pure_primal",
+  "sovereign_http_fallbacks": 0,
+  "gap_reports_enabled": true,
+  "gap_report_structure": {
+    "fields": ["gap_report", "url", "missing_primals", "action", "provenance", "provenance_session"],
+    "action_pattern": "hand to primalSpring for primal evolution",
+    "example": {
+      "gap_report": true,
+      "missing_primals": ["biomeOS (neural_api)", "NestGate (storage.fetch_external)"],
+      "action": "hand to primalSpring for primal evolution"
+    }
+  },
+  "fetch_routing": {
+    "tiers": [
+      {"tier": 1, "name": "nestgate_via_biomeos", "description": "biomeOS capability.call → NestGate fetch_external (TLS)"},
+      {"tier": 2, "name": "nestgate_direct", "description": "Direct NestGate socket → cache retrieve"},
+      {"tier": 3, "name": "gap_report", "description": "Structured gap report — no fallback"}
+    ],
+    "pattern": "Three-tier routing: biomeOS → NestGate → gap report. Never direct HTTP from springs."
+  },
+  "provenance_trio": {
+    "wire_names": {
+      "session_create": {"domain": "dag", "operation": "session.create", "primal": "rhizoCrypt"},
+      "event_append": {"domain": "dag", "operation": "event.append", "primal": "rhizoCrypt"},
+      "session_commit": {"domain": "session", "operation": "commit", "primal": "loamSpine"},
+      "braid_create": {"domain": "braid", "operation": "create", "primal": "sweetGrass"}
+    },
+    "session_lifecycle": ["session.create", "event.append (N times)", "session.commit", "braid.create"],
+    "witness_wire": "WireWitnessRef",
+    "witness_fields": ["agent", "kind", "evidence", "witnessed_at", "encoding", "algorithm", "tier", "context"]
+  },
+  "deploy_graph": {
+    "name": "wetspring_science_nucleus",
+    "version": "4.0.0",
+    "total_nodes": 14,
+    "phases": [
+      {"phase": 0, "name": "orchestration", "nodes": ["biomeos_neural_api"]},
+      {"phase": 1, "name": "tower_atomic", "nodes": ["beardog", "songbird"]},
+      {"phase": 2, "name": "nest_atomic", "nodes": ["nestgate"]},
+      {"phase": 3, "name": "node_atomic", "nodes": ["coralreef", "toadstool", "barracuda"]},
+      {"phase": 4, "name": "provenance_trio", "nodes": ["rhizocrypt", "loamspine", "sweetgrass"]},
+      {"phase": 5, "name": "meta_tier", "nodes": ["squirrel", "petaltongue"]},
+      {"phase": 6, "name": "science", "nodes": ["wetspring"]},
+      {"phase": 8, "name": "facade", "nodes": ["science_facade"]}
+    ],
+    "bond_types_used": ["covalent", "metallic", "weak"],
+    "bonding_policy": "Metallic trust model — InternalNucleus"
+  },
+  "capability_routing": {
+    "biomeos_discover": "Domain prefix matching (v2.92+) — dag.* → rhizoCrypt, session.* → loamSpine, braid.* → sweetGrass",
+    "domain_aliases": {
+      "rhizoCrypt": ["dag", "dag.session.create", "dag.event.append", "dag.merkle.root", "dag.dehydrate"],
+      "loamSpine": ["ledger", "spine.create", "entry.append", "session.commit"],
+      "sweetGrass": ["attribution", "braid.create", "braid.commit", "provenance.graph"]
+    }
+  },
+  "content_hashing": {
+    "algorithm": "BLAKE3",
+    "scope": "All data paths — fetch, store, validate, provenance"
+  },
+  "evolution_status": {
+    "code_complete": ["pure composition routing", "gap report pattern", "provenance session wrapping", "BLAKE3 content hashing", "wire name alignment (V082)"],
+    "deployment_gaps": ["biomeOS (neural_api socket)", "NestGate (storage.fetch_external)", "rhizoCrypt (DAG sessions)", "loamSpine (ledger commit)", "sweetGrass (braid create)", "BearDog (ed25519 signing)"],
+    "code_debt": ["dual neural_api_socket() implementations", "NCBI fetch_tiered sovereign HTTP", "composition.*_health misleading names", "validate_all coverage incomplete"]
+  }
+}

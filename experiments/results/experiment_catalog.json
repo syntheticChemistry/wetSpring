@@ -1,0 +1,105 @@
+{
+  "generated": "2026-05-07T13:00:00Z",
+  "spring": "wetSpring",
+  "evolution_tier": "tier1_frozen",
+  "total_experiment_dirs": 56,
+  "tracks": {
+    "track1_microbial_ecology": {
+      "description": "16S pipelines, diversity, quorum sensing, phage defense, time series",
+      "experiments": [
+        {"id": "001", "name": "galaxy_bootstrap", "focus": "Galaxy/QIIME2 bootstrap baseline"},
+        {"id": "002", "name": "phytoplankton", "focus": "Marine phytoplankton diversity"},
+        {"id": "003", "name": "phage", "focus": "Phage-bacteria dynamics"},
+        {"id": "022", "name": "gillespie", "focus": "Gillespie SSA stochastic simulation"},
+        {"id": "023", "name": "bistable", "focus": "Bistable QS switch dynamics"},
+        {"id": "024", "name": "multi_signal", "focus": "Multi-signal QS (48h)"},
+        {"id": "025", "name": "cooperation", "focus": "Cooperation ODE models"},
+        {"id": "030", "name": "phage_defense", "focus": "Phage defense mechanisms (48h)"},
+        {"id": "039", "name": "algae_timeseries", "focus": "Algal bloom time series"},
+        {"id": "040", "name": "bloom_surveillance", "focus": "Bloom surveillance pipeline"},
+        {"id": "051", "name": "rare_biosphere", "focus": "Rare biosphere detection"},
+        {"id": "052", "name": "viral_metagenomics", "focus": "Viral metagenome assembly"}
+      ]
+    },
+    "track2_lcms_pfas": {
+      "description": "LC-MS spectral matching, PFAS screening, EPA ML decision trees",
+      "experiments": [
+        {"id": "005", "name": "asari", "focus": "Asari LC-MS feature extraction"},
+        {"id": "006", "name": "pfascreen", "focus": "PFAS screening pipeline"},
+        {"id": "008", "name": "pfas_ml", "focus": "PFAS ML classification"},
+        {"id": "010", "name": "peak_baselines", "focus": "Peak detection baselines"},
+        {"id": "013", "name": "voc_baselines", "focus": "VOC biomarker baselines"},
+        {"id": "041", "name": "epa_pfas_ml", "focus": "EPA PFAS ML validation"},
+        {"id": "042", "name": "massbank_spectral", "focus": "MassBank spectral matching"}
+      ]
+    },
+    "track3_bioinformatics": {
+      "description": "Alignment, taxonomy, phylogenetics, HMM, k-mer, pangenomics",
+      "experiments": [
+        {"id": "019", "name": "phylogenetic", "focus": "Phylogenetic tree building"},
+        {"id": "021", "name": "rf_baseline", "focus": "Random forest baseline"},
+        {"id": "026", "name": "hmm", "focus": "HMM Forward + Viterbi"},
+        {"id": "028", "name": "alignment", "focus": "Smith-Waterman alignment"},
+        {"id": "029", "name": "felsenstein", "focus": "Felsenstein pruning algorithm"},
+        {"id": "031", "name": "bootstrap", "focus": "Bootstrap support values"},
+        {"id": "032", "name": "placement", "focus": "Phylogenetic placement"},
+        {"id": "036", "name": "phynetpy_rf", "focus": "PhyNetPy reticulation"},
+        {"id": "037", "name": "phylohmm", "focus": "PhyloHMM gene prediction"},
+        {"id": "038", "name": "sate_pipeline", "focus": "SATe iterative alignment"},
+        {"id": "053", "name": "sulfur_phylogenomics", "focus": "Sulfur-cycling phylogenomics"},
+        {"id": "054", "name": "phosphorus_phylogenomics", "focus": "Phosphorus-cycling phylogenomics"},
+        {"id": "055", "name": "population_genomics", "focus": "Population genomics metrics"},
+        {"id": "056", "name": "pangenomics", "focus": "Pangenome graph analysis"}
+      ]
+    },
+    "track4_anderson_physics": {
+      "description": "Anderson localization, GPU spectral, disorder sweep, scaling",
+      "experiments": [
+        {"id": "016", "name": "gpu_pipeline_parity", "focus": "GPU vs CPU pipeline parity"},
+        {"id": "027", "name": "capacitor", "focus": "Capacitor/spectral analogies"},
+        {"id": "043", "name": "barracuda_cpu_v3", "focus": "barraCuda CPU v3 baseline"},
+        {"id": "124", "name": "npu_spectral_triage", "focus": "NPU spectral triage (toadStool)"}
+      ]
+    },
+    "track5_gonzales_immunology": {
+      "description": "IC50, PK decay, tissue lattice, cross-species, hormesis",
+      "experiments": [
+        {"id": "paper_benchmarks", "name": "paper_benchmarks", "focus": "Published paper data extraction"},
+        {"id": "ncbi_dataset_search", "name": "ncbi_dataset_search", "focus": "NCBI dataset discovery"},
+        {"id": "python_16s_controls", "name": "python_16s_controls", "focus": "Python 16S control baselines"},
+        {"id": "qs_ode_baseline", "name": "qs_ode_baseline", "focus": "QS ODE time-series baselines"},
+        {"id": "r_baselines", "name": "r_baselines", "focus": "R phyloseq/UniFrac/DADA2 baselines"}
+      ]
+    },
+    "track6_soil_biogas": {
+      "description": "Soil pore geometry, no-till, biogas kinetics, biofilm",
+      "experiments": [
+        {"id": "170", "name": "soil_qs_pore_geometry", "focus": "Soil QS pore geometry"},
+        {"id": "171", "name": "soil_pore_diversity", "focus": "Soil pore diversity metrics"},
+        "172_soil_distance_colonization",
+        {"id": "173", "name": "notill_brandt_farm", "focus": "No-till Brandt farm data"},
+        {"id": "174", "name": "notill_meta_analysis", "focus": "No-till meta-analysis"},
+        {"id": "175", "name": "notill_longterm_tillage", "focus": "Long-term tillage comparison"},
+        {"id": "176", "name": "soil_biofilm_aggregate", "focus": "Soil biofilm aggregation"},
+        {"id": "177", "name": "soil_structure_function", "focus": "Soil structure-function"},
+        {"id": "178", "name": "tillage_microbiome", "focus": "Tillage microbiome shifts"}
+      ]
+    },
+    "benchmarks": {
+      "description": "Cross-domain timing and pipeline benchmarks",
+      "experiments": [
+        {"id": "015", "name": "pipeline_benchmark", "focus": "Rust vs Galaxy/QIIME2 pipeline"},
+        {"id": "059", "name": "23_domain_benchmark", "focus": "23-domain Python timing baseline"}
+      ]
+    }
+  },
+  "cross_references": {
+    "frozen_json_count": 64,
+    "tsv_count": 3,
+    "dat_count": 5,
+    "r_baseline_count": 6,
+    "python_baseline_count": 45,
+    "freeze_commit": "48fb787",
+    "freeze_date": "2026-02-23"
+  }
+}
