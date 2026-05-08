@@ -7,7 +7,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,594 tests)       (44 GPU modules)
+           (58 scripts)        (1,209 tests)       (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
            (342 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
@@ -27,7 +27,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 
 | | |
 |---|---|
-| **Tests** | 1,594 (lib) + 18 IPC roundtrip + integration, 0 failed |
+| **Tests** | 1,209 (lib) + 18 IPC roundtrip + integration, 0 failed |
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V151:** Deep debt evolution — modern idiomatic Rust. Eliminated `dyn` dispatch in I/O parsers (FASTQ, MS2, NRS). Replaced `println!` with `Write`-based output in validation layer. Removed hardcoded paths (`$WETSPRING_DORADO_SEARCH_DIRS`, `$XDG_RUNTIME_DIR`). Extracted shared validation helpers (`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Concrete `FacadeError` enum replaces `Box<dyn Error>`. Centralized remaining tolerance literals to `tolerances::ANALYTICAL_LOOSE`. 1,209 lib tests pass. V150: Phase 46 composition explorer. V149: `is_skip_error`, Level 4. V148: Level 4 initial (31/31). guideStone **Level 4** (38/38 pass, 4 skip, exit 0).
+**Current release — V153:** Phase 60+ deep debt evolution. Hardcoded bind/CORS/provenance URLs → env-configurable. Shared `CpuGpuRow`/`CrossSpringEntry` validation helpers extracted. `ring` crate banned (`deny.toml`). barraCuda optional (`barracuda-lib` feature). Registry cross-sync test (`tools/check_registry_sync.sh`). `exp400` NUCLEUS composition parity crate. 11 paper notebooks (Kachkovskiy spectral-QS added). Doc drift fixed (gonzales.md, PRIMAL_GAPS.md). 63/63 papers reproduced, 1,209 lib tests pass. V152: primalSpring Phase 60 parity audit absorption. V151: deep debt — zero `dyn`, `Write`-based output, shared helpers. guideStone **Level 4** (38/38 pass, 4 skip, exit 0).
 
 ---
 
@@ -262,17 +262,36 @@ Detailed version history: [CHANGELOG.md](CHANGELOG.md)
 
 ## Public Notebooks
 
-The `notebooks/` directory contains 5 public-facing Jupyter notebooks that
-visualize frozen experiment data and tell the baseCamp science story. These
-are rendered with embedded charts on [primals.eco/lab/notebooks/](https://primals.eco/lab/notebooks/).
+The `notebooks/` directory contains 5 meta-notebooks and 11 paper-specific
+notebooks that visualize frozen experiment data and tell the baseCamp science
+story. These are rendered with embedded charts on
+[primals.eco/lab/notebooks/](https://primals.eco/lab/notebooks/).
+
+**Meta notebooks** (ecosystem overview):
 
 | Notebook | Story |
 |----------|-------|
-| `01-16s-pipeline-validation` | Flagship 16S pipeline, Galaxy/QIIME2/R parity |
-| `02-benchmark-python-vs-rust` | Python vs Rust vs GPU performance |
-| `03-paper-reproductions` | 63/63 papers, 5 researchers, 6 tracks |
+| `01-science-validation` | Science methods, validation chain, test distribution |
+| `02-benchmark-comparison` | Python vs Rust vs GPU performance |
+| `03-gonzales-deep-dive` | Gonzales pipeline deep dive |
 | `04-cross-spring-connections` | 79 barraCuda primitives, ecosystem flows |
-| `05-soil-anderson-deep-dive` | Anderson localization in soil biology |
+| `05-primal-composition-patterns` | Primal composition and evolution path |
+
+**Paper notebooks** (per-faculty, publishable grade):
+
+| Notebook | Faculty / Track |
+|----------|----------------|
+| `papers/waters-quorum-sensing` | Waters Lab — 7 QS/ODE papers |
+| `papers/liu-phylogenetics` | Liu Lab — 12 phylogenetics papers |
+| `papers/anderson-deep-sea` | R. Anderson Lab — 6 deep-sea papers |
+| `papers/jones-pfas-chemistry` | Jones Lab — PFAS/ML papers |
+| `papers/soil-anderson-geometry` | Track 4 — 9 soil QS papers |
+| `papers/gonzales-jak-pharmacology` | Gonzales — JAK/STAT pharmacology |
+| `papers/cahill-smallwood-algae` | Sandia — algal pond ecology |
+| `papers/fajgenbaum-drug-repurposing` | Track 3 — drug repurposing |
+| `papers/liao-anaerobic-biogas` | Track 6 — anaerobic digestion |
+| `papers/r-industry-parity` | R package parity (vegan/DADA2/phyloseq) |
+| `papers/kachkovskiy-spectral-qs` | Anderson localization ↔ QS analogy |
 
 Run locally: `cd notebooks/ && jupyter lab`. Or access via
 [JupyterHub](https://primals.eco/lab/compute-access/).

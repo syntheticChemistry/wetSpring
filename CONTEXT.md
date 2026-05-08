@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V151:** Deep debt evolution — modern idiomatic Rust. Eliminated `dyn` dispatch in I/O parsers (FASTQ, MS2, NRS). Replaced `println!` with `Write`-based output in validation layer. Removed hardcoded paths. Extracted shared validation helpers (`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Centralized remaining tolerance literals. Concrete error types in facade binary. 1209 lib tests pass. V150: Phase 46 composition explorer. V149: `is_skip_error`, Level 4. guideStone Level 4 (38/38 pass, 4 skip, exit 0). 15 primal gaps open (7 resolved).
+**Current release — V153:** Phase 60+ deep debt evolution. Env-configurable bind/CORS/provenance URLs. Shared validation helpers (`CpuGpuRow`, `CrossSpringEntry`). `ring` banned, barraCuda optional, registry cross-sync test. 11 paper notebooks. 63/63 papers reproduced. 1,209 lib tests pass. guideStone Level 4 (38/38 pass, 4 skip, exit 0). 15 primal gaps open (7 resolved).
 
 ## Role in the Ecosystem
 
@@ -27,7 +27,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,594 lib + 18 IPC roundtrip + integration, 0 failed
+- **Tests:** 1,209 lib + 18 IPC roundtrip + integration, 0 failed
 - **Validation checks:** 5,900+ across 364 binaries
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
@@ -35,7 +35,7 @@ evolution pipeline.
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 10 open (`docs/PRIMAL_GAPS.md`) — 7 external + 3 internal, 7 resolved (PG-01–PG-17)
+- **Primal gaps:** 15 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 7 resolved
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities
@@ -71,7 +71,7 @@ evolution pipeline.
 
 ```
 Tier 1: Python baseline  → Rust CPU parity  → GPU validation
-           (58 scripts)     (1,594 tests)      (44 GPU modules)
+           (58 scripts)     (1,209 tests)      (44 GPU modules)
 Tier 2: Rust validation   → NUCLEUS composition patterns
            (364 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
 Tier 3: Composition       → IPC parity → Niche gate
