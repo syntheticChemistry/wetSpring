@@ -4,10 +4,11 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-04-27 (V151 — Deep debt evolution. 15 gaps open (PG-18..22
-from composition testing), 7 resolved. Provenance trio UDS reset (PG-18), petalTongue
-scene format documented (PG-19), socat dependency (PG-20/21), Songbird timeout (PG-22).
-V151: code quality debt cleared — zero `dyn` dispatch, `Write`-based output, shared helpers.)
+Last updated: 2026-05-08 (V153 — Phase 60+ deep debt evolution. primalSpring
+exp094 validates full NUCLEUS parity (Tower + Node + Nest + cross-atomic).
+wetSpring exp400 replicates this for our niche. `ring` banned, barraCuda optional,
+registry cross-sync test added. 15 gaps open, 7 resolved. Hardcoded binds/URLs
+now env-configurable. Shared validation helpers extracted.)
 
 ---
 
@@ -82,36 +83,38 @@ mapping, and biomeOS routing capability queries to registered providers.
 
 ---
 
-## PG-04: NestGate Storage — Declared but Not Wired
+## PG-04: NestGate Storage — IPC Wired, Awaiting Live Deployment
 
 **Owner:** NestGate team
-**Status:** Declared as optional niche dependency; no IPC integration
+**Status:** Partial — IPC routing implemented (V152), NestGate not yet deployed live
 
-`data.fetch.*` handlers store fetched data locally with BLAKE3 hashes.
-`vault.*` handlers provide consent-gated storage. Neither path calls
-NestGate over IPC for persistent cross-spring storage.
+V152 progress:
+- `data_fetch.rs` routes all external fetches through
+  `capability.call("storage", "fetch_external")` via biomeOS → NestGate
+- `capability.call("storage", "store")` for NestGate cache persistence
+- `capability.call("storage", "retrieve")` for cache retrieval
+- Pure primal composition: no fallbacks, gap reports on missing primals
+- exp400 validates NestGate health and cross-atomic store→retrieve pipeline
 
-**Impact:** Data provenance terminates at local filesystem boundaries. No
-cross-spring data retrieval with provenance continuity (see also
-GAPS.md #2: Cross-Spring Data Exchange via RootPulse).
+**Remaining:** NestGate live deployment in NUCLEUS stack. IPC paths are
+wired and tested — gap is infrastructure, not code.
 
 ---
 
-## PG-05: toadStool Compute — Discovery Helper but No Active Calls
+## PG-05: toadStool Compute — IPC Discovery + barraCuda Optional
 
 **Owner:** toadStool team
-**Status:** `discover_toadstool()` helper exists; no runtime compute dispatch
+**Status:** Partial — discovery wired, barraCuda now optional (V152)
 
-wetSpring uses barraCuda directly as a path dependency for all math/GPU
-operations. toadStool is declared as a Node/compute dependency in the niche,
-and the proto-nucleate lists it as a Phase 2 node with `spawn = false`.
+V152 progress:
+- `discover_toadstool()` helper resolves toadStool socket
+- barraCuda marked `optional = true` in `Cargo.toml` with `barracuda-lib`
+  feature gate — IPC-first deployment possible without library linking
+- exp400 validates `compute.health` via biomeOS
+- `deny.toml` bans `ring` crate for Tower crypto purity
 
-For sovereign dispatch (coralReef native), compute requests would route
-through toadStool IPC, not direct barraCuda imports. This is the expected
-evolution path but not yet wired.
-
-**Impact:** None currently — barraCuda path dependency is the correct
-approach for validation springs. Gap becomes relevant at NUCLEUS deployment.
+**Remaining:** Full compute dispatch via toadStool IPC (sovereign dispatch
+path). barraCuda library dep remains as default for validation/CI.
 
 ---
 
@@ -269,8 +272,8 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-01 | Proto-nucleate not parsed | wetSpring | **Resolved V141** | -- |
 | PG-02 | Provenance trio IPC | rhizoCrypt/loamSpine/sweetGrass | Trio IPC readiness (partial V142) | 2 |
 | PG-03 | Name-based discovery | Songbird/biomeOS | capability.resolve | 3 |
-| PG-04 | NestGate not wired | NestGate | NestGate IPC readiness | 2 |
-| PG-05 | toadStool compute IPC | toadStool | NUCLEUS deployment | 3 |
+| PG-04 | NestGate IPC wired, deploy pending | NestGate | NestGate live deployment | 2 |
+| PG-05 | toadStool discovery + barraCuda optional | toadStool | Sovereign dispatch wiring | 2 |
 | PG-06 | Ionic bond protocol | primalSpring Track 4 | Bond negotiation spec | 2 |
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
 | PG-08 | Validate manifest binary name | primalSpring | Manifest alignment | 1 |

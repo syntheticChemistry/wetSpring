@@ -76,6 +76,69 @@ pub fn bench_print<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
     (result, ms)
 }
 
+/// Per-domain CPU vs GPU timing comparison row.
+///
+/// Used by `validate_cpu_vs_gpu_*` and `benchmark_cross_spring_*` binaries.
+pub struct CpuGpuRow {
+    /// Domain or primitive name.
+    pub name: &'static str,
+    /// CPU elapsed time in microseconds.
+    pub cpu_us: f64,
+    /// GPU elapsed time in microseconds.
+    pub gpu_us: f64,
+    /// Pass/fail status label.
+    pub status: &'static str,
+}
+
+/// Per-primitive cross-spring benchmark entry with provenance.
+///
+/// Used by `validate_cross_spring_*` binaries to track which spring
+/// evolved each primitive and when.
+pub struct CrossSpringEntry {
+    /// Primitive or operation name.
+    pub primitive: &'static str,
+    /// Spring that evolved the primitive.
+    pub evolved_by: &'static str,
+    /// ToadStool session where it was absorbed.
+    pub session: &'static str,
+    /// CPU elapsed time in microseconds.
+    pub cpu_us: f64,
+    /// Problem description (e.g. "10×10 lattice").
+    pub problem: &'static str,
+    /// Number of validation checks performed.
+    pub checks: u32,
+}
+
+/// Print a CPU-vs-GPU timing table from [`CpuGpuRow`] data.
+pub fn print_cpu_gpu_table(rows: &[CpuGpuRow]) {
+    use std::io::Write as _;
+    let mut out = std::io::stdout().lock();
+    let _ = writeln!(
+        out,
+        "\n  {:40} {:>12} {:>12} {:>8}",
+        "Domain", "CPU (µs)", "GPU (µs)", "Status"
+    );
+    let _ = writeln!(out, "  {}", "─".repeat(76));
+    for r in rows {
+        let _ = writeln!(out, "  {:40} {:12.0} {:12.0} {:>8}", r.name, r.cpu_us, r.gpu_us, r.status);
+    }
+}
+
+/// Print a cross-spring evolution summary table from [`CrossSpringEntry`] data.
+pub fn print_cross_spring_table(rows: &[CrossSpringEntry]) {
+    use std::io::Write as _;
+    let mut out = std::io::stdout().lock();
+    let _ = writeln!(out);
+    let _ = writeln!(out, "  ┌──────────────────────────────┬──────────────┬────────┬──────────┬────────────────┬───────┐");
+    let _ = writeln!(out, "  │ Primitive                    │ Evolved By   │ Sess   │ CPU (µs) │ Problem        │ Chks  │");
+    let _ = writeln!(out, "  ├──────────────────────────────┼──────────────┼────────┼──────────┼────────────────┼───────┤");
+    for r in rows {
+        let _ = writeln!(out, "  │ {:28} │ {:12} │ {:6} │ {:8.0} │ {:14} │ {:5} │",
+            r.primitive, r.evolved_by, r.session, r.cpu_us, r.problem, r.checks);
+    }
+    let _ = writeln!(out, "  └──────────────────────────────┴──────────────┴────────┴──────────┴────────────────┴───────┘");
+}
+
 /// Print a three-column box-drawing timing table from [`BenchRow`] data.
 pub fn print_bench_table(rows: &[BenchRow]) {
     use std::io::Write as _;

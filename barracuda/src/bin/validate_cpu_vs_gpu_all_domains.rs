@@ -52,16 +52,9 @@ use wetspring_barracuda::io::mzml::MzmlSpectrum;
 use wetspring_barracuda::special;
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
-use wetspring_barracuda::validation::{self, Validator};
+use wetspring_barracuda::validation::{self, CpuGpuRow, Validator};
 
-struct Timing {
-    name: &'static str,
-    cpu_us: f64,
-    gpu_us: f64,
-    status: &'static str,
-}
-
-fn validate_shannon_simpson(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
+fn validate_shannon_simpson(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D01: Shannon + Simpson (FMR)");
     let counts = vec![
         120.0, 85.0, 230.0, 55.0, 180.0, 12.0, 42.0, 310.0, 8.0, 95.0,
@@ -86,7 +79,7 @@ fn validate_shannon_simpson(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
         cpu_si,
         tolerances::GPU_VS_CPU_TRANSCENDENTAL,
     );
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "Shannon + Simpson",
         cpu_us,
         gpu_us,
@@ -94,7 +87,7 @@ fn validate_shannon_simpson(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
     });
 }
 
-fn validate_bray_curtis(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
+fn validate_bray_curtis(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D02: Bray-Curtis");
     let a: Vec<f64> = vec![10.0, 20.0, 30.0, 0.0, 15.0, 5.0, 8.0, 12.0];
     let b: Vec<f64> = vec![12.0, 18.0, 25.0, 5.0, 10.0, 7.0, 6.0, 14.0];
@@ -111,7 +104,7 @@ fn validate_bray_curtis(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
         cpu_bc,
         tolerances::GPU_VS_CPU_F64,
     );
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "Bray-Curtis",
         cpu_us,
         gpu_us,
@@ -122,7 +115,7 @@ fn validate_bray_curtis(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
 fn validate_ani(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D03: ANI");
     let pairs: Vec<(&[u8], &[u8])> = vec![
@@ -145,7 +138,7 @@ fn validate_ani(
             tolerances::GPU_VS_CPU_TRANSCENDENTAL,
         );
     }
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "ANI (3 pairs)",
         cpu_us,
         gpu_us,
@@ -156,7 +149,7 @@ fn validate_ani(
 fn validate_snp(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D04: SNP Calling");
     let seqs: Vec<&[u8]> = vec![
@@ -183,7 +176,7 @@ fn validate_snp(
             cpu_count as f64,
             tolerances::EXACT,
         );
-        timings.push(Timing {
+        timings.push(CpuGpuRow {
             name: "SNP",
             cpu_us,
             gpu_us,
@@ -191,7 +184,7 @@ fn validate_snp(
         });
     } else {
         v.check_pass("SNP: driver/binding skip", true);
-        timings.push(Timing {
+        timings.push(CpuGpuRow {
             name: "SNP",
             cpu_us,
             gpu_us,
@@ -203,7 +196,7 @@ fn validate_snp(
 fn validate_dnds(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D05: dN/dS");
     let pairs: Vec<(&[u8], &[u8])> = vec![
@@ -237,7 +230,7 @@ fn validate_dnds(
             );
         }
     }
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "dN/dS (3 pairs)",
         cpu_us,
         gpu_us,
@@ -248,7 +241,7 @@ fn validate_dnds(
 fn validate_pangenome(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D06: Pangenome");
     let clusters = vec![
@@ -304,7 +297,7 @@ fn validate_pangenome(
         cpu_pan.unique_size as f64,
         tolerances::EXACT,
     );
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "Pangenome (5g×4)",
         cpu_us,
         gpu_us,
@@ -315,7 +308,7 @@ fn validate_pangenome(
 fn validate_random_forest(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D07: Random Forest");
     let t1 = DecisionTree::from_arrays(
@@ -369,7 +362,7 @@ fn validate_random_forest(
             tolerances::EXACT,
         );
     }
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "RF (4s × 3t)",
         cpu_us,
         gpu_us,
@@ -380,7 +373,7 @@ fn validate_random_forest(
 fn validate_hmm(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D08: HMM Forward");
     let model = hmm::HmmModel {
@@ -415,7 +408,7 @@ fn validate_hmm(
         cpu_ll2,
         tolerances::GPU_VS_CPU_F64,
     );
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "HMM (2s × 5obs)",
         cpu_us,
         gpu_us,
@@ -426,7 +419,7 @@ fn validate_hmm(
 fn validate_smith_waterman(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D09: Smith-Waterman");
     let q = b"ACGTACGT";
@@ -457,7 +450,7 @@ fn validate_smith_waterman(
     let gpu_us = tg.elapsed().as_micros() as f64;
     if let Ok(Ok(r)) = gpu_result {
         v.check_pass("SW: both positive", r.score > 0.0 && cpu_score > 0);
-        timings.push(Timing {
+        timings.push(CpuGpuRow {
             name: "Smith-Waterman",
             cpu_us,
             gpu_us,
@@ -465,7 +458,7 @@ fn validate_smith_waterman(
         });
     } else {
         v.check_pass("SW: driver skip", true);
-        timings.push(Timing {
+        timings.push(CpuGpuRow {
             name: "Smith-Waterman",
             cpu_us,
             gpu_us,
@@ -477,7 +470,7 @@ fn validate_smith_waterman(
 fn validate_gillespie(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D10: Gillespie SSA");
     let initial = vec![100_i64];
@@ -523,7 +516,7 @@ fn validate_gillespie(
         let gpu_mean = finals.iter().sum::<f64>() / finals.len() as f64;
         v.check_pass("SSA: GPU mean > 50", gpu_mean > 50.0);
         v.check_pass("SSA: CPU final positive", cpu_traj.final_state()[0] > 0);
-        timings.push(Timing {
+        timings.push(CpuGpuRow {
             name: "Gillespie SSA",
             cpu_us,
             gpu_us,
@@ -531,7 +524,7 @@ fn validate_gillespie(
         });
     } else {
         v.check_pass("SSA: driver skip", true);
-        timings.push(Timing {
+        timings.push(CpuGpuRow {
             name: "Gillespie SSA",
             cpu_us,
             gpu_us,
@@ -543,7 +536,7 @@ fn validate_gillespie(
 fn validate_decision_tree(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    timings: &mut Vec<Timing>,
+    timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D11: Decision Tree");
     let cpu_tree = DecisionTree::from_arrays(
@@ -585,7 +578,7 @@ fn validate_decision_tree(
                     tolerances::EXACT,
                 );
             }
-            timings.push(Timing {
+            timings.push(CpuGpuRow {
                 name: "Decision Tree",
                 cpu_us,
                 gpu_us,
@@ -596,7 +589,7 @@ fn validate_decision_tree(
             let gpu_us = tg.elapsed().as_micros() as f64;
             println!("  [SKIP] DT GPU: {e}");
             v.check_pass("DT driver skip", true);
-            timings.push(Timing {
+            timings.push(CpuGpuRow {
                 name: "Decision Tree",
                 cpu_us,
                 gpu_us,
@@ -606,7 +599,7 @@ fn validate_decision_tree(
     }
 }
 
-fn validate_spectral_cosine(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
+fn validate_spectral_cosine(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D12: Spectral Cosine");
     let spectra: Vec<Vec<f64>> = vec![
         vec![1.0, 0.0, 0.5, 0.2, 0.0, 0.8, 0.0, 0.3],
@@ -641,7 +634,7 @@ fn validate_spectral_cosine(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
             tolerances::GPU_LOG_POLYFILL,
         );
     }
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "Spectral Cosine",
         cpu_us,
         gpu_us,
@@ -649,7 +642,7 @@ fn validate_spectral_cosine(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<T
     });
 }
 
-fn validate_eic(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
+fn validate_eic(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D13: EIC Total Intensity");
     let spectra = synthetic_spectra();
     let target_mzs = vec![150.0, 200.0, 250.0, 300.0];
@@ -677,7 +670,7 @@ fn validate_eic(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
             tolerances::GPU_VS_CPU_F64,
         );
     }
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "EIC Intensity",
         cpu_us,
         gpu_us,
@@ -685,7 +678,7 @@ fn validate_eic(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
     });
 }
 
-fn validate_pcoa(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
+fn validate_pcoa(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D14: PCoA");
     let samples = vec![
         vec![120.0, 85.0, 230.0, 55.0],
@@ -715,7 +708,7 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
             tolerances::GPU_VS_CPU_F64,
         );
     }
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "PCoA",
         cpu_us,
         gpu_us,
@@ -723,7 +716,7 @@ fn validate_pcoa(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
     });
 }
 
-fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
+fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D15: Kriging");
     let sites = vec![
         kriging::SpatialSample {
@@ -776,7 +769,7 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) 
             o.is_finite() && s.is_finite(),
         );
     }
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "Kriging",
         cpu_us: 0.0,
         gpu_us,
@@ -784,7 +777,7 @@ fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) 
     });
 }
 
-fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timing>) {
+fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D16: Rarefaction Bootstrap");
     let counts: Vec<f64> = vec![
         120.0, 85.0, 230.0, 55.0, 180.0, 12.0, 42.0, 310.0, 8.0, 95.0, 33.0, 67.0, 145.0, 22.0,
@@ -816,7 +809,7 @@ fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<Timin
         500.0,
         tolerances::EXACT,
     );
-    timings.push(Timing {
+    timings.push(CpuGpuRow {
         name: "Rarefaction",
         cpu_us: 0.0,
         gpu_us,
@@ -831,7 +824,7 @@ async fn main() {
     let gpu = validation::gpu_or_skip().await;
     let device = gpu.to_wgpu_device();
     let t0 = Instant::now();
-    let mut timings: Vec<Timing> = Vec::new();
+    let mut timings: Vec<CpuGpuRow> = Vec::new();
 
     validate_shannon_simpson(&mut v, &gpu, &mut timings);
     validate_bray_curtis(&mut v, &gpu, &mut timings);

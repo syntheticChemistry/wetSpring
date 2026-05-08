@@ -37,7 +37,10 @@ pub use or_exit::OrExit;
 pub use sink::{
     CheckAbsOrRelResult, CheckResult, CollectingSink, SilentSink, StdoutSink, ValidationSink,
 };
-pub use timing::{BenchRow, bench, bench_n_us, bench_print, print_bench_table, print_timing_table, timed_us};
+pub use timing::{
+    BenchRow, CpuGpuRow, CrossSpringEntry, bench, bench_n_us, bench_print, print_bench_table,
+    print_cpu_gpu_table, print_cross_spring_table, print_timing_table, timed_us,
+};
 
 // ── Standalone helpers (for one-off use) ──────────────────────
 

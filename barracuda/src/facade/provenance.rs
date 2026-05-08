@@ -333,7 +333,11 @@ fn try_tier3_inner(braid_id: &str) -> Option<Value> {
     Some(json!({
         "tier": 3,
         "prov_o": provo,
-        "verify_url": format!("https://lab.primals.eco/api/v1/provenance/verify/{braid_id}"),
+        "verify_url": format!(
+            "{}/provenance/verify/{braid_id}",
+            std::env::var("PROVENANCE_VERIFY_BASE")
+                .unwrap_or_else(|_| "https://lab.primals.eco/api/v1".to_string()),
+        ),
     }))
 }
 

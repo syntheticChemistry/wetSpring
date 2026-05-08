@@ -31,12 +31,17 @@ the target cell through tissue geometry?"
 
 | # | Citation | Experiment | Checks | Status |
 |---|----------|-----------|:------:|--------|
-| 53 | Gonzales et al. 2013, *Vet Dermatol* 24:48-53 | Exp273 (partial) | — | Proposed |
-| 54 | Gonzales et al. 2014, *J Vet Pharmacol Ther* 37:317-324 | Planned | — | Proposed |
-| 55 | Gonzales et al. 2016, *Vet Dermatol* 27:34-e10 | Planned | — | Proposed |
-| 56 | Fleck,...,Gonzales 2021, *Vet Dermatol* 32:681-e182 | Planned | — | Proposed |
-| 57 | Gonzales et al. 2024, *J Vet Pharmacol Ther* 47:447-453 | Planned | — | Proposed |
-| 58 | McCandless et al. 2014, *Vet Immunol Immunopathol* 157:42-48 | Planned | — | Proposed |
+| 53 | Gonzales et al. 2013, *Vet Dermatol* 24:48-53 | Exp282 (IL-31 serum, Anderson spectral) | **15/15** | **DONE** |
+| 54 | Gonzales et al. 2014, *J Vet Pharmacol Ther* 37:317-324 | Exp280 (IC50 Hill, JAK selectivity) | **35/35** | **DONE** |
+| 55 | Gonzales et al. 2016, *Vet Dermatol* 27:34-e10 | Exp281 (PK, pruritus model) | **19/19** | **DONE** |
+| 56 | Fleck,...,Gonzales 2021, *Vet Dermatol* 32:681-e182 | Exp281 (dose-duration, decay) | **19/19** | **DONE** |
+| 57 | Gonzales et al. 2024, *J Vet Pharmacol Ther* 47:447-453 | Exp280 (FAD cross-validation) | **35/35** | **DONE** |
+| 58 | McCandless et al. 2014, *Vet Immunol Immunopathol* 157:42-48 | Exp281 (three-compartment) | **19/19** | **DONE** |
+
+**Additional validation experiments:**
+- Exp273-279: Immuno-Anderson framework (cell-type sweep, CPU parity, GPU, streaming, cross-substrate)
+- Exp283: CPU parity across all Gonzales reproductions (43/43 PASS)
+- Exp284-286: GPU validation, ToadStool streaming, metalForge cross-substrate
 
 ---
 

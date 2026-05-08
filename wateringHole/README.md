@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V152** | `handoffs/WETSPRING_V152_PARITY_AUDIT_ABSORPTION_HANDOFF_MAY08_2026.md` | May 8 | **Parity audit absorption**: ring ban, registry cross-sync test, barraCuda optional, exp400 composition crate. Responds to primalSpring Phase 60. |
+| **V153** | `handoffs/WETSPRING_V153_DEEP_DEBT_EVOLUTION_HANDOFF_MAY08_2026.md` | May 8 | **Deep debt evolution**: hardcoding → env-configurable, shared validation helpers, doc drift fixes, Kachkovskiy notebook, benchmark/dataset/downstream mapping. |
+| V152 | `handoffs/WETSPRING_V152_PARITY_AUDIT_ABSORPTION_HANDOFF_MAY08_2026.md` | May 8 | Parity audit absorption: ring ban, registry cross-sync test, barraCuda optional, exp400 composition crate. Responds to primalSpring Phase 60. |
 | V151 | `handoffs/WETSPRING_V151_ECOSYSTEM_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Ecosystem handoff**: primal usage review, 15 gaps for upstream teams, composition patterns for adoption, guideStone Level 4 status, Level 5/6 roadmap. For all primal and spring teams. |
 | V151 | `handoffs/WETSPRING_V151_DEEP_DEBT_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Deep debt evolution**: zero `dyn` dispatch in I/O, `Write`-based validation output, hardcoded paths removed, shared helpers extracted, concrete error types, tolerance centralization. 1,209 lib tests pass. |
 | V150 | `handoffs/WETSPRING_V150_PHASE46_COMPOSITION_EXPLORER_HANDOFF_APR27_2026.md` | Apr 27 | Phase 46 composition explorer: data visualization lane. Superseded by V151 debt evolution. |

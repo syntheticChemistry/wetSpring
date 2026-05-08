@@ -67,16 +67,7 @@ use wgpu::util::DeviceExt;
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
-use wetspring_barracuda::validation::{self, Validator};
-
-struct BenchEntry {
-    primitive: &'static str,
-    evolved_by: &'static str,
-    session: &'static str,
-    cpu_us: f64,
-    problem: &'static str,
-    checks: u32,
-}
+use wetspring_barracuda::validation::{self, CrossSpringEntry, Validator};
 
 fn dense_to_csr(matrix: &[f64], n: usize) -> SpectralCsrMatrix {
     let mut row_ptr = vec![0usize];
@@ -153,7 +144,7 @@ async fn main() {
     let device = gpu.to_wgpu_device();
     let d = device.device();
 
-    let mut bench_results: Vec<BenchEntry> = Vec::new();
+    let mut bench_results: Vec<CrossSpringEntry> = Vec::new();
 
     // ═══════════════════════════════════════════════════════════════════════
     // SECTION 1: S54 Primitives (neuralSpring baseCamp → ToadStool)
@@ -214,7 +205,7 @@ async fn main() {
         );
         println!("    Fiedler value: {fiedler:.4} (community connectivity)");
 
-        bench_results.push(BenchEntry {
+        bench_results.push(CrossSpringEntry {
             primitive: "graph_laplacian",
             evolved_by: "neuralSpring baseCamp",
             session: "S54",
@@ -273,7 +264,7 @@ async fn main() {
         println!("    Diverse community effective rank: {rank_diverse:.2} / 8");
         println!("    Dominated community effective rank: {rank_dominated:.2} / 8");
 
-        bench_results.push(BenchEntry {
+        bench_results.push(CrossSpringEntry {
             primitive: "effective_rank",
             evolved_by: "neuralSpring baseCamp",
             session: "S54",
@@ -344,7 +335,7 @@ async fn main() {
             f64::midpoint(trace, -sqrt_disc)
         );
 
-        bench_results.push(BenchEntry {
+        bench_results.push(CrossSpringEntry {
             primitive: "numerical_hessian",
             evolved_by: "neuralSpring baseCamp",
             session: "S54",
@@ -442,7 +433,7 @@ async fn main() {
         println!("    Strong disorder r={r_strong:.4}, effective_rank={rank_strong:.2}");
         println!("    → Disorder drives Poisson statistics (Anderson localization)");
 
-        bench_results.push(BenchEntry {
+        bench_results.push(CrossSpringEntry {
             primitive: "disordered_laplacian",
             evolved_by: "neuralSpring",
             session: "S56",
@@ -534,7 +525,7 @@ async fn main() {
                 .collect::<Vec<_>>()
         );
 
-        bench_results.push(BenchEntry {
+        bench_results.push(CrossSpringEntry {
             primitive: "belief_propagation_chain",
             evolved_by: "neuralSpring",
             session: "S56",
@@ -605,7 +596,7 @@ async fn main() {
             result.losses.len()
         );
 
-        bench_results.push(BenchEntry {
+        bench_results.push(CrossSpringEntry {
             primitive: "boltzmann_sampling",
             evolved_by: "neuralSpring",
             session: "S56",
@@ -692,7 +683,7 @@ async fn main() {
         println!("    Anderson-based r={r_anderson:.4}, rank={rank_anderson:.2}");
         println!("    → Both approaches detect Anderson localization in biofilm geometry");
 
-        bench_results.push(BenchEntry {
+        bench_results.push(CrossSpringEntry {
             primitive: "compound: graph+disorder+spectral",
             evolved_by: "neural+hotSpring",
             session: "S54+S56",

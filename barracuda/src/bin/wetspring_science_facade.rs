@@ -24,6 +24,9 @@ use tower_http::cors::{Any, CorsLayer};
 
 use wetspring_barracuda::facade::{dark_forest, routes};
 
+const DEFAULT_BIND: &str = "127.0.0.1:3100";
+const DEFAULT_CORS_ORIGIN: &str = "https://primals.eco";
+
 #[derive(Debug)]
 enum FacadeError {
     Io(std::io::Error),
@@ -64,7 +67,7 @@ async fn main() -> std::process::ExitCode {
 
 async fn run() -> Result<(), FacadeError> {
     let cors_origin =
-        std::env::var("FACADE_CORS_ORIGIN").unwrap_or_else(|_| "https://primals.eco".to_string());
+        std::env::var("FACADE_CORS_ORIGIN").unwrap_or_else(|_| DEFAULT_CORS_ORIGIN.to_string());
 
     let cors = if cors_origin == "*" {
         CorsLayer::new()
@@ -72,10 +75,9 @@ async fn run() -> Result<(), FacadeError> {
             .allow_methods(Any)
             .allow_headers(Any)
     } else {
-        let fallback: axum::http::HeaderValue = "https://primals.eco"
+        let origin: axum::http::HeaderValue = cors_origin
             .parse()
-            .map_err(|e| format!("default CORS origin invalid: {e}"))?;
-        let origin: axum::http::HeaderValue = cors_origin.parse().unwrap_or(fallback);
+            .unwrap_or_else(|_| DEFAULT_CORS_ORIGIN.parse().expect("valid default origin"));
         CorsLayer::new()
             .allow_origin(origin)
             .allow_methods(Any)
@@ -166,7 +168,7 @@ async fn run() -> Result<(), FacadeError> {
         ))
         .layer(cors);
 
-    let bind = std::env::var("FACADE_BIND").unwrap_or_else(|_| "127.0.0.1:3100".to_string());
+    let bind = std::env::var("FACADE_BIND").unwrap_or_else(|_| DEFAULT_BIND.to_string());
     let listener = tokio::net::TcpListener::bind(&bind).await?;
     tracing::info!("wetspring-science-facade listening on {bind}");
     tracing::info!(

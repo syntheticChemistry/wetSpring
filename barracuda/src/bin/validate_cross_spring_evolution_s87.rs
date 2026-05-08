@@ -62,7 +62,7 @@ use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversi
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{self, OrExit, Validator};
+use wetspring_barracuda::validation::{self, OrExit, Validator, bench_print};
 
 struct Timing {
     label: &'static str,
@@ -72,8 +72,7 @@ struct Timing {
 }
 
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
-    let (result, ms) = validation::bench(f);
-    println!("  {label}: {ms:.3} ms");
+    bench_print(label, f)
     (result, ms)
 }
 
