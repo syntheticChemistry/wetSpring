@@ -195,7 +195,7 @@ dependencies = [
 
 [[package]]
 name = "barracuda"
-version = "0.3.12"
+version = "0.3.13"
 dependencies = [
  "barracuda-naga-exec",
  "blake3",
@@ -216,7 +216,7 @@ dependencies = [
 
 [[package]]
 name = "barracuda-naga-exec"
-version = "0.3.12"
+version = "0.3.13"
 dependencies = [
  "naga",
  "thiserror",
@@ -1363,7 +1363,7 @@ dependencies = [
 
 [[package]]
 name = "primalspring"
-version = "0.9.24"
+version = "0.9.25"
 dependencies = [
  "base64",
  "blake3",
@@ -2272,6 +2272,15 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "wgpu",
+]
+
+[[package]]
+name = "wetspring-exp400"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "wetspring-barracuda",
 ]
 
 [[package]]

@@ -17,12 +17,15 @@ categories = ["science", "command-line-utilities"]
 workspace = true
 
 [features]
-default = []
+default = ["barracuda-lib"]
+# barraCuda as local path dependency (library linking).
+# Disable for IPC-only sovereign deployment where barraCuda runs as a separate primal.
+barracuda-lib = ["dep:barracuda"]
 # GPU acceleration via barraCuda (standalone math primal).
 # Enable with `cargo build --features gpu`.
 # Adds wgpu v28 (device creation), barraCuda GPU ops (144+ primitives),
 # and tokio (async device init). Zero local WGSL shaders (full lean).
-gpu = ["barracuda/gpu", "barracuda/domain-esn", "dep:wgpu", "dep:tokio"]
+gpu = ["barracuda-lib", "barracuda/gpu", "barracuda/domain-esn", "dep:wgpu", "dep:tokio"]
 # NPU acceleration via ToadStool akida-driver (BrainChip AKD1000/AKD1500).
 # Enable with `cargo build --features npu`.
 # Provides runtime discovery, capability-based dispatch, int8 inference.
@@ -49,7 +52,7 @@ facade = ["json", "dep:axum", "dep:tower-http", "dep:tokio", "dep:tracing-subscr
 # Sovereign dispatch: coralReef native GPU binary compilation + toadStool IPC.
 # Forwards to barraCuda's sovereign-dispatch feature for testing the
 # coralReef → native ISA pipeline from wetSpring validation binaries.
-sovereign-dispatch = ["barracuda/sovereign-dispatch", "gpu"]
+sovereign-dispatch = ["barracuda-lib", "barracuda/sovereign-dispatch", "gpu"]
 
 [dependencies]
 # serde: derive Serialize/Deserialize for visualization types (petalTongue schema).
@@ -70,7 +73,7 @@ thiserror = "2"
 # New: shaders::provenance (27 cross-spring shader records, evolution_report()),
 #      BatchedOdeRK45F64 (adaptive Dormand-Prince), mean_variance_to_buffer(),
 #      builder patterns (HmmForwardArgs, Dada2DispatchArgs, GillespieModel, etc.).
-barracuda = { path = "../../../primals/barraCuda/crates/barracuda", default-features = false }
+barracuda = { path = "../../../primals/barraCuda/crates/barracuda", default-features = false, optional = true }
 
 # akida-driver — pure Rust NPU access (BrainChip AKD1000/AKD1500).
 # Independent of barraCuda; sourced from toadStool neuromorphic crates.

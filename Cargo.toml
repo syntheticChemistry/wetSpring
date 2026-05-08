@@ -10,6 +10,7 @@ resolver = "2"
 members = [
     "barracuda",
     "metalForge/forge",
+    "experiments/exp400_nucleus_composition_parity",
 ]
 # barracuda/fuzz excluded: fuzz targets run indefinitely and block `cargo test --workspace`.
 # Run fuzz independently: `cd barracuda/fuzz && cargo +nightly fuzz run <target>`

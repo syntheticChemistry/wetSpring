@@ -42,6 +42,8 @@ wildcards = "deny"
 highlight = "all"
 allow = []
 deny = [
+    # Ecosystem security posture: no ring. BearDog uses pure-Rust crypto only.
+    { crate = "ring", reason = "Non-auditable C/ASM — use BearDog crypto primals" },
     # ecoBin compliance: zero C dependencies in application code.
     { crate = "openssl-sys", reason = "C dependency — use rustls" },
     { crate = "openssl", reason = "C dependency — use rustls" },

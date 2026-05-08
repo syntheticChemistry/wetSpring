@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** April 27, 2026  
+**Date:** May 8, 2026  
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V151** | `handoffs/WETSPRING_V151_ECOSYSTEM_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Ecosystem handoff**: primal usage review, 15 gaps for upstream teams, composition patterns for adoption, guideStone Level 4 status, Level 5/6 roadmap. For all primal and spring teams. |
+| **V152** | `handoffs/WETSPRING_V152_PARITY_AUDIT_ABSORPTION_HANDOFF_MAY08_2026.md` | May 8 | **Parity audit absorption**: ring ban, registry cross-sync test, barraCuda optional, exp400 composition crate. Responds to primalSpring Phase 60. |
+| V151 | `handoffs/WETSPRING_V151_ECOSYSTEM_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Ecosystem handoff**: primal usage review, 15 gaps for upstream teams, composition patterns for adoption, guideStone Level 4 status, Level 5/6 roadmap. For all primal and spring teams. |
 | V151 | `handoffs/WETSPRING_V151_DEEP_DEBT_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Deep debt evolution**: zero `dyn` dispatch in I/O, `Write`-based validation output, hardcoded paths removed, shared helpers extracted, concrete error types, tolerance centralization. 1,209 lib tests pass. |
 | V150 | `handoffs/WETSPRING_V150_PHASE46_COMPOSITION_EXPLORER_HANDOFF_APR27_2026.md` | Apr 27 | Phase 46 composition explorer: data visualization lane. Superseded by V151 debt evolution. |
 | V149 | `handoffs/WETSPRING_V149_V0917_ALIGNMENT_HANDOFF_APR20_2026.md` | Apr 20 | v0.9.17 alignment: 38/38 pass (4 skip), 6 new parity checks, PG-13 resolved, `is_skip_error` adopted. Superseded by V150 composition. |
