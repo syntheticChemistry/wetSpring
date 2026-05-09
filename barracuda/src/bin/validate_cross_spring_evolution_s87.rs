@@ -72,8 +72,7 @@ struct Timing {
 }
 
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
-    bench_print(label, f)
-    (result, ms)
+    bench_print(label, f)(result, ms)
 }
 
 fn main() {

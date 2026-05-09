@@ -27,6 +27,10 @@ pub fn handle_metrics_snapshot(_params: &Value) -> Result<Value, RpcError> {
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::unwrap_used,
+    reason = "test module: assertions use unwrap for clarity"
+)]
 mod tests {
     use super::*;
 

@@ -80,7 +80,12 @@ fn main() {
     );
 
     let ipc_chao1 = div_result["chao1"].as_f64().unwrap_or(f64::NAN);
-    v.check("parity: Chao1(uniform,4) IPC vs Rust", ipc_chao1, 4.0, tolerances::PYTHON_PARITY);
+    v.check(
+        "parity: Chao1(uniform,4) IPC vs Rust",
+        ipc_chao1,
+        4.0,
+        tolerances::PYTHON_PARITY,
+    );
 
     let ipc_observed = div_result["observed"].as_f64().unwrap_or(f64::NAN);
     v.check(
@@ -124,8 +129,7 @@ fn main() {
     }
 
     // D01d: Gonzales PK decay
-    let pk_result =
-        dispatch("science.gonzales.pk_decay", &json!({})).expect("pk_decay dispatch");
+    let pk_result = dispatch("science.gonzales.pk_decay", &json!({})).expect("pk_decay dispatch");
 
     v.check_pass(
         "parity: Gonzales pk_decay returns dose_profiles",
@@ -169,8 +173,7 @@ fn main() {
         brain_obs.get("acknowledged").is_some() || brain_obs.get("status").is_some(),
     );
 
-    let brain_attn =
-        dispatch("brain.attention", &json!({})).expect("brain.attention dispatch");
+    let brain_attn = dispatch("brain.attention", &json!({})).expect("brain.attention dispatch");
     v.check_pass(
         "parity: brain.attention returns attention state",
         brain_attn.is_object(),
@@ -206,11 +209,8 @@ fn main() {
             prov_record.get("vertex_id").is_some() || prov_record.get("provenance").is_some(),
         );
 
-        let prov_complete = dispatch(
-            "provenance.complete",
-            &json!({"session_id": session_id}),
-        )
-        .expect("provenance.complete dispatch");
+        let prov_complete = dispatch("provenance.complete", &json!({"session_id": session_id}))
+            .expect("provenance.complete dispatch");
         v.check_pass(
             "parity: provenance.complete returns completion",
             prov_complete.is_object(),
@@ -326,16 +326,14 @@ fn main() {
     );
 
     // D03c: Health probes
-    let liveness =
-        dispatch("health.liveness", &json!({})).expect("health.liveness dispatch");
+    let liveness = dispatch("health.liveness", &json!({})).expect("health.liveness dispatch");
     v.check_pass(
         "wire: health.liveness returns alive=true",
         liveness["alive"].as_bool().unwrap_or(false)
             || liveness["status"].as_str() == Some("alive"),
     );
 
-    let readiness =
-        dispatch("health.readiness", &json!({})).expect("health.readiness dispatch");
+    let readiness = dispatch("health.readiness", &json!({})).expect("health.readiness dispatch");
     v.check_pass(
         "wire: health.readiness returns ready=true",
         readiness["ready"].as_bool().unwrap_or(false),
@@ -365,7 +363,10 @@ fn main() {
     println!("    Stage 4: Primal composition parity   → THIS BINARY");
     println!("    Stage 5: NUCLEUS deployment           → graphs + IPC");
 
-    v.check_pass("composition: all science IPC methods return valid results", true);
+    v.check_pass(
+        "composition: all science IPC methods return valid results",
+        true,
+    );
 
     v.finish();
 }

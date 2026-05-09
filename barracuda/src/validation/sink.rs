@@ -59,7 +59,10 @@ impl ValidationSink {
         match self {
             Self::Stdout(_) => {
                 let tag = if passed { "OK" } else { "FAIL" };
-                let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
+                let _ = writeln!(
+                    std::io::stdout().lock(),
+                    "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})"
+                );
             }
             Self::Silent(_) => {}
             Self::Collecting(c) => {
@@ -77,17 +80,14 @@ impl ValidationSink {
     }
 
     /// A single exact count check completed.
-    pub fn on_check_count(
-        &mut self,
-        label: &str,
-        passed: bool,
-        actual: usize,
-        expected: usize,
-    ) {
+    pub fn on_check_count(&mut self, label: &str, passed: bool, actual: usize, expected: usize) {
         match self {
             Self::Stdout(_) => {
                 let tag = if passed { "OK" } else { "FAIL" };
-                let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual} (expected {expected})");
+                let _ = writeln!(
+                    std::io::stdout().lock(),
+                    "  [{tag}]  {label}: {actual} (expected {expected})"
+                );
             }
             Self::Silent(_) | Self::Collecting(_) => {}
         }
@@ -170,7 +170,10 @@ impl ValidationSink {
     pub fn on_finish(&mut self, name: &str, passed: u32, total: u32) {
         if let Self::Stdout(_) = self {
             let mut out = std::io::stdout().lock();
-            let _ = writeln!(out, "\n═══════════════════════════════════════════════════════════");
+            let _ = writeln!(
+                out,
+                "\n═══════════════════════════════════════════════════════════"
+            );
             let _ = writeln!(out, "  {name}: {passed}/{total} checks passed");
             if total == 0 {
                 let _ = writeln!(out, "  RESULT: FAIL (no checks executed)");
@@ -179,7 +182,10 @@ impl ValidationSink {
             } else {
                 let _ = writeln!(out, "  RESULT: FAIL ({} checks failed)", total - passed);
             }
-            let _ = writeln!(out, "═══════════════════════════════════════════════════════════");
+            let _ = writeln!(
+                out,
+                "═══════════════════════════════════════════════════════════"
+            );
         }
     }
 }

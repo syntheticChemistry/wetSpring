@@ -170,7 +170,11 @@ fn main() {
 
         // D01a: stats.mean — validation_capability from downstream manifest
         let local_mean = 30.0; // mean([10, 20, 30, 40, 50]) = 150/5
-        match rpc_call(sock, "stats.mean", &json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]})) {
+        match rpc_call(
+            sock,
+            "stats.mean",
+            &json!({"data": [10.0, 20.0, 30.0, 40.0, 50.0]}),
+        ) {
             Ok(result) => {
                 let ipc_mean = result["value"]
                     .as_f64()
@@ -282,19 +286,25 @@ fn main() {
         }
 
         // D01e: rng.uniform (barraCuda RNG service)
-        match rpc_call(sock, "rng.uniform", &json!({"n": 5, "low": 0.0, "high": 1.0})) {
+        match rpc_call(
+            sock,
+            "rng.uniform",
+            &json!({"n": 5, "low": 0.0, "high": 1.0}),
+        ) {
             Ok(result) => {
                 let samples = result["values"]
                     .as_array()
                     .or_else(|| result["data"].as_array())
                     .or_else(|| result.as_array());
                 if let Some(arr) = samples {
-                    let all_in_range = arr.iter().all(|v| {
-                        v.as_f64()
-                            .is_some_and(|x| (0.0..=1.0).contains(&x))
-                    });
+                    let all_in_range = arr
+                        .iter()
+                        .all(|v| v.as_f64().is_some_and(|x| (0.0..=1.0).contains(&x)));
                     v.check_pass("primal parity: rng.uniform values in [0,1]", all_in_range);
-                    v.check_pass("primal parity: rng.uniform returns 5 values", arr.len() == 5);
+                    v.check_pass(
+                        "primal parity: rng.uniform returns 5 values",
+                        arr.len() == 5,
+                    );
                 } else {
                     v.check_pass("primal parity: rng.uniform returns array", false);
                 }
@@ -329,9 +339,7 @@ fn main() {
 
         match rpc_call(sock, "capabilities.list", &json!({})) {
             Ok(result) => {
-                let methods = result["methods"]
-                    .as_array()
-                    .or_else(|| result.as_array());
+                let methods = result["methods"].as_array().or_else(|| result.as_array());
                 v.check_pass(
                     "primal infra: barraCuda capabilities.list returns methods",
                     methods.is_some_and(|m| !m.is_empty()),
@@ -347,8 +355,7 @@ fn main() {
             Ok(result) => {
                 v.check_pass(
                     "primal infra: barraCuda identity.get returns primal name",
-                    result["primal"].as_str().is_some()
-                        || result["name"].as_str().is_some(),
+                    result["primal"].as_str().is_some() || result["name"].as_str().is_some(),
                 );
             }
             Err(e) => {
@@ -449,8 +456,7 @@ fn main() {
             Ok(result) => {
                 v.check_pass(
                     "primal parity: crypto.hash returns hash",
-                    result["hash"].as_str().is_some()
-                        || result["digest"].as_str().is_some(),
+                    result["hash"].as_str().is_some() || result["digest"].as_str().is_some(),
                 );
             }
             Err(e) => {

@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! sweetGrass braid IPC client — experiment provenance hand-off.
+//! sweetGrass braid attribution — W3C PROV-O provenance braids.
 //!
-//! Emits `braid.create` followed by `braid.commit` to the sweetGrass primal when
-//! its socket is discovered at runtime. Standalone wetSpring runs skip this path
-//! without failing.
+//! Two complementary APIs:
+//! - **Capability-routed** (`create_attribution_braid`): Phase 3 of the
+//!   three-phase provenance completion, routed through biomeOS Neural API.
+//! - **Direct socket** (`record_experiment_provenance`): Standalone sweetGrass
+//!   RPC via `braid.create` + `braid.commit` for experiment hand-off.
+//!
+//! Standalone wetSpring runs skip both paths without failing.
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
@@ -11,9 +15,11 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use serde::Serialize;
-use serde_json::Value;
+use serde_json::{Value, json};
 
 use crate::primal_names::SWEETGRASS;
+
+use super::capability_call;
 
 const RPC_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -42,12 +48,34 @@ pub struct BraidCommitRequest {
     pub metadata: Value,
 }
 
+/// Create an attribution braid via the biomeOS capability router (Phase 3).
+///
+/// Best-effort: returns the braid result or an error. The caller should
+/// treat failure as non-fatal.
+pub(super) fn create_attribution_braid(
+    socket: &Path,
+    commit_id: &str,
+) -> Result<Value, crate::error::Error> {
+    let braid_args = json!({
+        "commit_ref": commit_id,
+        "agents": [{
+            "did": format!("did:key:{}", crate::PRIMAL_NAME),
+            "role": "author",
+            "contribution": 1.0,
+        }],
+    });
+    capability_call(socket, "braid", "create", &braid_args)
+}
+
 /// Discover the sweetGrass Unix socket using the standard biomeOS cascade.
 ///
 /// Returns `None` when sweetGrass is not present (standalone mode).
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
-    super::discover::discover_socket(&super::discover::socket_env_var(SWEETGRASS), SWEETGRASS)
+    super::super::discover::discover_socket(
+        &super::super::discover::socket_env_var(SWEETGRASS),
+        SWEETGRASS,
+    )
 }
 
 /// Record experiment provenance on sweetGrass via `braid.create` then `braid.commit`.
@@ -79,7 +107,7 @@ fn record_experiment_provenance_to(
 ) -> Result<(), String> {
     let create_params =
         serde_json::to_value(create).map_err(|e| format!("serialize braid.create params: {e}"))?;
-    let create_line = serde_json::json!({
+    let create_line = json!({
         "jsonrpc": "2.0",
         "method": "braid.create",
         "params": create_params,
@@ -111,7 +139,7 @@ fn record_experiment_provenance_to(
 
     let commit_params = serde_json::to_value(&commit_body)
         .map_err(|e| format!("serialize braid.commit params: {e}"))?;
-    let commit_line = serde_json::json!({
+    let commit_line = json!({
         "jsonrpc": "2.0",
         "method": "braid.commit",
         "params": commit_params,

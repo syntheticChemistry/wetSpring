@@ -38,7 +38,7 @@ json = ["dep:serde", "dep:serde_json"]
 ipc = ["json", "dep:tracing-subscriber", "dep:blake3"]
 # guideStone: self-validating NUCLEUS composition node (Level 5 primal proof).
 # Depends on primalspring composition API + ipc feature for JSON-RPC.
-guidestone = ["ipc", "dep:primalspring"]
+guidestone = ["ipc", "dep:primalspring", "dep:clap"]
 # Nautilus Shell: evolutionary reservoir computing for bio sentinel monitoring.
 # Adds concept edge detection, drift monitoring, evolutionary adaptation.
 nautilus = ["dep:bingocube-nautilus", "bingocube-nautilus/json"]
@@ -53,6 +53,13 @@ facade = ["json", "dep:axum", "dep:tower-http", "dep:tokio", "dep:tracing-subscr
 # Forwards to barraCuda's sovereign-dispatch feature for testing the
 # coralReef → native ISA pipeline from wetSpring validation binaries.
 sovereign-dispatch = ["barracuda-lib", "barracuda/sovereign-dispatch", "gpu"]
+# Primal proof: IPC-first compute routing for sovereign NUCLEUS deployment.
+# When enabled, IPC handler compute calls route through ecobin barraCuda over
+# JSON-RPC instead of in-process library calls. Requires a live barraCuda primal.
+# Complements `barracuda-lib` (library fallback) for the dual-lane pattern:
+#   cargo build --features ipc,primal-proof  → IPC-only (sovereign)
+#   cargo build --features ipc               → in-process library (default)
+primal-proof = ["ipc"]
 
 [dependencies]
 # serde: derive Serialize/Deserialize for visualization types (petalTongue schema).
@@ -114,6 +121,9 @@ flate2 = { version = "1.0", default-features = false, features = ["rust_backend"
 # Provides CompositionContext, validate_parity, validate_liveness, ValidationResult,
 # and named tolerances for NUCLEUS IPC certification.
 primalspring = { path = "../../primalSpring/ecoPrimal", optional = true }
+
+# clap: CLI argument parsing for the UniBin binary.
+clap = { version = "4", features = ["derive"], optional = true }
 
 # toml: TOML parsing for deploy graph structural validation (facade startup).
 # Pure Rust, zero C deps, ecoBin compliant.
@@ -1952,9 +1962,16 @@ name = "wetspring_gonzales_guidestone"
 path = "src/bin/wetspring_gonzales_guidestone.rs"
 
 # ── wetSpring guideStone: Self-Validating NUCLEUS Composition Node ──
+# (prokaryotic — superseded by wetspring_unibin, see fossilRecord/)
 [[bin]]
 name = "wetspring_guidestone"
 path = "src/bin/wetspring_guidestone.rs"
+required-features = ["guidestone"]
+
+# ── wetSpring UniBin: Eukaryotic single binary (certify/validate/serve/status/version) ──
+[[bin]]
+name = "wetspring_unibin"
+path = "src/bin/wetspring_unibin/main.rs"
 required-features = ["guidestone"]
 
 # ── Exp403: Primal Parity — Live NUCLEUS IPC vs Local Rust Baselines ──

@@ -120,7 +120,11 @@ pub fn print_cpu_gpu_table(rows: &[CpuGpuRow]) {
     );
     let _ = writeln!(out, "  {}", "─".repeat(76));
     for r in rows {
-        let _ = writeln!(out, "  {:40} {:12.0} {:12.0} {:>8}", r.name, r.cpu_us, r.gpu_us, r.status);
+        let _ = writeln!(
+            out,
+            "  {:40} {:12.0} {:12.0} {:>8}",
+            r.name, r.cpu_us, r.gpu_us, r.status
+        );
     }
 }
 
@@ -129,14 +133,29 @@ pub fn print_cross_spring_table(rows: &[CrossSpringEntry]) {
     use std::io::Write as _;
     let mut out = std::io::stdout().lock();
     let _ = writeln!(out);
-    let _ = writeln!(out, "  ┌──────────────────────────────┬──────────────┬────────┬──────────┬────────────────┬───────┐");
-    let _ = writeln!(out, "  │ Primitive                    │ Evolved By   │ Sess   │ CPU (µs) │ Problem        │ Chks  │");
-    let _ = writeln!(out, "  ├──────────────────────────────┼──────────────┼────────┼──────────┼────────────────┼───────┤");
+    let _ = writeln!(
+        out,
+        "  ┌──────────────────────────────┬──────────────┬────────┬──────────┬────────────────┬───────┐"
+    );
+    let _ = writeln!(
+        out,
+        "  │ Primitive                    │ Evolved By   │ Sess   │ CPU (µs) │ Problem        │ Chks  │"
+    );
+    let _ = writeln!(
+        out,
+        "  ├──────────────────────────────┼──────────────┼────────┼──────────┼────────────────┼───────┤"
+    );
     for r in rows {
-        let _ = writeln!(out, "  │ {:28} │ {:12} │ {:6} │ {:8.0} │ {:14} │ {:5} │",
-            r.primitive, r.evolved_by, r.session, r.cpu_us, r.problem, r.checks);
+        let _ = writeln!(
+            out,
+            "  │ {:28} │ {:12} │ {:6} │ {:8.0} │ {:14} │ {:5} │",
+            r.primitive, r.evolved_by, r.session, r.cpu_us, r.problem, r.checks
+        );
     }
-    let _ = writeln!(out, "  └──────────────────────────────┴──────────────┴────────┴──────────┴────────────────┴───────┘");
+    let _ = writeln!(
+        out,
+        "  └──────────────────────────────┴──────────────┴────────┴──────────┴────────────────┴───────┘"
+    );
 }
 
 /// Print a three-column box-drawing timing table from [`BenchRow`] data.
@@ -144,11 +163,27 @@ pub fn print_bench_table(rows: &[BenchRow]) {
     use std::io::Write as _;
     let mut out = std::io::stdout().lock();
     let _ = writeln!(out);
-    let _ = writeln!(out, "  ┌────────────────────────────────┬────────────────────────┬──────────┐");
-    let _ = writeln!(out, "  │ Primitive                      │ Origin                 │ Time     │");
-    let _ = writeln!(out, "  ├────────────────────────────────┼────────────────────────┼──────────┤");
+    let _ = writeln!(
+        out,
+        "  ┌────────────────────────────────┬────────────────────────┬──────────┐"
+    );
+    let _ = writeln!(
+        out,
+        "  │ Primitive                      │ Origin                 │ Time     │"
+    );
+    let _ = writeln!(
+        out,
+        "  ├────────────────────────────────┼────────────────────────┼──────────┤"
+    );
     for t in rows {
-        let _ = writeln!(out, "  │ {:30} │ {:22} │ {:7.3}ms│", t.label, t.origin, t.ms);
+        let _ = writeln!(
+            out,
+            "  │ {:30} │ {:22} │ {:7.3}ms│",
+            t.label, t.origin, t.ms
+        );
     }
-    let _ = writeln!(out, "  └────────────────────────────────┴────────────────────────┴──────────┘");
+    let _ = writeln!(
+        out,
+        "  └────────────────────────────────┴────────────────────────┴──────────┘"
+    );
 }

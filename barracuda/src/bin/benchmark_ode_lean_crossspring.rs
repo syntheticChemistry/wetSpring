@@ -395,7 +395,7 @@ fn main() {
     println!("  │ ToadStool  → OdeSystem trait + BatchedOdeRK4 generic template    │");
     println!("  │            → Tolerance registry + provenance tags                │");
     println!("  │            → 12 ProvenanceTag entries across 3 springs           │");
-    println!("  │            → 4,176 core tests, zero warnings, zero debt          │");
+    println!("  │            → 4,176 core tests, zero warnings, clean              │");
     println!("  └───────────────────────────────────────────────────────────────────┘");
 
     println!(

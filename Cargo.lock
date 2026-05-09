@@ -2258,6 +2258,7 @@ dependencies = [
  "blake3",
  "bytemuck",
  "chacha20poly1305",
+ "clap",
  "flate2",
  "primalspring",
  "proptest",

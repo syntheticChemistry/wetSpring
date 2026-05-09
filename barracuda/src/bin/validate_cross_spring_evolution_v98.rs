@@ -82,8 +82,8 @@ fn main() {
     let mut timings: Vec<Timing> = Vec::new();
 
     println!("Upstream pins:");
-    println!("  barraCuda : v0.3.3 a898dee (deep debt: typed errors, named constants)");
-    println!("  toadStool : S130+ bfe7977b (deep debt, spring sync, clippy pedantic)");
+    println!("  barraCuda : v0.3.3 a898dee (evolution: typed errors, named constants)");
+    println!("  toadStool : S130+ bfe7977b (evolution: spring sync, clippy pedantic)");
     println!("  coralReef : Iteration 10 d29a734 (AMD E2E verified)");
     println!("  Cross-spring: hotSpring + wetSpring + neuralSpring + airSpring + groundSpring\n");
 

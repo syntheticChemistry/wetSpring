@@ -16,7 +16,7 @@
     clippy::similar_names,
     reason = "validation harness: domain variables from published notation"
 )]
-//! # Exp287: `BarraCuda` CPU v21 — V92D Deep Debt Evolution
+//! # Exp287: `BarraCuda` CPU v21 — V92D Evolution
 //!
 //! Extends CPU v20 (D01–D32, 37 checks) with V92D validation:
 //! - D33: Error-handling pipeline (`block_on` returns `Result`, no panics)
@@ -48,7 +48,7 @@ use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::{self, Validator};
 
 fn main() {
-    let mut v = Validator::new("Exp287: BarraCuda CPU v21 — V92D Deep Debt Evolution");
+    let mut v = Validator::new("Exp287: BarraCuda CPU v21 — V92D Evolution");
     let t_total = std::time::Instant::now();
 
     println!("  Inherited: D01–D32 from CPU v20 (37 checks)");

@@ -521,9 +521,9 @@ mod tests {
             "downstream manifest must reference proto_nucleate_template.toml"
         );
 
-        let wetspring_section = manifest.split("[[downstream]]").find(|chunk| {
-            chunk.contains("spring_name = \"wetspring\"")
-        });
+        let wetspring_section = manifest
+            .split("[[downstream]]")
+            .find(|chunk| chunk.contains("spring_name = \"wetspring\""));
 
         let Some(section) = wetspring_section else {
             panic!(

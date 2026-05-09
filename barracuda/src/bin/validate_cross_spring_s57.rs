@@ -64,7 +64,6 @@ use std::sync::Arc;
 use std::time::Instant;
 use wgpu::util::DeviceExt;
 
-
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
 use wetspring_barracuda::validation::{self, CrossSpringEntry, Validator};

@@ -130,14 +130,21 @@ fn main() {
             }
             Err(e) => {
                 let msg = e.to_string();
-                let is_method_not_found = msg.contains("-32601") || msg.contains("method not found");
+                let is_method_not_found =
+                    msg.contains("-32601") || msg.contains("method not found");
                 if is_method_not_found {
-                    v.check_pass(&format!("niche→dispatch: {cap} (method not found — gap)"), false);
+                    v.check_pass(
+                        &format!("niche→dispatch: {cap} (method not found — gap)"),
+                        false,
+                    );
                     println!("    GAP: {msg}");
                 } else {
                     // Method exists but returned a domain error (GPU required, external
                     // service down, etc.) — counts as "dispatched" for niche parity.
-                    v.check_pass(&format!("niche→dispatch: {cap} (method exists, domain error)"), true);
+                    v.check_pass(
+                        &format!("niche→dispatch: {cap} (method exists, domain error)"),
+                        true,
+                    );
                     dispatched_count += 1;
                     println!("    [INFO] {msg}");
                 }
@@ -169,12 +176,18 @@ fn main() {
 
         if dep.required {
             v.check_pass(
-                &format!("graph: required dep '{}' ({}) in deploy graph", dep.name, dep.role),
+                &format!(
+                    "graph: required dep '{}' ({}) in deploy graph",
+                    dep.name, dep.role
+                ),
                 present,
             );
         } else if present {
             v.check_pass(
-                &format!("graph: optional dep '{}' ({}) in deploy graph", dep.name, dep.role),
+                &format!(
+                    "graph: optional dep '{}' ({}) in deploy graph",
+                    dep.name, dep.role
+                ),
                 true,
             );
         } else {
@@ -213,11 +226,7 @@ fn main() {
         !niche::CAPABILITIES.is_empty(),
     );
 
-    v.check_count(
-        "niche: CAPABILITIES count",
-        niche::CAPABILITIES.len(),
-        42,
-    );
+    v.check_count("niche: CAPABILITIES count", niche::CAPABILITIES.len(), 42);
 
     v.check_pass(
         "niche: DEPENDENCIES count >= 5 required",

@@ -24,6 +24,8 @@ mod data_dir;
 mod domain;
 mod harness;
 mod or_exit;
+#[cfg(feature = "guidestone")]
+pub mod scenarios;
 pub mod sink;
 pub mod test_data;
 mod timing;
@@ -59,7 +61,10 @@ pub use timing::{
 pub fn check(label: &str, actual: f64, expected: f64, tolerance: f64) -> bool {
     let pass = (actual - expected).abs() <= tolerance;
     let tag = if pass { "OK" } else { "FAIL" };
-    let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})");
+    let _ = writeln!(
+        std::io::stdout().lock(),
+        "  [{tag}]  {label}: {actual:.6} (expected {expected:.6}, tol {tolerance:.6})"
+    );
     pass
 }
 
@@ -77,7 +82,10 @@ pub fn check(label: &str, actual: f64, expected: f64, tolerance: f64) -> bool {
 pub fn check_count(label: &str, actual: usize, expected: usize) -> bool {
     let pass = actual == expected;
     let tag = if pass { "OK" } else { "FAIL" };
-    let _ = writeln!(std::io::stdout().lock(), "  [{tag}]  {label}: {actual} (expected {expected})");
+    let _ = writeln!(
+        std::io::stdout().lock(),
+        "  [{tag}]  {label}: {actual} (expected {expected})"
+    );
     pass
 }
 
@@ -88,7 +96,10 @@ pub fn check_count(label: &str, actual: usize, expected: usize) -> bool {
 #[must_use]
 pub fn print_result(name: &str, passed: u32, total: u32) -> bool {
     let mut out = std::io::stdout().lock();
-    let _ = writeln!(out, "\n═══════════════════════════════════════════════════════════");
+    let _ = writeln!(
+        out,
+        "\n═══════════════════════════════════════════════════════════"
+    );
     let _ = writeln!(out, "  {name}: {passed}/{total} checks passed");
     if total == 0 {
         let _ = writeln!(out, "  RESULT: FAIL (no checks executed)");
@@ -97,7 +108,10 @@ pub fn print_result(name: &str, passed: u32, total: u32) -> bool {
     } else {
         let _ = writeln!(out, "  RESULT: FAIL ({} checks failed)", total - passed);
     }
-    let _ = writeln!(out, "═══════════════════════════════════════════════════════════");
+    let _ = writeln!(
+        out,
+        "═══════════════════════════════════════════════════════════"
+    );
     total > 0 && passed == total
 }
 

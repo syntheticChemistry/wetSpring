@@ -77,6 +77,8 @@ pub const VAULT_KEY_CONTEXT: &str = primal_names::VAULT_KEY_CONTEXT;
 pub mod bench;
 pub mod bio;
 pub mod cast;
+#[cfg(feature = "guidestone")]
+pub mod certification;
 pub mod df64_host;
 pub mod encoding;
 pub mod error;

@@ -8,6 +8,14 @@
 //! All trio interaction goes through biomeOS `capability.call` over a Unix
 //! socket — zero compile-time coupling to trio crates. Domain logic never
 //! fails when provenance is unavailable (graceful degradation).
+//!
+//! # Per-trio modules
+//!
+//! | Module | Primal | Domain |
+//! |--------|--------|--------|
+//! | [`rhizocrypt`] | rhizoCrypt | Ephemeral DAG sessions (`dag.*`) |
+//! | [`loamspine`] | loamSpine | Immutable ledger commit (`session.commit`) |
+//! | [`sweetgrass`] | sweetGrass | W3C PROV-O attribution braids (`braid.*`) |
 
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
@@ -16,6 +24,15 @@ use std::time::Duration;
 use serde_json::{Value, json};
 
 use crate::ipc::protocol::RpcError;
+
+pub mod loamspine;
+pub mod rhizocrypt;
+pub mod sweetgrass;
+
+pub use rhizocrypt::{begin_session, record_step};
+pub use sweetgrass::{
+    BraidCommitRequest, BraidRequest, discover_socket, record_experiment_provenance,
+};
 
 const RPC_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -143,7 +160,7 @@ pub fn neural_api_socket() -> Option<PathBuf> {
 }
 
 /// Send a `capability.call` JSON-RPC request to the Neural API.
-fn capability_call(
+pub(crate) fn capability_call(
     socket_path: &Path,
     capability: &str,
     operation: &str,
@@ -223,77 +240,6 @@ fn local_session_id() -> String {
     format!("local-{}-{ts}", crate::PRIMAL_NAME)
 }
 
-/// Begin a provenance-tracked experiment session via rhizoCrypt.
-///
-/// Returns a local fallback ID if the trio is unavailable.
-#[must_use]
-pub fn begin_session(experiment_name: &str) -> ProvenanceResult {
-    let Some(socket) = neural_api_socket() else {
-        return ProvenanceResult {
-            id: local_session_id(),
-            available: false,
-            data: json!({"provenance": "unavailable"}),
-        };
-    };
-
-    let args = json!({
-        "metadata": {"type": "experiment", "name": experiment_name},
-        "session_type": {"Experiment": {"spring_id": crate::PRIMAL_NAME}},
-        "description": experiment_name,
-    });
-
-    capability_call(&socket, "dag", "session.create", &args).map_or_else(
-        |_| ProvenanceResult {
-            id: local_session_id(),
-            available: false,
-            data: json!({"provenance": "unavailable"}),
-        },
-        |result| {
-            let session_id = json_str_or(&result, "session_id", "unknown").to_string();
-            ProvenanceResult {
-                id: session_id.clone(),
-                available: true,
-                data: json!({"session_id": session_id}),
-            }
-        },
-    )
-}
-
-/// Record an experiment step in the rhizoCrypt DAG.
-#[must_use]
-pub fn record_step(session_id: &str, step: &Value) -> ProvenanceResult {
-    let Some(socket) = neural_api_socket() else {
-        return ProvenanceResult {
-            id: "unavailable".to_string(),
-            available: false,
-            data: json!({"provenance": "unavailable"}),
-        };
-    };
-
-    let args = json!({"session_id": session_id, "event": step});
-
-    capability_call(&socket, "dag", "event.append", &args).map_or_else(
-        |_| ProvenanceResult {
-            id: "unavailable".to_string(),
-            available: false,
-            data: json!({"provenance": "unavailable"}),
-        },
-        |result| {
-            let vertex_id = result
-                .get("vertex_id")
-                .or_else(|| result.get("id"))
-                .and_then(Value::as_str)
-                .unwrap_or("unknown")
-                .to_string();
-            ProvenanceResult {
-                id: vertex_id.clone(),
-                available: true,
-                data: json!({"vertex_id": vertex_id}),
-            }
-        },
-    )
-}
-
 /// Complete an experiment: dehydrate → commit → attribute.
 ///
 /// Three-phase completion following the wateringHole provenance trio pattern.
@@ -307,12 +253,7 @@ pub fn complete_session(session_id: &str) -> Value {
     };
 
     // Phase 1: Dehydrate (rhizoCrypt)
-    let Ok(dehydration) = capability_call(
-        &socket,
-        "dag",
-        "dehydrate",
-        &json!({"session_id": session_id}),
-    ) else {
+    let Ok(dehydration) = rhizocrypt::dehydrate(&socket, session_id) else {
         return json!({
             "provenance": "unavailable",
             "session_id": session_id,
@@ -321,13 +262,8 @@ pub fn complete_session(session_id: &str) -> Value {
 
     let merkle_root = json_str_or(&dehydration, "merkle_root", "").to_string();
 
-    // Phase 2: Commit (loamSpine — session.commit)
-    let Ok(commit_result) = capability_call(
-        &socket,
-        "session",
-        "commit",
-        &json!({"summary": dehydration, "content_hash": merkle_root}),
-    ) else {
+    // Phase 2: Commit (loamSpine)
+    let Ok(commit_result) = loamspine::commit_session(&socket, &dehydration, &merkle_root) else {
         return json!({
             "provenance": "partial",
             "session_id": session_id,
@@ -345,17 +281,7 @@ pub fn complete_session(session_id: &str) -> Value {
         .to_string();
 
     // Phase 3: Attribute (sweetGrass) — best-effort
-    let braid_args = json!({
-        "commit_ref": commit_id,
-        "agents": [{
-            "did": format!("did:key:{}", crate::PRIMAL_NAME),
-            "role": "author",
-            "contribution": 1.0,
-        }],
-    });
-    let braid_result = capability_call(&socket, "braid", "create", &braid_args);
-
-    let braid_id = braid_result
+    let braid_id = sweetgrass::create_attribution_braid(&socket, &commit_id)
         .ok()
         .and_then(|r| {
             let id = r.get("braid_id").or_else(|| r.get("id"));
@@ -458,21 +384,6 @@ mod tests {
     #[test]
     fn neural_api_socket_does_not_panic() {
         let _ = neural_api_socket();
-    }
-
-    #[test]
-    fn begin_session_degrades_gracefully() {
-        let result = begin_session("test_experiment");
-        let prefix = format!("local-{}-", crate::PRIMAL_NAME);
-        assert!(result.id.starts_with(&prefix));
-        assert!(!result.available);
-    }
-
-    #[test]
-    fn record_step_degrades_gracefully() {
-        let result = record_step("fake-session", &json!({"step": "diversity"}));
-        assert_eq!(result.id, "unavailable");
-        assert!(!result.available);
     }
 
     #[test]

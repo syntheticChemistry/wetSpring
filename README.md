@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V153:** Phase 60+ deep debt evolution. Hardcoded bind/CORS/provenance URLs → env-configurable. Shared `CpuGpuRow`/`CrossSpringEntry` validation helpers extracted. `ring` crate banned (`deny.toml`). barraCuda optional (`barracuda-lib` feature). Registry cross-sync test (`tools/check_registry_sync.sh`). `exp400` NUCLEUS composition parity crate. 11 paper notebooks (Kachkovskiy spectral-QS added). Doc drift fixed (gonzales.md, PRIMAL_GAPS.md). 63/63 papers reproduced, 1,209 lib tests pass. V152: primalSpring Phase 60 parity audit absorption. V151: deep debt — zero `dyn`, `Write`-based output, shared helpers. guideStone **Level 4** (38/38 pass, 4 skip, exit 0).
+**Current release — V154:** Interstadial eukaryotic evolution (primalSpring v0.9.25). Per-trio provenance modules (`ipc/provenance/{rhizocrypt,loamspine,sweetgrass}.rs`). `certification/` library module absorbing guidestone layers (L0–L6). `validation/scenarios/` with `ScenarioMeta` + 4 registered scenarios. `wetspring_unibin` binary (certify/validate/serve/status/version). `primal-proof` Cargo feature flag for IPC-first compute routing. `fossilRecord/guidestone_prokaryotic_may2026/` — prokaryotic guidestone archived. Zero `debt` strings in runtime output. 1,594 tests (guidestone features), 1,209 lib tests. fmt clean, clippy clean (new code). V153: Phase 60+ deep debt evolution. V152: primalSpring Phase 60 parity audit. guideStone **Level 4** (38/38 pass, 4 skip, exit 0).
 
 ---
 

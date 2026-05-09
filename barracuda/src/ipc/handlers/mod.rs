@@ -32,7 +32,6 @@ mod vault_ipc;
 
 pub use ai::handle_ai_ecology_interpret;
 pub use brain::{handle_brain_attention, handle_brain_observe, handle_brain_urgency};
-pub use metrics::handle_metrics_snapshot;
 pub use data_fetch::{handle_chembl_fetch, handle_pubchem_fetch, handle_register_table};
 pub use expanded::{
     handle_alignment, handle_kinetics, handle_nmf, handle_phylogenetics, handle_taxonomy,
@@ -41,6 +40,7 @@ pub use gonzales::{
     handle_biome_atlas, handle_cross_species, handle_disorder_sweep, handle_dose_response,
     handle_hormesis, handle_pk_decay, handle_tissue_lattice,
 };
+pub use metrics::handle_metrics_snapshot;
 pub use science::{
     handle_anderson, handle_diversity, handle_full_pipeline, handle_ncbi_fetch, handle_qs_model,
 };

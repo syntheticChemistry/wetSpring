@@ -50,7 +50,6 @@
 
 use std::sync::Arc;
 
-
 use wetspring_barracuda::bio::bistable::BistableParams;
 use wetspring_barracuda::bio::bistable_gpu::{BistableGpu, N_VARS as BIST_VARS};
 use wetspring_barracuda::bio::capacitor_gpu::{CapacitorGpu, CapacitorOdeConfig};
@@ -61,7 +60,9 @@ use wetspring_barracuda::bio::multi_signal_gpu::{MultiSignalGpu, MultiSignalOdeC
 use wetspring_barracuda::bio::phage_defense::PhageDefenseParams;
 use wetspring_barracuda::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
 use wetspring_barracuda::tolerances;
-use wetspring_barracuda::validation::{BenchRow, OrExit, Validator, bench_print, print_bench_table};
+use wetspring_barracuda::validation::{
+    BenchRow, OrExit, Validator, bench_print, print_bench_table,
+};
 
 fn main() {
     let mut v = Validator::new("Exp183: Cross-Spring Evolution Benchmark (ToadStool S65)");
@@ -268,19 +269,24 @@ fn main() {
         .map(|i| ((i * 7 + 3) % 50) as f64 + 1.0)
         .collect();
 
-    let (fusion_gpu, fusion_gpu_ms) = bench_print("DiversityFusionGpu (256 samples, 10 spp)", || {
-        let fusion = wetspring_barracuda::bio::diversity_fusion_gpu::DiversityFusionGpu::new(
-            Arc::clone(&device),
-        )
-        .or_exit("DiversityFusionGpu");
-        fusion
-            .compute(&abundances, n_samples, n_species)
-            .or_exit("compute")
-    });
+    let (fusion_gpu, fusion_gpu_ms) =
+        bench_print("DiversityFusionGpu (256 samples, 10 spp)", || {
+            let fusion = wetspring_barracuda::bio::diversity_fusion_gpu::DiversityFusionGpu::new(
+                Arc::clone(&device),
+            )
+            .or_exit("DiversityFusionGpu");
+            fusion
+                .compute(&abundances, n_samples, n_species)
+                .or_exit("compute")
+        });
 
-    let (fusion_cpu, fusion_cpu_ms) = bench_print("diversity_fusion_cpu (256 samples, 10 spp)", || {
-        wetspring_barracuda::bio::diversity_fusion_gpu::diversity_fusion_cpu(&abundances, n_species)
-    });
+    let (fusion_cpu, fusion_cpu_ms) =
+        bench_print("diversity_fusion_cpu (256 samples, 10 spp)", || {
+            wetspring_barracuda::bio::diversity_fusion_gpu::diversity_fusion_cpu(
+                &abundances,
+                n_species,
+            )
+        });
 
     v.check_pass(
         "DiversityFusion: GPU sample count",
@@ -613,13 +619,14 @@ fn main() {
     {
         v.section("§7 Anderson Spectral: hotSpring lattice → ToadStool → wetSpring Track 4");
 
-        let (anderson_res, anderson_ms) = bench_print("anderson_3d(L=8, W=2.0) + lanczos(50)", || {
-            let csr = barracuda::spectral::anderson_3d(8, 8, 8, 2.0, 42);
-            let tri = barracuda::spectral::lanczos(&csr, 50, 42);
-            let eigs = barracuda::spectral::lanczos_eigenvalues(&tri);
-            let r = barracuda::spectral::level_spacing_ratio(&eigs);
-            (eigs.len(), r)
-        });
+        let (anderson_res, anderson_ms) =
+            bench_print("anderson_3d(L=8, W=2.0) + lanczos(50)", || {
+                let csr = barracuda::spectral::anderson_3d(8, 8, 8, 2.0, 42);
+                let tri = barracuda::spectral::lanczos(&csr, 50, 42);
+                let eigs = barracuda::spectral::lanczos_eigenvalues(&tri);
+                let r = barracuda::spectral::level_spacing_ratio(&eigs);
+                (eigs.len(), r)
+            });
         let (n_eigs, r_val) = anderson_res;
         v.check_pass("Anderson: eigenvalues computed", n_eigs > 0);
         v.check_pass("Anderson: r finite", r_val.is_finite());
@@ -680,18 +687,19 @@ fn main() {
         ms: nmf_ms,
     });
 
-    let (ridge_res, ridge_ms) = bench_print("ridge regression (20×5→2) — barracuda::linalg", || {
-        let x_data: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
-        let y_data: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
-        barracuda::linalg::ridge_regression(
-            &x_data,
-            &y_data,
-            20,
-            5,
-            2,
-            tolerances::RIDGE_REGULARIZATION_SMALL,
-        )
-    });
+    let (ridge_res, ridge_ms) =
+        bench_print("ridge regression (20×5→2) — barracuda::linalg", || {
+            let x_data: Vec<f64> = (0..100).map(|i| f64::from(i) * 0.01).collect();
+            let y_data: Vec<f64> = (0..40).map(|i| f64::from(i).mul_add(0.25, 1.0)).collect();
+            barracuda::linalg::ridge_regression(
+                &x_data,
+                &y_data,
+                20,
+                5,
+                2,
+                tolerances::RIDGE_REGULARIZATION_SMALL,
+            )
+        });
     v.check_pass(
         "ridge weights finite",
         ridge_res

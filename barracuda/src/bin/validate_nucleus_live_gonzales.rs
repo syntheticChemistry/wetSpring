@@ -58,8 +58,8 @@ fn main() {
     // (V144+); wetSpring IPC exposes composition.science_health only.
     v.section("═══ D01: wetSpring Science Composition Health ═══");
 
-    let science_health = dispatch("composition.science_health", &json!({}))
-        .expect("science_health dispatch failed");
+    let science_health =
+        dispatch("composition.science_health", &json!({})).expect("science_health dispatch failed");
 
     let healthy = science_health["healthy"].as_bool().unwrap_or(false);
     let spring = science_health["spring"].as_str().unwrap_or("");
@@ -71,7 +71,10 @@ fn main() {
         .unwrap_or(false);
     let deploy_graph = science_health["deploy_graph"].as_str().unwrap_or("");
 
-    println!("  healthy:       {}", if healthy { "true" } else { "false" });
+    println!(
+        "  healthy:       {}",
+        if healthy { "true" } else { "false" }
+    );
     println!("  spring:        {spring}");
     println!(
         "  subsystems:    math={}, ipc={}",
@@ -91,10 +94,7 @@ fn main() {
         "science composition: health probe returns valid JSON",
         science_health.is_object(),
     );
-    v.check_pass(
-        "science: composition reports healthy=true",
-        healthy,
-    );
+    v.check_pass("science: composition reports healthy=true", healthy);
     v.check_pass(
         "science: spring identifies wetSpring",
         spring == "wetSpring",

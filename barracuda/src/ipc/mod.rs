@@ -85,8 +85,6 @@ pub mod server;
 #[cfg(feature = "ipc")]
 pub mod songbird;
 #[cfg(feature = "ipc")]
-pub mod sweetgrass;
-#[cfg(feature = "ipc")]
 pub mod timeseries;
 #[cfg(feature = "ipc")]
 pub mod transport;

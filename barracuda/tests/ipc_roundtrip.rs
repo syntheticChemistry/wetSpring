@@ -275,10 +275,7 @@ fn anderson_disorder_sweep_roundtrip() {
         );
 
         assert_eq!(resp["jsonrpc"], "2.0");
-        assert!(
-            resp.get("error").is_none(),
-            "disorder_sweep error: {resp}"
-        );
+        assert!(resp.get("error").is_none(), "disorder_sweep error: {resp}");
     });
 }
 
@@ -291,10 +288,7 @@ fn anderson_biome_atlas_roundtrip() {
         );
 
         assert_eq!(resp["jsonrpc"], "2.0");
-        assert!(
-            resp.get("error").is_none(),
-            "biome_atlas error: {resp}"
-        );
+        assert!(resp.get("error").is_none(), "biome_atlas error: {resp}");
     });
 }
 
@@ -367,10 +361,7 @@ fn brain_attention_roundtrip() {
         );
 
         assert_eq!(resp["jsonrpc"], "2.0");
-        assert!(
-            resp.get("error").is_none(),
-            "brain.attention error: {resp}"
-        );
+        assert!(resp.get("error").is_none(), "brain.attention error: {resp}");
     });
 }
 

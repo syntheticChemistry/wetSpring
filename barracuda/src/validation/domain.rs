@@ -22,9 +22,15 @@ pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
     let mut total_checks: u32 = 0;
     let mut total_ms: f64 = 0.0;
     let mut out = std::io::stdout().lock();
-    let _ = writeln!(out, "\n╔════════════════════════════════════════════════════════════════════╗");
+    let _ = writeln!(
+        out,
+        "\n╔════════════════════════════════════════════════════════════════════╗"
+    );
     let _ = writeln!(out, "║  {title:<64} ║");
-    let _ = writeln!(out, "╠════════════════════════════════════════════════════════════════════╣");
+    let _ = writeln!(
+        out,
+        "╠════════════════════════════════════════════════════════════════════╣"
+    );
     if has_spring {
         let _ = writeln!(
             out,
@@ -34,7 +40,10 @@ pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
     } else {
         let _ = writeln!(out, "║ {:<22} │ {:>7} │ {:>3} ║", "Domain", "Time", "✓");
     }
-    let _ = writeln!(out, "╠════════════════════════════════════════════════════════════════════╣");
+    let _ = writeln!(
+        out,
+        "╠════════════════════════════════════════════════════════════════════╣"
+    );
     for d in domains {
         total_checks += d.checks;
         total_ms += d.ms;
@@ -46,10 +55,17 @@ pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
                 d.name, spring, d.ms, d.checks
             );
         } else {
-            let _ = writeln!(out, "║ {:<22} │ {:>5.1}ms │ {:>3} ║", d.name, d.ms, d.checks);
+            let _ = writeln!(
+                out,
+                "║ {:<22} │ {:>5.1}ms │ {:>3} ║",
+                d.name, d.ms, d.checks
+            );
         }
     }
-    let _ = writeln!(out, "╠════════════════════════════════════════════════════════════════════╣");
+    let _ = writeln!(
+        out,
+        "╠════════════════════════════════════════════════════════════════════╣"
+    );
     if has_spring {
         let _ = writeln!(
             out,
@@ -63,5 +79,8 @@ pub fn print_domain_summary(title: &str, domains: &[DomainResult]) {
             "TOTAL", total_ms, total_checks
         );
     }
-    let _ = writeln!(out, "╚════════════════════════════════════════════════════════════════════╝");
+    let _ = writeln!(
+        out,
+        "╚════════════════════════════════════════════════════════════════════╝"
+    );
 }

@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** May 8, 2026  
+**Date:** May 9, 2026  
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -9,11 +9,11 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V153** | `handoffs/WETSPRING_V153_DEEP_DEBT_EVOLUTION_HANDOFF_MAY08_2026.md` | May 8 | **Deep debt evolution**: hardcoding → env-configurable, shared validation helpers, doc drift fixes, Kachkovskiy notebook, benchmark/dataset/downstream mapping. |
-| V152 | `handoffs/WETSPRING_V152_PARITY_AUDIT_ABSORPTION_HANDOFF_MAY08_2026.md` | May 8 | Parity audit absorption: ring ban, registry cross-sync test, barraCuda optional, exp400 composition crate. Responds to primalSpring Phase 60. |
-| V151 | `handoffs/WETSPRING_V151_ECOSYSTEM_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Ecosystem handoff**: primal usage review, 15 gaps for upstream teams, composition patterns for adoption, guideStone Level 4 status, Level 5/6 roadmap. |
-| V151 | `handoffs/WETSPRING_V151_DEEP_DEBT_EVOLUTION_HANDOFF_APR27_2026.md` | Apr 27 | **Deep debt evolution**: zero `dyn` dispatch in I/O, `Write`-based validation output, shared helpers, concrete error types. |
-| | *Superseded → `handoffs/archive/`* | | V150 and earlier are archived (**166** files). |
+| **V154** | `handoffs/WETSPRING_V154_INTERSTADIAL_EUKARYOTIC_HANDOFF_MAY09_2026.md` | May 9 | **Interstadial eukaryotic evolution**: per-trio provenance split, certification module, validation scenarios, UniBin binary, primal-proof feature, fossilization. Responds to primalSpring v0.9.25. |
+| V153 | `handoffs/WETSPRING_V153_DEEP_DEBT_EVOLUTION_HANDOFF_MAY08_2026.md` | May 8 | Deep debt evolution: hardcoding → env-configurable, shared helpers, doc drift fixes, Kachkovskiy notebook. |
+| V153 | `handoffs/WETSPRING_V153_UPSTREAM_PRIMAL_HANDOFF_MAY08_2026.md` | May 8 | Upstream primal handoff: gaps, patterns, composition debt for primal teams and other springs. |
+| V152 | `handoffs/WETSPRING_V152_PARITY_AUDIT_ABSORPTION_HANDOFF_MAY08_2026.md` | May 8 | Parity audit absorption: ring ban, registry cross-sync, barraCuda optional, exp400. |
+| | *Superseded → `handoffs/archive/`* | | V151 and earlier are archived (**168+** files). |
 
 ## Cross-Spring Documents
 
