@@ -24,7 +24,7 @@ pub use parser::{MzxmlIter, for_each_scan, parse_mzxml};
 pub use types::MzxmlSpectrum;
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::parser::{MzxmlIter, for_each_scan, parse_mzxml};
     use super::parser::{decode_peaks, parse_retention_time};

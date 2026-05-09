@@ -141,7 +141,7 @@ impl BioBrain {
         }
         let sum: f64 = self.recent_urgencies.iter().sum();
         let n = self.recent_urgencies.len();
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
         let divisor = n as f64;
         sum / divisor
     }

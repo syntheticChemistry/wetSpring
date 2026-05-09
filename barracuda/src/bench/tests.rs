@@ -5,7 +5,10 @@
 use super::*;
 
 #[test]
-#[expect(clippy::float_cmp)]
+#[expect(
+    clippy::float_cmp,
+    reason = "exact equality intentional in determinism test"
+)]
 fn energy_report_default_values() {
     let r = EnergyReport::default();
     assert_eq!(r.cpu_joules, 0.0);

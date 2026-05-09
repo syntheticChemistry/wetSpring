@@ -188,7 +188,7 @@ fn bio_to_beta(obs: &BioObservation) -> BetaObservation {
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "test assertions")]
 mod tests {
     use super::*;
 

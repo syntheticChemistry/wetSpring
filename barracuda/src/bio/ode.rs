@@ -133,7 +133,11 @@ where
     F: Fn(&[f64], f64) -> Vec<f64>,
 {
     let n_vars = y0.len();
-    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_sign_loss,
+        reason = "value fits target type"
+    )]
     // Truncation/Sign: step count bounded by integration range
     let n_steps = ((t_end - t_start) / dt).ceil() as usize;
 
@@ -230,7 +234,8 @@ pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
     #[expect(
         clippy::cast_possible_truncation,
         clippy::cast_sign_loss,
-        clippy::cast_precision_loss
+        clippy::cast_precision_loss,
+        reason = "n_points fraction is small and positive"
     )]
     let tail_len = (n as f64 * frac).ceil() as usize;
     let start = n.saturating_sub(tail_len);
@@ -239,13 +244,13 @@ pub fn steady_state_mean(result: &OdeResult, var_idx: usize, frac: f64) -> f64 {
         return 0.0;
     }
     let sum: f64 = (start..n).map(|i| result.var_at(i, var_idx)).sum();
-    #[expect(clippy::cast_precision_loss)] // Precision: count bounded by n
+    #[expect(clippy::cast_precision_loss, reason = "Precision: count bounded by n")]
     let mean = sum / count as f64;
     mean
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use crate::tolerances;

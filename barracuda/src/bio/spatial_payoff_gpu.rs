@@ -101,7 +101,7 @@ impl SpatialPayoffGpuWrapper {
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "test assertions")]
 #[expect(
     clippy::cast_possible_truncation,
     reason = "test module: f64 tolerance → f32 cast is intentional for GPU f32 comparisons"

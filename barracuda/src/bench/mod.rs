@@ -204,7 +204,8 @@ pub(crate) fn json_escape(s: &str) -> String {
 #[expect(
     clippy::cast_possible_truncation,
     clippy::cast_possible_wrap,
-    clippy::cast_sign_loss
+    clippy::cast_sign_loss,
+    reason = "Unix epoch seconds and calendar arithmetic fit i64/u32"
 )]
 #[must_use]
 pub fn now_iso8601() -> String {

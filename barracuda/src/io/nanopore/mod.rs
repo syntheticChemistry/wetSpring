@@ -41,7 +41,11 @@ pub use synthetic::{SyntheticSignalGenerator, simple_basecall, threshold_basecal
 pub use types::{NanoporeRead, SignalStats};
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used, clippy::cast_precision_loss)]
+#[expect(
+    clippy::unwrap_used,
+    clippy::cast_precision_loss,
+    reason = "test assertions"
+)]
 mod tests {
     use super::*;
     use crate::tolerances;

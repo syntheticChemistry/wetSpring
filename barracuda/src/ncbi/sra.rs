@@ -201,7 +201,7 @@ fn which_exists(cmd: &str) -> bool {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
 

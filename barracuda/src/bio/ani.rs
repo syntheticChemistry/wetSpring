@@ -22,7 +22,7 @@ pub struct AniResult {
 /// Aligns sequences positionally (assumes pre-aligned or equal-length).
 /// Gaps (`-` or `.`) and `N`s are excluded from both numerator and denominator.
 #[must_use]
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
 pub fn pairwise_ani(seq1: &[u8], seq2: &[u8]) -> AniResult {
     const fn is_gap_or_n(b: u8) -> bool {
         matches!(b, b'-' | b'.' | b'N')

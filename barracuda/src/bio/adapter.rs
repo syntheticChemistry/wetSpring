@@ -102,7 +102,7 @@ pub(crate) const fn bases_match(a: u8, b: u8) -> bool {
     false
 }
 
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 #[cfg(test)]
 mod tests {
     use super::*;

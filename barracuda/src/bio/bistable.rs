@@ -166,7 +166,7 @@ pub struct BifurcationResult {
 ///
 /// Returns forward and backward branches of the bifurcation diagram.
 #[must_use]
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
 pub fn bifurcation_scan(
     base_params: &BistableParams,
     lo: f64,

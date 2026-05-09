@@ -48,7 +48,7 @@ fn demo_tree() -> TreeNode {
 /// Computes site log-likelihoods and bootstrap replicate distribution using
 /// live `BarraCUDA` math (JC69 + RK4 pruning).
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // site/bootstrap counts < 1000
+#[expect(clippy::cast_precision_loss, reason = "site/bootstrap counts < 1000")]
 pub fn felsenstein_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Felsenstein Pruning",
@@ -269,7 +269,7 @@ pub fn unifrac_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Computes pairwise dN/dS (omega) ratios for codon-aligned sequences and
 /// visualises per-gene omega distributions.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // pair counts < 100
+#[expect(clippy::cast_precision_loss, reason = "pair counts < 100")]
 pub fn dnds_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     use crate::bio::dnds;
 
@@ -342,7 +342,7 @@ pub fn dnds_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Applies strict clock to branch lengths with calibration constraints
 /// and visualises divergence times and rate variation.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // node/branch counts < 100
+#[expect(clippy::cast_precision_loss, reason = "node/branch counts < 100")]
 pub fn molecular_clock_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Molecular Clock",

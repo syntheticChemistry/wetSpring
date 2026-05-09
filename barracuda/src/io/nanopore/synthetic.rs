@@ -194,7 +194,10 @@ pub fn threshold_basecall(calibrated_pa: f64) -> u8 {
 /// computes the mean of each, and classifies by threshold.
 /// Returns the basecalled sequence.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // Precision: segment.len() bounded by calibrated len
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "Precision: segment.len() bounded by calibrated len"
+)]
 pub fn simple_basecall(calibrated: &[f64], n_bases: usize) -> Vec<u8> {
     if n_bases == 0 || calibrated.is_empty() {
         return Vec::new();

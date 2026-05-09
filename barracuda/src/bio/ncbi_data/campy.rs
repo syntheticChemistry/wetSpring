@@ -149,7 +149,7 @@ pub fn gen_synthetic_campy() -> Vec<CampyAssembly> {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use tempfile::TempDir;

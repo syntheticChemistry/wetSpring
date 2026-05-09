@@ -93,7 +93,10 @@ impl DecisionTree {
     /// Traverses from root to leaf, returning the predicted class.
     /// Panics if the tree structure is invalid (broken child pointers).
     #[must_use]
-    #[expect(clippy::cast_sign_loss)] // Sign: left_child/right_child from tree build, non-negative
+    #[expect(
+        clippy::cast_sign_loss,
+        reason = "Sign: left_child/right_child from tree build, non-negative"
+    )]
     pub fn predict(&self, features: &[f64]) -> usize {
         let mut idx = 0usize;
         loop {
@@ -149,7 +152,10 @@ impl DecisionTree {
         self.node_depth(0)
     }
 
-    #[expect(clippy::cast_sign_loss)] // Sign: left_child/right_child from tree build, non-negative
+    #[expect(
+        clippy::cast_sign_loss,
+        reason = "Sign: left_child/right_child from tree build, non-negative"
+    )]
     fn node_depth(&self, idx: usize) -> usize {
         let node = &self.nodes[idx];
         if node.is_leaf() {
@@ -161,7 +167,7 @@ impl DecisionTree {
     }
 }
 
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 #[cfg(test)]
 mod tests {
     use super::*;

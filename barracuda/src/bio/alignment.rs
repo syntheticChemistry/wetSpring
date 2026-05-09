@@ -80,7 +80,10 @@ const fn score_pair(a: u8, b: u8, params: &ScoringParams) -> i32 {
 /// assert_eq!(result.aligned_query, q);
 /// assert_eq!(result.aligned_target, t);
 /// ```
-#[expect(clippy::many_single_char_names)] // m, n, i, j, h, e, f — standard SW matrix notation
+#[expect(
+    clippy::many_single_char_names,
+    reason = "m, n, i, j, h, e, f — standard SW matrix notation"
+)]
 #[must_use]
 pub fn smith_waterman(query: &[u8], target: &[u8], params: &ScoringParams) -> AlignmentResult {
     let m = query.len();

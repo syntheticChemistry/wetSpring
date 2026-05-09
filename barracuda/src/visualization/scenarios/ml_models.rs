@@ -52,7 +52,7 @@ pub fn decision_tree_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         .zip(expected.iter())
         .filter(|(p, e)| p == e)
         .count();
-    #[expect(clippy::cast_precision_loss)] // sample counts < 100
+    #[expect(clippy::cast_precision_loss, reason = "sample counts < 100")]
     let accuracy = correct as f64 / predictions_vec.len() as f64;
 
     let mut dt_node = node(
@@ -174,7 +174,7 @@ pub fn random_forest_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         "importance",
     ));
 
-    #[expect(clippy::cast_precision_loss)] // vote counts < 100
+    #[expect(clippy::cast_precision_loss, reason = "vote counts < 100")]
     let n_oob = oob_errors.len() as f64;
     let mean_oob = oob_errors.iter().sum::<f64>() / n_oob;
     let std_oob = (oob_errors
@@ -211,7 +211,7 @@ pub fn random_forest_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Trains a small reservoir on a sine wave and visualises predictions
 /// vs actual values alongside reservoir state gauge.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // loop indices < 300
+#[expect(clippy::cast_precision_loss, reason = "loop indices < 300")]
 pub fn esn_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Echo State Network",

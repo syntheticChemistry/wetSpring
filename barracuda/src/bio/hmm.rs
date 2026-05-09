@@ -331,7 +331,10 @@ mod tests {
     }
 
     #[test]
-    #[expect(clippy::float_cmp)]
+    #[expect(
+        clippy::float_cmp,
+        reason = "exact equality intentional in determinism test"
+    )]
     fn log_sum_exp2_neg_inf() {
         assert_eq!(log_sum_exp2(f64::NEG_INFINITY, 1.0), 1.0);
         assert_eq!(log_sum_exp2(1.0, f64::NEG_INFINITY), 1.0);

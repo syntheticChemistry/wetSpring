@@ -36,7 +36,10 @@ pub fn find_peaks(data: &[f64], params: &PeakParams) -> Vec<Peak> {
 
     // Also handle flat-topped peaks: find runs where consecutive values are equal
     // and both edges are strictly lower. Pick the midpoint.
-    #[expect(clippy::float_cmp)] // exact equality is intentional for plateau detection
+    #[expect(
+        clippy::float_cmp,
+        reason = "exact equality is intentional for plateau detection"
+    )]
     let eq = |a: f64, b: f64| a == b;
 
     let mut i = 1;

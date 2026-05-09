@@ -55,7 +55,11 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-#[expect(clippy::cast_precision_loss, clippy::too_many_lines)]
+#[expect(
+    clippy::cast_precision_loss,
+    clippy::too_many_lines,
+    reason = "integer fits in f64 mantissa"
+)]
 pub fn dereplicate_gpu(
     gpu: &GpuF64,
     records: &[FastqRecord],

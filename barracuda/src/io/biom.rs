@@ -228,7 +228,7 @@ fn parse_sparse_data(val: &serde_json::Value, n_rows: usize, n_cols: usize) -> R
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use crate::tolerances;

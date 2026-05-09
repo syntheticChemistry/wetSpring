@@ -150,7 +150,7 @@ fn preview_msg(msg: &str, body: &str) -> String {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
 
@@ -274,12 +274,18 @@ mod tests {
         assert_eq!(msg, "error: ");
     }
 
-    #[expect(clippy::unnecessary_wraps)]
+    #[expect(
+        clippy::unnecessary_wraps,
+        reason = "signature required by test injection"
+    )]
     fn mock_fasta_get(_url: &str) -> crate::error::Result<String> {
         Ok(">K03455.1 Human immunodeficiency virus\nATCGATCGATCG\n".to_string())
     }
 
-    #[expect(clippy::unnecessary_wraps)]
+    #[expect(
+        clippy::unnecessary_wraps,
+        reason = "signature required by test injection"
+    )]
     fn mock_genbank_get(_url: &str) -> crate::error::Result<String> {
         Ok("LOCUS       K03455  9719 bp    RNA\nDEFINITION  HIV-1\n".to_string())
     }
@@ -288,7 +294,10 @@ mod tests {
         Err(crate::error::Error::Ncbi("connection refused".to_string()))
     }
 
-    #[expect(clippy::unnecessary_wraps)]
+    #[expect(
+        clippy::unnecessary_wraps,
+        reason = "signature required by test injection"
+    )]
     fn mock_html_error_get(_url: &str) -> crate::error::Result<String> {
         Ok("<!DOCTYPE html><html><body>Error</body></html>".to_string())
     }

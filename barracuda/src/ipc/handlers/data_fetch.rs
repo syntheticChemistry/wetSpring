@@ -17,6 +17,17 @@ use serde_json::{Value, json};
 use crate::ipc::protocol::RpcError;
 use crate::ipc::provenance as trio;
 
+const CHEMBL_BASE_DEFAULT: &str = "https://www.ebi.ac.uk/chembl/api/data/activity.json";
+const PUBCHEM_BASE_DEFAULT: &str = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid";
+
+fn chembl_base() -> String {
+    std::env::var("WETSPRING_CHEMBL_BASE_URL").unwrap_or_else(|_| CHEMBL_BASE_DEFAULT.to_owned())
+}
+
+fn pubchem_base() -> String {
+    std::env::var("WETSPRING_PUBCHEM_BASE_URL").unwrap_or_else(|_| PUBCHEM_BASE_DEFAULT.to_owned())
+}
+
 // ── Public handlers ─────────────────────────────────────────────────────
 
 /// Fetch JAK inhibitor panel data from ChEMBL via primal composition.
@@ -24,15 +35,15 @@ use crate::ipc::provenance as trio;
 /// biomeOS routes to NestGate which handles TLS to `ebi.ac.uk`, content-
 /// addresses, caches, and returns the payload. wetSpring never opens a
 /// network connection.
+///
+/// Override: `WETSPRING_CHEMBL_BASE_URL`
 pub fn handle_chembl_fetch(params: &Value) -> Result<Value, RpcError> {
     let chembl_id = params
         .get("chembl_id")
         .and_then(Value::as_str)
         .unwrap_or("CHEMBL2103874");
 
-    let url = format!(
-        "https://www.ebi.ac.uk/chembl/api/data/activity.json?molecule_chembl_id={chembl_id}&limit=100"
-    );
+    let url = format!("{}?molecule_chembl_id={chembl_id}&limit=100", chembl_base());
     let cache_key = format!("data:chembl:{chembl_id}");
 
     let session = trio::begin_session(&format!("data.fetch.chembl:{chembl_id}"));
@@ -85,6 +96,8 @@ pub fn handle_chembl_fetch(params: &Value) -> Result<Value, RpcError> {
 ///
 /// biomeOS routes to NestGate which handles TLS to
 /// `pubchem.ncbi.nlm.nih.gov`. wetSpring never opens a network connection.
+///
+/// Override: `WETSPRING_PUBCHEM_BASE_URL`
 pub fn handle_pubchem_fetch(params: &Value) -> Result<Value, RpcError> {
     let aid = params
         .get("aid")
@@ -92,7 +105,7 @@ pub fn handle_pubchem_fetch(params: &Value) -> Result<Value, RpcError> {
         .or_else(|| params.get("assay_id").and_then(Value::as_str))
         .ok_or_else(|| RpcError::invalid_params("missing required param: aid or assay_id"))?;
 
-    let url = format!("https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/{aid}/JSON");
+    let url = format!("{}/{aid}/JSON", pubchem_base());
     let cache_key = format!("data:pubchem:{aid}");
 
     let session = trio::begin_session(&format!("data.fetch.pubchem:{aid}"));

@@ -341,7 +341,10 @@ fn validator_zero_checks() {
 // ── Determinism (rerun-identical) tests ────────────────────────
 
 #[test]
-#[expect(clippy::float_cmp)]
+#[expect(
+    clippy::float_cmp,
+    reason = "exact equality intentional in determinism test"
+)]
 fn determinism_diversity() {
     use crate::bio::diversity::{bray_curtis, chao1, shannon, simpson};
 
@@ -367,7 +370,10 @@ fn determinism_diversity() {
 }
 
 #[test]
-#[expect(clippy::float_cmp)]
+#[expect(
+    clippy::float_cmp,
+    reason = "exact equality intentional in determinism test"
+)]
 fn determinism_ode() {
     use crate::bio::qs_biofilm::{QsBiofilmParams, run_scenario};
 
@@ -389,7 +395,10 @@ fn determinism_ode() {
 }
 
 #[test]
-#[expect(clippy::float_cmp)]
+#[expect(
+    clippy::float_cmp,
+    reason = "exact equality intentional in determinism test"
+)]
 fn determinism_special_functions() {
     let x = 1.5;
     let erf1 = barracuda::special::erf(x);
@@ -407,7 +416,10 @@ fn determinism_special_functions() {
 
 #[cfg(feature = "gpu")]
 #[test]
-#[expect(clippy::float_cmp)]
+#[expect(
+    clippy::float_cmp,
+    reason = "exact equality intentional in determinism test"
+)]
 fn determinism_anderson_spectral() {
     use barracuda::spectral::{anderson_2d, lanczos, lanczos_eigenvalues, level_spacing_ratio};
 
@@ -447,7 +459,10 @@ fn determinism_encoding_roundtrip() {
 }
 
 #[test]
-#[expect(clippy::float_cmp)]
+#[expect(
+    clippy::float_cmp,
+    reason = "exact equality intentional in determinism test"
+)]
 fn determinism_fastq_parsing() {
     use crate::io::fastq::stats_from_file;
     use std::fs::File;

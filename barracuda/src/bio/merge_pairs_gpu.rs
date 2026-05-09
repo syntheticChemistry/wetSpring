@@ -48,7 +48,10 @@ pub fn merge_pairs_gpu(
     if !merged.is_empty() {
         let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device())
             .map_err(|e| Error::Gpu(format!("FusedMapReduceF64: {e}")))?;
-        #[expect(clippy::cast_precision_loss)] // Precision: sequence len fits f64
+        #[expect(
+            clippy::cast_precision_loss,
+            reason = "Precision: sequence len fits f64"
+        )]
         let lengths: Vec<f64> = merged.iter().map(|r| r.sequence.len() as f64).collect();
         let _total = fmr.sum(&lengths).map_err(|e| Error::Gpu(format!("{e}")))?;
     }
@@ -73,7 +76,7 @@ pub fn merge_pair_gpu(
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::type_complexity)]
+#[expect(clippy::type_complexity, reason = "GPU pipeline type")]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

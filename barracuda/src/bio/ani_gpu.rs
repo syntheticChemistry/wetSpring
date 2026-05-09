@@ -55,7 +55,11 @@ impl AniGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
-    #[expect(clippy::cast_possible_truncation, clippy::similar_names)] // Truncation: n_pairs, seq_len fit u32
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::similar_names,
+        reason = "Truncation: n_pairs, seq_len fit u32"
+    )]
     pub fn batch_ani(&self, pairs: &[(&[u8], &[u8])]) -> crate::error::Result<AniGpuResult> {
         let n_pairs = pairs.len();
         if n_pairs == 0 {
@@ -163,7 +167,11 @@ impl AniGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::expect_used, clippy::type_complexity)]
+#[expect(
+    clippy::expect_used,
+    clippy::type_complexity,
+    reason = "test assertions"
+)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

@@ -48,7 +48,7 @@ impl Dada2Gpu {
     /// Compute `log_p_error` for all (seq, center) pairs in a single GPU dispatch.
     ///
     /// Returns an `n_seqs × n_centers` matrix (row-major).
-    #[expect(clippy::too_many_arguments)]
+    #[expect(clippy::too_many_arguments, reason = "mirrors domain interface")]
     fn batch_log_p_error(
         &self,
         bases: &[u32],
@@ -131,7 +131,7 @@ impl Dada2Gpu {
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines, reason = "complexity inherent to algorithm")]
 pub fn denoise_gpu(
     dada2: &Dada2Gpu,
     seqs: &[UniqueSequence],
@@ -320,7 +320,10 @@ fn init_error_model() -> ErrorModel {
     dada2::init_error_model()
 }
 
-#[expect(clippy::needless_range_loop)]
+#[expect(
+    clippy::needless_range_loop,
+    reason = "index access required for multi-dimensional arrays"
+)]
 fn flatten_log_error_model(err: &ErrorModel) -> Vec<f64> {
     let mut flat = vec![0.0_f64; NUM_BASES * NUM_BASES * MAX_QUAL];
     for from in 0..NUM_BASES {
@@ -406,7 +409,10 @@ fn build_asvs(seqs: &[&UniqueSequence], partition: &[usize], centers: &[usize]) 
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::manual_let_else)]
+#[expect(
+    clippy::manual_let_else,
+    reason = "fallible conversion requires explicit handling"
+)]
 mod tests {
     use super::*;
     use crate::bio::derep::UniqueSequence;

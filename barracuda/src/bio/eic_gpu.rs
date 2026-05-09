@@ -158,7 +158,10 @@ pub fn batch_eic_total_intensity_gpu(gpu: &GpuF64, eics: &[Eic]) -> Result<Vec<f
 /// # Errors
 ///
 /// Returns an error if GPU dispatch fails or the device lacks f64 support.
-#[expect(clippy::cast_precision_loss)] // Precision: eic.intensity.len() fits f64
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "Precision: eic.intensity.len() fits f64"
+)]
 pub fn batch_find_peaks_gpu(
     gpu: &GpuF64,
     eics: &[Eic],
@@ -196,7 +199,7 @@ pub fn batch_find_peaks_gpu(
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use crate::bio::eic::Eic;

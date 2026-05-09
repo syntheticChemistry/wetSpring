@@ -8,7 +8,7 @@ use super::{BenchReport, PhaseResult, format_duration, format_eval_time};
 /// # Panics
 ///
 /// Panics if `matching` has fewer than 2 elements when computing speedup (internal logic error).
-#[expect(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines, reason = "complexity inherent to algorithm")]
 pub fn print_bench_report(report: &BenchReport) {
     println!();
     println!(
@@ -60,7 +60,7 @@ pub fn print_bench_report(report: &BenchReport) {
         };
 
         let j_per_eval = if primary_joules > 0.0 && p.n_evals > 0 {
-            #[expect(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
             let j = primary_joules / p.n_evals as f64;
             if j > 0.01 {
                 format!("{j:.3}")

@@ -134,7 +134,7 @@ pub fn biome_diversity_params() -> Vec<(&'static str, usize, f64)> {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use tempfile::TempDir;

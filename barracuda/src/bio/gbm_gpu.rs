@@ -73,7 +73,7 @@ fn predict_multi_batch(
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use crate::bio::gbm::GbmTree;

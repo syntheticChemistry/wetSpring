@@ -59,7 +59,10 @@ impl UniFracGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or readback fails.
-    #[expect(clippy::cast_possible_truncation)] // Truncation: n_nodes, n_samples, n_leaves fit u32
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "Truncation: n_nodes, n_samples, n_leaves fit u32"
+    )]
     pub fn propagate(
         &self,
         parent_array: &[u32],
@@ -133,7 +136,7 @@ impl UniFracGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::type_complexity)]
+#[expect(clippy::type_complexity, reason = "GPU pipeline type")]
 mod tests {
     use super::*;
 

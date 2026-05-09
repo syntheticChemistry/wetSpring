@@ -18,7 +18,11 @@ use super::{bar, gauge, heatmap, node, scaffold};
 ///
 /// Panics if fewer than 2 sequences are provided.
 #[must_use]
-#[expect(clippy::cast_precision_loss, clippy::naive_bytecount)]
+#[expect(
+    clippy::cast_precision_loss,
+    clippy::naive_bytecount,
+    reason = "integer fits in f64 mantissa"
+)]
 pub fn msa_scenario(
     sequences: &[&[u8]],
     labels: &[String],

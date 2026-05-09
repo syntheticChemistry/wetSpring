@@ -135,7 +135,7 @@ pub fn find_peaks_with_area_batch_gpu(
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::type_complexity)]
+#[expect(clippy::type_complexity, reason = "GPU pipeline type")]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

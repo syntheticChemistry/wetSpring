@@ -14,7 +14,10 @@ use super::{distribution, gauge, node, scaffold};
 /// - **Gauge**: total reads, mean quality, pass rate
 /// - **Distribution**: read length distribution
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // Precision: total_reads, passed_reads fit f64
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "Precision: total_reads, passed_reads fit f64"
+)]
 pub fn basecalling_scenario(
     total_reads: usize,
     passed_reads: usize,

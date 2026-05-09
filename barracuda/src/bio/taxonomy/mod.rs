@@ -53,7 +53,7 @@ pub(crate) fn argmax_with_priors(scores: &[f64], log_priors: &[f64]) -> usize {
 }
 
 #[cfg(test)]
-#[expect(clippy::expect_used, clippy::unwrap_used)]
+#[expect(clippy::expect_used, clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use crate::tolerances;

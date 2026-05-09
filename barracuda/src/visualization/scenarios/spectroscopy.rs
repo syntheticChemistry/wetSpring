@@ -124,7 +124,7 @@ pub fn spectroscopy_scenario_from_data(
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
 

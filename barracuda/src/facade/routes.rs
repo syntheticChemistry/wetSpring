@@ -565,7 +565,8 @@ pub async fn system_composition() -> Json<Value> {
         "reproduction": {
             "fetch_command": "cd plasmidBin && ./fetch.sh --tag v0.7.0",
             "deploy_command": "biomeos deploy --graph graphs/wetspring_science_nucleus.toml",
-            "plasmid_bin_url": "https://github.com/ecoPrimals/plasmidBin",
+            "plasmid_bin_url": std::env::var("WETSPRING_PLASMID_BIN_URL")
+                .unwrap_or_else(|_| "https://github.com/ecoPrimals/plasmidBin".to_owned()),
         },
         "provenance": prov,
     }))

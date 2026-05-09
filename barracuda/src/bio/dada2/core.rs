@@ -77,11 +77,14 @@ fn em_step(
 
 /// Initialize error model from Phred quality scores (no prior data).
 #[must_use]
-#[expect(clippy::needless_range_loop)] // 3D array requires indexing by from/to/q
+#[expect(
+    clippy::needless_range_loop,
+    reason = "3D array requires indexing by from/to/q"
+)]
 pub fn init_error_model() -> ErrorModel {
     let mut err = [[[0.0_f64; MAX_QUAL]; NUM_BASES]; NUM_BASES];
     for q in 0..MAX_QUAL {
-        #[expect(clippy::cast_precision_loss)] // q is 0..42, exact
+        #[expect(clippy::cast_precision_loss, reason = "q is 0..42, exact")]
         let p_err = (10.0_f64).powf(-(q as f64) / 10.0).clamp(MIN_ERR, MAX_ERR);
         for from in 0..NUM_BASES {
             for to in 0..NUM_BASES {
@@ -96,7 +99,10 @@ pub fn init_error_model() -> ErrorModel {
     err
 }
 
-#[expect(clippy::match_same_arms)]
+#[expect(
+    clippy::match_same_arms,
+    reason = "explicit arms for documentation clarity"
+)]
 /// Map nucleotide to error-matrix index: A=0, C=1, G=2, T=3.
 ///
 /// Ambiguous/unknown bases (N, IUPAC degenerate) map to 0 (A).
@@ -154,7 +160,11 @@ fn assign_to_centers(
 }
 
 /// Re-estimate error model from observed substitution patterns.
-#[expect(clippy::cast_precision_loss, clippy::needless_range_loop)] // Precision: abundance and quality indices bounded
+#[expect(
+    clippy::cast_precision_loss,
+    clippy::needless_range_loop,
+    reason = "Precision: abundance and quality indices bounded"
+)]
 pub fn estimate_error_model(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -231,7 +241,10 @@ pub fn err_model_converged(old: &ErrorModel, new: &ErrorModel) -> bool {
 /// For each non-center sequence, computes the expected abundance under the
 /// error model and tests whether the observed abundance is significantly
 /// higher using a Poisson CDF approximation.
-#[expect(clippy::cast_precision_loss)] // Precision: abundance and indices bounded by partition size
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "Precision: abundance and indices bounded by partition size"
+)]
 fn find_new_centers(
     seqs: &[&UniqueSequence],
     partition: &[usize],
@@ -274,7 +287,10 @@ fn find_new_centers(
 /// Upper-tail Poisson p-value: P(X >= k) for X ~ Poisson(lambda).
 /// Uses the identity: P(X >= k | Poisson(λ)) = P(k, λ) where P is the
 /// regularized lower incomplete gamma function.
-#[expect(clippy::cast_precision_loss)] // Precision: k bounded by read count (< 2^53)
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "Precision: k bounded by read count (< 2^53)"
+)]
 #[must_use]
 pub fn poisson_pvalue(k: usize, lambda: f64) -> f64 {
     if lambda <= 0.0 || k == 0 {

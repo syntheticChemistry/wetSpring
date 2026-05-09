@@ -69,7 +69,7 @@ fn preview_msg(msg: &str, body: &str) -> String {
 }
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
 

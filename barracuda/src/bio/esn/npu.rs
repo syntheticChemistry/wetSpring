@@ -21,7 +21,10 @@ pub struct NpuReadoutWeights {
 impl NpuReadoutWeights {
     /// Quantize raw readout weights to NPU format (shared by `LegacyEsn` and `BioEsn`).
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)] // Truncation: q clamped to [-128,127]
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "Truncation: q clamped to [-128,127]"
+    )]
     pub fn from_readout_weights(w_out: &[f64], output_size: usize, reservoir_size: usize) -> Self {
         if w_out.is_empty() {
             return Self {

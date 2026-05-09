@@ -185,7 +185,11 @@ impl MultiSignalGpu {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::expect_used, clippy::type_complexity)]
+#[expect(
+    clippy::expect_used,
+    clippy::type_complexity,
+    reason = "test assertions"
+)]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

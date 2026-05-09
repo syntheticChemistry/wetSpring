@@ -85,7 +85,7 @@ pub fn pcoa_gpu(
 
     // 2. GPU eigendecomposition via barraCuda
     let device = gpu.to_wgpu_device();
-    #[expect(clippy::cast_possible_truncation)] // capped at 5000, fits u32
+    #[expect(clippy::cast_possible_truncation, reason = "capped at 5000, fits u32")]
     let max_sweeps = (100 * n).min(5000) as u32;
 
     let (raw_eigenvalues, raw_eigenvectors) = if n <= 32 {
@@ -157,7 +157,7 @@ fn double_center(condensed: &[f64], n: usize) -> Vec<f64> {
     }
 
     // Row means (= column means since D² is symmetric)
-    #[expect(clippy::cast_precision_loss)] // N < 2^53 for any real dataset
+    #[expect(clippy::cast_precision_loss, reason = "N < 2^53 for any real dataset")]
     let n_f = n as f64;
     let mut row_means = vec![0.0; n];
     for i in 0..n {
@@ -180,7 +180,7 @@ fn double_center(condensed: &[f64], n: usize) -> Vec<f64> {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::used_underscore_items)]
+#[expect(clippy::used_underscore_items, reason = "GPU testing infrastructure")]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

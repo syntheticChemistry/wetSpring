@@ -36,7 +36,10 @@ struct GemmParams {
 }
 
 impl GemmParams {
-    #[expect(clippy::cast_possible_truncation)] // Truncation: f64.to_bits() hi/lo halves fit u32
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "Truncation: f64.to_bits() hi/lo halves fit u32"
+    )]
     const fn new(m: u32, k: u32, n: u32, batch_size: u32, alpha: f64, beta: f64) -> Self {
         let alpha_bits = alpha.to_bits();
         let beta_bits = beta.to_bits();
@@ -106,7 +109,10 @@ impl GemmCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch or readback fails.
-    #[expect(clippy::many_single_char_names)]
+    #[expect(
+        clippy::many_single_char_names,
+        reason = "standard mathematical notation"
+    )]
     pub fn execute(
         &self,
         a: &[f64],
@@ -161,7 +167,10 @@ impl GemmCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails.
-    #[expect(clippy::many_single_char_names)]
+    #[expect(
+        clippy::many_single_char_names,
+        reason = "standard mathematical notation"
+    )]
     pub fn execute_to_buffer(
         &self,
         a: &[f64],
@@ -217,7 +226,11 @@ impl GemmCached {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch or readback fails.
-    #[expect(clippy::many_single_char_names, clippy::too_many_arguments)]
+    #[expect(
+        clippy::many_single_char_names,
+        clippy::too_many_arguments,
+        reason = "standard mathematical notation"
+    )]
     pub fn execute_ex(
         &self,
         a: &[f64],
@@ -271,7 +284,11 @@ impl GemmCached {
         self.execute(&a_t, &b_t, out_rows, inner, out_cols, batch_size)
     }
 
-    #[expect(clippy::many_single_char_names, clippy::too_many_arguments)]
+    #[expect(
+        clippy::many_single_char_names,
+        clippy::too_many_arguments,
+        reason = "standard mathematical notation"
+    )]
     fn acquire_and_upload(
         &self,
         pool: &BufferPool,
@@ -303,7 +320,7 @@ impl GemmCached {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::type_complexity)]
+#[expect(clippy::type_complexity, reason = "GPU pipeline type")]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

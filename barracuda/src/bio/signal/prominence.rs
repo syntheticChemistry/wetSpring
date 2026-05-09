@@ -58,7 +58,10 @@ pub(super) fn compute_peak_properties(data: &[f64], peak_idx: usize) -> Peak {
 }
 
 /// Linearly interpolate where the signal crosses a threshold.
-#[expect(clippy::cast_precision_loss)] // indices are tiny relative to f64 range
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "indices are tiny relative to f64 range"
+)]
 pub(super) fn interpolate_crossing(
     data: &[f64],
     peak_idx: usize,

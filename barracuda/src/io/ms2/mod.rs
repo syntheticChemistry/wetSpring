@@ -24,7 +24,7 @@ pub use stats::{compute_stats, stats_from_file};
 pub use types::{Ms2Spectrum, Ms2Stats};
 
 #[cfg(test)]
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use crate::error::Result;

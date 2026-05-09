@@ -26,7 +26,7 @@
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use serde_json::{Value, json};
@@ -42,28 +42,18 @@ fn main() {
     let wetspring_socket = resolve_socket("WETSPRING_SOCKET", "wetspring-default.sock");
     let biomeos_socket = resolve_socket("BIOMEOS_SOCKET", "default.sock");
 
-    let ws_live = wetspring_socket.as_ref().is_some_and(|p| p.exists());
+    let ws_live = wetspring_socket.exists();
     v.check_bool(
         "wetspring_socket_exists",
         ws_live,
-        &format!(
-            "socket: {}",
-            wetspring_socket
-                .as_ref()
-                .map_or("not found".into(), |p| p.display().to_string()),
-        ),
+        &format!("socket: {}", wetspring_socket.display()),
     );
 
-    let bio_live = biomeos_socket.as_ref().is_some_and(|p| p.exists());
+    let bio_live = biomeos_socket.exists();
     v.check_bool(
         "biomeos_socket_exists",
         bio_live,
-        &format!(
-            "biomeOS: {}",
-            biomeos_socket
-                .as_ref()
-                .map_or("not found".into(), |p| p.display().to_string()),
-        ),
+        &format!("biomeOS: {}", biomeos_socket.display()),
     );
 
     // ── Tower Atomic (BearDog + Songbird) ──────────────────────────
@@ -98,7 +88,7 @@ fn main() {
 // Tower Atomic
 // ═════════════════════════════════════════════════════════════════════
 
-fn tower_health(socket: &Option<PathBuf>, v: &mut Harness) {
+fn tower_health(socket: &Path, v: &mut Harness) {
     for (label, method) in [
         ("beardog_health", "health.check"),
         ("songbird_health", "health.check"),
@@ -110,7 +100,7 @@ fn tower_health(socket: &Option<PathBuf>, v: &mut Harness) {
     }
 }
 
-fn tower_crypto_hash(socket: &Option<PathBuf>, v: &mut Harness) {
+fn tower_crypto_hash(socket: &Path, v: &mut Harness) {
     let test_data = "wetSpring exp400 NUCLEUS composition parity";
     match try_rpc(
         socket,
@@ -147,14 +137,14 @@ fn tower_crypto_hash(socket: &Option<PathBuf>, v: &mut Harness) {
 // Node Atomic
 // ═════════════════════════════════════════════════════════════════════
 
-fn node_compute_health(socket: &Option<PathBuf>, v: &mut Harness) {
+fn node_compute_health(socket: &Path, v: &mut Harness) {
     match try_rpc(socket, "compute.health", &json!({})) {
         Ok(r) => v.check_bool("compute_health", r.get("status").is_some(), &format!("{r}")),
         Err(e) => v.skip("compute_health", &e),
     }
 }
 
-fn node_stats_mean(socket: &Option<PathBuf>, v: &mut Harness) {
+fn node_stats_mean(socket: &Path, v: &mut Harness) {
     let data = vec![1.0, 2.0, 3.0, 4.0, 5.0];
     let expected_mean = 3.0;
     match try_rpc(
@@ -179,14 +169,14 @@ fn node_stats_mean(socket: &Option<PathBuf>, v: &mut Harness) {
 // Nest Atomic
 // ═════════════════════════════════════════════════════════════════════
 
-fn nest_storage_health(socket: &Option<PathBuf>, v: &mut Harness) {
+fn nest_storage_health(socket: &Path, v: &mut Harness) {
     match try_rpc(socket, "storage.health", &json!({})) {
         Ok(r) => v.check_bool("storage_health", r.get("status").is_some(), &format!("{r}")),
         Err(e) => v.skip("storage_health", &e),
     }
 }
 
-fn nest_provenance_health(socket: &Option<PathBuf>, v: &mut Harness) {
+fn nest_provenance_health(socket: &Path, v: &mut Harness) {
     match try_rpc(socket, "provenance.health", &json!({})) {
         Ok(r) => v.check_bool(
             "provenance_health",
@@ -201,7 +191,7 @@ fn nest_provenance_health(socket: &Option<PathBuf>, v: &mut Harness) {
 // wetSpring Niche
 // ═════════════════════════════════════════════════════════════════════
 
-fn niche_science_health(socket: &Option<PathBuf>, v: &mut Harness) {
+fn niche_science_health(socket: &Path, v: &mut Harness) {
     match try_rpc(socket, "health.check", &json!({})) {
         Ok(r) => {
             let methods = r.get("methods").and_then(Value::as_u64).unwrap_or(0);
@@ -215,7 +205,7 @@ fn niche_science_health(socket: &Option<PathBuf>, v: &mut Harness) {
     }
 }
 
-fn niche_diversity_parity(socket: &Option<PathBuf>, v: &mut Harness) {
+fn niche_diversity_parity(socket: &Path, v: &mut Harness) {
     let abundances = vec![10.0, 20.0, 30.0, 15.0, 25.0];
     match try_rpc(
         socket,
@@ -235,7 +225,7 @@ fn niche_diversity_parity(socket: &Option<PathBuf>, v: &mut Harness) {
     }
 }
 
-fn niche_capability_list(socket: &Option<PathBuf>, v: &mut Harness) {
+fn niche_capability_list(socket: &Path, v: &mut Harness) {
     match try_rpc(socket, "capability.list", &json!({})) {
         Ok(r) => {
             let methods = r.get("methods").and_then(|m| m.as_array());
@@ -254,11 +244,7 @@ fn niche_capability_list(socket: &Option<PathBuf>, v: &mut Harness) {
 // Cross-Atomic Pipeline
 // ═════════════════════════════════════════════════════════════════════
 
-fn cross_atomic_pipeline(
-    ws_socket: &Option<PathBuf>,
-    bio_socket: &Option<PathBuf>,
-    v: &mut Harness,
-) {
+fn cross_atomic_pipeline(ws_socket: &Path, bio_socket: &Path, v: &mut Harness) {
     let test_blob = json!({"experiment": "exp400", "data": [1.0, 2.0, 3.0]});
     let blob_str = serde_json::to_string(&test_blob).unwrap_or_default();
 
@@ -325,23 +311,20 @@ fn cross_atomic_pipeline(
 // Infrastructure
 // ═════════════════════════════════════════════════════════════════════
 
-fn resolve_socket(env_var: &str, filename: &str) -> Option<PathBuf> {
+fn resolve_socket(env_var: &str, filename: &str) -> PathBuf {
     if let Ok(p) = std::env::var(env_var) {
-        return Some(PathBuf::from(p));
+        return PathBuf::from(p);
     }
     let runtime = std::env::var("XDG_RUNTIME_DIR")
         .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
-    Some(PathBuf::from(runtime).join("biomeos").join(filename))
+    PathBuf::from(runtime).join("biomeos").join(filename)
 }
 
-fn try_rpc(socket: &Option<PathBuf>, method: &str, params: &Value) -> Result<Value, String> {
-    let path = socket
-        .as_ref()
-        .ok_or_else(|| "socket path not resolved".to_string())?;
-    if !path.exists() {
+fn try_rpc(socket: &Path, method: &str, params: &Value) -> Result<Value, String> {
+    if !socket.exists() {
         return Err(format!(
             "socket not found: {} — primal offline (gap)",
-            path.display()
+            socket.display()
         ));
     }
 
@@ -354,7 +337,7 @@ fn try_rpc(socket: &Option<PathBuf>, method: &str, params: &Value) -> Result<Val
     let request_line = serde_json::to_string(&request).map_err(|e| format!("serialize: {e}"))?;
 
     let stream =
-        UnixStream::connect(path).map_err(|e| format!("connect {}: {e}", path.display()))?;
+        UnixStream::connect(socket).map_err(|e| format!("connect {}: {e}", socket.display()))?;
     stream.set_read_timeout(Some(RPC_TIMEOUT)).ok();
     stream.set_write_timeout(Some(RPC_TIMEOUT)).ok();
 
@@ -413,6 +396,10 @@ impl Harness {
         }
     }
 
+    #[expect(
+        clippy::unused_self,
+        reason = "method receiver for v.section() call ergonomics"
+    )]
     fn section(&self, label: &str) {
         println!("\n── {label} ──────────────────────────────────────────");
     }

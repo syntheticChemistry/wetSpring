@@ -109,7 +109,12 @@ pub fn roundtrip_error(v: f64) -> f64 {
 }
 
 #[cfg(test)]
-#[expect(clippy::float_cmp, clippy::unwrap_used, clippy::expect_used)]
+#[expect(
+    clippy::float_cmp,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    reason = "exact equality intentional in determinism test"
+)]
 mod tests {
     use super::*;
     use crate::tolerances;

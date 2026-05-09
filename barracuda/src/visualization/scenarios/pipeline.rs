@@ -13,7 +13,7 @@ use super::{bar, distribution, edge, gauge, heatmap, node, scaffold, timeseries}
 /// Demonstrates Phred score distributions and per-position quality profiles
 /// using synthetic reads.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // position/count indices < 300
+#[expect(clippy::cast_precision_loss, reason = "position/count indices < 300")]
 pub fn quality_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Quality Filtering",
@@ -84,7 +84,7 @@ pub fn quality_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Runs DADA2 on synthetic unique sequences and visualises the error model
 /// and ASV output counts.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // ASV/read counts < 10_000
+#[expect(clippy::cast_precision_loss, reason = "ASV/read counts < 10_000")]
 pub fn dada2_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     use crate::bio::derep::UniqueSequence;
 

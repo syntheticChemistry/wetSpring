@@ -448,7 +448,8 @@ mod tests {
 
     #[test]
     fn guidestone_readiness_is_valid() {
-        assert!(GUIDESTONE_READINESS <= 5);
+        let readiness = GUIDESTONE_READINESS;
+        assert!(readiness <= 5);
     }
 
     #[test]
@@ -504,6 +505,9 @@ mod tests {
     /// than a hard failure.
     #[test]
     fn proto_nucleate_node_names_match_niche_dependencies() {
+        const OPTIONAL_IN_DOWNSTREAM_DEPENDS_ON: &[&str] =
+            &["rhizocrypt", "loamspine", "sweetgrass"];
+
         let manifest_path = concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/../../primalSpring/graphs/downstream/downstream_manifest.toml"
@@ -535,10 +539,6 @@ mod tests {
             section.contains("owner = \"wetSpring\""),
             "wetspring downstream entry must declare owner = \"wetSpring\""
         );
-
-        // IPC trio may be wired outside consolidated `depends_on`; optional there per PG-02.
-        const OPTIONAL_IN_DOWNSTREAM_DEPENDS_ON: &[&str] =
-            &["rhizocrypt", "loamspine", "sweetgrass"];
 
         for dep in DEPENDENCIES {
             if OPTIONAL_IN_DOWNSTREAM_DEPENDS_ON.contains(&dep.name) {

@@ -177,7 +177,7 @@ fn stream_fasta_subsampled(
     Some(refs)
 }
 
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 #[cfg(test)]
 mod tests {
     use super::*;

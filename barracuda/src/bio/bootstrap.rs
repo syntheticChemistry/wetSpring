@@ -150,7 +150,7 @@ pub fn bootstrap_support(
             a_wins += 1;
         }
     }
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
     {
         a_wins as f64 / n_reps as f64
     }

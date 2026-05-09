@@ -65,7 +65,7 @@ impl GpuPipelineSession {
     /// # Errors
     ///
     /// Returns an error if GPU dispatch fails for taxonomy or diversity.
-    #[expect(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
     pub fn stream_sample(
         &self,
         classifier: &NaiveBayesClassifier,

@@ -169,7 +169,7 @@ pub fn screen_pfas_fragments(
     }
 }
 
-#[expect(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 #[cfg(test)]
 mod tests {
     use super::*;

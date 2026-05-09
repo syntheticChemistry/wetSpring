@@ -208,7 +208,7 @@ fn pack_quality_data(reads: &[FastqRecord]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::type_complexity)]
+#[expect(clippy::type_complexity, reason = "GPU pipeline type")]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

@@ -204,7 +204,7 @@ mod tests {
         let peaks = find_peaks(&data, &params);
         assert_eq!(peaks.len(), 3);
         // Peaks should be near 40, 100, 160
-        #[expect(clippy::cast_precision_loss)]
+        #[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
         {
             assert!((peaks[0].index as f64 - 40.0).abs() < crate::tolerances::PEAK_INDEX_PROXIMITY);
             assert!(

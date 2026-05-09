@@ -74,7 +74,7 @@ pub struct DerepStats {
 /// # Returns
 ///
 /// Tuple of (unique sequences, statistics).
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
 pub fn dereplicate(
     records: &[FastqRecord],
     sort: DerepSort,
@@ -193,7 +193,10 @@ pub fn to_fasta_with_abundance(uniques: &[UniqueSequence]) -> String {
 /// Returns a vector of f64 counts (one per unique sequence), sorted
 /// by abundance descending — ready for Shannon/Simpson/Chao1.
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // abundance to f64 for diversity calculations
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "abundance to f64 for diversity calculations"
+)]
 pub fn abundance_vector(uniques: &[UniqueSequence]) -> Vec<f64> {
     let mut counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
     counts.sort_by(|a, b| b.total_cmp(a));

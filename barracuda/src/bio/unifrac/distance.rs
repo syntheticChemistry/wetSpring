@@ -28,7 +28,7 @@ pub fn to_sample_matrix(
     flat_tree: &FlatTree,
     samples: &AbundanceTable,
 ) -> (Vec<f64>, usize, usize) {
-    let sample_ids: Vec<&String> = samples.keys().collect();
+    let sample_ids: Vec<&str> = samples.keys().map(String::as_str).collect();
     let n_samples = sample_ids.len();
     let n_leaves = flat_tree.leaf_labels.len();
     let mut matrix = vec![0.0_f64; n_samples * n_leaves];

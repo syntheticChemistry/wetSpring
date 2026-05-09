@@ -73,8 +73,9 @@ pub fn certify(max_layer: u8) -> ValidationResult {
     );
 
     if alive == 0 {
-        eprintln!("\n  No NUCLEUS primals discovered. Bare properties validated.");
-        eprintln!("  Deploy from plasmidBin and rerun for full certification.\n");
+        tracing::warn!(
+            "No NUCLEUS primals discovered — bare properties validated. Deploy from plasmidBin and rerun for full certification."
+        );
         v.finish();
         return v;
     }

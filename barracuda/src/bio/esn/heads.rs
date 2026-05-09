@@ -256,7 +256,10 @@ impl BioHeadGroupDisagreement {
             max - min
         };
         let phase_disagree = {
-            #[expect(clippy::bool_to_int_with_if)]
+            #[expect(
+                clippy::bool_to_int_with_if,
+                reason = "explicit conversion for readability"
+            )]
             let phase_label = |v: f64| -> u8 {
                 if v > PHASE_LABEL_HIGH {
                     2

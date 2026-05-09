@@ -51,7 +51,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// # Errors
 ///
 /// Returns an error if the device lacks `SHADER_F64` support.
-#[expect(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
 pub fn detect_chimeras_gpu(
     gpu: &GpuF64,
     seqs: &[Asv],

@@ -334,7 +334,7 @@ fn provenance_lifecycle_roundtrip() {
 #[test]
 fn brain_observe_roundtrip() {
     with_server("brain_obs", |socket| {
-        let head_outputs: Vec<f64> = (0..36).map(|i| (i as f64) * 0.01).collect();
+        let head_outputs: Vec<f64> = (0..36).map(|i| f64::from(i) * 0.01).collect();
         let request = serde_json::json!({
             "jsonrpc": "2.0",
             "method": "brain.observe",

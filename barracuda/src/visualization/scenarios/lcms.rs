@@ -111,7 +111,7 @@ pub fn tolerance_search_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         &["science.tolerance_search"],
     );
 
-    #[expect(clippy::cast_precision_loss)] // hit counts are tiny (< 100)
+    #[expect(clippy::cast_precision_loss, reason = "hit counts are tiny (< 100)")]
     let hit_counts = [
         cf2_hits.len() as f64,
         c2f4_hits.len() as f64,

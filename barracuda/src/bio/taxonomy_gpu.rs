@@ -35,7 +35,8 @@ use std::collections::HashSet;
 #[expect(
     clippy::cast_precision_loss,
     clippy::cast_possible_truncation,
-    clippy::cast_sign_loss
+    clippy::cast_sign_loss,
+    reason = "k-mer counts and sequence lengths fit f64 and u32"
 )]
 pub fn classify_batch_gpu(
     gpu: &GpuF64,
@@ -186,7 +187,7 @@ pub fn classify_batch_gpu(
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::type_complexity)]
+#[expect(clippy::type_complexity, reason = "GPU pipeline type")]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;

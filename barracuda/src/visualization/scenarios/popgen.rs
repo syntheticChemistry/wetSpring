@@ -59,7 +59,7 @@ pub fn snp_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         .map(snp::Variant::alt_frequency)
         .collect();
     if !alt_freqs.is_empty() {
-        #[expect(clippy::cast_precision_loss)] // variant count < 10_000
+        #[expect(clippy::cast_precision_loss, reason = "variant count < 10_000")]
         let n_af = alt_freqs.len() as f64;
         let mean_af = alt_freqs.iter().sum::<f64>() / n_af;
         let std_af = (alt_freqs.iter().map(|v| (v - mean_af).powi(2)).sum::<f64>() / n_af).sqrt();
@@ -109,7 +109,7 @@ pub fn population_genomics_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
         &["science.population_genomics"],
     );
 
-    #[expect(clippy::cast_precision_loss)] // RF distance < 1000
+    #[expect(clippy::cast_precision_loss, reason = "RF distance < 1000")]
     let rf_f64 = rf as f64;
     popgen_node.data_channels.push(bar(
         "rf_distances",
@@ -138,7 +138,7 @@ pub fn population_genomics_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
 /// Counts k-mers in a synthetic metagenome and renders the frequency
 /// spectrum using the `Spectrum` channel type (first real user).
 #[must_use]
-#[expect(clippy::cast_precision_loss)] // k-mer histogram bins < 10_000
+#[expect(clippy::cast_precision_loss, reason = "k-mer histogram bins < 10_000")]
 pub fn kmer_spectrum_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "K-mer Frequency Spectrum",

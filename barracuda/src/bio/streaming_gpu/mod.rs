@@ -122,7 +122,7 @@ impl GpuPipelineSession {
 
 #[cfg(test)]
 #[cfg(feature = "gpu")]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "test assertions")]
 mod tests {
     use super::*;
     use crate::gpu::GpuF64;
