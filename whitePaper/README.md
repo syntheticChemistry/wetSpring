@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** April 27, 2026
-**Status:** V150 — Phase 46 composition explorer: data visualization lane. **guideStone Level 4** (38/38 pass, 4 skip). Interactive NUCLEUS via `wetspring_composition.sh` + `composition_nucleus.sh` + `nucleus_composition_lib.sh`. petalTongue 100-node scenes (<1ms), barraCuda IPC math passes, provenance trio UDS reset (PG-18). **Tier 1:** Python→Rust (5,900+ checks, 1,594 lib + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 15 primal gaps open (7 resolved). Clippy zero warnings, `forbid(unsafe_code)`, cargo-deny clean. 64 papers reproduced.
+**Date:** May 9, 2026
+**Status:** V155 — deep debt resolution + interstadial eukaryotic evolution. Formal `#[expect(reason)]` on all lint suppressions. Env-configurable data-source URLs. Zero clippy warnings workspace-wide. V154: per-trio provenance split, `certification/` organelle, `validation/scenarios/`, `wetspring_unibin` binary, `primal-proof` feature flag. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 252 lib + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 15 primal gaps open (7 resolved). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---

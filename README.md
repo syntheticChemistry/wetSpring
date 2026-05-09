@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V154:** Interstadial eukaryotic evolution (primalSpring v0.9.25). Per-trio provenance modules (`ipc/provenance/{rhizocrypt,loamspine,sweetgrass}.rs`). `certification/` library module absorbing guidestone layers (L0–L6). `validation/scenarios/` with `ScenarioMeta` + 4 registered scenarios. `wetspring_unibin` binary (certify/validate/serve/status/version). `primal-proof` Cargo feature flag for IPC-first compute routing. `fossilRecord/guidestone_prokaryotic_may2026/` — prokaryotic guidestone archived. Zero `debt` strings in runtime output. 1,594 tests (guidestone features), 1,209 lib tests. fmt clean, clippy clean (new code). V153: Phase 60+ deep debt evolution. V152: primalSpring Phase 60 parity audit. guideStone **Level 4** (38/38 pass, 4 skip, exit 0).
+**Current release — V155:** Deep debt resolution — formal `#[expect(reason)]` on all 193 lint suppression attributes across 120 library files. Env-configurable data-source URLs (`WETSPRING_CHEMBL_BASE_URL`, `WETSPRING_PUBCHEM_BASE_URL`, `WETSPRING_PLASMID_BIN_URL`). Idiomatic Rust: `Vec<&String>` → `Vec<&str>`, `eprintln!` → `tracing`, `&Option<T>` → `&Path`. exp400 refactored to zero clippy warnings. **Zero warnings workspace-wide** (`cargo clippy --workspace --all-targets`). V154: Interstadial eukaryotic evolution (primalSpring v0.9.25) — per-trio provenance split, `certification/` organelle, `validation/scenarios/` with `ScenarioMeta`, `wetspring_unibin` binary, `primal-proof` feature flag, prokaryotic guidestone fossilized. 252 lib tests, 0 failed. guideStone **Level 4** (38/38 pass, 4 skip).
 
 ---
 

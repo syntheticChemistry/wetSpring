@@ -3,6 +3,92 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V155] — 2026-05-09
+
+### Deep Debt Resolution — Formal Lint Reasons, Env-Configurable URLs
+
+Universal `#[expect(reason)]` policy enforced: all 193 bare `#[expect(clippy::*)]`
+attributes across 120 library files now carry formal `reason = "..."` fields.
+
+#### Changed
+- **Lint policy**: every `#[expect()]` in library and test code has `reason = "..."`.
+  Zero bare `#[expect()]` or `#[allow()]` attributes remain in any `.rs` file.
+- **Env-configurable data URLs**: ChEMBL (`WETSPRING_CHEMBL_BASE_URL`), PubChem
+  (`WETSPRING_PUBCHEM_BASE_URL`), plasmidBin (`WETSPRING_PLASMID_BIN_URL`) —
+  defaults to canonical endpoints, overridable for air-gapped or proxy deployments.
+- **Idiomatic Rust**: `Vec<&String>` → `Vec<&str>` in unifrac distance matrix.
+  `eprintln!` → `tracing::warn!` in certification module. `i32 as f64` → `f64::from(i32)`
+  in IPC roundtrip test.
+- **exp400 refactored**: `&Option<PathBuf>` → `&Path` throughout, `resolve_socket`
+  returns `PathBuf` directly (was unnecessary `Option`), `section()` receiver documented.
+- **niche.rs**: const-after-statements moved to function top, constant assertion rewritten.
+- **Zero clippy warnings**: `cargo clippy --workspace --all-targets` passes clean.
+
+#### Library tests
+- 252 pass, 0 fail, 1 ignored.
+
+## [V154] — 2026-05-09
+
+### Interstadial Eukaryotic Evolution — primalSpring v0.9.25
+
+Per primalSpring Interstadial Primordial Extinction directive. UniBin pattern,
+certification organelle, validation scenarios, provenance trio split.
+
+#### Added
+- **`certification/` library module**: `bare.rs` (L0–L2), `health.rs` (L3–L6),
+  `mod.rs` orchestrator — absorbs guidestone layers into reusable organelle.
+- **`validation/scenarios/`**: `ScenarioMeta`, `Tier`, `Track`, `ScenarioRegistry`
+  with 4 registered scenarios (bare_science, manifest_ipc_parity,
+  cross_atomic_pipeline, gonzales_provenance).
+- **`wetspring_unibin` binary**: certify/validate/serve/status/version subcommands
+  using `clap` derive. Integrates certification and scenario engines.
+- **`primal-proof` Cargo feature flag**: gates IPC-first compute routing.
+- **`ipc/provenance/` per-trio split**: `rhizocrypt.rs`, `loamspine.rs`,
+  `sweetgrass.rs` with shared `mod.rs` re-exports.
+- **`fossilRecord/guidestone_prokaryotic_may2026/`**: archived pre-extinction
+  guidestone with README provenance.
+
+#### Changed
+- Zero `debt` strings in runtime output — rephrased to `evolution` / `clean`.
+- `wetspring_guidestone` marked prokaryotic/superseded in `Cargo.toml`.
+
+#### Library tests
+- 252 pass, 0 fail, 1 ignored.
+
+## [V153] — 2026-05-08
+
+### Phase 60+ Deep Debt Evolution
+
+Systematic debt elimination: hardcoding → env-configurable, shared helpers,
+doc drift fixes, Kachkovskiy notebook.
+
+#### Changed
+- Env-configurable bind (`FACADE_BIND`), CORS (`FACADE_CORS_ORIGIN`), provenance
+  verify URL (`PROVENANCE_VERIFY_BASE`), NCBI eutils URLs.
+- Shared validation helpers extracted; benchmark binaries refactored.
+- `ring` banned in `deny.toml`. Registry cross-sync test added.
+- barraCuda made optional (non-default feature).
+- exp400 NUCLEUS composition parity experiment created.
+- Kachkovskiy spectral QS notebook added.
+
+#### Library tests
+- 1,209 pass, 0 fail, 1 ignored.
+
+## [V152] — 2026-05-08
+
+### primalSpring Phase 60 Parity Audit Absorption
+
+Absorbed universal evolution targets from primalSpring Phase 60 upstream audit.
+
+#### Changed
+- `ring` dependency banned via `deny.toml`.
+- Registry cross-sync test (`niche.rs`) validates downstream manifest.
+- barraCuda dependency made fully optional (non-default feature).
+- exp400 NUCLEUS composition parity crate created.
+
+#### Library tests
+- 1,209 pass, 0 fail, 1 ignored.
+
 ## [V151] — 2026-04-27
 
 ### Deep Debt Evolution — Modern Idiomatic Rust

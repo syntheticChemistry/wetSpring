@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-08 (V153: Phase 60+ deep debt evolution. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,209** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). V153: env-configurable, shared helpers, `ring` banned, barraCuda optional, exp400 NUCLEUS composition parity. 11 paper notebooks. 63/63 papers. Clippy 0 warnings.)
+**Updated**: 2026-05-09 (V155: deep debt resolution + interstadial eukaryotic evolution. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **252** lib tests **+ 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). V155: formal `#[expect(reason)]`, env-configurable data-source URLs, zero clippy warnings workspace-wide. V154: per-trio provenance split, certification module, validation scenarios, UniBin binary. 11 paper notebooks. 63/63 papers.)
 
 ---
 

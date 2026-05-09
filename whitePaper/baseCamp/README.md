@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** May 8, 2026
+**Date:** May 9, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V153 — Phase 60+ deep debt evolution. Env-configurable bind/CORS/provenance URLs. Shared validation helpers (`CpuGpuRow`, `CrossSpringEntry`). `ring` banned. barraCuda optional (IPC-first). Registry cross-sync test. exp400 NUCLEUS composition parity. 11 paper notebooks (Kachkovskiy added). 63/63 papers. 1,209 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip, exit 0). **Tier 1:** Python→Rust (1,209 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition (Phase 46). 383 experiments, 48 consumed capabilities (33 v0.9.17 + 15 legacy). **15** primal gaps open (PG-01–PG-22, 7 resolved).
+**Status:** V155 — deep debt resolution + interstadial eukaryotic evolution. Formal `#[expect(reason)]` on all lint attrs. Env-configurable data-source URLs. Zero clippy warnings workspace-wide. Per-trio provenance split, `certification/` organelle, `validation/scenarios/`, `wetspring_unibin` binary, `primal-proof` feature flag. 11 paper notebooks. 63/63 papers. 252 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (252 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition. 383 experiments, 48 consumed capabilities (33 v0.9.17 + 15 legacy). **15** primal gaps open (PG-01–PG-22, 7 resolved).
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,209 lib tests).
@@ -151,7 +151,7 @@ This is the validation narrative crystallized:
 **V140** marks the transition from "Rust validates Python" to "Rust + Python
 validate NUCLEUS composition patterns." Full ecosystem audit executed against
 wateringHole standards. Deploy graph schema canonicalized (all 7 graphs
-`[[graph.node]]`). Machine-readable tolerance provenance trail added
+`[[graph.nodes]]`). Machine-readable tolerance provenance trail added
 (`tolerance_provenance.toml`). Clippy driven to zero warnings. cargo-deny
 clean (stale allowances removed, `windows-sys` skip). CI orchestrator
 (`scripts/check_all.sh`). Handoff crafted for primal/spring teams.

@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V154:** Interstadial eukaryotic evolution (primalSpring v0.9.25). Per-trio provenance modules. `certification/` organelle + `validation/scenarios/` with ScenarioMeta. `wetspring_unibin` binary. `primal-proof` feature flag. Prokaryotic guidestone fossilized. 1,594 tests (guidestone), 1,209 lib tests. 63/63 papers reproduced. guideStone Level 4 (38/38 pass, 4 skip, exit 0).
+**Current release — V155:** Deep debt resolution — formal `#[expect(reason)]` on all lint suppression attributes (193 across 120 files). Env-configurable data-source URLs. Zero clippy warnings workspace-wide. Idiomatic Rust refinements. V154: Interstadial eukaryotic evolution (primalSpring v0.9.25) — per-trio provenance modules, `certification/` organelle, `validation/scenarios/` with ScenarioMeta, `wetspring_unibin` binary, `primal-proof` feature flag, prokaryotic guidestone fossilized. 252 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4 (38/38 pass, 4 skip).
 
 ## Role in the Ecosystem
 
