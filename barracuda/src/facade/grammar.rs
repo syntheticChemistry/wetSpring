@@ -268,7 +268,7 @@ pub fn render_grammar(grammar: &Value, data: &[Value], domain: &str) -> Option<V
 
     let mut stream = UnixStream::connect(&neural_socket).ok()?;
     stream
-        .set_read_timeout(Some(std::time::Duration::from_secs(15)))
+        .set_read_timeout(Some(crate::ipc::timeouts::FACADE_RENDER))
         .ok();
 
     let rpc = json!({

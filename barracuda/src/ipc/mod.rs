@@ -85,6 +85,8 @@ pub mod server;
 #[cfg(feature = "ipc")]
 pub mod songbird;
 #[cfg(feature = "ipc")]
+pub mod timeouts;
+#[cfg(feature = "ipc")]
 pub mod timeseries;
 #[cfg(feature = "ipc")]
 pub mod transport;

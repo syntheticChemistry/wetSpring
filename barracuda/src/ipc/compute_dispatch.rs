@@ -16,7 +16,7 @@ use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-const RPC_TIMEOUT: Duration = Duration::from_secs(30);
+const RPC_TIMEOUT: Duration = super::timeouts::COMPUTE;
 
 /// Discover the toadStool compute socket.
 ///

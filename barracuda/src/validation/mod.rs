@@ -28,7 +28,7 @@ mod or_exit;
 pub mod scenarios;
 pub mod sink;
 pub mod test_data;
-mod timing;
+pub mod timing;
 
 use std::io::Write as _;
 
@@ -40,8 +40,9 @@ pub use sink::{
     CheckAbsOrRelResult, CheckResult, CollectingSink, SilentSink, StdoutSink, ValidationSink,
 };
 pub use timing::{
-    BenchRow, CpuGpuRow, CrossSpringEntry, bench, bench_n_us, bench_print, print_bench_table,
-    print_cpu_gpu_table, print_cross_spring_table, print_timing_table, timed_us,
+    BenchRow, BenchRowEvolved, CpuGpuRow, CrossSpringEntry, bench, bench_n_us, bench_print,
+    print_bench_evolved_table, print_bench_table, print_cpu_gpu_table, print_cross_spring_table,
+    print_kv_box, print_timing_table, timed_us,
 };
 
 // ── Standalone helpers (for one-off use) ──────────────────────

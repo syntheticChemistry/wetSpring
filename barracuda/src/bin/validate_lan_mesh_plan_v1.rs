@@ -58,8 +58,7 @@
 //! Provenance: LAN mesh deployment planning validation
 
 use std::time::Instant;
-use wetspring_barracuda::validation::OrExit;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 struct TowerNode {
     name: &'static str,

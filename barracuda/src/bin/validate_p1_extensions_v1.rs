@@ -53,8 +53,7 @@
 //! Provenance: Phase 1 extension validation
 
 use std::time::Instant;
-use wetspring_barracuda::validation::OrExit;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 struct P1Extension {
     name: &'static str,
@@ -183,11 +182,11 @@ fn main() {
         "  {:20} {:>12} {:>8} {:>10} {:>8}",
         "Extension", "Accession", "Samples", "Raw (GB)", "GPU (h)"
     );
-    println!("  {}", "─".repeat(62));
+    println!("  {}", "─".repeat(82));
     for ext in &extensions {
         println!(
-            "  {:20} {:>12} {:>8} {:>10.1} {:>8.1}",
-            ext.name, ext.accession, ext.n_samples, ext.raw_gb, ext.compute_hours
+            "  {:20} {:>12} {:>20} {:>8} {:>10.1} {:>8.1}",
+            ext.name, ext.accession, ext.biome, ext.n_samples, ext.raw_gb, ext.compute_hours
         );
     }
 

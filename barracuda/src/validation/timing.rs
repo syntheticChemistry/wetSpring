@@ -76,6 +76,68 @@ pub fn bench_print<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
     (result, ms)
 }
 
+/// Per-primitive benchmark row with provenance evolution tracking.
+///
+/// Extends [`BenchRow`] with a `evolved` field for cross-spring evolution
+/// narratives that track which session evolved each primitive.
+pub struct BenchRowEvolved {
+    /// Primitive or operation name.
+    pub label: &'static str,
+    /// Provenance origin (e.g. "wetSpring→S87").
+    pub origin: &'static str,
+    /// Evolution session that introduced this primitive.
+    pub evolved: &'static str,
+    /// Elapsed time in milliseconds.
+    pub ms: f64,
+}
+
+/// Print a four-column box-drawing table from [`BenchRowEvolved`] data.
+pub fn print_bench_evolved_table(rows: &[BenchRowEvolved]) {
+    use std::io::Write as _;
+    let mut out = std::io::stdout().lock();
+    let _ = writeln!(out);
+    let _ = writeln!(
+        out,
+        "  ┌────────────────────────────────┬────────────────────────┬────────────────┬──────────┐"
+    );
+    let _ = writeln!(
+        out,
+        "  │ Primitive                      │ Origin                 │ Evolved        │ Time     │"
+    );
+    let _ = writeln!(
+        out,
+        "  ├────────────────────────────────┼────────────────────────┼────────────────┼──────────┤"
+    );
+    for t in rows {
+        let _ = writeln!(
+            out,
+            "  │ {:30} │ {:22} │ {:14} │ {:7.3}ms│",
+            t.label, t.origin, t.evolved, t.ms
+        );
+    }
+    let _ = writeln!(
+        out,
+        "  └────────────────────────────────┴────────────────────────┴────────────────┴──────────┘"
+    );
+}
+
+/// Print a key-value summary box with box-drawing characters.
+///
+/// Avoids copy-paste of `╔═╗` / `║ metric │ value ║` blocks across
+/// cross-spring validation binaries.
+pub fn print_kv_box(title: &str, rows: &[(&str, &str)]) {
+    use std::io::Write as _;
+    let mut out = std::io::stdout().lock();
+    let width = 60;
+    let _ = writeln!(out, "  ╔{}╗", "═".repeat(width));
+    let _ = writeln!(out, "  ║ {title:^w$} ║", w = width - 2);
+    let _ = writeln!(out, "  ╠{}╣", "═".repeat(width));
+    for &(k, v) in rows {
+        let _ = writeln!(out, "  ║ {k:24} │ {v:>w$} ║", w = width - 28);
+    }
+    let _ = writeln!(out, "  ╚{}╝", "═".repeat(width));
+}
+
 /// Per-domain CPU vs GPU timing comparison row.
 ///
 /// Used by `validate_cpu_vs_gpu_*` and `benchmark_cross_spring_*` binaries.

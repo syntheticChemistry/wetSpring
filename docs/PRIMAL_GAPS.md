@@ -4,10 +4,13 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-10 (V156 — post-interstadial triage. primalSpring audit
-confirmed all upstream gaps resolved, JH-11 shipped. Triaged all 22 gaps per
-directive: "aggressive gap closure". skunkBat wired into 7 deploy graphs + niche.
-composition.status + method.register consumed. CI cross-sync test created (6 tests).
+Last updated: 2026-05-10 (V157 — deep debt evolution wave. IPC timeouts centralized
+into `ipc::timeouts` module (5 tiers: discovery/standard/compute/AI/connection +
+3 facade tiers). `submit_and_poll` removed from `pairwise_l2_gpu.rs` per barraCuda
+BREAKING_CHANGES (Sprint 42 → `read_buffer_f32` internal poll). Shared validation
+harness evolved: `BenchRowEvolved`, `print_bench_evolved_table`, `print_kv_box`.
+s87 broken `bench` wrapper fixed. 3 bin warnings resolved. Full audit: zero unsafe,
+zero production mocks, all URLs env-configurable. Gardens pulled and reviewed.
 12 gaps open, 10 resolved/closed.)
 
 ---

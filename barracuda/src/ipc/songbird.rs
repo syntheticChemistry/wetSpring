@@ -25,7 +25,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
-const RPC_TIMEOUT: Duration = Duration::from_secs(5);
+const RPC_TIMEOUT: Duration = super::timeouts::DISCOVERY;
 
 /// Discover the Songbird Unix socket path.
 ///

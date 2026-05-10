@@ -27,7 +27,9 @@ pub fn call(method: &str, params: &Value) -> Result<Value, String> {
     let path = socket_path();
     let stream =
         UnixStream::connect(&path).map_err(|e| format!("connect to {}: {e}", path.display()))?;
-    stream.set_read_timeout(Some(Duration::from_secs(10))).ok();
+    stream
+        .set_read_timeout(Some(crate::ipc::timeouts::FACADE_STANDARD))
+        .ok();
     call_on_stream(stream, method, params)
 }
 

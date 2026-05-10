@@ -14,7 +14,7 @@ use super::message::Request;
 use super::metrics::Metrics;
 use super::protocol::{self, RpcError};
 
-const CONNECTION_READ_TIMEOUT: Duration = Duration::from_secs(120);
+const CONNECTION_READ_TIMEOUT: Duration = super::timeouts::CONNECTION;
 
 /// Dispatch a method call, routing `metrics.snapshot` internally and
 /// all other methods through the capability handler.

@@ -66,9 +66,6 @@ pub fn pairwise_l2_condensed_gpu(
     pl2.dispatch(&input_buf, &output_buf, n as u32, dim as u32)
         .map_err(|e| Error::Gpu(format!("PairwiseL2 dispatch: {e}")))?;
 
-    // Poll to wait for dispatch completion (PairwiseL2Gpu submits internally)
-    device.submit_and_poll(std::iter::empty::<wgpu::CommandBuffer>());
-
     let raw = device
         .read_buffer_f32(&output_buf, n_pairs)
         .map_err(|e| Error::Gpu(format!("PairwiseL2 read: {e}")))?;

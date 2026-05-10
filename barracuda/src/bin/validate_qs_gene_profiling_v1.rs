@@ -51,8 +51,7 @@
 //! Provenance: Quorum-sensing gene prevalence profiling validation
 
 use std::time::Instant;
-use wetspring_barracuda::validation::OrExit;
-use wetspring_barracuda::validation::Validator;
+use wetspring_barracuda::validation::{OrExit, Validator};
 
 const FNR_REGULATED: u8 = 1 << 0;
 const ARCAB_REGULATED: u8 = 1 << 1;

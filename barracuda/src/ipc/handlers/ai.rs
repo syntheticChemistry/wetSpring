@@ -15,7 +15,7 @@ use crate::ipc::discover;
 use crate::ipc::primal_names;
 use crate::ipc::protocol::RpcError;
 
-const RPC_TIMEOUT: Duration = Duration::from_secs(30);
+const RPC_TIMEOUT: Duration = crate::ipc::timeouts::AI_INFERENCE;
 
 /// Send a JSON-RPC `ai.query` request to Squirrel.
 fn squirrel_query(

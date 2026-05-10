@@ -34,7 +34,7 @@ pub use sweetgrass::{
     BraidCommitRequest, BraidRequest, discover_socket, record_experiment_provenance,
 };
 
-const RPC_TIMEOUT: Duration = Duration::from_secs(10);
+const RPC_TIMEOUT: Duration = crate::ipc::timeouts::STANDARD_RPC;
 
 /// Self-describing provenance witness per Attestation Encoding Standard v2.0.
 ///

@@ -21,7 +21,7 @@ use crate::primal_names::SWEETGRASS;
 
 use super::capability_call;
 
-const RPC_TIMEOUT: Duration = Duration::from_secs(10);
+const RPC_TIMEOUT: Duration = crate::ipc::timeouts::STANDARD_RPC;
 
 /// Parameters for creating a new provenance braid on sweetGrass.
 #[derive(Debug, Clone, Serialize)]

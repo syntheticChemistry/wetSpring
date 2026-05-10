@@ -516,7 +516,7 @@ fn call_neural(socket_path: &std::path::Path, method: &str, params: &Value) -> O
 
     let mut stream = UnixStream::connect(socket_path).ok()?;
     stream
-        .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+        .set_read_timeout(Some(crate::ipc::timeouts::FACADE_SHORT))
         .ok();
 
     let request = json!({

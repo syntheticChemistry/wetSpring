@@ -16,7 +16,7 @@ use std::time::Duration;
 
 /// Default timeout for client JSON-RPC over Unix sockets to peer primals
 /// (toadStool, sweetGrass, …) when not using workload-specific limits.
-pub const UNIX_JSONRPC_TIMEOUT: Duration = Duration::from_secs(10);
+pub const UNIX_JSONRPC_TIMEOUT: Duration = super::timeouts::STANDARD_RPC;
 
 /// Send one newline-terminated JSON-RPC request and read one response line.
 pub fn unix_jsonrpc_line(socket: &Path, request_line: &str) -> Result<String, String> {

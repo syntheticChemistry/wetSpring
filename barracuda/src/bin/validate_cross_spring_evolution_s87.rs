@@ -62,22 +62,16 @@ use wetspring_barracuda::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversi
 use wetspring_barracuda::bio::gemm_cached::GemmCached;
 use wetspring_barracuda::gpu::GpuF64;
 use wetspring_barracuda::tolerances;
+use wetspring_barracuda::validation::timing::BenchRowEvolved;
 use wetspring_barracuda::validation::{self, OrExit, Validator, bench_print};
 
-struct Timing {
-    label: &'static str,
-    origin: &'static str,
-    evolved: &'static str,
-    ms: f64,
-}
-
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
-    bench_print(label, f)(result, ms)
+    bench_print(label, f)
 }
 
 fn main() {
     let mut v = Validator::new("Exp304: Cross-Spring Evolution — ToadStool S87 Modern Systems");
-    let mut timings: Vec<Timing> = Vec::new();
+    let mut timings: Vec<BenchRowEvolved> = Vec::new();
 
     println!("ToadStool pin: S87 (2dc26792) — 264 ComputeDispatch ops, 144 consumed by wetSpring");
     println!(
@@ -164,7 +158,7 @@ fn main() {
                 if ms_cpu > 0.0 {
                     println!("  Speedup: {:.1}× GPU vs CPU", ms_cpu / ms_gpu.max(0.001));
                 }
-                timings.push(Timing {
+                timings.push(BenchRowEvolved {
                     label: "DiversityFusion GPU",
                     origin: "wetSpring V6",
                     evolved: "→ S63 absorb → all springs consume",
@@ -173,7 +167,7 @@ fn main() {
             }
             Err(e) => v.check_pass(&format!("GPU diversity skip ({e})"), true),
         }
-        timings.push(Timing {
+        timings.push(BenchRowEvolved {
             label: "DiversityFusion CPU",
             origin: "wetSpring V6",
             evolved: "→ S63 absorb",
@@ -243,13 +237,13 @@ fn main() {
                     );
 
                     if n == 256 {
-                        timings.push(Timing {
+                        timings.push(BenchRowEvolved {
                             label: "GEMM 256×256 GPU",
                             origin: "neuralSpring S64",
                             evolved: "→ S72 ComputeDispatch → wetSpring NMF",
                             ms: ms_gpu,
                         });
-                        timings.push(Timing {
+                        timings.push(BenchRowEvolved {
                             label: "GEMM 256×256 CPU",
                             origin: "neuralSpring S64",
                             evolved: "→ CPU baseline",
@@ -295,7 +289,7 @@ fn main() {
             }
 
             if m == 256 {
-                timings.push(Timing {
+                timings.push(BenchRowEvolved {
                     label: "GemmCached 256×128×64",
                     origin: "wetSpring V6",
                     evolved: "→ neuralSpring GEMM + hotSpring precision",
@@ -338,7 +332,7 @@ fn main() {
                                 d.iter().all(|&x| (0.0..=1.0).contains(&x)),
                             );
                             if n_samples == 50 {
-                                timings.push(Timing {
+                                timings.push(BenchRowEvolved {
                                     label: "BrayCurtis GPU 50×200",
                                     origin: "wetSpring bio",
                                     evolved: "→ ToadStool S82 ComputeDispatch",
@@ -375,7 +369,7 @@ fn main() {
                 barracuda::spectral::POISSON_R
             );
             if n == 2000 {
-                timings.push(Timing {
+                timings.push(BenchRowEvolved {
                     label: "Anderson 1D n=2000",
                     origin: "hotSpring v0.6.0",
                     evolved: "→ S26 absorb → S79 Lanczos → S83 4D",
@@ -400,7 +394,7 @@ fn main() {
             barracuda::spectral::anderson::anderson_4d(4, 4.0, 42)
         });
         v.check_pass("4D: 256 sites", csr_4d.n == 256);
-        timings.push(Timing {
+        timings.push(BenchRowEvolved {
             label: "Anderson 3D 512",
             origin: "hotSpring v0.6.0",
             evolved: "→ S26 → S79 Lanczos → S83 4D+Wegner",
@@ -495,7 +489,7 @@ fn main() {
         });
         v.check_pass("Bootstrap: lo < hi", ci.lower < ci.upper);
         println!("  CI: [{:.4}, {:.4}]", ci.lower, ci.upper);
-        timings.push(Timing {
+        timings.push(BenchRowEvolved {
             label: "Bootstrap 200×50k",
             origin: "groundSpring V54",
             evolved: "→ S70 absorb → S72 GPU jackknife",
@@ -509,7 +503,7 @@ fn main() {
             barracuda::stats::kimura_fixation_prob(1000, 0.0, 0.01)
         });
         v.check_pass("Kimura fixation", us_fix > 0.0);
-        timings.push(Timing {
+        timings.push(BenchRowEvolved {
             label: "Kimura fixation 10k",
             origin: "groundSpring V54",
             evolved: "→ S70 absorb",
@@ -551,7 +545,7 @@ fn main() {
         });
         let boltz_final = *boltz.losses.last().or_exit("unexpected error");
         v.check_pass("Boltzmann converges", boltz_final < rosenbrock(&initial));
-        timings.push(Timing {
+        timings.push(BenchRowEvolved {
             label: "Boltzmann 5k×2D",
             origin: "wateringHole",
             evolved: "→ S76 GPU dispatch → S80 batch",
@@ -609,7 +603,7 @@ fn main() {
                     "  {rows}×{cols}→k=5, {} iters, err={last:.6}",
                     r.errors.len()
                 );
-                timings.push(Timing {
+                timings.push(BenchRowEvolved {
                     label: "NMF 100×50 k=5",
                     origin: "wetSpring V6",
                     evolved: "→ S64 absorb → S82 GPU SparseGemm",
@@ -633,7 +627,7 @@ fn main() {
         let diag: Vec<f64> = (0..n).map(|i| lap[i * n + i]).collect();
         let eff = barracuda::linalg::effective_rank(&diag);
         v.check_pass("effective_rank > 0", eff > 0.0);
-        timings.push(Timing {
+        timings.push(BenchRowEvolved {
             label: "Graph Laplacian 100",
             origin: "neuralSpring V64",
             evolved: "→ S54 → S72 ComputeDispatch",
