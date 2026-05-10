@@ -268,6 +268,13 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "cross_species",
     ]);
 
+    let biome_os_status = json!({
+        "composition_status": "deferred_to_live",
+        "method_register": "deferred_to_live",
+        "audit_logging": "deferred_to_live",
+        "note": "biomeOS v3.51 composition.status / method.register / skunkBat audit wired in niche; populated at runtime via CompositionContext"
+    });
+
     Ok(json!({
         "healthy": true,
         "spring": "wetSpring",
@@ -277,6 +284,7 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "science_domains": science_domains,
         "capabilities_count": CAPABILITIES.len(),
         "bonding_support": ["Covalent", "Ionic"],
+        "biome_os": biome_os_status,
     }))
 }
 

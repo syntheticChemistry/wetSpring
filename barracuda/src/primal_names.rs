@@ -42,6 +42,9 @@ pub const SWEETGRASS: &str = "sweetgrass";
 /// Squirrel AI assistant.
 pub const SQUIRREL: &str = "squirrel";
 
+/// skunkBat audit logging — cross-primal event instrumentation.
+pub const SKUNKBAT: &str = "skunkbat";
+
 /// Legacy JSON-RPC method prefix (`{SELF_NAME}.`) on the wire — must match [`SELF_NAME`] + `.`.
 pub const LEGACY_SELF_METHOD_PREFIX: &str = "wetspring.";
 

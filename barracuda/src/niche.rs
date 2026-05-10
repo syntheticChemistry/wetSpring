@@ -46,8 +46,8 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 pub const GUIDESTONE_READINESS: u8 = 4;
 
 use crate::primal_names::{
-    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SONGBIRD, SQUIRREL, SWEETGRASS,
-    TOADSTOOL,
+    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SKUNKBAT, SONGBIRD, SQUIRREL,
+    SWEETGRASS, TOADSTOOL,
 };
 
 /// Primals this niche depends on (germination order matters).
@@ -105,6 +105,12 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
         role: "ai",
         required: false,
         capability: "ai",
+    },
+    NicheDependency {
+        name: SKUNKBAT,
+        role: "audit",
+        required: false,
+        capability: "audit",
     },
 ];
 
@@ -201,6 +207,12 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "inference.complete",
     "inference.embed",
     "render.dashboard",
+    // ── skunkBat audit logging (JH-5 forwarding) ──
+    "audit.event",
+    "audit.forward",
+    // ── biomeOS v3.51 composition lifecycle ──
+    "composition.status",
+    "method.register",
 ];
 
 /// All capabilities this niche exposes to biomeOS.
@@ -506,7 +518,7 @@ mod tests {
     #[test]
     fn proto_nucleate_node_names_match_niche_dependencies() {
         const OPTIONAL_IN_DOWNSTREAM_DEPENDS_ON: &[&str] =
-            &["rhizocrypt", "loamspine", "sweetgrass"];
+            &["rhizocrypt", "loamspine", "sweetgrass", "skunkbat"];
 
         let manifest_path = concat!(
             env!("CARGO_MANIFEST_DIR"),

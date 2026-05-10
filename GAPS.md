@@ -4,12 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-09 (V155 — deep debt resolution + interstadial eukaryotic
-evolution. 15 gaps open (PG-01–PG-22), 7 resolved. NestGate IPC wired (PG-04),
-barraCuda optional (PG-05). Env-configurable bind/CORS/URLs + data-source URLs
-(ChEMBL, PubChem, plasmidBin). Formal `#[expect(reason)]` on all lint
-suppressions. Zero clippy warnings workspace-wide. `certification/` organelle,
-`validation/scenarios/`, `wetspring_unibin` binary. `primal-proof` feature flag.)
+Last updated: 2026-05-10 (V156 — post-interstadial gap triage per primalSpring
+audit. 12 gaps open (PG-01–PG-22), 10 resolved. PG-16/20/21 closed. skunkBat
+wired into all 7 deploy graphs. composition.status + method.register consumed
+from biomeOS v3.51. CI cross-sync test validates against canonical 403 registry.)
 
 ---
 

@@ -75,6 +75,22 @@ security_model = "btsp"
 capabilities = ["discovery.find_primals", "discovery.announce"]
 
 # ═══════════════════════════════════════════════════════════════
+# Phase 1b: Audit Logging — skunkBat (JH-5 forwarding)
+# ═══════════════════════════════════════════════════════════════
+
+[[graph.nodes]]
+name = "skunkbat"
+binary = "skunkbat"
+order = 3
+required = false
+spawn = false
+depends_on = ["beardog"]
+health_method = "health.liveness"
+by_capability = "audit"
+security_model = "tower_delegated"
+capabilities = ["audit.event", "audit.forward"]
+
+# ═══════════════════════════════════════════════════════════════
 # Phase 2: Science (required — the facade's data source)
 # ═══════════════════════════════════════════════════════════════
 
