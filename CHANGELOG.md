@@ -3,6 +3,28 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V157] — 2026-05-10
+
+### Deep Debt Evolution — Centralized Timeouts, GPU API, Shared Validation Harness
+
+- **IPC timeouts centralized:** New `ipc::timeouts` module with 5 semantic tiers (discovery 5s, standard 10s, compute 30s, AI 30s, connection 120s) + 3 facade tiers. All 11 scattered `Duration` constants across 7 IPC + 4 facade files now reference the canonical module.
+- **GPU API evolved:** Removed deprecated `submit_and_poll` from `pairwise_l2_gpu.rs` per barraCuda BREAKING_CHANGES Sprint 42 — `read_buffer_f32` handles its own poll cycle internally via `submit_and_map<T>`.
+- **Shared validation harness:** `validation::timing` expanded with `BenchRowEvolved` (cross-spring evolution narratives), `print_bench_evolved_table`, `print_kv_box` (reusable ASCII summary boxes). `timing` module now public.
+- **Bug fix:** Fixed broken `bench` wrapper in `validate_cross_spring_evolution_s87.rs` (GPU-only bin, syntax error uncaught behind `required-features = ["gpu"]`).
+- **Warning cleanup:** Resolved 3 bin warnings — restored `OrExit` imports, wired `biome` field into P1 extensions output table.
+- **Full deep debt audit:** Zero unsafe code, zero production mocks, all URLs env-configurable, zero `todo!()` macros. projectNUCLEUS + foundation gardens pulled and reviewed.
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,594/0/1)
+
+## [V156] — 2026-05-10
+
+### Post-Interstadial — skunkBat Audit, biomeOS v3.51, CI Cross-Sync, Gap Triage
+
+- **skunkBat audit logging wired:** `SKUNKBAT` primal constant, `NicheDependency`, all 7 deploy graphs updated with `[[graph.nodes]]` entry (order 2, `depends_on = ["beardog"]`, capabilities `audit.event` + `audit.forward`).
+- **biomeOS v3.51 consumed:** `composition.status` and `method.register` added to `CONSUMED_CAPABILITIES`. `composition.science_health` handler includes `biome_os` status block.
+- **CI cross-sync test:** New `ci_cross_sync.rs` with 6 integration tests validating local capabilities against canonical `primalSpring/config/capability_registry.toml` (403 methods).
+- **Primal gap triage:** PG-16 (std_dev convention), PG-20 (`uds_send.py` for `socat`), PG-21 (same) closed. 12 gaps open, 10 resolved.
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,594/0/1)
+
 ## [V155] — 2026-05-09
 
 ### Deep Debt Resolution — Formal Lint Reasons, Env-Configurable URLs

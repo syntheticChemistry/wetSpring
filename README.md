@@ -7,7 +7,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,209 tests)       (44 GPU modules)
+           (58 scripts)        (1,594 tests)       (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
            (342 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
@@ -27,7 +27,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 
 | | |
 |---|---|
-| **Tests** | 1,209 (lib) + 18 IPC roundtrip + integration, 0 failed |
+| **Tests** | 1,594 (lib) + 18 IPC roundtrip + integration, 0 failed |
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
@@ -40,12 +40,12 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 15 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 7 resolved), 5 new from Phase 46 composition |
+| **Primal gaps** | 12 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 10 resolved) |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V155:** Deep debt resolution — formal `#[expect(reason)]` on all 193 lint suppression attributes across 120 library files. Env-configurable data-source URLs (`WETSPRING_CHEMBL_BASE_URL`, `WETSPRING_PUBCHEM_BASE_URL`, `WETSPRING_PLASMID_BIN_URL`). Idiomatic Rust: `Vec<&String>` → `Vec<&str>`, `eprintln!` → `tracing`, `&Option<T>` → `&Path`. exp400 refactored to zero clippy warnings. **Zero warnings workspace-wide** (`cargo clippy --workspace --all-targets`). V154: Interstadial eukaryotic evolution (primalSpring v0.9.25) — per-trio provenance split, `certification/` organelle, `validation/scenarios/` with `ScenarioMeta`, `wetspring_unibin` binary, `primal-proof` feature flag, prokaryotic guidestone fossilized. 252 lib tests, 0 failed. guideStone **Level 4** (38/38 pass, 4 skip).
+**Current release — V157:** Deep debt evolution wave — IPC timeouts centralized into `ipc::timeouts` module (5 tiers: discovery/standard/compute/AI/connection + 3 facade tiers). GPU API evolved: deprecated `submit_and_poll` removed per barraCuda BREAKING_CHANGES Sprint 42. Shared validation harness expanded (`BenchRowEvolved`, `print_bench_evolved_table`, `print_kv_box`). s87 broken bench wrapper fixed. 3 bin warnings resolved. Full audit: zero unsafe, zero production mocks, all URLs env-configurable. V156: skunkBat audit logging wired into 7 deploy graphs + niche. biomeOS v3.51 `composition.status` + `method.register` consumed. CI cross-sync test (6 tests). PG-16/20/21 closed. 1,594 lib tests, 0 failed. **12 gaps open, 10 resolved.**
 
 ---
 

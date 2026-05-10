@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V155:** Deep debt resolution — formal `#[expect(reason)]` on all lint suppression attributes (193 across 120 files). Env-configurable data-source URLs. Zero clippy warnings workspace-wide. Idiomatic Rust refinements. V154: Interstadial eukaryotic evolution (primalSpring v0.9.25) — per-trio provenance modules, `certification/` organelle, `validation/scenarios/` with ScenarioMeta, `wetspring_unibin` binary, `primal-proof` feature flag, prokaryotic guidestone fossilized. 252 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4 (38/38 pass, 4 skip).
+**Current release — V157:** Deep debt evolution wave — IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API evolved: `submit_and_poll` removed per barraCuda Sprint 42. Shared validation harness: `BenchRowEvolved`, `print_bench_evolved_table`, `print_kv_box`. V156: skunkBat audit wired, biomeOS v3.51 consumed, CI cross-sync, PG-16/20/21 closed. 1,594 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4 (38/38 pass, 4 skip). 12 gaps open, 10 resolved.
 
 ## Role in the Ecosystem
 
@@ -27,7 +27,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,209 lib + 18 IPC roundtrip + integration, 0 failed
+- **Tests:** 1,594 lib + 18 IPC roundtrip + integration, 0 failed
 - **Validation checks:** 5,900+ across 364 binaries
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
@@ -35,7 +35,7 @@ evolution pipeline.
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 15 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 7 resolved
+- **Primal gaps:** 12 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 10 resolved
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities
@@ -71,7 +71,7 @@ evolution pipeline.
 
 ```
 Tier 1: Python baseline  → Rust CPU parity  → GPU validation
-           (58 scripts)     (1,209 tests)      (44 GPU modules)
+           (58 scripts)     (1,594 tests)      (44 GPU modules)
 Tier 2: Rust validation   → NUCLEUS composition patterns
            (364 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
 Tier 3: Composition       → IPC parity → Niche gate

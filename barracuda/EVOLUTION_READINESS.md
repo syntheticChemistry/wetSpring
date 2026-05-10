@@ -1,8 +1,8 @@
 # wetSpring Evolution Readiness
 
-**Date:** March 24, 2026 (V137 — barraCuda v0.3.12 + toadStool S155+ + coralReef Phase 10)
+**Date:** May 10, 2026 (V157 — barraCuda v0.3.12 + toadStool S155+ + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
-**Status:** 44 `bio/*_gpu.rs` modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.12, wgpu 28). 1,902 tests (0 failures), 379 experiments, 5,700+ checks, 242 named tolerances (zero inline literals), 355 binaries (333 barracuda + 22 forge), 109 bio modules. `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in entire codebase**. `forbid(unsafe_code)` at workspace level + all crate roots. All primal names via `primal_names::*` constants. 91.20% line coverage (gated at 90%). **V137:** Provenance headers on all 355 binaries, 8 new tolerance constants (242 total), `ipc/connection.rs` extraction, GPU buffer renames, doc link fixes. **V136:** thiserror migration, named cast helpers (60+ casts), upstream contract pinning, determinism tests, CI pin, hardcoding audit. **V135:** Doc reconciliation, V135 handoff. **V134:** Deep audit — drug NMF delegation, validation harness refactored, primal discovery extended. **V133:** `GpuContext`/`TensorSession`, `validate_all`, zero-copy I/O. **See also:** `wateringHole/handoffs/WETSPRING_V137_PROVENANCE_TOLERANCE_IPC_HANDOFF_MAR24_2026.md`.
+**Status:** 44 `bio/*_gpu.rs` modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.12, wgpu 28). 1,594 lib tests (0 failures), 383 experiments, 5,900+ checks, 242 named tolerances (zero inline literals), 364 binaries (342 barracuda + 22 forge). `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in entire codebase**. `forbid(unsafe_code)` at workspace level + all crate roots. All primal names via `primal_names::*` constants. 91.20% line coverage (gated at 90%). IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API: `submit_and_poll` removed per barraCuda Sprint 42. skunkBat audit wired (7 deploy graphs). biomeOS v3.51 consumed (`composition.status`, `method.register`). CI cross-sync test (6 tests). **12** primal gaps open (**10** resolved). **See also:** `wateringHole/handoffs/WETSPRING_V157_DEEP_DEBT_EVOLUTION_HANDOFF_MAY10_2026.md`.
 
 ### Full Lean Phase
 
@@ -47,9 +47,9 @@ ToadStool S39-S62+DF64 (55+ commits since V39) delivered massive infrastructure:
 - `Precision::op_preamble()` — abstract precision ops layer (S68)
 - `downcast_f64_to_f16()` — F16 downcast with sentinel protection (S68)
 - `WgpuDevice::is_lost()` — device-lost detection (S68+) — **WIRED** in `GpuF64::is_lost()` (V63)
-- `WgpuDevice::acquire_dispatch()` — concurrency permit (S68+) — transparent via `submit_and_poll`
+- `WgpuDevice::acquire_dispatch()` — concurrency permit (S68+) — transparent via `submit_and_map`
 - `WgpuDevice::max_concurrent_dispatches()` — concurrency budget query (S68+)
-- `submit_and_poll()` — resilient submit with catch_unwind (S68+) — **WIRED** in 5 ODE GPU + 1 GEMM module (V64)
+- `submit_and_map<T>()` — single-poll readback (S68+ → Sprint 42) — replaces deprecated `submit_and_poll` (removed V157)
 - `ComputeDispatch` builder — eliminates 80-line bind-group/pipeline boilerplate
 - `Fp64Strategy` auto-detect — Native/Hybrid selection per GPU era — **WIRED** in `GpuF64::fp64_strategy()` (V64)
 - DF64 core-streaming — routes f64 through FP32 cores on consumer GPUs (RTX 4070: 5888 FP32 cores vs 92 FP64 units)

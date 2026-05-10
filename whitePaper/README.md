@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** May 9, 2026
-**Status:** V155 — deep debt resolution + interstadial eukaryotic evolution. Formal `#[expect(reason)]` on all lint suppressions. Env-configurable data-source URLs. Zero clippy warnings workspace-wide. V154: per-trio provenance split, `certification/` organelle, `validation/scenarios/`, `wetspring_unibin` binary, `primal-proof` feature flag. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 252 lib + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 15 primal gaps open (7 resolved). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
+**Date:** May 10, 2026
+**Status:** V157 — deep debt evolution wave. IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API evolved (`submit_and_poll` → `read_buffer_f32` internal poll). Shared validation harness (`BenchRowEvolved`, `print_kv_box`). V156: skunkBat audit wired (7 deploy graphs), biomeOS v3.51 consumed (`composition.status`, `method.register`), CI cross-sync (6 tests). PG-16/20/21 closed. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 1,594 lib + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 12 primal gaps open (10 resolved). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---

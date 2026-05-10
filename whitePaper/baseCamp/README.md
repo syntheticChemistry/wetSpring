@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** May 9, 2026
+**Date:** May 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V155 — deep debt resolution + interstadial eukaryotic evolution. Formal `#[expect(reason)]` on all lint attrs. Env-configurable data-source URLs. Zero clippy warnings workspace-wide. Per-trio provenance split, `certification/` organelle, `validation/scenarios/`, `wetspring_unibin` binary, `primal-proof` feature flag. 11 paper notebooks. 63/63 papers. 252 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (252 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition. 383 experiments, 48 consumed capabilities (33 v0.9.17 + 15 legacy). **15** primal gaps open (PG-01–PG-22, 7 resolved).
+**Status:** V157 — deep debt evolution wave. IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API evolved (`submit_and_poll` → `read_buffer_f32` internal poll). Shared validation harness (`BenchRowEvolved`, `print_kv_box`). V156: skunkBat audit wired (7 deploy graphs), biomeOS v3.51 consumed, CI cross-sync (6 tests). PG-16/20/21 closed. 11 paper notebooks. 63/63 papers. 1,594 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,594 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition. 383 experiments, 50 consumed capabilities (33 v0.9.17 + 15 legacy + `audit.event` + `audit.forward`). **12** primal gaps open (PG-01–PG-22, 10 resolved).
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,209 lib tests).
