@@ -52,7 +52,10 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
     let ws_path = wetspring_socket.display();
     let version = env!("CARGO_PKG_VERSION");
     let primal = crate::PRIMAL_NAME;
+    #[cfg(feature = "barracuda-lib")]
     let caps = super::handlers::CAPABILITIES;
+    #[cfg(not(feature = "barracuda-lib"))]
+    let caps: &[&str] = &[];
     let caps_json: Vec<String> = caps.iter().map(|c| format!("\"{c}\"")).collect();
     let caps_str = caps_json.join(",");
 

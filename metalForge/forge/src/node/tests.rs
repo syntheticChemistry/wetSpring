@@ -57,16 +57,19 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "barracuda-lib")]
     fn mean_basic() {
         assert!((barracuda::stats::mean(&[1.0, 2.0, 3.0]) - 2.0).abs() < f64::EPSILON);
     }
 
     #[test]
+    #[cfg(feature = "barracuda-lib")]
     fn mean_empty() {
         assert!((barracuda::stats::mean(&[]) - 0.0).abs() < f64::EPSILON);
     }
 
     #[test]
+    #[cfg(feature = "barracuda-lib")]
     fn std_dev_basic() {
         let values = [2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0];
         let _m = barracuda::stats::mean(&values);
@@ -78,6 +81,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "barracuda-lib")]
     fn std_dev_single() {
         let sd = barracuda::stats::correlation::std_dev(&[42.0]).unwrap_or(0.0);
         assert!((sd - 0.0).abs() < f64::EPSILON);

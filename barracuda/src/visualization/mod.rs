@@ -11,8 +11,10 @@
 pub mod capabilities;
 pub mod ipc_push;
 pub mod live_pipeline;
+#[cfg(feature = "barracuda-lib")]
 pub mod scenarios;
 pub mod stream;
+#[cfg(feature = "barracuda-lib")]
 pub mod stream_ecology;
 mod types;
 
@@ -213,6 +215,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "barracuda-lib")]
     fn data_channel_fieldmap_serializes() {
         let ch = scenarios::fieldmap(
             "fm1",

@@ -160,12 +160,32 @@ pub fn count_gc(sequences: &[Vec<u8>]) -> (u64, u64) {
     (gc, total)
 }
 
+#[cfg(feature = "barracuda-lib")]
 fn mean(values: &[f64]) -> f64 {
     barracuda::stats::mean(values)
 }
 
+#[cfg(not(feature = "barracuda-lib"))]
+fn mean(values: &[f64]) -> f64 {
+    if values.is_empty() {
+        return 0.0;
+    }
+    values.iter().sum::<f64>() / values.len() as f64
+}
+
+#[cfg(feature = "barracuda-lib")]
 fn std_dev(values: &[f64], _mean_val: f64) -> f64 {
     barracuda::stats::correlation::std_dev(values).unwrap_or(0.0)
+}
+
+#[cfg(not(feature = "barracuda-lib"))]
+fn std_dev(values: &[f64], _mean_val: f64) -> f64 {
+    if values.len() < 2 {
+        return 0.0;
+    }
+    let m = mean(values);
+    let var = values.iter().map(|v| (v - m).powi(2)).sum::<f64>() / (values.len() - 1) as f64;
+    var.sqrt()
 }
 
 /// Shannon entropy of a distribution binned into `n_bins` equal-width bins.
@@ -205,7 +225,21 @@ pub fn shannon_entropy_binned(values: &[f64], n_bins: usize) -> f64 {
 
     let n = values.len() as f64;
     let frequencies: Vec<f64> = bins.iter().map(|&count| count as f64 / n).collect();
-    barracuda::stats::shannon_from_frequencies(&frequencies)
+    shannon_from_frequencies(&frequencies)
+}
+
+#[cfg(feature = "barracuda-lib")]
+fn shannon_from_frequencies(freq: &[f64]) -> f64 {
+    barracuda::stats::shannon_from_frequencies(freq)
+}
+
+#[cfg(not(feature = "barracuda-lib"))]
+fn shannon_from_frequencies(freq: &[f64]) -> f64 {
+    -freq
+        .iter()
+        .filter(|&&p| p > 0.0)
+        .map(|&p| p * p.ln())
+        .sum::<f64>()
 }
 
 /// List `.fna.gz` assembly files in a directory.

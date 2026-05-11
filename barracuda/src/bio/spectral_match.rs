@@ -105,13 +105,13 @@ pub fn cosine_similarity(
         .iter()
         .map(|&i| ref_intensity[i])
         .collect();
-    let dot = crate::special::dot(&matched_q, &matched_r);
+    let dot = dot_product(&matched_q, &matched_r);
 
     // Norms include ALL peaks (matched + unmatched) for proper cosine —
     // this differs from a simple `l2_norm` on matched subsets because
     // unmatched peaks contribute to each spectrum's magnitude.
-    let norm_q = crate::special::l2_norm(query_intensity);
-    let norm_r = crate::special::l2_norm(ref_intensity);
+    let norm_q = l2_norm(query_intensity);
+    let norm_r = l2_norm(ref_intensity);
 
     let denom = norm_q * norm_r;
     let score = if denom > 0.0 { dot / denom } else { 0.0 };
@@ -122,6 +122,26 @@ pub fn cosine_similarity(
         query_indices,
         reference_indices,
     }
+}
+
+#[cfg(feature = "barracuda-lib")]
+fn dot_product(a: &[f64], b: &[f64]) -> f64 {
+    crate::special::dot(a, b)
+}
+
+#[cfg(not(feature = "barracuda-lib"))]
+fn dot_product(a: &[f64], b: &[f64]) -> f64 {
+    a.iter().zip(b).map(|(x, y)| x * y).sum()
+}
+
+#[cfg(feature = "barracuda-lib")]
+fn l2_norm(v: &[f64]) -> f64 {
+    crate::special::l2_norm(v)
+}
+
+#[cfg(not(feature = "barracuda-lib"))]
+fn l2_norm(v: &[f64]) -> f64 {
+    v.iter().map(|x| x * x).sum::<f64>().sqrt()
 }
 
 /// Compute modified cosine similarity with Stein & Scott m/z weighting.

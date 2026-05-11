@@ -8,9 +8,9 @@ Last updated: 2026-05-11 (V161 — PG-12 resolved. Legacy Exp403 surface
 separated into `CONSUMED_CAPABILITIES_LEGACY` (15 methods) for explicit
 tracking. Canonical `CONSUMED_CAPABILITIES` now contains only v0.9.17
 surface + composition infrastructure. Foundation Thread 04 seeded with
-36 validated targets. Deep debt audit: zero unsafe, zero mocks, zero
-hardcoded paths, zero TODO/FIXME, all deps pure Rust (except wgpu GPU
-driver). 8 gaps open (all external), 14 resolved/closed. 1,962 tests.)
+36 validated targets. V162: Tier 4 defaults (barracuda-lib removed from
+default), PG-06/10/17/18 closed. 4 gaps open (all external), 18
+resolved/closed. 1,962 tests.)
 
 ---
 
@@ -123,14 +123,17 @@ path). barraCuda library dep remains as default for validation/CI.
 
 ---
 
-## PG-06: Ionic Bond Negotiation Protocol
+## PG-06: Ionic Bond Negotiation Protocol (Closed V162 — deferred)
 
 **Owner:** primalSpring Track 4
-**Status:** Metadata declared; no negotiation protocol (same as GAPS.md #1)
+**Status:** Closed (V162) — deferred pending Track 4 specification
 
 The facade declares bonding capabilities (Covalent, Ionic) in composition
 health responses and bonding metadata. No automated protocol for
-establishing, modifying, or terminating ionic bonds exists.
+establishing, modifying, or terminating ionic bonds exists. This is an
+architectural gap requiring a primalSpring Track 4 specification before
+any spring can implement. Not blocking interstadial exit. wetSpring's
+bonding metadata is correctly declared for when the protocol ships.
 
 ---
 
@@ -249,27 +252,17 @@ are quality-of-life improvements, not Tier 4 blockers.
 
 ---
 
-## PG-10: spectral/linalg Routing Gap in primalSpring composition API
+## PG-10: spectral/linalg Routing Gap in primalSpring composition API (Resolved V162)
 
 **Owner:** primalSpring (composition API)
-**Status:** Open — discovered during V147 guideStone N2 expansion
+**Status:** Resolved (V162) — verified fixed upstream in primalSpring `routing.rs`
 
-`primalspring::composition::method_to_capability_domain()` maps method
-prefixes to capability domains. Currently `tensor`, `stats`, `math`, `noise`,
-`activation`, `rng`, `fhe`, `tolerances`, `validate`, `device` all route to
-`"tensor"` (barraCuda). However, `spectral` and `linalg` prefixes fall through
-to the default `_ => prefix` branch, meaning `method_to_capability_domain("spectral.fft")`
-returns `"spectral"` instead of `"tensor"`.
-
-**Workaround:** wetSpring's guideStone explicitly passes `"tensor"` as the
-capability domain for spectral/linalg `validate_parity` calls, bypassing the
-helper. This works but defeats the purpose of centralized routing.
-
-**Fix:** Add `"spectral" | "linalg"` to the `"tensor"` match arm in
-`method_to_capability_domain()`.
-
-**Impact:** Any spring using `method_to_capability_domain` for spectral/linalg
-methods will get incorrect routing until this is fixed.
+primalSpring's `composition::routing::method_to_capability_domain()` now maps
+`"spectral" | "linalg"` to `"tensor"` alongside `tensor`, `stats`, `math`,
+etc. Doc tests assert `linalg.solve` and `spectral.fft` → `"tensor"`.
+Verified on disk: `primalSpring/ecoPrimal/src/composition/routing.rs` (lines
+93–112). wetSpring's guideStone workaround (explicit `"tensor"` domain) is
+still in place as defense-in-depth but is no longer required.
 
 ---
 
@@ -325,19 +318,19 @@ Exp403 itself continues to work against the live barraCuda primal.
 | PG-03 | Name-based discovery | Songbird/biomeOS | **Partial V158** — capability abstraction wired | 3 |
 | PG-04 | NestGate IPC wired, deploy pending | NestGate | NestGate live deployment | 2 |
 | PG-05 | toadStool discovery + barraCuda optional | toadStool | Sovereign dispatch wiring | 2 |
-| PG-06 | Ionic bond protocol | primalSpring Track 4 | Bond negotiation spec | 2 |
+| PG-06 | Ionic bond protocol | primalSpring Track 4 | **Closed V162** — deferred, no spec | -- |
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
 | PG-08 | Validate manifest binary name | primalSpring | **Closed V158** — informational, upstream | -- |
 | PG-09 | barraCuda IPC evaporation | wetSpring | **Resolved V160** — all 5 handlers wired, Tier 4 complete | -- |
-| PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
+| PG-10 | spectral/linalg routing | primalSpring | **Resolved V162** — verified fixed upstream | -- |
 | PG-11 | Manifest drift (N2 methods) | primalSpring | **Resolved V148** | -- |
 | PG-12 | Exp403 legacy surface | wetSpring | **Resolved V161** — separated into LEGACY constant | -- |
 | PG-13 | barraCuda missing 6 manifest methods | barraCuda | **Resolved V149** — param names corrected | -- |
 | PG-14 | Squirrel BTSP-only socket | Squirrel | **Closed V158** — informational, infra dep | -- |
 | PG-15 | ToadStool compute.dispatch | ToadStool | **Closed V158** — informational, expected | -- |
 | PG-16 | stats.std_dev N-1 vs N divisor | barraCuda/wetSpring | **Resolved V156** — documented as intentional | -- |
-| PG-17 | tensor.matmul handle-based only | barraCuda | inline data path or document | 1 |
-| PG-18 | Provenance trio UDS connection reset | rhizoCrypt/loamSpine/sweetGrass | Trio JSON-RPC on UDS | 2 |
+| PG-17 | tensor.matmul handle-based only | barraCuda | **Closed V162** — informational, accepted API | -- |
+| PG-18 | Provenance trio UDS connection reset | rhizoCrypt/loamSpine/sweetGrass | **Closed V162** — subsumed by PG-02 | -- |
 | PG-19 | petalTongue scene primitive format | petalTongue/primalSpring | **Informational V150** — documented | -- |
 | PG-20 | socat dependency in composition lib | primalSpring | **Resolved V156** — uds_send.py established | -- |
 | PG-21 | Health check uses socat | primalSpring | **Resolved V156** — same as PG-20 | -- |
@@ -422,38 +415,31 @@ No code change needed — the asymmetric expectations are by design.
 
 ---
 
-## PG-17: tensor.matmul Handle-Based API
+## PG-17: tensor.matmul Handle-Based API (Closed V162 — informational)
 
 **Owner:** barraCuda
-**Status:** Open — discovered V148 live NUCLEUS validation
+**Status:** Closed (V162) — informational, accepted API contract
 
 `tensor.matmul` requires pre-created tensor handles (`lhs_id`, `rhs_id`)
 rather than accepting inline data. The guideStone works around this with
-create→matmul→check-shape, but `validate_parity` (which expects a scalar
-`result` field) cannot be used. Either barraCuda should add an inline-data
-convenience path, or `primalspring::composition` should gain a handle-aware
-parity helper.
+create→matmul→check-shape. This is an intentional design choice in
+barraCuda's tensor API (handle-based for GPU memory efficiency). wetSpring's
+guideStone validates matmul end-to-end via the create→matmul→check flow.
+The `validate_parity` helper gap is a composition-lib convenience item,
+not a correctness gap.
 
 ---
 
-## PG-18: Provenance Trio UDS Connection Reset (Composition-Discovered)
+## PG-18: Provenance Trio UDS Connection Reset (Closed V162 — subsumed by PG-02)
 
 **Owner:** rhizoCrypt / loamSpine / sweetGrass
-**Status:** Open — discovered V150 composition exploration (Phase 46)
+**Status:** Closed (V162) — subsumed by PG-02
 
-All three provenance trio primals (rhizoCrypt, loamSpine, sweetGrass) accept
-UDS connections but immediately reset them when JSON-RPC is sent. This matches
-upstream PG-45 (primalSpring composition testing). The sockets are created and
-the primals are running (`pgrep` confirms), but they do not speak JSON-RPC on
-UDS out of the box.
-
-**Impact:** DAG session creation, ledger spine creation, and braid recording
-all fail. The composition degrades gracefully (logs empty responses, continues
-without provenance tracking). However, the **entire provenance layer is
-non-functional** for interactive compositions.
-
-**Workaround:** The composition lib handles empty responses gracefully; DAG,
-ledger, and braid features are disabled but the composition still runs.
+This gap is the same root cause as PG-02 (provenance trio not speaking
+JSON-RPC on UDS). PG-02 tracks the full trio IPC readiness lifecycle.
+Maintaining a separate gap for the specific UDS reset symptom adds no
+tracking value. Graceful degradation is confirmed: compositions continue
+without provenance tracking when the trio is unavailable.
 
 ---
 
@@ -596,14 +582,17 @@ with 36 validated targets.
 
 **Status after V161:** 8 gaps open (all external), 14 resolved/closed. 1,962 tests.
 
+**Status after V162:** 4 gaps open (all external), 18 resolved/closed.
+Tier 4 defaults: `default = []` (barracuda-lib removed from default features).
+PG-06 closed (deferred — no spec), PG-10 resolved (verified fixed upstream),
+PG-17 closed (informational — accepted API), PG-18 closed (subsumed by PG-02).
+
 **Remaining open gaps by owner:**
 - **wetSpring internal:** None — all wetSpring-owned gaps resolved
-- **External teams (5):** PG-02 (trio IPC readiness), PG-04 (NestGate deploy),
-  PG-05 (toadStool sovereign dispatch), PG-06 (ionic bond protocol),
-  PG-18 (trio UDS connection reset)
-- **Mixed (2):** PG-03 (partial — Songbird + wetSpring, capability abstraction
-  wired), PG-10 (primalSpring spectral/linalg routing)
-- **barraCuda (1):** PG-17 (matmul handle-based API)
+- **Provenance Trio (1):** PG-02 (trio IPC readiness — rhizoCrypt/loamSpine/sweetGrass)
+- **Infrastructure (1):** PG-04 (NestGate live deployment)
+- **Mixed (1):** PG-03 (partial — Songbird `capability.resolve`, wetSpring side wired)
+- **Compute (1):** PG-05 (toadStool sovereign dispatch)
 
 *This document is maintained by wetSpring and fed back to primalSpring via
 `wateringHole/handoffs/` per the NUCLEUS_SPRING_ALIGNMENT.md feedback protocol.*

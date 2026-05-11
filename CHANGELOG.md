@@ -3,6 +3,22 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V162b] — 2026-05-11
+
+### Tier 4 IPC-First Defaults, 4 PG Gaps Closed, Forge Decoupled, LTEE B7 STARTED
+
+- **Tier 4 IPC-first defaults:** `barracuda/Cargo.toml` `default` flipped from `["barracuda-lib"]` to `[]`. The UniBin builds and serves science without linking the barraCuda library. Users opt in to local compute with `--features barracuda-lib`. wetSpring now qualifies for Tier 4 alongside groundSpring + healthSpring (4/4+ springs needed for exit gate).
+- **metalForge/forge decoupled:** `barracuda` dep made `optional = true` with `barracuda-lib` feature (default on). `node/assembly.rs` stats functions have local fallback implementations when barracuda is off. Test code gated.
+- **8 barracuda-dependent bio modules feature-gated:** `anderson_spectral`, `binding_landscape`, `bistable`, `capacitor`, `cooperation`, `hormesis`, `multi_signal`, `phage_defense`, `calibration`, `derep`, `diversity`, `eic`, `esn`, `ode`, `pangenome`, `qs_biofilm`, `special` — all behind `#[cfg(feature = "barracuda-lib")]`. `pub use barracuda::linalg::nmf` re-export gated. Visualization scenarios (`ode_systems`, `nmf`, `hormesis_viz`) also gated.
+- **4 PG gaps closed** (8 → 4 open, 14 → 18 resolved/closed):
+  - PG-06 closed (deferred — no primalSpring Track 4 specification exists)
+  - PG-10 resolved (verified fixed upstream — primalSpring `routing.rs` maps `linalg | spectral` → `"tensor"`)
+  - PG-17 closed (informational — handle-based API is accepted design, guideStone workaround validated)
+  - PG-18 closed (subsumed by PG-02 — same root cause, double-tracking)
+- **LTEE B7 STARTED:** Sovereign genomics pipeline (Tenaillon 2016). 10-paper LTEE GuideStone Queue added to `specs/PAPER_REVIEW_QUEUE.md`. B7 targets: 264 NCBI genome download, mutation accumulation curves, breseq comparison → lithoSpore module 6.
+- **Remaining 4 open gaps** (all external): PG-02 (provenance trio), PG-03 (Songbird), PG-04 (NestGate), PG-05 (toadStool).
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,643 with standard features / 1,209 lib-only)
+
 ## [V162] — 2026-05-11
 
 ### Doc Reconciliation, Gap Count Correction, Upstream Primal Handoff

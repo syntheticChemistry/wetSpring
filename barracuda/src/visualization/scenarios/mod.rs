@@ -16,6 +16,7 @@ pub mod cross_species;
 pub mod dynamics;
 pub mod ecology;
 pub mod gonzales;
+#[cfg(feature = "barracuda-lib")]
 pub mod hormesis_viz;
 
 pub mod hmm;
@@ -23,7 +24,9 @@ pub mod lcms;
 pub mod ml_models;
 pub mod msa;
 pub mod neighbor_joining;
+#[cfg(feature = "barracuda-lib")]
 pub mod nmf;
+#[cfg(feature = "barracuda-lib")]
 pub mod ode_systems;
 pub mod ordination;
 pub mod pangenome;

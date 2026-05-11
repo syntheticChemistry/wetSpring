@@ -152,7 +152,7 @@ pub fn integrate_peak(x: &[f64], y: &[f64], peak: &Peak) -> f64 {
     }
     let x_slice = &x[peak.left_base..=peak.right_base];
     let y_slice = &y[peak.left_base..=peak.right_base];
-    barracuda::numerical::trapz(y_slice, x_slice).unwrap_or(0.0)
+    trapz(y_slice, x_slice)
 }
 
 /// Detect peaks and compute their integrated areas in one pass.
@@ -176,4 +176,21 @@ pub fn find_peaks_with_area(x: &[f64], y: &[f64], params: &PeakParams) -> Vec<(P
             (p, area)
         })
         .collect()
+}
+
+#[cfg(feature = "barracuda-lib")]
+fn trapz(y: &[f64], x: &[f64]) -> f64 {
+    barracuda::numerical::trapz(y, x).unwrap_or(0.0)
+}
+
+#[cfg(not(feature = "barracuda-lib"))]
+fn trapz(y: &[f64], x: &[f64]) -> f64 {
+    if y.len() < 2 || x.len() != y.len() {
+        return 0.0;
+    }
+    let mut sum = 0.0;
+    for i in 1..y.len() {
+        sum += (x[i] - x[i - 1]) * (y[i] + y[i - 1]) / 2.0;
+    }
+    sum
 }

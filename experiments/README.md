@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-11 (V161: zero internal gaps. PG-12 resolved, PG-09 resolved, foundation seeded. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). Deep debt audit clean. 11 paper notebooks. 63/63 papers. 8 primal gaps open (all external), 14 resolved/closed.)
+**Updated**: 2026-05-11 (V162: zero internal gaps. PG-12 resolved, PG-09 resolved, foundation seeded. Tier 4 IPC-first defaults. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). Deep debt audit clean. 11 paper notebooks. 63/63 papers. 4 primal gaps open (all external), 18 resolved/closed.)
 
 ---
 
@@ -656,7 +656,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V161):** 383 experiments indexed (380 completed + 3 PROPOSED), 364 binaries (342 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 4 (NUCLEUS 38/38 pass, 4 skip, v0.9.17 manifest). 8 primal gaps open (all external), 14 resolved/closed. V161: PG-12 resolved, foundation seeded. V160: PG-09 resolved. V159: barraCuda IPC routing.
+**Totals (V162):** 383 experiments indexed (380 completed + 3 PROPOSED), 364 binaries (342 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 4 (NUCLEUS 38/38 pass, 4 skip, v0.9.17 manifest). 4 primal gaps open (all external), 18 resolved/closed. V162: Tier 4 IPC-first defaults; PG-12 resolved, foundation seeded. V160: PG-09 resolved. V159: barraCuda IPC routing.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -686,7 +686,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V161): 383 experiments indexed, 364 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). guideStone Level 4 (38/38 NUCLEUS, 4 skip, v0.9.17). Zero internal gaps. 8 gaps open (all external), 14 resolved/closed.**
+**Totals (V162): 383 experiments indexed, 364 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). guideStone Level 4 (38/38 NUCLEUS, 4 skip, v0.9.17). Zero internal gaps. Tier 4 IPC-first defaults. 4 gaps open (all external), 18 resolved/closed.**
 
 ---
 

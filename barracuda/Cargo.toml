@@ -17,7 +17,7 @@ categories = ["science", "command-line-utilities"]
 workspace = true
 
 [features]
-default = ["barracuda-lib"]
+default = []
 # barraCuda as local path dependency (library linking).
 # Disable for IPC-only sovereign deployment where barraCuda runs as a separate primal.
 barracuda-lib = ["dep:barracuda"]

@@ -159,7 +159,10 @@ pub(crate) fn mean_quality(qual: &[u8]) -> f64 {
         .iter()
         .map(|&q| f64::from(q.saturating_sub(33)))
         .collect();
-    barracuda::stats::mean(&phred_values)
+    if phred_values.is_empty() {
+        return 0.0;
+    }
+    phred_values.iter().sum::<f64>() / phred_values.len() as f64
 }
 
 /// Write dereplicated sequences to FASTA format with abundance annotations.

@@ -1,8 +1,11 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
 <!-- V141 note (Apr 11, 2026): Paper queue is ALL DONE (63/63). Current
-     experiment counts (380 indexed) and test counts (1,946) are in the root
+     experiment counts (380 indexed) and test counts (1,962) are in the root
      README.md. This file preserves the V126 per-paper detail. -->
+<!-- V162 note (May 11, 2026): LTEE GuideStone Queue section added.
+     10 papers (B1-B8, E1, E5) seeded. B7 STARTED — sovereign genomics
+     pipeline (Tenaillon 2016, 264 NCBI genomes). -->
 
 # wetSpring — Paper Review Queue
 
@@ -467,6 +470,35 @@ Open Data (NCBI SRA, Zenodo, EPA, journal tables, published equations)
 All Python baselines have reproduction headers (script, commit, date, hardware, SHA-256).
 All Rust validators have provenance classification headers.
 All tolerance constants are scientifically justified and hierarchy-tested.
+
+---
+
+## LTEE GuideStone Queue
+
+<!-- V162: LTEE paper queue seeded per infra/wateringHole/handoffs/LTEE_GUIDESTONE_SUBSYSTEM_HANDOFF_MAY11_2026.md -->
+
+wetSpring owns 10 papers (B1–B8, E1, E5) for the LTEE Targeted GuideStone.
+Module 6 (breseq comparison — B7) is wetSpring's primary contribution.
+
+| ID | Paper | Year | lithoSpore Module | Status | Notes |
+|----|-------|------|-------------------|--------|-------|
+| B1 | Barrick et al. — Genome evolution in a simple mutation accumulation experiment | 2009 | 2 (mutation accum.) | queued | Neutral mutation rate, fixation probability |
+| B2 | Wiser et al. — Long-term dynamics of adaptation in asexual populations | 2013 | 1 (power-law fitness) | queued | Power-law fitness trajectories, Anderson disorder analogy |
+| B3 | Good et al. — The dynamics of molecular evolution over 60,000 generations | 2017 | 3 (allele traj.) | queued | Multi-clade dynamics, clonal interference |
+| B4 | Blount et al. — Genomic analysis of a key innovation (Cit+) | 2012 | 4 (citrate) | queued | Potentiating cascade detection |
+| B5 | Burden/symbiont PK/PD model | 2024 | 5 (BioBrick) | queued | Burden distribution across 301 plasmids |
+| B6 | Burden et al. — Quantifying the fitness effects of gene expression | 2024 | 5 (BioBrick) | queued | Burden distribution, Anderson Wc analogy |
+| B7 | Tenaillon et al. — Tempo and mode of genome evolution in a 50,000-generation experiment | 2016 | 6 (breseq) | **STARTED** | **wetSpring primary**: 264 NCBI genome download, mutation accumulation curves |
+| B8 | Barrick/Lenski — Genome dynamics during experimental evolution | 2013 | — | queued | Genome dynamics review |
+| E1 | Eaves/Woldring — engineered protein evolution | — | — | queued | TBD |
+| E5 | Eaves/Woldring — cyclic peptide screening | — | — | queued | TBD |
+
+**B7 (Tenaillon 2016) — wetSpring sovereign genomics pipeline:**
+- Download 264 *E. coli* genomes from NCBI (BioProject accessions in paper)
+- Compute mutation accumulation curves per lineage
+- Compare mutation rates against breseq-called variants
+- Produce expected values JSON for lithoSpore module 6
+- Feeds groundSpring epistasis quantification
 
 ---
 

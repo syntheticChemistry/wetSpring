@@ -97,6 +97,7 @@ pub mod primal_names;
 #[cfg(feature = "gpu")]
 pub mod provenance;
 pub mod provenance_registry;
+#[cfg(feature = "barracuda-lib")]
 pub mod special;
 pub mod tolerances;
 pub mod upstream_contract;

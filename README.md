@@ -40,12 +40,12 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 8 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 14 resolved/closed). Zero internal gaps. |
+| **Primal gaps** | 4 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 18 resolved/closed). Zero internal gaps. |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V161:** Deep debt audit clean — zero internal gaps remain. PG-12 resolved (legacy surface separated). PG-09 resolved (all 5 `barracuda::*`-calling handlers `primal-proof` wired). Foundation Thread 04 seeded (36 validated targets). Tier 4 Cargo confirmed. 1,962 lib tests, 0 failed. 63/63 papers reproduced. **8 gaps open (all external), 14 resolved/closed.**
+**Current release — V162:** Tier 4 IPC-first defaults (`default = []`, barracuda-lib removed). 4 PG gaps closed (PG-06 deferred, PG-10 resolved upstream, PG-17 informational, PG-18 subsumed). metalForge/forge barracuda dep now optional. 8 barracuda-dependent bio modules feature-gated behind `barracuda-lib`. LTEE B7 STARTED (sovereign genomics pipeline). 1,962 lib tests, 0 failed. 63/63 papers reproduced. **4 gaps open (all external), 18 resolved/closed.**
 
 ---
 

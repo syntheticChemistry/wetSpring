@@ -3,28 +3,36 @@
 
 pub mod adapter;
 pub mod alignment;
+#[cfg(feature = "barracuda-lib")]
 pub mod anderson_spectral;
 pub mod ani;
 #[cfg(feature = "gpu")]
 pub mod ani_gpu;
 #[cfg(feature = "gpu")]
 pub mod batch_fitness_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod binding_landscape;
+#[cfg(feature = "barracuda-lib")]
 pub mod bistable;
 #[cfg(feature = "gpu")]
 pub mod bistable_gpu;
 pub mod bootstrap;
 pub mod brain;
+#[cfg(feature = "barracuda-lib")]
 pub mod calibration;
+#[cfg(feature = "barracuda-lib")]
 pub mod capacitor;
 #[cfg(feature = "gpu")]
 pub mod capacitor_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod chimera;
 #[cfg(feature = "gpu")]
 pub mod chimera_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod cooperation;
 #[cfg(feature = "gpu")]
 pub mod cooperation_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod dada2;
 #[cfg(feature = "gpu")]
 pub mod dada2_gpu;
@@ -32,6 +40,7 @@ pub mod decision_tree;
 pub mod derep;
 #[cfg(feature = "gpu")]
 pub mod derep_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod diversity;
 #[cfg(feature = "gpu")]
 pub mod diversity_fusion_gpu;
@@ -41,10 +50,12 @@ pub mod dnds;
 #[cfg(feature = "gpu")]
 pub mod dnds_gpu;
 pub mod dorado;
+#[cfg(feature = "barracuda-lib")]
 pub mod eic;
 #[cfg(feature = "gpu")]
 pub mod eic_gpu;
 pub mod esn;
+#[cfg(feature = "barracuda-lib")]
 pub mod feature_table;
 #[cfg(feature = "gpu")]
 pub mod feature_table_gpu;
@@ -62,6 +73,7 @@ pub mod hamming_gpu;
 pub mod hmm;
 #[cfg(feature = "gpu")]
 pub mod hmm_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod hormesis;
 #[cfg(feature = "gpu")]
 pub mod jaccard_gpu;
@@ -85,6 +97,7 @@ pub mod molecular_clock;
 #[cfg(feature = "gpu")]
 pub mod molecular_clock_gpu;
 pub mod msa;
+#[cfg(feature = "barracuda-lib")]
 pub mod multi_signal;
 #[cfg(feature = "gpu")]
 pub mod multi_signal_gpu;
@@ -93,22 +106,26 @@ pub mod neighbor_joining;
 #[cfg(feature = "gpu")]
 pub mod neighbor_joining_gpu;
 pub mod numerics;
+#[cfg(feature = "barracuda-lib")]
 pub mod ode;
 #[cfg(feature = "gpu")]
 pub mod ode_sweep_gpu;
 #[cfg(feature = "gpu")]
 pub mod pairwise_l2_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod pangenome;
 #[cfg(feature = "gpu")]
 pub mod pangenome_gpu;
 pub mod pcoa;
 #[cfg(feature = "gpu")]
 pub mod pcoa_gpu;
+#[cfg(feature = "barracuda-lib")]
 pub mod phage_defense;
 #[cfg(feature = "gpu")]
 pub mod phage_defense_gpu;
 pub mod phred;
 pub mod placement;
+#[cfg(feature = "barracuda-lib")]
 pub mod qs_biofilm;
 pub mod quality;
 #[cfg(feature = "gpu")]
@@ -157,4 +174,5 @@ pub mod validation_helpers;
 /// NMF (Non-negative Matrix Factorization) is used for community type
 /// detection, metagenome binning, and spectral decomposition. Re-exported
 /// here so bio-domain callers can find it alongside other bio modules.
+#[cfg(feature = "barracuda-lib")]
 pub use barracuda::linalg::nmf;

@@ -55,15 +55,15 @@ pub mod barracuda_route;
 pub mod capability_domains;
 #[cfg(feature = "ipc")]
 pub mod compute_dispatch;
-#[cfg(feature = "ipc")]
+#[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 mod connection;
 #[cfg(feature = "ipc")]
 pub mod discover;
-#[cfg(feature = "ipc")]
+#[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub mod dispatch;
 #[cfg(feature = "ipc")]
 pub mod dispatch_strategy;
-#[cfg(feature = "ipc")]
+#[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub mod handlers;
 #[cfg(feature = "ipc")]
 pub mod mcp;
@@ -82,7 +82,7 @@ pub mod protocol;
 pub mod provenance;
 #[cfg(feature = "ipc")]
 pub mod resilience;
-#[cfg(feature = "ipc")]
+#[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub mod server;
 #[cfg(feature = "ipc")]
 pub mod skunkbat;
@@ -90,12 +90,12 @@ pub mod skunkbat;
 pub mod songbird;
 #[cfg(feature = "ipc")]
 pub mod timeouts;
-#[cfg(feature = "ipc")]
+#[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub mod timeseries;
 #[cfg(feature = "ipc")]
 pub mod transport;
 
-#[cfg(feature = "ipc")]
+#[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub use server::Server;
 
 #[cfg(all(test, feature = "ipc"))]

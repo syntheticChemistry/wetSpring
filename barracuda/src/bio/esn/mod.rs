@@ -31,6 +31,7 @@ mod config;
 pub mod heads;
 mod npu;
 mod reservoir;
+#[cfg(feature = "barracuda-lib")]
 mod training;
 
 #[cfg(feature = "gpu")]
@@ -45,6 +46,7 @@ pub use reservoir::Lcg;
 pub use toadstool_bridge::{BioEsn, BioEsnConfig, BioHeadKind, MultiHeadBioEsn};
 
 use reservoir::{build_w_in, build_w_res, update_state};
+#[cfg(feature = "barracuda-lib")]
 use training::solve_ridge;
 
 /// Legacy CPU-only Echo State Network.
@@ -145,6 +147,10 @@ impl LegacyEsn {
     }
 
     /// Train readout weights via ridge regression on collected states.
+    #[cfg_attr(
+        not(feature = "barracuda-lib"),
+        expect(unused_variables, reason = "ridge regression requires barracuda-lib")
+    )]
     pub fn train(&mut self, inputs: &[Vec<f64>], targets: &[Vec<f64>]) {
         let n_res = self.config.reservoir_size;
         let n_out = self.config.output_size;
@@ -165,6 +171,7 @@ impl LegacyEsn {
             }
         }
 
+        #[cfg(feature = "barracuda-lib")]
         solve_ridge(
             &mut self.w_out,
             &flat_states,
@@ -179,6 +186,10 @@ impl LegacyEsn {
     }
 
     /// Train from sequences with reset between each trajectory.
+    #[cfg_attr(
+        not(feature = "barracuda-lib"),
+        expect(unused_variables, reason = "ridge regression requires barracuda-lib")
+    )]
     pub fn train_stateful(&mut self, trajectories: &[Vec<(Vec<f64>, Vec<f64>)>]) {
         let n_res = self.config.reservoir_size;
         let n_out = self.config.output_size;
@@ -202,6 +213,7 @@ impl LegacyEsn {
             return;
         }
 
+        #[cfg(feature = "barracuda-lib")]
         solve_ridge(
             &mut self.w_out,
             &flat_states,
@@ -216,6 +228,10 @@ impl LegacyEsn {
     }
 
     /// Train with reset before each sample (stateless: each window independent).
+    #[cfg_attr(
+        not(feature = "barracuda-lib"),
+        expect(unused_variables, reason = "ridge regression requires barracuda-lib")
+    )]
     pub fn train_stateless(&mut self, inputs: &[Vec<f64>], targets: &[Vec<f64>]) {
         let n_res = self.config.reservoir_size;
         let n_out = self.config.output_size;
@@ -235,6 +251,7 @@ impl LegacyEsn {
             }
         }
 
+        #[cfg(feature = "barracuda-lib")]
         solve_ridge(
             &mut self.w_out,
             &flat_states,

@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V161:** PG-12 resolved, foundation Thread 04 seeded (36 targets). Deep debt audit clean: zero unsafe, zero mocks, zero hardcoded paths, zero TODO, all deps pure Rust. Zero wetSpring-internal gaps remain. V160: PG-09 resolved (5/5 handlers primal-proof wired). 1,962 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4. 8 gaps open (all external), 14 resolved/closed.
+**Current release — V162:** Tier 4 IPC-first defaults (`default = []`). 4 PG gaps closed (PG-06/10/17/18), 4 remain (all external). metalForge/forge barracuda dep optional. Bio modules feature-gated. LTEE B7 STARTED. 1,962 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
 
 ## Role in the Ecosystem
 
@@ -35,7 +35,7 @@ evolution pipeline.
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 8 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 14 resolved/closed. Zero wetSpring-internal gaps.
+- **Primal gaps:** 4 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 18 resolved/closed. Zero wetSpring-internal gaps.
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities

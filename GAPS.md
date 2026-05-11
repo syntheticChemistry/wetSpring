@@ -5,8 +5,8 @@ Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
 Last updated: 2026-05-11 (V161 — PG-12 resolved (legacy surface separated),
-PG-09 resolved (5/5 handlers primal-proof wired), foundation Thread 04 seeded.
-Deep debt audit clean. 8 gaps open (all external), 14 resolved/closed. 1,962 tests.)
+V162: Tier 4 IPC-first defaults, PG-06/10/17/18 closed, forge barracuda optional,
+bio modules feature-gated, LTEE B7 STARTED. 4 gaps open (all external), 18 resolved/closed. 1,962 tests.)
 
 ---
 

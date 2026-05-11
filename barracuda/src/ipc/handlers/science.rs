@@ -3,7 +3,9 @@
 
 use serde_json::{Value, json};
 
+#[cfg(feature = "barracuda-lib")]
 use crate::bio::diversity;
+#[cfg(feature = "barracuda-lib")]
 use crate::bio::qs_biofilm::{self, N_PARAMS, QsBiofilmParams};
 use crate::ipc::protocol::RpcError;
 
