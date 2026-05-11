@@ -160,7 +160,7 @@ fn validate_bare_science(v: &mut ValidationResult) {
     v.check_bool(
         "mean([10..50]) = 30.0",
         (local_mean - 30.0).abs() <= tolerances::ANALYTICAL_F64,
-        "Python baseline: scripts/diversity/compute_stats.py",
+        "Analytical identity: mean(10..50) = 30.0 (exact)",
     );
 
     // std_dev([10,20,30,40,50]) = √200 ≈ 14.142 (population std)

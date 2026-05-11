@@ -4,7 +4,7 @@
 
 **Date:** April 27, 2026 (V150 update)
 **Author:** wetSpring V150 (ecoPrimals)
-**Foundation:** 383 experiments, 5,900+ checks, 64 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,594 lib tests, 342 binaries, 91.20% coverage. **V150:** Phase 46 composition explorer — data exploration & visualization lane. `wetspring_composition.sh` with gene panel explorer, petalTongue scene graphs (100 nodes, <1ms), barraCuda IPC math (all pass). Provenance trio UDS reset (PG-18). guideStone Level 4 (38/38, 4 skip). 15 gaps open (PG-01–PG-22, 7 resolved). `composition_nucleus.sh` launcher, Python UDS shim. primalSpring v0.9.17. Zero local WGSL, zero unsafe code, clippy **ZERO WARNINGS**.
+**Foundation:** 383 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,865 lib tests, 364 binaries, 91.20% coverage. **V150:** Phase 46 composition explorer — data exploration & visualization lane. `wetspring_composition.sh` with gene panel explorer, petalTongue scene graphs (100 nodes, <1ms), barraCuda IPC math (all pass). Provenance trio UDS reset (PG-18). guideStone Level 4 (38/38, 4 skip). 15 gaps open (PG-01–PG-22, 7 resolved). `composition_nucleus.sh` launcher, Python UDS shim. primalSpring v0.9.17. Zero local WGSL, zero unsafe code, clippy **ZERO WARNINGS**.
 
 ---
 

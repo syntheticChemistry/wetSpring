@@ -32,7 +32,7 @@ pub fn validate_bare_science(v: &mut ValidationResult) {
     v.check_bool(
         "mean([10..50]) = 30.0",
         (local_mean - 30.0).abs() <= tolerances::ANALYTICAL_F64,
-        "Python baseline: scripts/diversity/compute_stats.py",
+        "Analytical identity: mean(10..50) = 30.0 (exact)",
     );
 
     let local_std = (200.0_f64).sqrt();

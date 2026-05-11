@@ -71,7 +71,7 @@ evolution pipeline.
 
 ```
 Tier 1: Python baseline  → Rust CPU parity  → GPU validation
-           (58 scripts)     (1,594 tests)      (44 GPU modules)
+           (58 scripts)     (1,865 tests)      (44 GPU modules)
 Tier 2: Rust validation   → NUCLEUS composition patterns
            (364 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
 Tier 3: Composition       → IPC parity → Niche gate

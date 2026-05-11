@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** April 27, 2026 (V151 — Deep debt evolution. barraCuda v0.3.12 standalone, toadStool S155+, coralReef Phase 10, wgpu 28. 1,594 lib + 18 IPC tests (0 failures), 364 binaries (342 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, **zero `dyn` dispatch**, clippy ZERO WARNINGS pedantic+nursery. V151: `FastqReader` enum (FASTQ), `BufReader<File>` (MS2), generic `write_ctx` (NRS), `Write`-based validation output, shared `BenchRow`/`bench_print`/`gpu_or_skip_sync`, concrete `FacadeError`, env-var discovery, tolerance centralization. V150: Phase 46 composition explorer. V149: guideStone Level 4 (38/38, 4 skip). V148: Level 4 initial. V137: provenance headers on all binaries, tolerance constants.)
+**Updated:** May 11, 2026 (V159 — deep debt audit clean. barraCuda IPC routing module (`ipc/barracuda_route.rs`), `#[cfg(feature = "primal-proof")]` wired into 3 science handlers for IPC-first compute. V158: skunkBat IPC module, CI cross-sync 413, capability discovery. V157: IPC timeouts centralized, GPU API evolved, shared harness. 1,865 lib + 97 integration + 18 IPC tests (0 failures), 364 binaries (342 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, **zero `dyn` dispatch**, clippy ZERO WARNINGS pedantic+nursery. 8 primal gaps open, 14 resolved/closed. 63/63 papers reproduced.)
 
 ---
 

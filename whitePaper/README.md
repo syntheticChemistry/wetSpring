@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** May 10, 2026
-**Status:** V157 — deep debt evolution wave. IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API evolved (`submit_and_poll` → `read_buffer_f32` internal poll). Shared validation harness (`BenchRowEvolved`, `print_kv_box`). V156: skunkBat audit wired (7 deploy graphs), biomeOS v3.51 consumed (`composition.status`, `method.register`), CI cross-sync (6 tests). PG-16/20/21 closed. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 1,594 lib + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 12 primal gaps open (10 resolved). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
+**Date:** May 11, 2026
+**Status:** V159 — deep debt audit clean. barraCuda IPC routing module wired (`ipc/barracuda_route.rs`), `#[cfg(feature = "primal-proof")]` in 3 science handlers for IPC-first compute. V158: skunkBat IPC module, CI cross-sync 413, capability discovery, PG-08/14/15/22 closed. V157: IPC timeouts centralized, GPU API evolved, shared harness. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 1,865 lib + 97 integration + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 8 primal gaps open (14 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---
