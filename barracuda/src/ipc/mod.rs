@@ -50,6 +50,8 @@
 pub mod stream_item;
 
 #[cfg(feature = "ipc")]
+pub mod barracuda_route;
+#[cfg(feature = "ipc")]
 pub mod capability_domains;
 #[cfg(feature = "ipc")]
 pub mod compute_dispatch;

@@ -4,16 +4,15 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-11 (V158 — post-interstadial gap closure wave.
-skunkBat IPC module wired (`ipc/skunkbat.rs`: `audit.event`, `audit.forward`,
-graceful degradation, 12 tests). CI cross-sync updated to 413 canonical methods.
-Capability-oriented discovery abstraction (`discover_by_capability`) added for
-PG-03 evolution path. `BARRACUDA` added to `primal_names`. Gaps triaged:
-PG-03 advanced (structural → partial), PG-08 closed (informational, upstream),
-PG-09 advanced (primal-proof feature + capability discovery wired),
-PG-14 closed (informational, infra dep), PG-15 closed (informational, expected),
-PG-22 closed (resolved, timeouts centralized).
-8 gaps open, 14 resolved/closed. 1,608 lib tests.)
+Last updated: 2026-05-11 (V159 — deep debt audit + PG-09 handler wiring.
+`ipc/barracuda_route.rs` created — barraCuda IPC routing module with `discover`,
+`forward`, `try_forward`, `is_available`, graceful degradation, 5 tests.
+`#[cfg(feature = "primal-proof")]` wired into 3 science handlers: `handle_diversity`
+(→ `stats.diversity`), `handle_anderson` (→ `spectral.anderson_3d`), `handle_qs_model`
+(→ `compute.ode_rk4`). Paper count reconciled (63 consistent). Doc metrics
+synchronized. V158: skunkBat IPC, CI cross-sync 413, capability discovery,
+PG-08/14/15/22 closed, PG-03/09 advanced.
+8 gaps open, 14 resolved/closed. 1,865 lib tests.)
 
 ---
 
@@ -170,8 +169,8 @@ or validation. Handed off to primalSpring via wateringHole.
 ## PG-09: barraCuda IPC Evaporation Surface — Domain Math via IPC
 
 **Owner:** wetSpring (internal)
-**Status:** In progress — guideStone Level 4, `primal-proof` feature declared,
-capability-oriented discovery wired (V158)
+**Status:** Handler-level wired (V159) — `primal-proof` feature gates route
+three science handlers through barraCuda IPC with graceful fallback.
 
 barraCuda is a full ecobin primal. The v0.9.17 canonical surface defines 33
 JSON-RPC methods (TENSOR 9, STATS 9, COMPUTE 4, SPECTRAL 3, LINALG 6,
@@ -179,7 +178,7 @@ HEALTH 2). Today, wetSpring links barraCuda as a Rust library dependency
 (`path = "../../../primals/barraCuda"`) and calls math in-process. For the
 primal proof (Level 5), domain math must migrate to IPC.
 
-**What exists (V149):**
+**What exists (V159):**
 - `niche::CONSUMED_CAPABILITIES` declares full v0.9.17 canonical surface (33
   methods) plus 15 legacy Exp403 methods pending migration
 - `wetspring_guidestone` binary (Level 4): NUCLEUS validated (38/38 pass, 4 skip,
@@ -188,18 +187,25 @@ primal proof (Level 5), domain math must migrate to IPC.
 - Exp403 (`validate_primal_parity_v1`) remains as Tier 2 IPC-WIRED validation
   with the original 22-method surface
 - Socket discovery uses `ipc::discover::discover_primal()` (env var → XDG → temp)
+- **`ipc/barracuda_route.rs`** — barraCuda IPC routing module with `discover()`,
+  `forward()`, `try_forward()`, `is_available()`, and 5 tests
+- **Handler-level `#[cfg(feature = "primal-proof")]`** wired in `handle_diversity`
+  (→ `stats.diversity`), `handle_anderson` (→ `spectral.anderson_3d`), and
+  `handle_qs_model` (→ `compute.ode_rk4`). Each attempts IPC first and falls
+  back to in-process on any failure (socket absent, transport error, RPC reject).
 
 **Evaporation candidates (library → IPC migration):**
 
-| Library call | IPC method | Priority |
-|-------------|-----------|----------|
-| `barracuda::stats::mean()` | `stats.mean` | High — used in diversity, QS |
-| `barracuda::stats::std_dev()` | `stats.std_dev` | High — used in diversity |
-| `barracuda::stats::weighted_mean()` | `stats.weighted_mean` | Medium (legacy surface) |
-| `barracuda::linalg::matmul()` | `tensor.matmul` | High — core linear algebra |
-| `barracuda::ops::*` | `tensor.*` | Medium — tensor operations |
-| `barracuda::dispatch::*` | `compute.dispatch` | High — GPU workloads |
-| `barracuda::sample::noise_*()` | `noise.perlin2d/3d` | Low — legacy surface |
+| Library call | IPC method | Priority | V159 Status |
+|-------------|-----------|----------|-------------|
+| `barracuda::stats::mean()` | `stats.mean` | High | Covered via `stats.diversity` forward |
+| `barracuda::stats::std_dev()` | `stats.std_dev` | High | Covered via `stats.diversity` forward |
+| `barracuda::stats::weighted_mean()` | `stats.weighted_mean` | Medium | Pending |
+| `barracuda::linalg::matmul()` | `tensor.matmul` | High | Pending (handler not yet wired) |
+| `barracuda::ops::*` | `tensor.*` | Medium | Pending |
+| `barracuda::dispatch::*` | `compute.dispatch` | High | `compute.ode_rk4` wired |
+| `barracuda::sample::noise_*()` | `noise.perlin2d/3d` | Low | Pending |
+| `barracuda::spectral::*` | `spectral.anderson_3d` | High | **Wired V159** |
 
 **Impact:** The library dep remains for Level 2 Rust-proof comparison and CI.
 The IPC path is additive. Full evaporation happens when Tier 3 (NUCLEUS from
@@ -213,9 +219,18 @@ V158 progress:
 - Dual-lane pattern documented: `cargo build --features ipc,primal-proof`
   (IPC-only) vs `cargo build --features ipc` (in-process default)
 
-**Next:** Wire `#[cfg(feature = "primal-proof")]` into dispatch handlers
-to route compute calls through barraCuda IPC when the feature is active.
-hotSpring and ludoSpring demonstrate the pattern.
+V159 progress:
+- `ipc/barracuda_route.rs` — full routing module (`discover`, `forward`,
+  `try_forward`, `is_available`, atomic request IDs, graceful degradation)
+- `#[cfg(feature = "primal-proof")]` wired into `handle_diversity`,
+  `handle_anderson`, `handle_qs_model` — three core science handlers now
+  attempt barraCuda IPC first, with in-process fallback
+- 5 new tests verifying discovery, availability, forwarding, and error paths
+
+**Next:** Wire remaining handlers (gonzales NMF, kinetics, expanded science),
+add integration test with a mock barraCuda responder, and extend
+`health.readiness` to report barraCuda primal connectivity when
+`primal-proof` is active.
 
 **Blocked by:** Nothing — barraCuda already exposes all methods. The gap is
 in wetSpring's handler-level `cfg` wiring, not in barraCuda's capabilities.
@@ -301,7 +316,7 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-06 | Ionic bond protocol | primalSpring Track 4 | Bond negotiation spec | 2 |
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
 | PG-08 | Validate manifest binary name | primalSpring | **Closed V158** — informational, upstream | -- |
-| PG-09 | barraCuda IPC evaporation | wetSpring | Tier 4 — primal-proof + capability discovery (V158) | 1 |
+| PG-09 | barraCuda IPC evaporation | wetSpring | **Handler-wired V159** — 3 handlers route via IPC | 1 |
 | PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
 | PG-11 | Manifest drift (N2 methods) | primalSpring | **Resolved V148** | -- |
 | PG-12 | Exp403 legacy surface | wetSpring | v0.9.17 migration | 2 |
@@ -542,11 +557,25 @@ declared, capability discovery wired, `BARRACUDA` constant added).
 - `SKUNKBAT` re-exported from `ipc/primal_names.rs`
 - skunkBat IPC module cross-sync test added
 
-**Status after V158 triage:** 8 gaps open, 14 resolved/closed. 1,608 lib tests.
+**Advanced V159:** PG-09 (barraCuda IPC evaporation — handler-level
+`#[cfg(feature = "primal-proof")]` wired into 3 science handlers with
+graceful fallback to in-process compute).
+
+**New infrastructure wired V159:**
+- `ipc/barracuda_route.rs` — barraCuda IPC routing module (`discover`,
+  `forward`, `try_forward`, `is_available`, atomic request IDs, 5 tests)
+- `handle_diversity` → `stats.diversity` IPC forward
+- `handle_anderson` → `spectral.anderson_3d` IPC forward
+- `handle_qs_model` → `compute.ode_rk4` IPC forward
+- Paper count reconciled (63 consistent across all docs)
+- CONTEXT.md gap count synchronized (8 open, 14 resolved/closed)
+
+**Status after V159:** 8 gaps open, 14 resolved/closed. 1,865 lib tests.
 
 **Remaining open gaps by owner:**
-- **wetSpring internal (2):** PG-09 (barraCuda IPC evaporation — primal-proof
-  handler wiring), PG-12 (Exp403 legacy surface — v0.9.17 migration)
+- **wetSpring internal (2):** PG-09 (barraCuda IPC evaporation — handler wired
+  V159, remaining: gonzales/kinetics/expanded + integration test), PG-12 (Exp403
+  legacy surface — v0.9.17 migration)
 - **External teams (5):** PG-02 (trio IPC readiness), PG-04 (NestGate deploy),
   PG-05 (toadStool sovereign dispatch), PG-06 (ionic bond protocol),
   PG-18 (trio UDS connection reset)

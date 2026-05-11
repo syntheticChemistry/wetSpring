@@ -16,7 +16,15 @@ use super::{extract_f64_array, extract_string_array};
 use super::try_gpu;
 
 /// Alpha diversity metrics (Shannon, Simpson, Chao1, etc.).
+///
+/// When `primal-proof` is active, attempts to forward to a live barraCuda
+/// primal via IPC before falling back to in-process compute.
 pub fn handle_diversity(params: &Value) -> Result<Value, RpcError> {
+    #[cfg(feature = "primal-proof")]
+    if let Some(result) = super::super::barracuda_route::try_forward("stats.diversity", params) {
+        return Ok(result);
+    }
+
     let counts = extract_f64_array(params, "counts")?;
     if counts.is_empty() {
         return Err(RpcError::invalid_params("counts array is empty"));
@@ -142,7 +150,15 @@ fn dispatch_metric(counts: &[f64], cpu_fn: fn(&[f64]) -> f64, gpu_result: Option
 }
 
 /// QS/c-di-GMP biofilm ODE integration.
+///
+/// When `primal-proof` is active, attempts to forward to a live barraCuda
+/// primal for remote ODE compute before falling back to in-process.
 pub fn handle_qs_model(params: &Value) -> Result<Value, RpcError> {
+    #[cfg(feature = "primal-proof")]
+    if let Some(result) = super::super::barracuda_route::try_forward("compute.ode_rk4", params) {
+        return Ok(result);
+    }
+
     let scenario = params
         .get("scenario")
         .and_then(Value::as_str)
@@ -228,7 +244,16 @@ pub fn handle_ncbi_fetch(params: &Value) -> Result<Value, RpcError> {
 /// CPU fallback by design; callers should check `health.readiness` substrate before
 /// invoking. The `science.full_pipeline` handler degrades gracefully when Anderson
 /// is unavailable.
+///
+/// When `primal-proof` is active, attempts to forward to a live barraCuda primal
+/// for remote spectral compute before falling back to in-process GPU or error.
 pub fn handle_anderson(params: &Value) -> Result<Value, RpcError> {
+    #[cfg(feature = "primal-proof")]
+    if let Some(result) = super::super::barracuda_route::try_forward("spectral.anderson_3d", params)
+    {
+        return Ok(result);
+    }
+
     #[cfg(not(feature = "gpu"))]
     {
         let _ = params;

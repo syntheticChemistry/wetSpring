@@ -4,7 +4,7 @@
 
 **Date:** May 10, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V157 — deep debt evolution wave. IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API evolved (`submit_and_poll` → `read_buffer_f32` internal poll). Shared validation harness (`BenchRowEvolved`, `print_kv_box`). V156: skunkBat audit wired (7 deploy graphs), biomeOS v3.51 consumed, CI cross-sync (6 tests). PG-16/20/21 closed. 11 paper notebooks. 63/63 papers. 1,594 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,594 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition. 383 experiments, 50 consumed capabilities (33 v0.9.17 + 15 legacy + `audit.event` + `audit.forward`). **12** primal gaps open (PG-01–PG-22, 10 resolved).
+**Status:** V159 — deep debt audit clean. V158: skunkBat IPC module wired (`ipc/skunkbat.rs`), CI cross-sync updated to 413 canonical methods, capability-oriented discovery (`discover_by_capability`), 4 primal gaps closed (PG-08/14/15/22), 2 advanced (PG-03/09). V157: IPC timeouts centralized, GPU API evolved, shared validation harness. V156: skunkBat deploy graphs, biomeOS v3.51, CI cross-sync. 11 paper notebooks. 63/63 papers. 1,608 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,608 lib + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition. 383 experiments, 50 consumed capabilities (33 v0.9.17 + 15 legacy + `audit.event` + `audit.forward`). **8** primal gaps open (PG-01–PG-22, 14 resolved/closed).
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,209 lib tests).
@@ -220,7 +220,7 @@ See companion handoffs under `wateringHole/handoffs/` for barraCuda/toadStool as
 | **V108 Track 6 Anaerobic** | Liao (MSU BAE) | 6 | 5+6 | Exp336-346 | 183 | Gompertz, first-order, Monod, Haldane kinetics, anaerobic diversity, Anderson W mapping, full 6-tier chain |
 | **V110 petalTongue + Anderson H3** | — | viz+science | — | Exp353-356 | 111 | petalTongue live dashboards, Anderson QS O₂-modulated W model (H3, r=0.851), stream_ecology, 6 JSON scenarios |
 | **V130 Anderson Hormesis** | Gonzales/Lisabeth/Waters/Jones/Kachkovskiy | cross | 1 | Exp377-379 | 31 | Biphasic dose-response via Anderson, colonization resistance surface, binding IPR/localization, computation as experiment preprocessor, healthSpring joint |
-| **Total** | | | **64** | | **5,707+** | |
+| **Total** | | | **63** | | **5,707+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 
@@ -266,7 +266,7 @@ See companion handoffs under `wateringHole/handoffs/` for barraCuda/toadStool as
 
 ## Validation Chain
 
-Every paper goes through the full evolution. Status across all 64 papers:
+Every paper goes through the full evolution. Status across all 63 papers:
 
 | Stage | What It Proves | Coverage |
 |-------|---------------|----------|

@@ -7,7 +7,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,594 tests)       (44 GPU modules)
+           (58 scripts)        (1,865 tests)       (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
            (342 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
@@ -27,7 +27,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 
 | | |
 |---|---|
-| **Tests** | 1,608 (lib) + 18 IPC roundtrip + integration, 0 failed |
+| **Tests** | 1,865 (lib) + 97 integration + 18 IPC roundtrip, 0 failed |
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V158:** Post-interstadial gap closure wave. skunkBat IPC module wired (`ipc/skunkbat.rs`: `audit.event`, `audit.forward`, graceful degradation). CI cross-sync updated to 413 canonical methods. Capability-oriented discovery abstraction (`discover_by_capability`, 15 domain→primal mappings). Primal gaps: PG-08/14/15/22 closed, PG-03/09 advanced. V157: IPC timeouts centralized, GPU API evolved, shared harness expanded. V156: skunkBat deploy graphs, biomeOS v3.51, CI cross-sync, PG-16/20/21 closed. 1,608 lib tests, 0 failed. **8 gaps open, 14 resolved/closed.**
+**Current release — V159:** Deep debt audit + PG-09 handler wiring. barraCuda IPC routing module (`ipc/barracuda_route.rs`): `discover`, `forward`, `try_forward`, `is_available`, graceful degradation. `#[cfg(feature = "primal-proof")]` wired into 3 science handlers (diversity, Anderson, QS model) for IPC-first compute with in-process fallback. Paper count reconciled (63 consistent). Doc metrics synchronized. V158: skunkBat IPC, CI cross-sync 413, capability discovery, PG-08/14/15/22 closed. V157: IPC timeouts centralized, GPU API evolved, shared harness. 1,865 lib tests, 0 failed. **8 gaps open, 14 resolved/closed.**
 
 ---
 

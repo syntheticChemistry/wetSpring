@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V159] — 2026-05-11
+
+### Deep Debt Audit — barraCuda IPC Routing, PG-09 Handler Wiring, Doc Reconciliation
+
+- **barraCuda IPC routing module:** New `ipc/barracuda_route.rs` — `discover()`, `forward()`, `try_forward()`, `is_available()`, atomic request IDs, `COMPUTE` timeout tier, graceful degradation on absent socket. 5 tests (discovery, availability, forwarding, error paths, ID sequencing). Follows `compute_dispatch.rs` and `skunkbat.rs` patterns.
+- **PG-09 handler-level wiring:** `#[cfg(feature = "primal-proof")]` branches added to 3 science handlers: `handle_diversity` (→ `stats.diversity`), `handle_anderson` (→ `spectral.anderson_3d`), `handle_qs_model` (→ `compute.ode_rk4`). Each attempts barraCuda IPC first and falls back to in-process compute on any failure. This is the dual-lane pattern from ludoSpring's `local` feature, applied to wetSpring's sovereign deployment path.
+- **Paper count reconciliation:** Faculty table total corrected from 64 to 63, matching the consistent "63/63 papers reproduced" across all other documentation. baseCamp README status updated to V159.
+- **Doc metric synchronization:** CONTEXT.md gap count fixed (was stale at 12/10, now 8/14). Test counts updated across all root docs (README, CONTEXT, GAPS, baseCamp). All metrics consistent.
+- **Deep debt audit results:** Zero unsafe code, zero production mocks, zero `todo!()` in library, zero hardcoded paths, all external deps pure Rust (except wgpu native GPU driver layer), no library files >800L, all 4 large bins (>800L) use shared validation harness with zero local structs.
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,865 lib + 97 integration / 0 failed)
+
 ## [V158] — 2026-05-11
 
 ### Post-Interstadial Gap Closure — skunkBat IPC, Capability Discovery, 413 Cross-Sync
