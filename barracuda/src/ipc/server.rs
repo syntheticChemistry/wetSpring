@@ -32,8 +32,8 @@ impl Server {
     ///
     /// Discovery order:
     /// 1. `WETSPRING_SOCKET` env var (explicit override)
-    /// 2. `$XDG_RUNTIME_DIR/biomeos/wetspring-default.sock`
-    /// 3. `<temp_dir>/wetspring-default.sock` (platform-agnostic fallback)
+    /// 2. `$XDG_RUNTIME_DIR/biomeos/wetspring-{family_id}.sock`
+    /// 3. `<temp_dir>/wetspring-{family_id}.sock` (platform-agnostic fallback)
     ///
     /// # Errors
     ///

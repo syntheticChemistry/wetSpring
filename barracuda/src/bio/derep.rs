@@ -162,7 +162,7 @@ pub(crate) fn mean_quality(qual: &[u8]) -> f64 {
     if phred_values.is_empty() {
         return 0.0;
     }
-    phred_values.iter().sum::<f64>() / phred_values.len() as f64
+    phred_values.iter().sum::<f64>() / crate::cast::usize_f64(phred_values.len())
 }
 
 /// Write dereplicated sequences to FASTA format with abundance annotations.

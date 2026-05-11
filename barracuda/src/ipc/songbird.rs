@@ -14,8 +14,8 @@
 //!
 //! Socket path resolution:
 //! 1. `SONGBIRD_SOCKET` env var
-//! 2. `$XDG_RUNTIME_DIR/biomeos/songbird-default.sock`
-//! 3. `<temp_dir>/songbird-default.sock`
+//! 2. `$XDG_RUNTIME_DIR/biomeos/songbird-{family_id}.sock`
+//! 3. `<temp_dir>/songbird-{family_id}.sock`
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

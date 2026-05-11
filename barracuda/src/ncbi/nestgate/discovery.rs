@@ -19,8 +19,8 @@ pub fn is_enabled() -> bool {
 ///
 /// Capability-based discovery (no hardcoded absolute paths):
 /// 1. `NESTGATE_SOCKET` env var (explicit override)
-/// 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock`
-/// 3. `<temp_dir>/nestgate-default.sock` (platform-agnostic fallback)
+/// 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-{family_id}.sock`
+/// 3. `<temp_dir>/nestgate-{family_id}.sock` (platform-agnostic fallback)
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
     discover_primal_socket("NESTGATE_SOCKET", NESTGATE)
@@ -29,8 +29,8 @@ pub fn discover_socket() -> Option<PathBuf> {
 /// Discover the biomeOS Neural API socket for capability-based routing.
 ///
 /// 1. `BIOMEOS_SOCKET` env var (explicit override)
-/// 2. `$XDG_RUNTIME_DIR/biomeos/biomeos-default.sock`
-/// 3. `<temp_dir>/biomeos-default.sock`
+/// 2. `$XDG_RUNTIME_DIR/biomeos/biomeos-{family_id}.sock`
+/// 3. `<temp_dir>/biomeos-{family_id}.sock`
 #[must_use]
 pub fn discover_biomeos_socket() -> Option<PathBuf> {
     discover_primal_socket("BIOMEOS_SOCKET", BIOMEOS)
@@ -93,6 +93,7 @@ fn resolve_primal_socket(
 }
 
 /// Standalone discovery when the `ipc` feature is not enabled.
+/// Uses `FAMILY_ID` / `BIOMEOS_FAMILY_ID` for multi-instance parity with `ipc::discover`.
 #[cfg(not(feature = "ipc"))]
 fn discover_standalone(env_var: &str, primal: &str) -> Option<PathBuf> {
     if let Ok(path) = std::env::var(env_var) {
@@ -102,14 +103,18 @@ fn discover_standalone(env_var: &str, primal: &str) -> Option<PathBuf> {
         }
     }
 
+    let fam = std::env::var("FAMILY_ID")
+        .or_else(|_| std::env::var("BIOMEOS_FAMILY_ID"))
+        .unwrap_or_else(|_| "default".to_string());
+
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join(format!("biomeos/{primal}-default.sock"));
+        let p = PathBuf::from(xdg).join(format!("biomeos/{primal}-{fam}.sock"));
         if p.exists() {
             return Some(p);
         }
     }
 
-    let fallback = std::env::temp_dir().join(format!("{primal}-default.sock"));
+    let fallback = std::env::temp_dir().join(format!("{primal}-{fam}.sock"));
     if fallback.exists() {
         return Some(fallback);
     }

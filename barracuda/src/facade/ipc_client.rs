@@ -4,22 +4,23 @@
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
-use std::time::Duration;
 
 use serde_json::{Value, json};
 
 /// Resolve the wetSpring IPC socket path.
 ///
-/// Priority: `WETSPRING_SOCKET` env var > XDG runtime dir > /tmp fallback.
+/// Delegates to the shared discovery logic in [`crate::ipc::discover`],
+/// ensuring the facade client uses the same `family_id()` and path
+/// conventions as the IPC server. Priority:
+///
+/// 1. `WETSPRING_SOCKET` env var (explicit override)
+/// 2. `$XDG_RUNTIME_DIR/biomeos/wetspring-{family_id}.sock`
+/// 3. `<temp_dir>/wetspring-{family_id}.sock`
 pub fn socket_path() -> PathBuf {
-    if let Ok(p) = std::env::var("WETSPRING_SOCKET") {
-        return PathBuf::from(p);
-    }
-    let runtime = std::env::var("XDG_RUNTIME_DIR")
-        .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
-    PathBuf::from(runtime)
-        .join("biomeos")
-        .join("wetspring-default.sock")
+    crate::ipc::discover::resolve_bind_path(
+        &crate::ipc::discover::socket_env_var(crate::primal_names::SELF_NAME),
+        crate::primal_names::SELF_NAME,
+    )
 }
 
 /// Send a JSON-RPC 2.0 request and return the result or error.

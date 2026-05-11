@@ -7,7 +7,7 @@
 //!
 //! RPC: `compute.dispatch.submit`, `compute.dispatch.result`, `compute.dispatch.capabilities`
 //! (toadStool S156+). Discovery: `TOADSTOOL_SOCKET`, then
-//! `$XDG_RUNTIME_DIR/biomeos/toadstool-default.sock`, then temp dir; standalone when absent.
+//! `$XDG_RUNTIME_DIR/biomeos/toadstool-{family_id}.sock`, then temp dir; standalone when absent.
 
 pub use super::dispatch_strategy::*;
 

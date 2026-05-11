@@ -11,8 +11,8 @@
 //! JSON-RPC 2.0, newline-delimited, over Unix domain socket.
 //! Socket discovery (capability-based, no hardcoded paths):
 //! 1. `NESTGATE_SOCKET` env var (explicit override)
-//! 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-default.sock`
-//! 3. `<temp_dir>/nestgate-default.sock` (platform-agnostic fallback)
+//! 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-{family_id}.sock`
+//! 3. `<temp_dir>/nestgate-{family_id}.sock` (platform-agnostic fallback)
 //!
 //! # Data routing tiers
 //!
