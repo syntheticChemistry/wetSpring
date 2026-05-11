@@ -482,3 +482,24 @@ All tolerance constants are scientifically justified and hierarchy-tested.
 - Extension papers (Phase 37-39) are CPU-only by design — they validate analytical models where GPU is not the bottleneck
 - Track 6 papers (Liao/ADREC) complete — 5 papers reproduced, full 6-tier chain (Exp336-346, 183 checks). baseCamp Paper 16 Stage 1 computational foundation done. Faculty anchor: Wei Liao (ADREC, MSU BAE)
 - V92D: all library code is panic-free, all clippy pedantic warnings resolved under `--all-features`
+
+---
+
+## LTEE GuideStone Queue (Barrick/Lenski + Eaves/Woldring)
+
+Targeted paper reproductions for the LTEE Targeted GuideStone artifact — a USB-deployable
+validation subsystem of projectNUCLEUS. See `infra/whitePaper/gen4/architecture/GUIDESTONE_LTEE.md`
+and `infra/whitePaper/attsi/non-anon/contact/barrick/PAPER_REVIEW_AND_SPRING_TARGETS.md`.
+
+| ID | Paper | What to Reproduce | Exp | Status |
+|----|-------|-------------------|-----|--------|
+| B1 | Barrick et al. 2009 "Genome evolution" *Nature* | Diversity metrics (Shannon, Pielou) from OTU-like data; Anderson disorder mapping per population | TBD | QUEUED |
+| B2 | Wiser et al. 2013 "Long-term dynamics of adaptation" *Science* | Anderson-QS predictions for LTEE biofilm experiments; power-law fitness via Anderson framework | TBD | QUEUED |
+| B3 | Good et al. 2017 "Dynamics of molecular evolution" *Nature* | Anderson framework: competing clades = multi-species community; Pielou evenness of clade frequencies | TBD | QUEUED |
+| B4 | Blount et al. 2008/2012 Citrate innovation | Timeline analysis, potentiating mutation cascade provenance | TBD | QUEUED |
+| B5 | Leonard et al. 2024 "One-step genome engineering in bee gut" *mBio* | Anderson-QS prediction: bee gut 3D biofilm → engineered symbionts QS geometry | TBD | QUEUED |
+| B6 | "Measuring the burden of hundreds of BioBricks" 2024 *Nat Comms* | Burden distribution across 301 plasmids; diversity metrics on burden values | TBD | QUEUED |
+| B7 | Tenaillon et al. 2016 "Tempo and mode" *Nature* | Download 264 genomes from NCBI BioProject via sovereign pipeline; mutation accumulation curves | TBD | QUEUED |
+| B8 | Barrick & Waters 2025 "Phages use contingency loci" *bioRxiv* | HMM identification of contingency loci across phage genomes | TBD | QUEUED |
+| E1 | Woldring et al. 2017 "Gradient of sitewise diversity" *Biochemistry* | Anderson disorder analogy: sitewise diversity = W at each lattice site; structured vs random | TBD | QUEUED |
+| E5 | Woldring Lab 2023 "Single-Cell scFab Libraries" | Single-cell sequencing analysis pipeline (sovereign, Rust-based) | TBD | QUEUED |
