@@ -4,13 +4,11 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-11 (V161 — PG-12 resolved. Legacy Exp403 surface
-separated into `CONSUMED_CAPABILITIES_LEGACY` (15 methods) for explicit
-tracking. Canonical `CONSUMED_CAPABILITIES` now contains only v0.9.17
-surface + composition infrastructure. Foundation Thread 04 seeded with
-36 validated targets. V162: Tier 4 defaults (barracuda-lib removed from
-default), PG-06/10/17/18 closed. 4 gaps open (all external), 18
-resolved/closed. 1,962 tests.)
+Last updated: 2026-05-11 (V163 — unified socket discovery: facade,
+nestgate, petalTongue fallback paths honor `family_id()` for multi-instance
+parity. V162b: Tier 4 defaults (barracuda-lib removed from default),
+PG-06/10/17/18 closed. 4 gaps open (all external), 18 resolved/closed.
+1,962 tests.)
 
 ---
 

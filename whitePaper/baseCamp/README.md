@@ -4,7 +4,7 @@
 
 **Date:** May 11, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V162 — zero internal gaps. PG-12 resolved (legacy surface separated). PG-09 resolved (5/5 handlers primal-proof wired). Foundation Thread 04 seeded (36 targets). Deep debt audit clean. 11 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4) + IPC-first defaults for composition/dispatch. **Tier 5:** Interactive composition. 383 experiments. **4** primal gaps open (all external, PG-01–PG-22, 18 resolved/closed).
+**Status:** V163 — unified socket discovery (family_id parity). Deep debt audit clean: zero unsafe, zero `#[allow(]`, all URLs env-configurable. 11 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4) + IPC-first defaults (`default = []`). **Tier 5:** Interactive composition. 383 experiments. **4** primal gaps open (all external, PG-01–PG-22, 18 resolved/closed).
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).

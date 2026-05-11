@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: May 11, 2026
-**Status**: V162 — zero internal gaps. PG-12 resolved (legacy surface separated). PG-09 resolved (5/5 handlers primal-proof wired). Foundation Thread 04 seeded. Tier 4 IPC-first defaults (composition/dispatch prefer IPC where applicable). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, zero `dyn` in application code. 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 4 composition gaps open (all external, 18 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0). *(Detailed validation tables below reflect their respective phases.)*
+**Status**: V163 — unified socket discovery (family_id parity). Deep debt audit clean. Tier 4 IPC-first defaults. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 4 composition gaps open (all external, 18 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0). *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

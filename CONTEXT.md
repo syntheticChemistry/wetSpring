@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V162:** Tier 4 IPC-first defaults (`default = []`). 4 PG gaps closed (PG-06/10/17/18), 4 remain (all external). metalForge/forge barracuda dep optional. Bio modules feature-gated. LTEE B7 STARTED. 1,962 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
+**Current release — V163:** Unified socket discovery (facade, nestgate, petalTongue fallback all honor `family_id()` — was hardcoded `-default.sock`). Deep debt audit clean. V162b: Tier 4 IPC-first defaults (`default = []`). 4 PG gaps closed (PG-06/10/17/18). metalForge/forge barracuda dep optional. Bio modules feature-gated. LTEE B7 STARTED. 1,962 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
 
 ## Role in the Ecosystem
 

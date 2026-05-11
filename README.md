@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V162:** Tier 4 IPC-first defaults (`default = []`, barracuda-lib removed). 4 PG gaps closed (PG-06 deferred, PG-10 resolved upstream, PG-17 informational, PG-18 subsumed). metalForge/forge barracuda dep now optional. 8 barracuda-dependent bio modules feature-gated behind `barracuda-lib`. LTEE B7 STARTED (sovereign genomics pipeline). 1,962 lib tests, 0 failed. 63/63 papers reproduced. **4 gaps open (all external), 18 resolved/closed.**
+**Current release — V163:** Unified socket discovery — facade, nestgate, petalTongue fallback paths now honor `family_id()` for multi-instance parity (was hardcoded `-default.sock`). Deep debt audit: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable, all deps pure Rust, `deny.toml` effective. Clippy `cast_precision_loss` resolved. V162b: Tier 4 IPC-first defaults (`default = []`). 4 PG gaps closed. metalForge/forge barracuda dep optional. LTEE B7 STARTED. 1,962 lib tests, 0 failed. 63/63 papers reproduced. **4 gaps open (all external), 18 resolved/closed.**
 
 ---
 

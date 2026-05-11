@@ -9,7 +9,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V162** | `handoffs/WETSPRING_V162_TIER4_IPC_FIRST_DEFAULTS_HANDOFF_MAY11_2026.md` | May 11 | **Tier 4 IPC-first defaults**: composition/dispatch paths default to IPC where applicable; primal gap ledger updated to 4 open (all external), 18 resolved/closed. Companion to V161 upstream + deep-debt handoffs. |
+| **V163** | `handoffs/WETSPRING_V163_UNIFIED_DISCOVERY_UPSTREAM_HANDOFF_MAY11_2026.md` | May 11 | **V163 unified socket discovery + upstream handoff**: family_id parity for facade/nestgate/petalTongue, deep debt audit clean, primal/spring team evolution patterns, NUCLEUS composition guidance. |
 | **V161** | `handoffs/WETSPRING_V161_UPSTREAM_PRIMAL_SPRING_HANDOFF_MAY11_2026.md` | May 11 | **Upstream primal & spring team handoff**: NestGate live deployment (P0), provenance trio JSON-RPC (P0), full data/compute chain dependencies. Patterns for handler-level primal-proof wiring, legacy surface separation, foundation seeding. projectNUCLEUS deployment readiness matrix. |
 | V161 | `handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md` | May 11 | PG-12 resolved + foundation seeded: Legacy surface separated. Thread 04 seeded (36 targets). Deep debt audit clean. Zero internal gaps. 4 open (all external), 18 resolved/closed. |
 | V160 | `handoffs/WETSPRING_V160_TIER4_PRIMAL_PROOF_HANDOFF_MAY11_2026.md` | May 11 | PG-09 resolved — Tier 4 handler-level primal-proof complete. All 5 handlers wired. plasmidBin binary placed (1.4M). |

@@ -1,6 +1,6 @@
 # wetSpring Evolution Readiness
 
-**Date:** May 11, 2026 (V162 — barraCuda v0.3.12 + toadStool S155+ + coralReef Phase 10)
+**Date:** May 11, 2026 (V163 — barraCuda v0.3.12 + toadStool S155+ + coralReef Phase 10)
 **Pattern:** Write → Absorb → Lean (inherited from hotSpring)
 **Status:** 44 `bio/*_gpu.rs` modules + CPU modules + IPC + vault + provenance + visualization (all lean, 0 local WGSL, 0 local derivative/regression math), 150+ primitives consumed (standalone barraCuda v0.3.12, wgpu 28). 1,962 lib tests (0 failures), 383 experiments, 5,900+ checks, 242 named tolerances (zero inline literals), 364 binaries (342 barracuda + 22 forge). `cargo clippy -D warnings -W pedantic -W nursery` CLEAN, **0 silent fallbacks**, **0 `#[allow()]` in entire codebase**. `forbid(unsafe_code)` at workspace level + all crate roots. All primal names via `primal_names::*` constants. 91.20% line coverage (gated at 90%). IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API: `submit_and_poll` removed per barraCuda Sprint 42. skunkBat audit wired (7 deploy graphs). biomeOS v3.51 consumed (`composition.status`, `method.register`). CI cross-sync test (6 tests). **4** primal gaps open (all external, **18** resolved/closed). Tier 4 IPC-first defaults. **V162:** PG-12 resolved (legacy surface separated), foundation Thread 04 seeded (36 targets), deep debt audit clean. **See also:** `wateringHole/handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md`.
 

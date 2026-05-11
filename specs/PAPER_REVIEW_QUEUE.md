@@ -475,7 +475,7 @@ All tolerance constants are scientifically justified and hierarchy-tested.
 
 ## LTEE GuideStone Queue
 
-<!-- V162: LTEE paper queue seeded per infra/wateringHole/handoffs/LTEE_GUIDESTONE_SUBSYSTEM_HANDOFF_MAY11_2026.md -->
+<!-- V162: LTEE paper queue seeded per primalSpring river delta audit -->
 
 wetSpring owns 10 papers (B1–B8, E1, E5) for the LTEE Targeted GuideStone.
 Module 6 (breseq comparison — B7) is wetSpring's primary contribution.

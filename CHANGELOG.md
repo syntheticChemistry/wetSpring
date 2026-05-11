@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V163] — 2026-05-11
+
+### Unified Socket Discovery, Deep Debt Audit Clean
+
+- **Socket discovery unified:** `facade/ipc_client.rs` now delegates to `ipc::discover::resolve_bind_path` instead of hardcoding `wetspring-default.sock`. Same fix applied to `ncbi/nestgate/discovery.rs` standalone path and `visualization/ipc_push.rs` petalTongue fallback. All three now honor `FAMILY_ID` / `BIOMEOS_FAMILY_ID` for multi-instance deployment parity with the IPC server. Doc comments across 7 IPC modules updated from `-default.sock` to `-{family_id}.sock`.
+- **Clippy lint fixed:** `derep.rs` `cast_precision_loss` resolved via `crate::cast::usize_f64` (was raw `as f64`).
+- **Deep debt audit (V163):** Zero unsafe code, zero `#[allow(]` (all `#[expect(reason)]`), zero production mocks, zero `extern crate` / `try!` / `#[macro_use]`, all URLs env-configurable with defaults, all deps pure Rust (except `wgpu` GPU drivers), `deny.toml` effective (15 C-binding crates banned), all library files <800L, `gillespie.rs` `Box<dyn Fn>` retained as justified SSA design exception (documented).
+- **Doc sync:** Root README, CONTEXT, GAPS, PRIMAL_GAPS, whitePaper, baseCamp, experiments, barracuda README, EVOLUTION_READINESS, ABSORPTION_MANIFEST, specs, wateringHole all updated to V163.
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,613 with standard features)
+
 ## [V162b] — 2026-05-11
 
 ### Tier 4 IPC-First Defaults, 4 PG Gaps Closed, Forge Decoupled, LTEE B7 STARTED
@@ -23,8 +33,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Doc Reconciliation, Gap Count Correction, Upstream Primal Handoff
 
-- **Gap count corrected:** Previous sessions undercounted open gaps. Reconciled with PRIMAL_GAPS.md summary table: **8 open** (PG-02, PG-03, PG-04, PG-05, PG-06, PG-10, PG-17, PG-18), **14 resolved/closed**. All 8 are external dependencies — zero wetSpring-internal gaps.
-- **Doc metrics synchronized (V162):** 18+ files updated from stale V159/V160 status lines and incorrect gap counts to V161/V162 accurate state: 1,962 tests, 8/14 gaps, zero internal.
+- **Gap count corrected:** Previous sessions undercounted open gaps. Reconciled with PRIMAL_GAPS.md summary table: **8 open** (PG-02, PG-03, PG-04, PG-05, PG-06, PG-10, PG-17, PG-18), **14 resolved/closed** at V162. All 8 were external dependencies — zero wetSpring-internal gaps. *(V162b subsequently closed 4 more → 4 open, 18 resolved/closed.)*
+- **Doc metrics synchronized (V162):** 18+ files updated from stale V159/V160 status lines and incorrect gap counts to V161/V162 accurate state: 1,962 tests, zero internal.
 - **Stale fossil banners updated:** `ECOSYSTEM_LEVERAGE_GUIDE.md` (V128 fossil, V161 metrics), `CROSS_SPRING_SHADER_EVOLUTION.md` (V126 fossil, V161 metrics) — both now labeled as fossil record with current metrics banner.
 - **waters.md shader table corrected:** 4 ODE shaders previously listed as "Local WGSL, pending BatchedOdeRK4Generic" are now "Absorbed — zero local WGSL (fully lean)." Write → Absorb → Lean cycle complete.
 - **PRIMAL_GAPS.md PG-09 section updated:** "pending migration" text corrected to reflect V161 PG-12 resolution (legacy surface separated).
