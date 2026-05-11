@@ -1,14 +1,14 @@
 # Cross-Spring Shader Evolution (fossil record — V126 provenance map)
 
-> **V161 note (May 11, 2026):** This document preserves the V126 shader
+> **V163 note (May 11, 2026):** This document preserves the V126 shader
 > provenance map as a fossil record. Current state: barraCuda v0.3.12,
 > **800+** WGSL shaders, **150+** primitives consumed, **zero** local WGSL
-> (fully lean). guideStone Level 4 (38/38, 4 skip). PG-09 + PG-12 resolved.
-> Foundation Thread 04 seeded. **6** primal gaps open (all external,
-> 14 resolved/closed). See `docs/PRIMAL_GAPS.md`.
+> (fully lean). guideStone Level 4 (38/38, 4 skip). Tier 4 IPC-first
+> defaults. **4** primal gaps open (all external, **18** resolved/closed).
+> See `docs/PRIMAL_GAPS.md`.
 
-**Last updated**: Mar 16, 2026 — V126
-**Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173), standalone barraCuda v0.3.5, 1,443+ tests
+**Last updated**: Mar 16, 2026 — V126 (fossil record)
+**Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173). Current: barraCuda v0.3.12, 1,962 lib tests
 
 ---
 

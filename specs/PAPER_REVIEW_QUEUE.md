@@ -9,7 +9,7 @@
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: March 16, 2026 (V126 — 376 experiments, 5,707+ checks, 1,443+ tests, 63 papers complete + 6 reproduced. V125: structured `IpcError`, `extract_capabilities()`, `discover_primal()`, 18 binary fixes. V126: `DispatchOutcome<T>` protocol vs application error separation, `health.liveness`/`health.readiness` probes, `IpcError` query helpers (`is_retriable()`/`is_timeout_likely()`/`is_method_not_found()`/`is_connection_error()`). V124: `deny.toml`, `compute.dispatch`, `tracing`. V123: zero-panic `OrExit`, dual-format discovery. All 46 three-tier eligible papers validated. barraCuda v0.3.5, clippy ZERO WARNINGS)
+**Last Updated**: May 11, 2026 (V163 — 383 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers complete. barraCuda v0.3.12, Tier 4 IPC-first defaults. 10-paper LTEE GuideStone Queue (B7 STARTED). 4 primal gaps open (all external), 18 resolved/closed.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
@@ -475,26 +475,25 @@ All tolerance constants are scientifically justified and hierarchy-tested.
 
 ## LTEE GuideStone Queue
 
-<!-- V162: LTEE paper queue seeded per primalSpring river delta audit -->
+wetSpring owns 10 papers (B1–B8, E1, E5) for the LTEE Targeted GuideStone —
+a USB-deployable validation subsystem of projectNUCLEUS. Module 6 (breseq
+comparison — B7) is wetSpring's primary contribution.
 
-wetSpring owns 10 papers (B1–B8, E1, E5) for the LTEE Targeted GuideStone.
-Module 6 (breseq comparison — B7) is wetSpring's primary contribution.
-
-| ID | Paper | Year | lithoSpore Module | Status | Notes |
-|----|-------|------|-------------------|--------|-------|
-| B1 | Barrick et al. — Genome evolution in a simple mutation accumulation experiment | 2009 | 2 (mutation accum.) | queued | Neutral mutation rate, fixation probability |
-| B2 | Wiser et al. — Long-term dynamics of adaptation in asexual populations | 2013 | 1 (power-law fitness) | queued | Power-law fitness trajectories, Anderson disorder analogy |
-| B3 | Good et al. — The dynamics of molecular evolution over 60,000 generations | 2017 | 3 (allele traj.) | queued | Multi-clade dynamics, clonal interference |
-| B4 | Blount et al. — Genomic analysis of a key innovation (Cit+) | 2012 | 4 (citrate) | queued | Potentiating cascade detection |
-| B5 | Burden/symbiont PK/PD model | 2024 | 5 (BioBrick) | queued | Burden distribution across 301 plasmids |
-| B6 | Burden et al. — Quantifying the fitness effects of gene expression | 2024 | 5 (BioBrick) | queued | Burden distribution, Anderson Wc analogy |
-| B7 | Tenaillon et al. — Tempo and mode of genome evolution in a 50,000-generation experiment | 2016 | 6 (breseq) | **STARTED** | **wetSpring primary**: 264 NCBI genome download, mutation accumulation curves |
-| B8 | Barrick/Lenski — Genome dynamics during experimental evolution | 2013 | — | queued | Genome dynamics review |
-| E1 | Eaves/Woldring — engineered protein evolution | — | — | queued | TBD |
-| E5 | Eaves/Woldring — cyclic peptide screening | — | — | queued | TBD |
+| ID | Paper | Year | lithoSpore Module | What to Reproduce | Status |
+|----|-------|------|-------------------|-------------------|--------|
+| B1 | Barrick et al. — "Genome evolution" *Nature* | 2009 | 2 (mutation accum.) | Diversity metrics (Shannon, Pielou); Anderson disorder mapping per population | queued |
+| B2 | Wiser et al. — "Long-term dynamics of adaptation" *Science* | 2013 | 1 (power-law fitness) | Power-law fitness trajectories; Anderson-QS predictions for LTEE biofilm | queued |
+| B3 | Good et al. — "Dynamics of molecular evolution" *Nature* | 2017 | 3 (allele traj.) | Multi-clade dynamics; Pielou evenness of clade frequencies | queued |
+| B4 | Blount et al. — "Genomic analysis of a key innovation (Cit+)" | 2012 | 4 (citrate) | Timeline analysis, potentiating mutation cascade provenance | queued |
+| B5 | Leonard et al. — "One-step genome engineering in bee gut" *mBio* | 2024 | 5 (BioBrick) | Anderson-QS prediction: bee gut 3D biofilm → engineered symbionts QS geometry | queued |
+| B6 | "Measuring the burden of hundreds of BioBricks" *Nat Comms* | 2024 | 5 (BioBrick) | Burden distribution across 301 plasmids; diversity metrics on burden values | queued |
+| B7 | Tenaillon et al. — "Tempo and mode of genome evolution" *Nature* | 2016 | 6 (breseq) | 264 NCBI genome download, mutation accumulation curves, breseq comparison | **STARTED** |
+| B8 | Barrick & Waters — "Phages use contingency loci" *bioRxiv* | 2025 | — | HMM identification of contingency loci across phage genomes | queued |
+| E1 | Woldring et al. — "Gradient of sitewise diversity" *Biochemistry* | 2017 | — | Anderson disorder analogy: sitewise diversity = W at each lattice site | queued |
+| E5 | Woldring Lab — "Single-Cell scFab Libraries" | 2023 | — | Single-cell sequencing analysis pipeline (sovereign, Rust-based) | queued |
 
 **B7 (Tenaillon 2016) — wetSpring sovereign genomics pipeline:**
-- Download 264 *E. coli* genomes from NCBI (BioProject accessions in paper)
+- Download 264 *E. coli* genomes from NCBI (BioProject PRJNA294072)
 - Compute mutation accumulation curves per lineage
 - Compare mutation rates against breseq-called variants
 - Produce expected values JSON for lithoSpore module 6
@@ -514,24 +513,3 @@ Module 6 (breseq comparison — B7) is wetSpring's primary contribution.
 - Extension papers (Phase 37-39) are CPU-only by design — they validate analytical models where GPU is not the bottleneck
 - Track 6 papers (Liao/ADREC) complete — 5 papers reproduced, full 6-tier chain (Exp336-346, 183 checks). baseCamp Paper 16 Stage 1 computational foundation done. Faculty anchor: Wei Liao (ADREC, MSU BAE)
 - V92D: all library code is panic-free, all clippy pedantic warnings resolved under `--all-features`
-
----
-
-## LTEE GuideStone Queue (Barrick/Lenski + Eaves/Woldring)
-
-Targeted paper reproductions for the LTEE Targeted GuideStone artifact — a USB-deployable
-validation subsystem of projectNUCLEUS. See `infra/whitePaper/gen4/architecture/GUIDESTONE_LTEE.md`
-and `infra/whitePaper/attsi/non-anon/contact/barrick/PAPER_REVIEW_AND_SPRING_TARGETS.md`.
-
-| ID | Paper | What to Reproduce | Exp | Status |
-|----|-------|-------------------|-----|--------|
-| B1 | Barrick et al. 2009 "Genome evolution" *Nature* | Diversity metrics (Shannon, Pielou) from OTU-like data; Anderson disorder mapping per population | TBD | QUEUED |
-| B2 | Wiser et al. 2013 "Long-term dynamics of adaptation" *Science* | Anderson-QS predictions for LTEE biofilm experiments; power-law fitness via Anderson framework | TBD | QUEUED |
-| B3 | Good et al. 2017 "Dynamics of molecular evolution" *Nature* | Anderson framework: competing clades = multi-species community; Pielou evenness of clade frequencies | TBD | QUEUED |
-| B4 | Blount et al. 2008/2012 Citrate innovation | Timeline analysis, potentiating mutation cascade provenance | TBD | QUEUED |
-| B5 | Leonard et al. 2024 "One-step genome engineering in bee gut" *mBio* | Anderson-QS prediction: bee gut 3D biofilm → engineered symbionts QS geometry | TBD | QUEUED |
-| B6 | "Measuring the burden of hundreds of BioBricks" 2024 *Nat Comms* | Burden distribution across 301 plasmids; diversity metrics on burden values | TBD | QUEUED |
-| B7 | Tenaillon et al. 2016 "Tempo and mode" *Nature* | Download 264 genomes from NCBI BioProject via sovereign pipeline; mutation accumulation curves | TBD | QUEUED |
-| B8 | Barrick & Waters 2025 "Phages use contingency loci" *bioRxiv* | HMM identification of contingency loci across phage genomes | TBD | QUEUED |
-| E1 | Woldring et al. 2017 "Gradient of sitewise diversity" *Biochemistry* | Anderson disorder analogy: sitewise diversity = W at each lattice site; structured vs random | TBD | QUEUED |
-| E5 | Woldring Lab 2023 "Single-Cell scFab Libraries" | Single-cell sequencing analysis pipeline (sovereign, Rust-based) | TBD | QUEUED |

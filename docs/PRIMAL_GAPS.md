@@ -592,5 +592,47 @@ PG-17 closed (informational — accepted API), PG-18 closed (subsumed by PG-02).
 - **Mixed (1):** PG-03 (partial — Songbird `capability.resolve`, wetSpring side wired)
 - **Compute (1):** PG-05 (toadStool sovereign dispatch)
 
+---
+
+## V163 Upstream Block Summary
+
+Per primalSpring primal composition sprint audit (May 11, 2026): all 4
+remaining gaps are blocked on upstream primal endpoints going live.
+wetSpring's side is fully prepared — IPC paths wired, graceful degradation
+confirmed, `CompositionContext` integrated. No further wetSpring code changes
+will close these gaps.
+
+| PG | Upstream Owner | What's Blocked | wetSpring Ready |
+|----|----------------|----------------|-----------------|
+| PG-02 | rhizoCrypt / loamSpine / sweetGrass | Trio primals not speaking JSON-RPC on UDS | `ipc/provenance.rs`, `ipc/sweetgrass.rs`, `WireWitnessRef`, graceful degradation to local sessions |
+| PG-03 | Songbird / biomeOS | `capability.resolve` RPC not shipped | `discover_by_capability()` + `capability_to_primal()` — single-swap migration point |
+| PG-04 | NestGate | Live NUCLEUS deployment needed | `data_fetch.rs` routes through `capability.call("storage", ...)`, exp400 validates health + store/retrieve |
+| PG-05 | toadStool | Sovereign dispatch needs compiled GPU binary path | `discover_toadstool()`, `compute.dispatch` probe, `sovereign-dispatch` feature ready |
+
+---
+
+## guideStone L4 → L5 Path
+
+Current state: **L4** (38/38 pass, 4 skip, `GUIDESTONE_READINESS = 4`).
+
+The 4 skips blocking L5 certification:
+
+| Skip | Certification Layer | Blocked By |
+|------|-------------------|------------|
+| `stats.median` | 5 (domain science) | barraCuda `stats.median` IPC endpoint not yet exercised live |
+| `linalg.determinant` | 5 (domain science) | barraCuda `linalg.determinant` IPC endpoint not yet exercised live |
+| `compute.dispatch` | 4 (manifest) | toadStool sovereign dispatch — PG-05 |
+| `inference.complete` | 4 (manifest) | Squirrel AI backend (Ollama) — PG-14 (closed informational) |
+
+**When L5 is achievable:** `stats.median` and `linalg.determinant` require
+a live barraCuda instance implementing these methods. Once confirmed:
+1. Flip `validate_parity_or_skip` → `validate_parity` for both
+2. Bump `GUIDESTONE_READINESS` to `5` in `niche.rs`
+3. `compute.dispatch` and `inference.complete` remain infrastructure-dependent
+
+`stats.weighted_mean` is already a **required** parity check (not skip) and
+passes. The domain science surface (`certification/health.rs:validate_domain_science`)
+is structurally ready for L5 — the gate is live infrastructure.
+
 *This document is maintained by wetSpring and fed back to primalSpring via
 `wateringHole/handoffs/` per the NUCLEUS_SPRING_ALIGNMENT.md feedback protocol.*
