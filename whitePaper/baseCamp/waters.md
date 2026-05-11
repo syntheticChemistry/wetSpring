@@ -124,15 +124,13 @@ metalForge Cross-Substrate      ← Exp103/104: CPU = GPU parity for all ODE
 | Shader | Variables | Parameters | ToadStool Status |
 |--------|:---------:|:----------:|-----------------|
 | `qs_biofilm` (Waters 2008) | 5 | 16 | Absorbed via `BatchedOdeRK4F64` |
-| `phage_defense` (Hsueh 2022) | 4 | 11 | Local WGSL, pending `BatchedOdeRK4Generic` |
-| `bistable` (Fernandez 2020) | 5 | 21 | Local WGSL, pending `BatchedOdeRK4Generic` |
-| `multi_signal` (Srivastava 2011) | 7 | 24 | Local WGSL, pending `BatchedOdeRK4Generic` |
-| `cooperation` (Bruger 2018) | 4 | 13 | Local WGSL, pending `BatchedOdeRK4Generic` |
+| `phage_defense` (Hsueh 2022) | 4 | 11 | Absorbed — zero local WGSL (fully lean) |
+| `bistable` (Fernandez 2020) | 5 | 21 | Absorbed — zero local WGSL (fully lean) |
+| `multi_signal` (Srivastava 2011) | 7 | 24 | Absorbed — zero local WGSL (fully lean) |
+| `cooperation` (Bruger 2018) | 4 | 13 | Absorbed — zero local WGSL (fully lean) |
 
-The QS biofilm shader (Waters 2008) is already absorbed into ToadStool via
-the generic `BatchedOdeRK4F64` primitive. The remaining 4 shaders are fully
-functional but require the generic `BatchedOdeRK4Generic` primitive for
-ToadStool absorption.
+All 5 ODE shaders are absorbed into barraCuda/toadStool. Zero local WGSL
+remains. Write → Absorb → Lean cycle complete (S58).
 
 ---
 

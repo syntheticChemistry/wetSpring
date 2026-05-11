@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 11, 2026 (V160 — PG-09 resolved: all 5 `barracuda::*`-calling handlers `primal-proof` wired (IPC-first, graceful fallback). Tier 4 Cargo confirmed. V159: barraCuda IPC routing module + 3 handler wiring. V158: skunkBat IPC, CI cross-sync 413, capability discovery. V157: IPC timeouts centralized, GPU API evolved, shared harness. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 364 binaries (342 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, **zero `dyn` dispatch**, clippy ZERO WARNINGS pedantic+nursery. 7 primal gaps open, 15 resolved/closed. 63/63 papers reproduced.)
+**Updated:** May 11, 2026 (V161 — zero internal gaps. PG-12 resolved (legacy surface separated into `CONSUMED_CAPABILITIES_LEGACY`). PG-09 resolved (5/5 handlers primal-proof wired). Foundation Thread 04 seeded (36 targets). Deep debt audit clean. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 364 binaries (342 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, **zero `dyn` dispatch**, clippy ZERO WARNINGS pedantic+nursery. 8 primal gaps open (all external), 14 resolved/closed. 63/63 papers reproduced.)
 
 ---
 

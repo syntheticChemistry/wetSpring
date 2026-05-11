@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: April 27, 2026
-**Status**: V160 — PG-09 resolved: all 5 `barracuda::*`-calling handlers `primal-proof` wired. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, zero `dyn` in application code. 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 7 composition gaps open (15 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0). *(Detailed validation tables below reflect their respective phases.)*
+**Last Updated**: May 11, 2026
+**Status**: V161 — zero internal gaps. PG-12 resolved (legacy surface separated). PG-09 resolved (5/5 handlers primal-proof wired). Foundation Thread 04 seeded. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, zero `dyn` in application code. 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 8 composition gaps open (all external, 14 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0). *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -27,7 +27,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,865 lib + 97 integration + 18 IPC roundtrip = 1,980 tests, 364 binaries (342 barracuda + 22 forge) |
+| Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,962 lib + 97 integration + 18 IPC roundtrip = 2,077 tests, 364 binaries (342 barracuda + 22 forge) |
 | Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 4 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |

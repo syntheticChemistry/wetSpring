@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** April 27, 2026 (V150 update)
-**Author:** wetSpring V150 (ecoPrimals)
-**Foundation:** 383 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,962 lib tests, 364 binaries, 91.20% coverage. **V160:** PG-09 resolved — all 5 handlers primal-proof wired. Tier 4 Cargo confirmed. **V159:** barraCuda IPC routing module. **V158:** skunkBat IPC, capability discovery. guideStone Level 4 (38/38, 4 skip). 7 gaps open (PG-01–PG-22, 15 resolved). primalSpring v0.9.17. Zero local WGSL, zero unsafe code, clippy **ZERO WARNINGS**.
+**Date:** May 11, 2026 (V161 update)
+**Author:** wetSpring V161 (ecoPrimals)
+**Foundation:** 383 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,962 lib tests, 364 binaries, 91.20% coverage. **V161:** Zero internal gaps. PG-12 resolved (legacy surface separated). PG-09 resolved (5/5 handlers primal-proof wired). Foundation Thread 04 seeded (36 targets). Deep debt audit clean. guideStone Level 4 (38/38, 4 skip). 8 gaps open (all external, PG-01–PG-22, 14 resolved). primalSpring v0.9.17. Zero local WGSL, zero unsafe code, clippy **ZERO WARNINGS**.
 
 ---
 

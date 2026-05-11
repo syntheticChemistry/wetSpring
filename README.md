@@ -40,12 +40,12 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 8 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 14 resolved/closed) |
+| **Primal gaps** | 8 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 14 resolved/closed). Zero internal gaps. |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V159:** Deep debt audit + PG-09 handler wiring. barraCuda IPC routing module (`ipc/barracuda_route.rs`): `discover`, `forward`, `try_forward`, `is_available`, graceful degradation. `#[cfg(feature = "primal-proof")]` wired into 3 science handlers (diversity, Anderson, QS model) for IPC-first compute with in-process fallback. Paper count reconciled (63 consistent). Doc metrics synchronized. V158: skunkBat IPC, CI cross-sync 413, capability discovery, PG-08/14/15/22 closed. V157: IPC timeouts centralized, GPU API evolved, shared harness. 1,865 lib tests, 0 failed. **8 gaps open, 14 resolved/closed.**
+**Current release — V161:** Deep debt audit clean — zero internal gaps remain. PG-12 resolved (legacy surface separated). PG-09 resolved (all 5 `barracuda::*`-calling handlers `primal-proof` wired). Foundation Thread 04 seeded (36 validated targets). Tier 4 Cargo confirmed. 1,962 lib tests, 0 failed. 63/63 papers reproduced. **8 gaps open (all external), 14 resolved/closed.**
 
 ---
 

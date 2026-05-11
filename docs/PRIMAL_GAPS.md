@@ -10,7 +10,7 @@ tracking. Canonical `CONSUMED_CAPABILITIES` now contains only v0.9.17
 surface + composition infrastructure. Foundation Thread 04 seeded with
 36 validated targets. Deep debt audit: zero unsafe, zero mocks, zero
 hardcoded paths, zero TODO/FIXME, all deps pure Rust (except wgpu GPU
-driver). 6 gaps open (all external), 16 resolved/closed. 1,962 tests.)
+driver). 8 gaps open (all external), 14 resolved/closed. 1,962 tests.)
 
 ---
 
@@ -176,9 +176,10 @@ HEALTH 2). Today, wetSpring links barraCuda as a Rust library dependency
 (`path = "../../../primals/barraCuda"`) and calls math in-process. For the
 primal proof (Level 5), domain math must migrate to IPC.
 
-**What exists (V160):**
-- `niche::CONSUMED_CAPABILITIES` declares full v0.9.17 canonical surface (33
-  methods) plus 15 legacy Exp403 methods pending migration
+**What exists (V161):**
+- `niche::CONSUMED_CAPABILITIES` declares the v0.9.17 canonical surface (33
+  methods). Legacy Exp403 methods (15) are separated into
+  `niche::CONSUMED_CAPABILITIES_LEGACY` (PG-12 resolved V161)
 - `wetspring_guidestone` binary (Level 4): NUCLEUS validated (38/38 pass, 4 skip,
   exit 0), bare mode (16/16 pass, exit 2), handle-based matmul, all stats/linalg/
   spectral methods passing, cross-atomic pipeline. `is_skip_error` from v0.9.17
@@ -593,7 +594,7 @@ call `barracuda::*` directly are now `primal-proof` wired).
 `CONSUMED_CAPABILITIES_LEGACY` constant). Foundation Thread 04 seeded
 with 36 validated targets.
 
-**Status after V161:** 6 gaps open, 16 resolved/closed. 1,962 tests.
+**Status after V161:** 8 gaps open (all external), 14 resolved/closed. 1,962 tests.
 
 **Remaining open gaps by owner:**
 - **wetSpring internal:** None — all wetSpring-owned gaps resolved

@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V161** | `handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md` | May 11 | **PG-12 resolved + foundation seeded**: Legacy surface separated into `CONSUMED_CAPABILITIES_LEGACY`. Thread 04 seeded (36 targets). Deep debt audit clean. Zero wetSpring-internal gaps. 6 open (all external), 16 resolved/closed. |
+| **V161** | `handoffs/WETSPRING_V161_UPSTREAM_PRIMAL_SPRING_HANDOFF_MAY11_2026.md` | May 11 | **Upstream primal & spring team handoff**: NestGate live deployment (P0), provenance trio JSON-RPC (P0), full data/compute chain dependencies. Patterns for handler-level primal-proof wiring, legacy surface separation, foundation seeding. projectNUCLEUS deployment readiness matrix. |
+| V161 | `handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md` | May 11 | PG-12 resolved + foundation seeded: Legacy surface separated. Thread 04 seeded (36 targets). Deep debt audit clean. Zero internal gaps. 8 open (all external), 14 resolved/closed. |
 | V160 | `handoffs/WETSPRING_V160_TIER4_PRIMAL_PROOF_HANDOFF_MAY11_2026.md` | May 11 | PG-09 resolved — Tier 4 handler-level primal-proof complete. All 5 handlers wired. plasmidBin binary placed (1.4M). |
 | V159 | `handoffs/WETSPRING_V159_DEEP_DEBT_PRIMAL_EVOLUTION_HANDOFF_MAY11_2026.md` | May 11 | Deep debt audit + barraCuda IPC routing: `ipc/barracuda_route.rs` module, `primal-proof` handler wiring (3 science handlers), comprehensive deep debt audit (zero debt), broken provenance reference fixed, all docs synchronized. |
 | V158 | `handoffs/WETSPRING_V158_GAP_CLOSURE_FOUNDATION_HANDOFF_MAY11_2026.md` | May 11 | Post-interstadial gap closure + foundation seeding: skunkBat IPC module wired, CI cross-sync updated to 413, capability-oriented discovery, 4 gaps closed + 2 advanced (8 open/14 resolved), foundation seeding targets for NCBI 16S/cold seep/Fajgenbaum. |
@@ -24,8 +25,8 @@
 
 | File | Purpose |
 |------|---------|
-| `ECOSYSTEM_LEVERAGE_GUIDE.md` | What wetSpring absorbs from ecosystem and contributes back (V128 snapshot, V150 metrics note) |
-| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map (800+ barraCuda WGSL shaders, V126 snapshot) |
+| `ECOSYSTEM_LEVERAGE_GUIDE.md` | What wetSpring absorbs from ecosystem and contributes back (V128 fossil record, V161 metrics banner) |
+| `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map — 800+ barraCuda WGSL, zero local (V126 fossil record, V161 metrics banner) |
 | `TOADSTOOL_WETSPRING_GAP_ANALYSIS.md` | Gap analysis: barraCuda exports vs wetSpring usage (SUPERSEDED — see `docs/PRIMAL_GAPS.md`) |
 
 ## Archive

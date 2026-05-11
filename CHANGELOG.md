@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V162] — 2026-05-11
+
+### Doc Reconciliation, Gap Count Correction, Upstream Primal Handoff
+
+- **Gap count corrected:** Previous sessions undercounted open gaps. Reconciled with PRIMAL_GAPS.md summary table: **8 open** (PG-02, PG-03, PG-04, PG-05, PG-06, PG-10, PG-17, PG-18), **14 resolved/closed**. All 8 are external dependencies — zero wetSpring-internal gaps.
+- **Doc metrics synchronized (V162):** 18+ files updated from stale V159/V160 status lines and incorrect gap counts to V161/V162 accurate state: 1,962 tests, 8/14 gaps, zero internal.
+- **Stale fossil banners updated:** `ECOSYSTEM_LEVERAGE_GUIDE.md` (V128 fossil, V161 metrics), `CROSS_SPRING_SHADER_EVOLUTION.md` (V126 fossil, V161 metrics) — both now labeled as fossil record with current metrics banner.
+- **waters.md shader table corrected:** 4 ODE shaders previously listed as "Local WGSL, pending BatchedOdeRK4Generic" are now "Absorbed — zero local WGSL (fully lean)." Write → Absorb → Lean cycle complete.
+- **PRIMAL_GAPS.md PG-09 section updated:** "pending migration" text corrected to reflect V161 PG-12 resolution (legacy surface separated).
+- **baseCamp/README.md test counts corrected:** 1,209 → 1,962 (historical Python→Rust pipeline test count updated to current).
+- **Upstream primal & spring handoff created:** `WETSPRING_V161_UPSTREAM_PRIMAL_SPRING_HANDOFF_MAY11_2026.md` — NestGate live deployment (P0), provenance trio JSON-RPC (P0), Songbird capability.resolve, toadStool sovereign dispatch, barraCuda matmul inline data, primalSpring routing fix. Includes patterns for absorption, NUCLEUS deployment readiness matrix, and next-round evolution targets (full data and compute chains).
+- Build gate: docs only, no code changes.
+
 ## [V161] — 2026-05-11
 
 ### Deep Debt Audit Clean — PG-12 Resolved, Foundation Thread 04 Seeded, Zero Internal Gaps
@@ -14,7 +27,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **Benchmark audit:** 6 Python-vs-Rust benchmark bins (v2-v5 + 23-domain + three-tier) all completed. Galaxy/QIIME2/scipy/numpy/R parity baselines all established. Kokkos is hotSpring scope.
 - **Paper queue:** 63/63 complete. 3 PROPOSED experiments (377: hormesis biphasic, 378: trophic cascade Anderson, 379: joint colonization resistance).
 - **Downstream review:** projectNUCLEUS (11 wetSpring workload TOMLs ready). foundation (Thread 04 seeded, 23 sources, 36 targets).
-- **Gap status:** 6 open (all external), 16 resolved/closed. Zero wetSpring-internal gaps remain.
+- **Gap status:** 8 open (all external), 14 resolved/closed. Zero wetSpring-internal gaps remain.
 - Build gate: cargo build + fmt + clippy (0 warnings) + test (1,962 / 0 failed)
 
 ## [V160] — 2026-05-11

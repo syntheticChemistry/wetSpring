@@ -4,11 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-11 (V160 — PG-09 resolved: all 5 `barracuda::*`-calling
-handlers `primal-proof` wired (5/5 complete). Tier 4 Cargo confirmed. 7 gaps open,
-15 resolved/closed. V159: barraCuda IPC routing module + 3 handler wiring. V158:
-skunkBat IPC, CI cross-sync 413, capability discovery,
-PG-08/14/15/22 closed. 8 primal gaps open, 14 resolved/closed. 1,865 lib tests.)
+Last updated: 2026-05-11 (V161 — PG-12 resolved (legacy surface separated),
+PG-09 resolved (5/5 handlers primal-proof wired), foundation Thread 04 seeded.
+Deep debt audit clean. 8 gaps open (all external), 14 resolved/closed. 1,962 tests.)
 
 ---
 

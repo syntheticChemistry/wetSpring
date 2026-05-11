@@ -1,12 +1,13 @@
-# Ecosystem Leverage Guide — wetSpring V128
+# Ecosystem Leverage Guide — wetSpring V128 (fossil record)
 
-> **V150 note (Apr 27, 2026):** This guide was written at V128. Current
-> metrics: **364** binaries, **1,702** tests, **150+** barraCuda primitives
+> **V161 note (May 11, 2026):** This guide was written at V128. Current
+> metrics: **364** binaries, **1,962** tests, **150+** barraCuda primitives
 > (v0.3.12), **42** niche capabilities, **48** barraCuda IPC consumed
-> capabilities (33 v0.9.17 canonical + 15 legacy). **guideStone Level 4**
-> (38/38, 4 skip). **Phase 46 composition explorer**: `wetspring_composition.sh`,
-> petalTongue 100-node scenes, barraCuda IPC math. **15** primal gaps open
-> (PG-01–PG-22, 7 resolved). See `docs/PRIMAL_GAPS.md`.
+> capabilities (33 v0.9.17 canonical + 15 legacy, machine-readable in `niche.rs`).
+> **guideStone Level 4** (38/38, 4 skip). PG-09 + PG-12 resolved.
+> Foundation Thread 04 seeded (36 targets). **6** primal gaps open (all external,
+> 14 resolved/closed). Deep debt audit clean — zero internal gaps.
+> See `docs/PRIMAL_GAPS.md`.
 
 **Date:** March 18, 2026
 **Scope:** What wetSpring absorbs from the ecoPrimals ecosystem and what it contributes back.

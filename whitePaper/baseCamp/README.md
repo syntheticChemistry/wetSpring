@@ -2,12 +2,12 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** May 10, 2026
+**Date:** May 11, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V160 — PG-09 resolved: all 5 `barracuda::*`-calling handlers `primal-proof` wired (IPC-first, graceful fallback). Tier 4 Cargo confirmed (`barracuda` optional). V159: barraCuda IPC routing module + 3 handler wiring. V158: skunkBat IPC, CI cross-sync 413, capability discovery, PG-08/14/15/22 closed. V157: IPC timeouts centralized, GPU API evolved, shared harness. 11 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition. 383 experiments, 50 consumed capabilities (33 v0.9.17 + 15 legacy + `audit.event` + `audit.forward`). **7** primal gaps open (PG-01–PG-22, 15 resolved/closed).
+**Status:** V161 — zero internal gaps. PG-12 resolved (legacy surface separated). PG-09 resolved (5/5 handlers primal-proof wired). Foundation Thread 04 seeded (36 targets). Deep debt audit clean. 11 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4). **Tier 5:** Interactive composition. 383 experiments. **8** primal gaps open (all external, PG-01–PG-22, 14 resolved/closed).
 
 This is the validation narrative crystallized:
-- **Python was the validation target for Rust** (58 scripts → 1,209 lib tests).
+- **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).
 - **Rust + Python are now validation targets for NUCLEUS composition** (136/136
   proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
 - **NUCLEUS composition enables the primal proof** (38/38 guideStone, IPC parity,
@@ -133,12 +133,12 @@ IPC math, provenance trio. 5 new gaps (PG-18..22).
 **V151** deep debt evolution: zero `dyn` dispatch (concrete `FastqReader` enum,
 `BufReader<File>`, generic `write_ctx`). `Write`-based output in validation
 layer. Hardcoded paths → env-var discovery. Shared helpers extracted
-(`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Concrete `FacadeError`. 1,209
+(`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Concrete `FacadeError`. 1,962
 lib tests pass. Interstadial-compliant: Edition 2024, `#[expect]` only,
 `forbid(unsafe_code)`, zero `#[allow()]`.
 
 This is the validation narrative crystallized:
-- **Python was the validation target for Rust** (58 scripts → 1,209 lib tests).
+- **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).
 - **Rust + Python are now validation targets for NUCLEUS composition** (136/136
   proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
 - **NUCLEUS composition enables the primal proof** (guideStone 38/38, IPC

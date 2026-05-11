@@ -15,7 +15,7 @@ V161 resolves the last wetSpring-internal primal gap (PG-12) and seeds
 foundation Thread 04 with 36 validated targets. A comprehensive deep debt
 audit confirms zero actionable debt across all dimensions.
 
-**Metrics:** 1,962 tests, 0 failed. 6 gaps open (all external), 16 resolved/closed.
+**Metrics:** 1,962 tests, 0 failed. 8 gaps open (all external), 14 resolved/closed.
 Zero wetSpring-internal gaps remain. 63/63 papers reproduced. guideStone Level 4.
 
 ---
@@ -83,7 +83,7 @@ Updated `THREAD_INDEX.toml`: Thread 04 status → "seeded", `data_targets` path 
 ### primalSpring
 - PG-10 remains: `method_to_capability_domain()` needs `"spectral" | "linalg"`
   in the `"tensor"` match arm.
-- wetSpring has zero internal gaps — all remaining 6 are external team dependencies.
+- wetSpring has zero internal gaps — all remaining 8 are external team dependencies.
 
 ### barraCuda
 - PG-17 remains: `tensor.matmul` handle-based API needs inline-data convenience.
