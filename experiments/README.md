@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-11 (V159: deep debt audit clean. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,865** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). V159: barraCuda IPC routing, PG-09 handler wiring. V158: skunkBat IPC, CI cross-sync 413, capability discovery, PG-08/14/15/22 closed. 11 paper notebooks. 63/63 papers. 8 primal gaps open, 14 resolved/closed.)
+**Updated**: 2026-05-11 (V160: PG-09 resolved — all 5 handlers wired. 383 experiments indexed (380 completed + 3 PROPOSED), **364** binaries (**342** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). V160: handler-level primal-proof complete. V159: barraCuda IPC routing. V158: skunkBat IPC, CI cross-sync 413, capability discovery. 11 paper notebooks. 63/63 papers. 7 primal gaps open, 15 resolved/closed.)
 
 ---
 

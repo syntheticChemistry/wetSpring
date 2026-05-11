@@ -3,7 +3,7 @@
 # wetSpring White Paper
 
 **Date:** May 11, 2026
-**Status:** V159 — deep debt audit clean. barraCuda IPC routing module wired (`ipc/barracuda_route.rs`), `#[cfg(feature = "primal-proof")]` in 3 science handlers for IPC-first compute. V158: skunkBat IPC module, CI cross-sync 413, capability discovery, PG-08/14/15/22 closed. V157: IPC timeouts centralized, GPU API evolved, shared harness. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 1,865 lib + 97 integration + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 8 primal gaps open (14 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
+**Status:** V160 — PG-09 resolved: all 5 `barracuda::*`-calling handlers `primal-proof` wired (IPC-first, graceful fallback). Tier 4 Cargo confirmed. V159: barraCuda IPC routing module + 3 handler wiring. V158: skunkBat IPC, CI cross-sync 413, capability discovery, PG-08/14/15/22 closed. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs, 48 capabilities). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 7 primal gaps open (15 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---

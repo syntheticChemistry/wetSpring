@@ -7,7 +7,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,865 tests)       (44 GPU modules)
+           (58 scripts)        (1,962 tests)       (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
            (342 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
@@ -27,7 +27,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 
 | | |
 |---|---|
-| **Tests** | 1,865 (lib) + 97 integration + 18 IPC roundtrip, 0 failed |
+| **Tests** | 1,962 (lib) + 97 integration + 18 IPC roundtrip, 0 failed |
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |

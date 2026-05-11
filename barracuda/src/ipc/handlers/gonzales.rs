@@ -29,7 +29,14 @@ fn linspace(n: usize, max: f64) -> Vec<f64> {
 ///
 /// Computes Hill equation curves across a dose range for JAK1, IL-2, IL-6,
 /// IL-31, IL-4, and IL-13 using published IC50 values from Gonzales 2014.
+/// When `primal-proof` is active, attempts to forward to a live barraCuda
+/// primal via IPC before falling back to in-process compute.
 pub fn handle_dose_response(params: &Value) -> Result<Value, RpcError> {
+    #[cfg(feature = "primal-proof")]
+    if let Some(result) = super::super::barracuda_route::try_forward("stats.hill_sweep", params) {
+        return Ok(result);
+    }
+
     let n_points = params.get("n_points").and_then(Value::as_u64).unwrap_or(50);
     let dose_max = params
         .get("dose_max")

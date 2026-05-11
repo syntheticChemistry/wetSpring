@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V160] — 2026-05-11
+
+### PG-09 Resolved — Complete Handler-Level primal-proof Wiring, Tier 4 Confirmed
+
+- **PG-09 resolved:** All 5 handlers that call `barracuda::*` directly are now `primal-proof` wired with IPC-first routing and graceful in-process fallback: `handle_nmf` (→ `linalg.nmf`), `handle_dose_response` (→ `stats.hill_sweep`), plus V159's `handle_diversity`, `handle_anderson`, `handle_qs_model`. Full handler audit confirmed remaining handlers (`kinetics`, `alignment`, `taxonomy`, `phylogenetics`, `brain`, gonzales non-hill) use only `crate::bio::*` — no barraCuda IPC routing needed.
+- **Tier 4 Cargo structure confirmed:** `barracuda` is already `optional = true` with `barracuda-lib` feature gate (default on), matching ludoSpring exemplar pattern. `primal-proof` feature enables IPC-only sovereign deployment.
+- **Upstream review:** infra/plasmidBin cell TOMLs, ludoSpring Tier 4 `math.rs` dual-path dispatch, primalSpring capability registry (413 methods) reviewed for pattern alignment.
+- **Gap closure:** 7 open, 15 resolved/closed (was 8/14). Only 1 wetSpring-internal gap remains (PG-12, Exp403 legacy surface migration).
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,962 lib + 97 integration / 0 failed)
+
 ## [V159] — 2026-05-11
 
 ### Deep Debt Audit — barraCuda IPC Routing, PG-09 Handler Wiring, Doc Reconciliation

@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: April 27, 2026
-**Status**: V151 — Deep debt evolution. Zero `dyn` dispatch in I/O parsers (FASTQ, MS2, NRS). `Write`-based output in validation layer. Hardcoded paths removed. Shared validation helpers extracted (`BenchRow`, `bench_print`, `gpu_or_skip_sync`). Concrete error types. 1,209 lib tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, zero `dyn` in application code (gillespie justified exception). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 15 composition gaps open. **guideStone Level 4** unchanged (38/38 pass, 4 skip, exit 0). V150: Phase 46 composition explorer. V149: `is_skip_error`, Level 4. *(Detailed validation tables below reflect their respective phases.)*
+**Status**: V160 — PG-09 resolved: all 5 `barracuda::*`-calling handlers `primal-proof` wired. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, zero `dyn` in application code. 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 7 composition gaps open (15 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0). *(Detailed validation tables below reflect their respective phases.)*
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

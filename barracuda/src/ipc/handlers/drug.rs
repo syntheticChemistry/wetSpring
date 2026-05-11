@@ -16,11 +16,18 @@ use super::extract_f64_array;
 /// Handle `science.nmf` — Non-negative Matrix Factorization (multiplicative update).
 ///
 /// Delegates to [`barracuda::linalg::nmf::nmf`] for the actual factorisation.
+/// When `primal-proof` is active, attempts to forward to a live barraCuda
+/// primal via IPC before falling back to in-process compute.
 ///
 /// # Errors
 ///
 /// Returns `RpcError::invalid_params` for dimension mismatches or invalid rank.
 pub fn handle_nmf(params: &Value) -> Result<Value, RpcError> {
+    #[cfg(feature = "primal-proof")]
+    if let Some(result) = super::super::barracuda_route::try_forward("linalg.nmf", params) {
+        return Ok(result);
+    }
+
     let data = extract_f64_array(params, "data")?;
     let n_rows = u64_usize(
         params
