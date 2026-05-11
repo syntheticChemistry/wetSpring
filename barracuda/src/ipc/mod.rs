@@ -83,6 +83,8 @@ pub mod resilience;
 #[cfg(feature = "ipc")]
 pub mod server;
 #[cfg(feature = "ipc")]
+pub mod skunkbat;
+#[cfg(feature = "ipc")]
 pub mod songbird;
 #[cfg(feature = "ipc")]
 pub mod timeouts;

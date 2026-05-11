@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V158] — 2026-05-11
+
+### Post-Interstadial Gap Closure — skunkBat IPC, Capability Discovery, 413 Cross-Sync
+
+- **skunkBat IPC module wired:** New `ipc/skunkbat.rs` — `audit.event` and `audit.forward` JSON-RPC emitters with graceful degradation (`try_emit`, `audit_info`, `audit_warn`). 12 tests. Socket discovery via standard cascade (`SKUNKBAT_SOCKET` env → XDG → temp). Follows songbird.rs pattern. wetSpring is now a skunkBat exemplar per primalSpring audit.
+- **CI cross-sync updated to 413:** Module docs, assertions, and panic messages updated from 403 to 413 canonical methods per primalSpring v0.9.25 scorecard. New `skunkbat_ipc_module_exists` cross-sync test verifies the module is wired and discoverable. Counting logic tightened (`trim().starts_with('"') && trim().ends_with(',')` for method lines).
+- **Capability-oriented discovery:** New `discover_by_capability(domain)` and `capability_to_primal(domain)` in `ipc/discover.rs`. 15 capability domain→primal mappings (tensor/stats/compute → barraCuda, crypto → BearDog, audit → skunkBat, etc.). Single migration point for Songbird `capability.resolve`. Advances PG-03 from structural to partial.
+- **`BARRACUDA` primal constant:** Added to `primal_names.rs` and re-exported from `ipc/primal_names.rs` alongside `SKUNKBAT`.
+- **Primal gap closure:** PG-08 (informational, upstream manifest), PG-14 (informational, Ollama infra dep), PG-15 (informational, expected GPU binary requirement), PG-22 (resolved, timeouts centralized + graceful degradation). PG-03 advanced (capability abstraction wired). PG-09 advanced (`primal-proof` + capability discovery). **8 gaps open, 14 resolved/closed** (was 12/10).
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,608/0/1)
+
 ## [V157] — 2026-05-10
 
 ### Deep Debt Evolution — Centralized Timeouts, GPU API, Shared Validation Harness

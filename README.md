@@ -27,7 +27,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 
 | | |
 |---|---|
-| **Tests** | 1,594 (lib) + 18 IPC roundtrip + integration, 0 failed |
+| **Tests** | 1,608 (lib) + 18 IPC roundtrip + integration, 0 failed |
 | **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
 | **Experiments** | 380 completed + 3 proposed (383 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
@@ -40,12 +40,12 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 12 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 10 resolved) |
+| **Primal gaps** | 8 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 14 resolved/closed) |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V157:** Deep debt evolution wave — IPC timeouts centralized into `ipc::timeouts` module (5 tiers: discovery/standard/compute/AI/connection + 3 facade tiers). GPU API evolved: deprecated `submit_and_poll` removed per barraCuda BREAKING_CHANGES Sprint 42. Shared validation harness expanded (`BenchRowEvolved`, `print_bench_evolved_table`, `print_kv_box`). s87 broken bench wrapper fixed. 3 bin warnings resolved. Full audit: zero unsafe, zero production mocks, all URLs env-configurable. V156: skunkBat audit logging wired into 7 deploy graphs + niche. biomeOS v3.51 `composition.status` + `method.register` consumed. CI cross-sync test (6 tests). PG-16/20/21 closed. 1,594 lib tests, 0 failed. **12 gaps open, 10 resolved.**
+**Current release — V158:** Post-interstadial gap closure wave. skunkBat IPC module wired (`ipc/skunkbat.rs`: `audit.event`, `audit.forward`, graceful degradation). CI cross-sync updated to 413 canonical methods. Capability-oriented discovery abstraction (`discover_by_capability`, 15 domain→primal mappings). Primal gaps: PG-08/14/15/22 closed, PG-03/09 advanced. V157: IPC timeouts centralized, GPU API evolved, shared harness expanded. V156: skunkBat deploy graphs, biomeOS v3.51, CI cross-sync, PG-16/20/21 closed. 1,608 lib tests, 0 failed. **8 gaps open, 14 resolved/closed.**
 
 ---
 

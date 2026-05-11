@@ -18,6 +18,9 @@ pub const SONGBIRD: &str = "songbird";
 /// `NestGate` content-addressed storage.
 pub const NESTGATE: &str = "nestgate";
 
+/// barraCuda standalone math primal.
+pub const BARRACUDA: &str = "barracuda";
+
 /// `BearDog` security foundation.
 pub const BEARDOG: &str = "beardog";
 

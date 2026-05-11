@@ -111,6 +111,69 @@ pub fn discover_sweetgrass() -> Option<PathBuf> {
     discover_primal(super::primal_names::SWEETGRASS)
 }
 
+/// Discover skunkBat audit socket.
+///
+/// skunkBat handles security audit logging and JH-5 forwarding.
+/// Priority: `SKUNKBAT_SOCKET` env → XDG runtime → temp dir.
+#[must_use]
+pub fn discover_skunkbat() -> Option<PathBuf> {
+    discover_primal(super::primal_names::SKUNKBAT)
+}
+
+/// Discover a primal by the **capability** it provides.
+///
+/// Maps a capability domain to the primal that serves it, then resolves
+/// the socket via the standard name-based cascade. This is the
+/// capability-oriented abstraction (PG-03 evolution path): when Songbird
+/// implements `capability.resolve`, this function becomes the single
+/// point of migration — callers never change.
+///
+/// Returns `None` if the capability domain is unrecognized or the
+/// providing primal has no reachable socket.
+///
+/// # Known mappings
+///
+/// | Capability domain | Provider primal |
+/// |-------------------|-----------------|
+/// | `"tensor"`, `"stats"`, `"compute"`, `"spectral"`, `"linalg"` | barraCuda |
+/// | `"crypto"`, `"security"` | BearDog |
+/// | `"discovery"` | Songbird |
+/// | `"storage"` | NestGate |
+/// | `"dag"` | rhizoCrypt |
+/// | `"spine"`, `"entry"` | loamSpine |
+/// | `"braid"`, `"provenance"` | sweetGrass |
+/// | `"render"`, `"shader"` | petalTongue |
+/// | `"ai"`, `"inference"` | Squirrel |
+/// | `"audit"` | skunkBat |
+#[must_use]
+pub fn discover_by_capability(capability_domain: &str) -> Option<PathBuf> {
+    let primal = capability_to_primal(capability_domain)?;
+    discover_primal(primal)
+}
+
+/// Map a capability domain prefix to the canonical primal name that serves it.
+///
+/// Returns `None` for unrecognized domains.
+#[must_use]
+pub const fn capability_to_primal(domain: &str) -> Option<&str> {
+    match domain.as_bytes() {
+        b"tensor" | b"stats" | b"compute" | b"spectral" | b"linalg" | b"math" | b"noise"
+        | b"activation" | b"fhe" | b"tolerances" | b"rng" | b"health" => {
+            Some(super::primal_names::BARRACUDA)
+        }
+        b"crypto" | b"security" => Some(super::primal_names::BEARDOG),
+        b"discovery" => Some(super::primal_names::SONGBIRD),
+        b"storage" => Some(super::primal_names::NESTGATE),
+        b"dag" => Some(super::primal_names::RHIZOCRYPT),
+        b"spine" | b"entry" => Some(super::primal_names::LOAMSPINE),
+        b"braid" | b"provenance" => Some(super::primal_names::SWEETGRASS),
+        b"render" | b"shader" => Some(super::primal_names::PETALTONGUE),
+        b"ai" | b"inference" => Some(super::primal_names::SQUIRREL),
+        b"audit" => Some(super::primal_names::SKUNKBAT),
+        _ => None,
+    }
+}
+
 /// Discover an existing primal socket by env var and primal name.
 ///
 /// Returns `Some(path)` if a socket file is found at one of the
@@ -331,5 +394,42 @@ mod tests {
         assert_eq!(socket_env_var("sweetgrass"), "SWEETGRASS_SOCKET");
         assert_eq!(socket_env_var("petaltongue"), "PETALTONGUE_SOCKET");
         assert_eq!(socket_env_var("squirrel"), "SQUIRREL_SOCKET");
+        assert_eq!(socket_env_var("skunkbat"), "SKUNKBAT_SOCKET");
+    }
+
+    #[test]
+    fn discover_skunkbat_returns_none_when_absent() {
+        assert!(discover_skunkbat().is_none());
+    }
+
+    #[test]
+    fn capability_to_primal_maps_known_domains() {
+        assert_eq!(capability_to_primal("tensor"), Some("barracuda"));
+        assert_eq!(capability_to_primal("stats"), Some("barracuda"));
+        assert_eq!(capability_to_primal("compute"), Some("barracuda"));
+        assert_eq!(capability_to_primal("spectral"), Some("barracuda"));
+        assert_eq!(capability_to_primal("linalg"), Some("barracuda"));
+        assert_eq!(capability_to_primal("crypto"), Some("beardog"));
+        assert_eq!(capability_to_primal("discovery"), Some("songbird"));
+        assert_eq!(capability_to_primal("storage"), Some("nestgate"));
+        assert_eq!(capability_to_primal("dag"), Some("rhizocrypt"));
+        assert_eq!(capability_to_primal("spine"), Some("loamspine"));
+        assert_eq!(capability_to_primal("braid"), Some("sweetgrass"));
+        assert_eq!(capability_to_primal("render"), Some("petaltongue"));
+        assert_eq!(capability_to_primal("ai"), Some("squirrel"));
+        assert_eq!(capability_to_primal("audit"), Some("skunkbat"));
+    }
+
+    #[test]
+    fn capability_to_primal_none_for_unknown() {
+        assert_eq!(capability_to_primal("nonexistent"), None);
+        assert_eq!(capability_to_primal(""), None);
+    }
+
+    #[test]
+    fn discover_by_capability_returns_none_for_absent_primals() {
+        assert!(discover_by_capability("tensor").is_none());
+        assert!(discover_by_capability("audit").is_none());
+        assert!(discover_by_capability("nonexistent").is_none());
     }
 }

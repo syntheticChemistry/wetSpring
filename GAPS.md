@@ -4,12 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-10 (V157 — deep debt evolution wave. IPC timeouts centralized
-(ipc::timeouts: 5 tiers + 3 facade). GPU API evolved: submit_and_poll → read_buffer_f32
-internal poll (barraCuda BREAKING_CHANGES Sprint 42). Shared validation harness:
-BenchRowEvolved, print_bench_evolved_table, print_kv_box. Full deep debt audit: zero
-unsafe, zero production mocks, all URLs env-configurable. projectNUCLEUS + foundation
-reviewed. 12 gaps open, 10 resolved.)
+Last updated: 2026-05-11 (V158 — post-interstadial gap closure wave. skunkBat IPC
+module wired (ipc/skunkbat.rs). CI cross-sync updated to 413 canonical methods.
+Capability-oriented discovery abstraction (discover_by_capability). PG-08/14/15/22
+closed, PG-03/09 advanced. 8 primal gaps open, 14 resolved/closed. 1,608 lib tests.)
 
 ---
 

@@ -5,6 +5,7 @@
 //! available). This module re-exports them so existing `use crate::ipc::primal_names::*`
 //! call sites continue to compile without changes.
 
+pub use crate::primal_names::BARRACUDA;
 pub use crate::primal_names::BEARDOG;
 pub use crate::primal_names::BIOMEOS;
 pub use crate::primal_names::CORALREEF;
@@ -13,6 +14,7 @@ pub use crate::primal_names::NESTGATE;
 pub use crate::primal_names::PETALTONGUE;
 pub use crate::primal_names::RHIZOCRYPT;
 pub use crate::primal_names::SELF_NAME as SELF;
+pub use crate::primal_names::SKUNKBAT;
 pub use crate::primal_names::SONGBIRD;
 pub use crate::primal_names::SQUIRREL;
 pub use crate::primal_names::SWEETGRASS;

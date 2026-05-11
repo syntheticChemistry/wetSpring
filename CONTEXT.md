@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V157:** Deep debt evolution wave — IPC timeouts centralized (`ipc::timeouts`: 5 tiers + 3 facade). GPU API evolved: `submit_and_poll` removed per barraCuda Sprint 42. Shared validation harness: `BenchRowEvolved`, `print_bench_evolved_table`, `print_kv_box`. V156: skunkBat audit wired, biomeOS v3.51 consumed, CI cross-sync, PG-16/20/21 closed. 1,594 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4 (38/38 pass, 4 skip). 12 gaps open, 10 resolved.
+**Current release — V158:** Post-interstadial gap closure wave — skunkBat IPC module wired (`ipc/skunkbat.rs`: `audit.event`, `audit.forward`, graceful degradation, 12 tests). CI cross-sync updated to 413 canonical methods. Capability-oriented discovery abstraction (`discover_by_capability`). Primal gaps: PG-08/14/15/22 closed, PG-03/09 advanced. 1,608 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4. 8 gaps open, 14 resolved.
 
 ## Role in the Ecosystem
 
@@ -27,7 +27,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,594 lib + 18 IPC roundtrip + integration, 0 failed
+- **Tests:** 1,608 lib + 18 IPC roundtrip + integration, 0 failed
 - **Validation checks:** 5,900+ across 364 binaries
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)

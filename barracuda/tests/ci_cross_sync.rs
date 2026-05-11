@@ -6,16 +6,19 @@
     reason = "integration test: CI cross-sync validations use unwrap for diagnostic clarity"
 )]
 //! CI Cross-Sync: validates wetSpring's local capability surface against the
-//! primalSpring canonical registry (`config/capability_registry.toml`, 403 methods).
+//! primalSpring canonical registry (`config/capability_registry.toml`, 413 methods).
 //!
 //! Per primalSpring post-interstadial directive (May 10, 2026): "CI cross-sync —
-//! validate your local capability methods against primalSpring canonical 403.
+//! validate your local capability methods against primalSpring canonical 413.
 //! Zero drift is the target."
 //!
-//! Three checks:
+//! Six checks:
 //! 1. Local capability_registry.toml methods == dispatch table methods
 //! 2. Niche CAPABILITIES ⊇ dispatch methods
-//! 3. Consumed capabilities reference recognized ecosystem domains
+//! 3. Niche DEPENDENCIES includes all infrastructure primals
+//! 4. Consumed capabilities include biomeOS v3.51 lifecycle methods
+//! 5. Consumed capabilities reference recognized ecosystem domains
+//! 6. Canonical primalSpring registry accessible and non-trivial (413+)
 
 use std::collections::BTreeSet;
 
@@ -154,7 +157,7 @@ fn consumed_capabilities_use_recognized_domains() {
     }
 }
 
-/// Cross-check: canonical primalSpring registry file exists and contains 403+
+/// Cross-check: canonical primalSpring registry file exists and contains 413+
 /// methods. This validates our CI can access the canonical source of truth.
 #[test]
 fn canonical_registry_accessible_and_nontrivial() {
@@ -173,14 +176,31 @@ fn canonical_registry_accessible_and_nontrivial() {
     }
 
     let content = std::fs::read_to_string(&canonical).unwrap();
+
     let method_count = content
         .lines()
-        .filter(|l| l.starts_with("methods = [") || l.starts_with("    \""))
-        .filter(|l| l.trim().starts_with('"'))
+        .filter(|l| l.trim().starts_with('"') && l.trim().ends_with(','))
         .count();
 
     assert!(
-        method_count >= 300,
-        "canonical registry has only {method_count} method entries — expected 403+"
+        method_count >= 400,
+        "canonical registry has only {method_count} method entries — expected 413+"
     );
+}
+
+/// Cross-check: skunkBat IPC module is wired and discoverable.
+#[test]
+fn skunkbat_ipc_module_exists() {
+    use wetspring_barracuda::ipc::skunkbat;
+
+    let _socket = skunkbat::discover_socket();
+
+    let event = skunkbat::AuditEvent {
+        domain: "test",
+        action: "ci_cross_sync",
+        severity: skunkbat::Severity::Info,
+        detail: "verifying skunkBat module wiring".into(),
+        context: None,
+    };
+    skunkbat::try_emit(&event);
 }
