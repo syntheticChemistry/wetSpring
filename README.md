@@ -7,7 +7,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 ```
 Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,962 tests)       (44 GPU modules)
+           (58 scripts)        (1,962+ tests)      (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
            (342 binaries)      (136/136 proto-nucleate, 7 deploy graphs)

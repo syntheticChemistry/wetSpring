@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V160** | `handoffs/WETSPRING_V160_TIER4_PRIMAL_PROOF_HANDOFF_MAY11_2026.md` | May 11 | **PG-09 resolved — Tier 4 handler-level primal-proof complete**: All 5 `barracuda::*`-calling handlers wired (`handle_nmf` → `linalg.nmf`, `handle_dose_response` → `stats.hill_sweep`). Tier 4 Cargo confirmed. plasmidBin binary placed (1.4M). 7 gaps open, 15 resolved/closed. |
+| **V161** | `handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md` | May 11 | **PG-12 resolved + foundation seeded**: Legacy surface separated into `CONSUMED_CAPABILITIES_LEGACY`. Thread 04 seeded (36 targets). Deep debt audit clean. Zero wetSpring-internal gaps. 6 open (all external), 16 resolved/closed. |
+| V160 | `handoffs/WETSPRING_V160_TIER4_PRIMAL_PROOF_HANDOFF_MAY11_2026.md` | May 11 | PG-09 resolved — Tier 4 handler-level primal-proof complete. All 5 handlers wired. plasmidBin binary placed (1.4M). |
 | V159 | `handoffs/WETSPRING_V159_DEEP_DEBT_PRIMAL_EVOLUTION_HANDOFF_MAY11_2026.md` | May 11 | Deep debt audit + barraCuda IPC routing: `ipc/barracuda_route.rs` module, `primal-proof` handler wiring (3 science handlers), comprehensive deep debt audit (zero debt), broken provenance reference fixed, all docs synchronized. |
 | V158 | `handoffs/WETSPRING_V158_GAP_CLOSURE_FOUNDATION_HANDOFF_MAY11_2026.md` | May 11 | Post-interstadial gap closure + foundation seeding: skunkBat IPC module wired, CI cross-sync updated to 413, capability-oriented discovery, 4 gaps closed + 2 advanced (8 open/14 resolved), foundation seeding targets for NCBI 16S/cold seep/Fajgenbaum. |
 | V157 | `handoffs/WETSPRING_V157_DEEP_DEBT_EVOLUTION_HANDOFF_MAY10_2026.md` | May 10 | Deep debt evolution + upstream handoff: IPC timeouts centralized, GPU API evolved, shared validation harness, skunkBat wired, biomeOS v3.51 consumed, CI cross-sync, 3 gaps closed. |

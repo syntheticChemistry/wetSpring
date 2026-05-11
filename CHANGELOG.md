@@ -3,6 +3,20 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V161] — 2026-05-11
+
+### Deep Debt Audit Clean — PG-12 Resolved, Foundation Thread 04 Seeded, Zero Internal Gaps
+
+- **PG-12 resolved:** Exp403 legacy 15-method surface separated into `niche::CONSUMED_CAPABILITIES_LEGACY` constant. Canonical `CONSUMED_CAPABILITIES` now contains only v0.9.17 surface + composition infrastructure. Machine-readable distinction for CI and composition tools.
+- **Foundation Thread 04 seeded:** Created `data/targets/thread04_enviro_targets.toml` with 36 validated targets across diversity, Anderson localization, ODE, phylogenetics, PFAS, cold seep, NMF, Gonzales, HMM, soil, R/Python parity, NPU, and spectral matching. Updated `THREAD_INDEX.toml` (status: "seeded", data_targets path added).
+- **Deep debt audit (comprehensive):** Zero unsafe code, zero production mocks, zero `todo!()`, zero `.unwrap()` in library, zero `#[allow()]`, zero hardcoded `/home/` paths, zero library files >800L, zero `TODO`/`FIXME`/`HACK`. All external deps pure Rust (except wgpu native GPU driver). `deny.toml` bans ring/openssl/libz/etc. 4 large bins (831-923L) are legitimate validation narratives.
+- **External deps analysis:** All direct deps pure Rust. `flate2` uses `rust_backend`. `blake3` uses `pure` feature. `chacha20poly1305` is RustCrypto. `deny.toml` bans 15 C-binding crates.
+- **Benchmark audit:** 6 Python-vs-Rust benchmark bins (v2-v5 + 23-domain + three-tier) all completed. Galaxy/QIIME2/scipy/numpy/R parity baselines all established. Kokkos is hotSpring scope.
+- **Paper queue:** 63/63 complete. 3 PROPOSED experiments (377: hormesis biphasic, 378: trophic cascade Anderson, 379: joint colonization resistance).
+- **Downstream review:** projectNUCLEUS (11 wetSpring workload TOMLs ready). foundation (Thread 04 seeded, 23 sources, 36 targets).
+- **Gap status:** 6 open (all external), 16 resolved/closed. Zero wetSpring-internal gaps remain.
+- Build gate: cargo build + fmt + clippy (0 warnings) + test (1,962 / 0 failed)
+
 ## [V160] — 2026-05-11
 
 ### PG-09 Resolved — Complete Handler-Level primal-proof Wiring, Tier 4 Confirmed

@@ -120,8 +120,9 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 /// to validate composition completeness without hardcoded knowledge of
 /// which primals provide what.
 ///
-/// barraCuda surface aligned to primalSpring v0.9.15 canonical (33 methods).
-/// Legacy methods (Exp403 Tier 2) retained until Exp403 migrates.
+/// barraCuda surface aligned to primalSpring v0.9.17 canonical (33 methods).
+/// Legacy methods separated into [`CONSUMED_CAPABILITIES_LEGACY`] for
+/// explicit tracking (PG-12 resolution).
 pub const CONSUMED_CAPABILITIES: &[&str] = &[
     // Tower Atomic (BearDog + Songbird)
     "crypto.hash",
@@ -130,7 +131,7 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "crypto.blake3_hash",
     "discovery.find_primals",
     "discovery.announce",
-    // ── barraCuda v0.9.15 canonical surface (33 methods) ──
+    // ── barraCuda v0.9.17 canonical surface (33 methods) ──
     // TENSOR (9)
     "tensor.create",
     "tensor.matmul",
@@ -170,22 +171,6 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     // HEALTH (2) — barraCuda ecobin liveness/readiness (used by CompositionContext)
     "health.liveness",
     "health.readiness",
-    // ── barraCuda legacy (Exp403 Tier 2, pending migration to v0.9.15 surface) ──
-    "tensor.scale",
-    "tensor.clamp",
-    "tensor.sigmoid",
-    "tensor.batch.submit",
-    "stats.weighted_mean",
-    "noise.perlin2d",
-    "noise.perlin3d",
-    "math.sigmoid",
-    "math.log2",
-    "activation.fitts",
-    "activation.hick",
-    "fhe.ntt",
-    "fhe.pointwise_mul",
-    "tolerances.get",
-    "rng.uniform",
     // Node Atomic — toadStool compute orchestration
     "compute.dispatch.submit",
     "math.tensor",
@@ -213,6 +198,31 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     // ── biomeOS v3.51 composition lifecycle ──
     "composition.status",
     "method.register",
+];
+
+/// Extended surface from Exp403 (Tier 2 IPC validation, pre-v0.9.17).
+///
+/// These 15 methods are served by barraCuda but are **not** part of the
+/// canonical 33-method surface defined in `primalSpring/config/capability_registry.toml`.
+/// Retained for backward compatibility with Exp403 `validate_primal_parity_v1`.
+/// PG-12 resolution: separated from canonical `CONSUMED_CAPABILITIES` so
+/// CI and composition tools can distinguish canonical from extended surface.
+pub const CONSUMED_CAPABILITIES_LEGACY: &[&str] = &[
+    "tensor.scale",
+    "tensor.clamp",
+    "tensor.sigmoid",
+    "tensor.batch.submit",
+    "stats.weighted_mean",
+    "noise.perlin2d",
+    "noise.perlin3d",
+    "math.sigmoid",
+    "math.log2",
+    "activation.fitts",
+    "activation.hick",
+    "fhe.ntt",
+    "fhe.pointwise_mul",
+    "tolerances.get",
+    "rng.uniform",
 ];
 
 /// All capabilities this niche exposes to biomeOS.

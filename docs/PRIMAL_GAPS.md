@@ -4,15 +4,13 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-11 (V160 — PG-09 handler wiring complete.
-All 5 handlers that call `barracuda::*` directly are now `primal-proof` wired:
-`handle_diversity` (→ `stats.diversity`), `handle_anderson` (→ `spectral.anderson_3d`),
-`handle_qs_model` (→ `compute.ode_rk4`), `handle_nmf` (→ `linalg.nmf`),
-`handle_dose_response` (→ `stats.hill_sweep`). Remaining handlers use only
-`crate::bio::*` (wetSpring library) — no barraCuda IPC routing needed.
-Tier 4 Cargo structure confirmed: `barracuda` is `optional = true` with
-`barracuda-lib` feature gate (default on). 7 open gaps, 15 resolved/closed.
-1,962 lib tests.)
+Last updated: 2026-05-11 (V161 — PG-12 resolved. Legacy Exp403 surface
+separated into `CONSUMED_CAPABILITIES_LEGACY` (15 methods) for explicit
+tracking. Canonical `CONSUMED_CAPABILITIES` now contains only v0.9.17
+surface + composition infrastructure. Foundation Thread 04 seeded with
+36 validated targets. Deep debt audit: zero unsafe, zero mocks, zero
+hardcoded paths, zero TODO/FIXME, all deps pure Rust (except wgpu GPU
+driver). 6 gaps open (all external), 16 resolved/closed. 1,962 tests.)
 
 ---
 
@@ -295,10 +293,10 @@ all 15 manifest capabilities.
 
 ---
 
-## PG-12: Exp403 Legacy Method Surface — Pending v0.9.17 Migration
+## PG-12: Exp403 Legacy Method Surface — Separated from Canonical (Resolved V161)
 
 **Owner:** wetSpring (internal)
-**Status:** Open — documented V147, unchanged V149
+**Status:** Resolved (V161) — legacy methods separated into `CONSUMED_CAPABILITIES_LEGACY`
 
 Exp403 (`validate_primal_parity_v1`) uses 22 barraCuda methods from the
 pre-v0.9.17 surface. 15 of these are now "legacy" (not on the v0.9.17
@@ -307,13 +305,13 @@ canonical list): `tensor.scale`, `tensor.clamp`, `tensor.sigmoid`,
 `math.sigmoid/log2`, `activation.fitts/hick`, `fhe.ntt/pointwise_mul`,
 `tolerances.get`, `rng.uniform`.
 
-These may still be served by barraCuda but are not part of the canonical
-33-method surface. Exp403 D01 tiers should be migrated to v0.9.17 method
-names, and legacy-only checks should be gated behind a feature or documented
-as extended surface.
-
-**Impact:** Low — Exp403 still works. But the dual surface (canonical + legacy)
-complicates reasoning about what wetSpring actually requires from barraCuda.
+**V161 resolution:** The 15 legacy methods are now in a separate
+`niche::CONSUMED_CAPABILITIES_LEGACY` constant, distinct from the canonical
+`CONSUMED_CAPABILITIES`. This makes the distinction machine-readable:
+- `CONSUMED_CAPABILITIES`: v0.9.17 canonical (33 methods) + composition infrastructure
+- `CONSUMED_CAPABILITIES_LEGACY`: 15 Exp403 extended methods
+CI and composition tools can now distinguish canonical from extended surface.
+Exp403 itself continues to work against the live barraCuda primal.
 
 ---
 
@@ -332,7 +330,7 @@ complicates reasoning about what wetSpring actually requires from barraCuda.
 | PG-09 | barraCuda IPC evaporation | wetSpring | **Resolved V160** — all 5 handlers wired, Tier 4 complete | -- |
 | PG-10 | spectral/linalg routing | primalSpring | `method_to_capability_domain` update | 1 |
 | PG-11 | Manifest drift (N2 methods) | primalSpring | **Resolved V148** | -- |
-| PG-12 | Exp403 legacy surface | wetSpring | v0.9.17 migration | 2 |
+| PG-12 | Exp403 legacy surface | wetSpring | **Resolved V161** — separated into LEGACY constant | -- |
 | PG-13 | barraCuda missing 6 manifest methods | barraCuda | **Resolved V149** — param names corrected | -- |
 | PG-14 | Squirrel BTSP-only socket | Squirrel | **Closed V158** — informational, infra dep | -- |
 | PG-15 | ToadStool compute.dispatch | ToadStool | **Closed V158** — informational, expected | -- |
@@ -591,10 +589,14 @@ call `barracuda::*` directly are now `primal-proof` wired).
 - `handle_dose_response` → `stats.hill_sweep` IPC forward (gonzales.rs)
 - Full audit confirmed remaining handlers use only `crate::bio::*`
 
-**Status after V160:** 7 gaps open, 15 resolved/closed. 1,962 lib tests.
+**Resolved V161:** PG-12 (Exp403 legacy surface — separated into
+`CONSUMED_CAPABILITIES_LEGACY` constant). Foundation Thread 04 seeded
+with 36 validated targets.
+
+**Status after V161:** 6 gaps open, 16 resolved/closed. 1,962 tests.
 
 **Remaining open gaps by owner:**
-- **wetSpring internal (1):** PG-12 (Exp403 legacy surface — v0.9.17 migration)
+- **wetSpring internal:** None — all wetSpring-owned gaps resolved
 - **External teams (5):** PG-02 (trio IPC readiness), PG-04 (NestGate deploy),
   PG-05 (toadStool sovereign dispatch), PG-06 (ionic bond protocol),
   PG-18 (trio UDS connection reset)
