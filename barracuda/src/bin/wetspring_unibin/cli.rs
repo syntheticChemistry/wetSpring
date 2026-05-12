@@ -10,6 +10,16 @@ pub struct Cli {
     pub command: Commands,
 }
 
+/// Output format for structured results.
+#[derive(Clone, Copy, Default, clap::ValueEnum)]
+pub enum OutputFormat {
+    /// Human-readable text (default).
+    #[default]
+    Text,
+    /// Machine-readable JSON (for projectNUCLEUS Tier 2 ingestion).
+    Json,
+}
+
 /// UniBin subcommands.
 #[derive(clap::Subcommand)]
 pub enum Commands {
@@ -21,6 +31,9 @@ pub enum Commands {
         /// Bare mode — layer 0 only, no primals needed.
         #[arg(long, default_value_t = false)]
         bare: bool,
+        /// Output format (text or json).
+        #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
+        format: OutputFormat,
     },
     /// Run validation scenarios.
     Validate {
@@ -36,11 +49,18 @@ pub enum Commands {
         /// List all scenarios without running them.
         #[arg(long, default_value_t = false)]
         list: bool,
+        /// Output format (text or json).
+        #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
+        format: OutputFormat,
     },
     /// Start JSON-RPC IPC server (biomeOS science primal).
     Serve,
     /// Print composition health status.
-    Status,
+    Status {
+        /// Output format (text or json).
+        #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
+        format: OutputFormat,
+    },
     /// Print version information.
     Version,
 }

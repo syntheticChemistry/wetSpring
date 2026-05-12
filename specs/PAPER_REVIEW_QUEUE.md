@@ -9,7 +9,7 @@
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: May 11, 2026 (V163 — 383 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers complete. barraCuda v0.3.12, Tier 4 IPC-first defaults. 10-paper LTEE GuideStone Queue (B7 STARTED). 4 primal gaps open (all external), 18 resolved/closed.)
+**Last Updated**: May 12, 2026 (V164 — 384 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers complete. barraCuda v0.3.12, Tier 4 IPC-first defaults. 10-paper LTEE GuideStone Queue (B7 TIER 1 COMPLETE). 4 primal gaps open (all external), 18 resolved/closed. Foundation Thread 4 expression active.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
@@ -487,7 +487,7 @@ comparison — B7) is wetSpring's primary contribution.
 | B4 | Blount et al. — "Genomic analysis of a key innovation (Cit+)" | 2012 | 4 (citrate) | Timeline analysis, potentiating mutation cascade provenance | queued |
 | B5 | Leonard et al. — "One-step genome engineering in bee gut" *mBio* | 2024 | 5 (BioBrick) | Anderson-QS prediction: bee gut 3D biofilm → engineered symbionts QS geometry | queued |
 | B6 | "Measuring the burden of hundreds of BioBricks" *Nat Comms* | 2024 | 5 (BioBrick) | Burden distribution across 301 plasmids; diversity metrics on burden values | queued |
-| B7 | Tenaillon et al. — "Tempo and mode of genome evolution" *Nature* | 2016 | 6 (breseq) | 264 NCBI genome download, mutation accumulation curves, breseq comparison | **STARTED** |
+| B7 | Tenaillon et al. — "Tempo and mode of genome evolution" *Nature* | 2016 | 6 (breseq) | 264 NCBI genome download, mutation accumulation curves, breseq comparison | **TIER 1 COMPLETE** |
 | B8 | Barrick & Waters — "Phages use contingency loci" *bioRxiv* | 2025 | — | HMM identification of contingency loci across phage genomes | queued |
 | E1 | Woldring et al. — "Gradient of sitewise diversity" *Biochemistry* | 2017 | — | Anderson disorder analogy: sitewise diversity = W at each lattice site | queued |
 | E5 | Woldring Lab — "Single-Cell scFab Libraries" | 2023 | — | Single-cell sequencing analysis pipeline (sovereign, Rust-based) | queued |

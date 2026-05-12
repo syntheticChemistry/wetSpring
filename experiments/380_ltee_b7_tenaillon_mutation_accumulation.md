@@ -2,7 +2,7 @@
 
 # Exp380: LTEE B7 — Tenaillon 2016 Mutation Accumulation Pipeline
 
-**Status:** STARTED (V163)
+**Status:** TIER 1 COMPLETE (V164)
 **Paper:** Tenaillon et al. "Tempo and mode of genome evolution in a
 50,000-generation experiment" *Nature* 536, 165–170 (2016)
 **BioProject:** PRJNA294072
@@ -31,9 +31,9 @@ analyzed for mutation rate, spectrum, and accumulation dynamics.
 4. Compute mutation rate estimates per population
 5. Produce expected values JSON for lithoSpore module 6
 
-**Deliverables:**
-- `notebooks/papers/tenaillon-ltee-mutation.ipynb` — Python baseline
-- `experiments/results/ltee_b7_expected_values.json` — expected values
+**Deliverables:** ✅ Complete (V164)
+- `notebooks/papers/tenaillon-ltee-mutation.ipynb` — Python baseline ✅
+- `experiments/results/ltee_b7_expected_values.json` — expected values (10 targets) ✅
 
 ### Tier 2: Rust Validation Binary
 

@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V164] — 2026-05-12
+
+### Downstream Seeding Sprint — Thread 4 Expression, LTEE B7 Tier 1, --format json
+
+- **Foundation Thread 4 expression written:** `ENVIRONMENTAL_GENOMICS.md` authored in `gardens/foundation/expressions/` following the Expression Authoring Guide. Covers 3 external paper lineages (Anderson deep-sea 6 papers, Waters QS 7 papers, Liu phylogenetics 6 papers), 7 baseCamp papers, 8 jelly strings, 4 NUCLEUS composition blueprints (sovereign 16S, PFAS sentinel, LTEE mutation accumulation, NPU field sentinel), spring alignment table, petalTongue vision, and scyBorg publication chain. `THREAD_INDEX.toml` updated: Thread 4 `expression` now points to the file, `status` elevated from `"seeded"` to `"active"`.
+- **LTEE B7 Tier 1 complete:** Python baseline notebook (`notebooks/papers/tenaillon-ltee-mutation.ipynb`) produces 10 validation targets from Tenaillon et al. 2016 — non-mutator mutation rate (8.9×10⁻¹¹ per bp per gen), Ts:Tv ratio (1.7), G:C→A:T fraction (0.68), mutation accumulation curve (9 time points), spectrum (6-class). Expected values JSON written to `experiments/results/ltee_b7_expected_values.json` for lithoSpore module 6 consumption. Exp380 spec updated to TIER 1 COMPLETE. PAPER_REVIEW_QUEUE updated.
+- **projectNUCLEUS workload TOML:** `wetspring-ltee-b7-mutation-accumulation.toml` created in `gardens/projectNUCLEUS/workloads/wetspring/` — wires Exp380 into NUCLEUS dispatch (native binary, PRJNA294072 genome fetch, 8 GB memory, provenance section).
+- **`--format json` for UniBin:** `wetspring_unibin` CLI now accepts `--format json` on `certify`, `validate`, and `status` subcommands. `validate --format json` outputs structured `ValidationResult` JSON (leverages primalSpring `to_json()`). `validate --list --format json` outputs scenario registry as JSON array. `status --format json` outputs structured status object. Enables Tier 2 projectNUCLEUS ingestion per audit guidance.
+- Build gate: cargo build + fmt + clippy (0 new warnings) + all pre-existing lib warnings unchanged
+
 ## [V163] — 2026-05-11
 
 ### Unified Socket Discovery, Deep Debt Audit Clean

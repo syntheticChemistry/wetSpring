@@ -31,26 +31,42 @@ fn main() {
     let parsed = cli::Cli::parse();
 
     match parsed.command {
-        cli::Commands::Certify { layer, bare } => cmd_certify(layer, bare),
+        cli::Commands::Certify {
+            layer,
+            bare,
+            format,
+        } => cmd_certify(layer, bare, format),
         cli::Commands::Validate {
             ref track,
             ref scenario,
             ref tier,
             list,
-        } => cmd_validate(track.as_deref(), scenario.as_deref(), tier.as_deref(), list),
+            format,
+        } => cmd_validate(
+            track.as_deref(),
+            scenario.as_deref(),
+            tier.as_deref(),
+            list,
+            format,
+        ),
         cli::Commands::Serve => cmd_serve(),
-        cli::Commands::Status => cmd_status(),
+        cli::Commands::Status { format } => cmd_status(format),
         cli::Commands::Version => cmd_version(),
     }
 }
 
-fn cmd_certify(layer: Option<u8>, bare: bool) {
+fn cmd_certify(layer: Option<u8>, bare: bool, format: cli::OutputFormat) {
     let max_layer = if bare {
         0
     } else {
         layer.unwrap_or(certification::MAX_LAYER)
     };
     let result = certification::certify(max_layer);
+    if matches!(format, cli::OutputFormat::Json) {
+        if let Ok(json) = result.to_json() {
+            println!("{json}");
+        }
+    }
     let code = if result.exit_code() == 0 && max_layer < 3 {
         2
     } else {
@@ -64,26 +80,48 @@ fn cmd_validate(
     scenario_id: Option<&str>,
     tier_filter: Option<&str>,
     list: bool,
+    format: cli::OutputFormat,
 ) {
     let registry = scenarios::build_registry();
+    let json_mode = matches!(format, cli::OutputFormat::Json);
 
     if list {
-        println!(
-            "  {:30} {:15} {:6} {}",
-            "ID", "TRACK", "TIER", "DESCRIPTION"
-        );
-        println!("  {}", "─".repeat(80));
-        for s in registry.all() {
+        if json_mode {
+            let items: Vec<serde_json::Value> = registry
+                .all()
+                .iter()
+                .map(|s| {
+                    serde_json::json!({
+                        "id": s.meta.id,
+                        "track": format!("{}", s.meta.track),
+                        "tier": format!("{}", s.meta.tier),
+                        "description": s.meta.description,
+                    })
+                })
+                .collect();
+            if let Ok(json) = serde_json::to_string_pretty(&items) {
+                println!("{json}");
+            }
+        } else {
             println!(
                 "  {:30} {:15} {:6} {}",
-                s.meta.id, s.meta.track, s.meta.tier, s.meta.description
+                "ID", "TRACK", "TIER", "DESCRIPTION"
             );
+            println!("  {}", "─".repeat(80));
+            for s in registry.all() {
+                println!(
+                    "  {:30} {:15} {:6} {}",
+                    s.meta.id, s.meta.track, s.meta.tier, s.meta.description
+                );
+            }
         }
         return;
     }
 
     let mut v = ValidationResult::new("wetSpring Validation — Scenario Suite");
-    ValidationResult::print_banner("wetSpring Validation — Scenario Suite");
+    if !json_mode {
+        ValidationResult::print_banner("wetSpring Validation — Scenario Suite");
+    }
     let mut ctx = CompositionContext::from_live_discovery_with_fallback();
     let mut ran = 0_u32;
 
@@ -114,11 +152,21 @@ fn cmd_validate(
     }
 
     if ran == 0 {
-        eprintln!("No scenarios matched the filter.");
+        if json_mode {
+            println!(r#"{{"error": "No scenarios matched the filter."}}"#);
+        } else {
+            eprintln!("No scenarios matched the filter.");
+        }
         std::process::exit(1);
     }
 
-    v.finish();
+    if json_mode {
+        if let Ok(json) = v.to_json() {
+            println!("{json}");
+        }
+    } else {
+        v.finish();
+    }
     std::process::exit(v.exit_code());
 }
 
@@ -128,29 +176,46 @@ fn cmd_serve() {
     std::process::exit(0);
 }
 
-fn cmd_status() {
-    println!("wetSpring UniBin Status");
-    println!("  version:     {}", env!("CARGO_PKG_VERSION"));
-    println!("  domain:      {}", wetspring_barracuda::PRIMAL_DOMAIN);
-    println!(
-        "  niche:       {}",
-        wetspring_barracuda::niche::NICHE_DESCRIPTION
-    );
-    println!(
-        "  guidestone:  L{}",
-        wetspring_barracuda::niche::GUIDESTONE_READINESS
-    );
-
+fn cmd_status(format: cli::OutputFormat) {
     let registry = scenarios::build_registry();
-    println!("  scenarios:   {}", registry.len());
-
     let tier1 = registry.filter_by_tier(Tier::Rust).count();
     let tier2 = registry.filter_by_tier(Tier::Live).count();
-    println!("  tier 1 (rust): {tier1}");
-    println!("  tier 2 (live): {tier2}");
-
     let _ctx = CompositionContext::from_live_discovery_with_fallback();
-    println!("  primals:     (live discovery attempted)");
+
+    match format {
+        cli::OutputFormat::Json => {
+            let status = serde_json::json!({
+                "binary": "wetspring_unibin",
+                "version": env!("CARGO_PKG_VERSION"),
+                "domain": wetspring_barracuda::PRIMAL_DOMAIN,
+                "niche": wetspring_barracuda::niche::NICHE_DESCRIPTION,
+                "guidestone_level": wetspring_barracuda::niche::GUIDESTONE_READINESS,
+                "scenarios": registry.len(),
+                "tier1_rust": tier1,
+                "tier2_live": tier2,
+            });
+            if let Ok(json) = serde_json::to_string_pretty(&status) {
+                println!("{json}");
+            }
+        }
+        cli::OutputFormat::Text => {
+            println!("wetSpring UniBin Status");
+            println!("  version:     {}", env!("CARGO_PKG_VERSION"));
+            println!("  domain:      {}", wetspring_barracuda::PRIMAL_DOMAIN);
+            println!(
+                "  niche:       {}",
+                wetspring_barracuda::niche::NICHE_DESCRIPTION
+            );
+            println!(
+                "  guidestone:  L{}",
+                wetspring_barracuda::niche::GUIDESTONE_READINESS
+            );
+            println!("  scenarios:   {}", registry.len());
+            println!("  tier 1 (rust): {tier1}");
+            println!("  tier 2 (live): {tier2}");
+            println!("  primals:     (live discovery attempted)");
+        }
+    }
 }
 
 fn cmd_version() {
