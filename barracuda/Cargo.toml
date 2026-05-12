@@ -1980,6 +1980,11 @@ name = "validate_primal_parity_v1"
 path = "src/bin/validate_primal_parity_v1.rs"
 required-features = ["ipc"]
 
+# ── LTEE B7 Tenaillon 2016 Mutation Accumulation (Exp380 Tier 2) ──
+[[bin]]
+name = "validate_ltee_b7_v1"
+path = "src/bin/validate_ltee_b7_v1.rs"
+
 # ── Science Facade: HTTP gateway for primals.eco live science ──
 [[bin]]
 name = "wetspring_science_facade"

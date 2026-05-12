@@ -2,7 +2,7 @@
 
 # Exp380: LTEE B7 — Tenaillon 2016 Mutation Accumulation Pipeline
 
-**Status:** TIER 1 COMPLETE (V164)
+**Status:** TIER 2 COMPLETE (V165)
 **Paper:** Tenaillon et al. "Tempo and mode of genome evolution in a
 50,000-generation experiment" *Nature* 536, 165–170 (2016)
 **BioProject:** PRJNA294072
@@ -43,9 +43,11 @@ analyzed for mutation rate, spectrum, and accumulation dynamics.
 3. Spectrum analysis: transition/transversion ratios per population
 4. Cross-check against breseq-called variants (when available)
 
-**Deliverables:**
-- `barracuda/src/bin/validate_ltee_b7_v1.rs`
-- Tolerances registered in `tolerances/mod.rs`
+**Deliverables:** ✅ Complete (V165)
+- `barracuda/src/bin/validate_ltee_b7_v1.rs` — 27/27 checks PASS ✅
+- Mutation accumulation curve: 9 time points, R² = 0.999985 ✅
+- Spectrum: 6-class with sum = 1.0000 ✅
+- Linear slope matches rate prediction within 5% ✅
 
 ### Tier 3: lithoSpore Integration
 

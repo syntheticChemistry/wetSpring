@@ -487,7 +487,7 @@ comparison — B7) is wetSpring's primary contribution.
 | B4 | Blount et al. — "Genomic analysis of a key innovation (Cit+)" | 2012 | 4 (citrate) | Timeline analysis, potentiating mutation cascade provenance | queued |
 | B5 | Leonard et al. — "One-step genome engineering in bee gut" *mBio* | 2024 | 5 (BioBrick) | Anderson-QS prediction: bee gut 3D biofilm → engineered symbionts QS geometry | queued |
 | B6 | "Measuring the burden of hundreds of BioBricks" *Nat Comms* | 2024 | 5 (BioBrick) | Burden distribution across 301 plasmids; diversity metrics on burden values | queued |
-| B7 | Tenaillon et al. — "Tempo and mode of genome evolution" *Nature* | 2016 | 6 (breseq) | 264 NCBI genome download, mutation accumulation curves, breseq comparison | **TIER 1 COMPLETE** |
+| B7 | Tenaillon et al. — "Tempo and mode of genome evolution" *Nature* | 2016 | 6 (breseq) | 264 NCBI genome download, mutation accumulation curves, breseq comparison | **TIER 2 COMPLETE** (Exp380, 27/27 Rust checks PASS) |
 | B8 | Barrick & Waters — "Phages use contingency loci" *bioRxiv* | 2025 | — | HMM identification of contingency loci across phage genomes | queued |
 | E1 | Woldring et al. — "Gradient of sitewise diversity" *Biochemistry* | 2017 | — | Anderson disorder analogy: sitewise diversity = W at each lattice site | queued |
 | E5 | Woldring Lab — "Single-Cell scFab Libraries" | 2023 | — | Single-cell sequencing analysis pipeline (sovereign, Rust-based) | queued |

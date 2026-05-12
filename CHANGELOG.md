@@ -3,6 +3,14 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V165] — 2026-05-12
+
+### LTEE B7 Tier 2 Complete + Upstream Audit Response
+
+- **LTEE B7 Tier 2 Rust validation binary:** `validate_ltee_b7_v1.rs` — 27/27 checks PASS. Reproduces Tenaillon 2016 mutation accumulation model in pure Rust. Validates: population structure (12 populations, 264 genomes), mutation rate (8.9×10⁻¹¹ per bp per gen), accumulation curve (9 time points, R² = 0.999985), mutation spectrum (6-class, Ts:Tv 1.7, G:C→A:T 68%), linear model slope matches rate prediction within 5%. lithoSpore module 6 can now consume both Tier 1 (Python) and Tier 2 (Rust) artifacts.
+- **Upstream audit response:** primalSpring "River Delta Evolution" audit (May 12) asked for Thread 4 expression, `--format json`, LTEE B7 — all completed in V164. This increment completes the remaining Tier 2 binary. PG-02 through PG-05 remain blocked on upstream primal endpoints (provenance trio, Songbird, NestGate, toadStool).
+- Build gate: cargo build + clippy (0 warnings) on new binary
+
 ## [V164b] — 2026-05-12
 
 ### Deep Debt Audit + Foundation Thread Sync
