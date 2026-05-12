@@ -9,16 +9,12 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V164b** | `handoffs/WETSPRING_V164B_UPSTREAM_DEEP_DEBT_HANDOFF_MAY12_2026.md` | May 12 | **Deep debt audit + foundation sync**: foundation 10/10 threads active, pending datasets tracker, 13 docs synced to V164b, fuzz targets fixed, archive cleanup. Upstream patterns for all spring teams + projectNUCLEUS + lithoSpore. |
-| **V164** | `handoffs/WETSPRING_V164_DOWNSTREAM_SEEDING_HANDOFF_MAY12_2026.md` | May 12 | **Downstream seeding sprint**: Thread 4 expression authored, LTEE B7 Tier 1 complete, projectNUCLEUS workload TOML, `--format json` on UniBin. |
-| **V163** | `handoffs/WETSPRING_V163_UNIFIED_DISCOVERY_UPSTREAM_HANDOFF_MAY11_2026.md` | May 11 | V163 unified socket discovery + upstream handoff. |
-| V161 | `handoffs/WETSPRING_V161_UPSTREAM_PRIMAL_SPRING_HANDOFF_MAY11_2026.md` | May 11 | Upstream primal & spring team handoff. |
-| V161 | `handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md` | May 11 | PG-12 resolved + foundation seeded. |
-| V160 | `handoffs/WETSPRING_V160_TIER4_PRIMAL_PROOF_HANDOFF_MAY11_2026.md` | May 11 | PG-09 resolved — Tier 4 handler-level primal-proof. |
-| V159 | `handoffs/WETSPRING_V159_DEEP_DEBT_PRIMAL_EVOLUTION_HANDOFF_MAY11_2026.md` | May 11 | Deep debt + barraCuda IPC routing. |
-| V158 | `handoffs/WETSPRING_V158_GAP_CLOSURE_FOUNDATION_HANDOFF_MAY11_2026.md` | May 11 | Post-interstadial gap closure + foundation seeding. |
-| V157 | `handoffs/WETSPRING_V157_DEEP_DEBT_EVOLUTION_HANDOFF_MAY10_2026.md` | May 10 | IPC timeouts, GPU API, shared harness, skunkBat, biomeOS v3.51. |
-|| | *Superseded → `handoffs/archive/`* | | V155 and earlier archived (**172** files). |
+| **V165b** | `handoffs/WETSPRING_V165B_TIER2_WAVE_SYNC_HANDOFF_MAY12_2026.md` | May 12 | **Tier 2 wave sync**: `toadstool.validate` + `barracuda.precision.route` IPC clients wired. Absorption patterns for other springs. Tier 2 structurally complete. |
+| **V165** | `handoffs/WETSPRING_V165_LTEE_B7_TIER2_UPSTREAM_HANDOFF_MAY12_2026.md` | May 12 | **LTEE B7 Tier 2**: Rust validation binary (27/27 PASS). PG-02 through PG-05 readiness. lithoSpore module 6 artifacts. |
+| V164b | `handoffs/WETSPRING_V164B_UPSTREAM_DEEP_DEBT_HANDOFF_MAY12_2026.md` | May 12 | Deep debt audit + foundation 10/10 sync. |
+| V164 | `handoffs/WETSPRING_V164_DOWNSTREAM_SEEDING_HANDOFF_MAY12_2026.md` | May 12 | Thread 4 expression, LTEE B7 Tier 1, `--format json`, projectNUCLEUS workload. |
+| V163 | `handoffs/WETSPRING_V163_UNIFIED_DISCOVERY_UPSTREAM_HANDOFF_MAY11_2026.md` | May 11 | Unified socket discovery + upstream handoff. |
+|| | *Superseded → `handoffs/archive/`* | | V161 and earlier archived (**178** files). |
 
 ## Cross-Spring Documents
 

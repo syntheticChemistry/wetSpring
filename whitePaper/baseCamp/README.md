@@ -4,7 +4,7 @@
 
 **Date:** May 12, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V164b — foundation 10/10 threads active, LTEE B7 Tier 1 complete, `--format json` on UniBin, projectNUCLEUS workload, pending datasets tracker. Deep debt audit clean: zero unsafe, zero `#[allow(]`, all URLs env-configurable. 11 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs). **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4) + IPC-first defaults (`default = []`). **Tier 5:** Interactive composition. 384 experiments. **4** primal gaps open (all external, PG-01–PG-22, 18 resolved/closed).
+**Status:** V165b — Tier 2 structurally complete (`toadstool.validate` + `barracuda.precision.route` IPC). LTEE B7 Tier 2 (27/27 PASS). Foundation 10/10 threads active. Deep debt audit clean: zero unsafe, zero `#[allow(]`, all URLs env-configurable. 12 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs) + IPC wired. **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4) + IPC-first defaults (`default = []`). **Tier 5:** Interactive composition. 384 experiments. **4** primal gaps open (all external, PG-01–PG-22, 18 resolved/closed).
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).

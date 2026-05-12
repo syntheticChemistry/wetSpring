@@ -4,9 +4,9 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-12 (V164b — foundation 10/10 threads active,
-pending datasets tracker. V164: Thread 4 expression, LTEE B7 Tier 1 complete,
---format json on UniBin. V163: Unified socket discovery, Tier 4 IPC-first defaults.
+Last updated: 2026-05-12 (V165b — Tier 2 IPC wired (toadstool.validate,
+barracuda.precision.route). V165: LTEE B7 Tier 2 Rust binary (27/27 PASS).
+V164b: Foundation 10/10 threads active. Tier 4 IPC-first defaults.
 4 gaps open (all external), 18 resolved/closed. 1,962 tests.)
 
 ---

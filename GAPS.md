@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-12 (V164b — foundation 10/10 threads active, pending datasets tracker.
-V164: Thread 4 expression, LTEE B7 Tier 1 complete, --format json on UniBin.
-V163: Unified socket discovery, Tier 4 IPC-first defaults. 4 gaps open (all external), 18 resolved/closed. 1,962 tests.)
+Last updated: 2026-05-12 (V165b — Tier 2 structurally complete (toadstool.validate + barracuda.precision.route IPC).
+V165: LTEE B7 Tier 2 Rust binary (27/27 PASS). V164b: Foundation 10/10 threads active.
+4 gaps open (all external), 18 resolved/closed. 1,962 tests.)
 
 ---
 

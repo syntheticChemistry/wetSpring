@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-12 (V164b: foundation 10/10 threads active. LTEE B7 Tier 1 complete. `--format json` on UniBin. projectNUCLEUS workload. 384 experiments indexed (381 completed + 3 PROPOSED), **366** binaries (**344** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). 12 paper notebooks. 63/63 papers. 4 primal gaps open (all external), 18 resolved/closed.)
+**Updated**: 2026-05-12 (V165b: Tier 2 IPC wired. LTEE B7 Tier 2 (27/27 PASS). `--format json` on UniBin. 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). **guideStone Level 4** (38/38, 4 skip). 12 paper notebooks. 63/63 papers. 4 primal gaps open (all external), 18 resolved/closed.)
 
 ---
 
@@ -656,7 +656,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V164b):** 384 experiments indexed (381 completed + 3 PROPOSED), 366 binaries (344 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 4 (NUCLEUS 38/38 pass, 4 skip, v0.9.17 manifest). 4 primal gaps open (all external), 18 resolved/closed. V164b: Foundation 10/10 threads active. V164: Thread 4 expression, LTEE B7 Tier 1, --format json, projectNUCLEUS workload. V163: Unified socket discovery. V162: Tier 4 IPC-first defaults.
+**Totals (V165b):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 4 (NUCLEUS 38/38 pass, 4 skip, v0.9.17 manifest). 4 primal gaps open (all external), 18 resolved/closed. V164b: Foundation 10/10 threads active. V164: Thread 4 expression, LTEE B7 Tier 1, --format json, projectNUCLEUS workload. V163: Unified socket discovery. V162: Tier 4 IPC-first defaults.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -686,7 +686,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V164b): 384 experiments indexed, 366 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). guideStone Level 4 (38/38 NUCLEUS, 4 skip, v0.9.17). Zero internal gaps. Tier 4 IPC-first defaults. 4 gaps open (all external), 18 resolved/closed.**
+**Totals (V165b): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). guideStone Level 4 (38/38 NUCLEUS, 4 skip, v0.9.17). Zero internal gaps. Tier 4 IPC-first defaults. 4 gaps open (all external), 18 resolved/closed.**
 
 ---
 
