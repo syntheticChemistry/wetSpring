@@ -73,6 +73,8 @@ pub mod message;
 pub mod metrics;
 #[cfg(feature = "ipc")]
 pub mod performance_surface;
+#[cfg(feature = "ipc")]
+pub mod precision_route;
 /// Re-exports primal name constants for `use crate::ipc::primal_names::*` in graph binaries.
 #[cfg(any(feature = "ipc", feature = "json"))]
 pub mod primal_names;
@@ -90,6 +92,8 @@ pub mod skunkbat;
 pub mod songbird;
 #[cfg(feature = "ipc")]
 pub mod timeouts;
+#[cfg(feature = "ipc")]
+pub mod toadstool_validate;
 #[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub mod timeseries;
 #[cfg(feature = "ipc")]

@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V165b] — 2026-05-12
+
+### Tier 2 IPC Wiring — toadstool.validate + barracuda.precision.route
+
+- **`toadstool.validate` IPC client:** `ipc/toadstool_validate.rs` — typed client for Tier 2 workload pre-flight via toadStool S250+ (`toadstool.validate` method). Takes `workload_path` + `dry_run`, returns `ValidateResult` (valid, gpu_available, precision_tier, estimated_dispatch_time_ms, warnings, required_capabilities). Also wires `toadstool.list_workloads` (filter → WorkloadEntry list). 4 unit tests.
+- **`barracuda.precision.route` IPC client:** `ipc/precision_route.rs` — typed client for Tier 2 precision advisory via barraCuda S250+ (`barracuda.precision.route` method). Takes `domain` + `hardware_hint`, returns `PrecisionAdvice` (recommended_tier, fma_safe, requires_compiler, hardware_hint). 2 unit tests.
+- Both modules follow the `compute_dispatch.rs` pattern: discovery via `discover()`, typed request/response, `ValidateError`/`PrecisionError` enums, `rpc_call()` with timeouts.
+- Tier 2 convergence now structurally ready: `--format json` (V164), `toadstool.validate` client, `barracuda.precision.route` client, 12 workload TOMLs in projectNUCLEUS.
+- Build gate: cargo build --features ipc (exit 0)
+
 ## [V165] — 2026-05-12
 
 ### LTEE B7 Tier 2 Complete + Upstream Audit Response
