@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V164b] — 2026-05-12
+
+### Deep Debt Audit + Foundation Thread Sync
+
+- **Foundation THREAD_INDEX sync:** Wired 3 expressions on disk but not indexed — Thread 3 (Immunology: `IMMUNO_DRUG_DISCOVERY.md` + sources + targets, "mapped" → "active"), Thread 9 (Gaming: `GAMING_CREATIVE_SCIENCE.md`, already had sources/targets), Thread 10 (Provenance: `PROVENANCE_ECONOMICS.md` + sources + targets, "mapped" → "active"). Thread 8 (Health) promoted from "seeded" → "active" (expression + data already wired). Foundation now 10/10 threads active. Expressions README updated to list all 9 expression documents.
+- **Pending datasets tracker:** Created `specs/PENDING_DATASETS.md` — consolidated view of 4 data downloads pending (EPA UCMR 5, EPA PFOS, Jones PFAS library, LTEE genomes), 9 LTEE queue datasets, 2 hardware items (AKD1000, Titan V), 3 GPU shaders not written, and foundation thread contribution status.
+- **Deep debt audit confirmed clean:** zero unsafe, zero `#[allow(`, zero production mocks, zero deprecated patterns, zero `todo!()`/`unimplemented!()`, all hardcoded addresses env-configurable, `deny.toml` bans 15 C-binding crates. 5 files >800L are all experiment binaries with justified `#[expect(clippy::too_many_lines)]` — not candidates for splitting (each contains unique science logic, `Validator` harness handles shared patterns).
+- **Python benchmarks confirmed:** 23 benchmark binaries (`benchmark_python_vs_rust_v2-v5`, `benchmark_23_domain_timing`, etc.), Python baselines in `scripts/benchmark_python_baseline.py` and `notebooks/02-benchmark-python-vs-rust.ipynb`. Industry GPU benchmarks: 58 GPU validation binaries (WGSL/wgpu); Kokkos/LAMMPS is hotSpring scope. No GROMACS/OpenMM benchmarks (not wetSpring domain).
+- Build gate: no code changes in this increment (documentation + foundation sync only)
+
 ## [V164] — 2026-05-12
 
 ### Downstream Seeding Sprint — Thread 4 Expression, LTEE B7 Tier 1, --format json
