@@ -4,11 +4,10 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-11 (V163 — unified socket discovery: facade,
-nestgate, petalTongue fallback paths honor `family_id()` for multi-instance
-parity. V162b: Tier 4 defaults (barracuda-lib removed from default),
-PG-06/10/17/18 closed. 4 gaps open (all external), 18 resolved/closed.
-1,962 tests.)
+Last updated: 2026-05-12 (V164b — foundation 10/10 threads active,
+pending datasets tracker. V164: Thread 4 expression, LTEE B7 Tier 1 complete,
+--format json on UniBin. V163: Unified socket discovery, Tier 4 IPC-first defaults.
+4 gaps open (all external), 18 resolved/closed. 1,962 tests.)
 
 ---
 
@@ -564,7 +563,7 @@ graceful fallback to in-process compute).
 - `handle_anderson` → `spectral.anderson_3d` IPC forward
 - `handle_qs_model` → `compute.ode_rk4` IPC forward
 - Paper count reconciled (63 consistent across all docs)
-- CONTEXT.md gap count synchronized (8 open, 14 resolved/closed)
+- CONTEXT.md gap count synchronized (V159: 8 open, 14 resolved; V162b: 4 open, 18 resolved/closed)
 
 **Resolved V160:** PG-09 (barraCuda IPC evaporation — all 5/5 handlers that
 call `barracuda::*` directly are now `primal-proof` wired).

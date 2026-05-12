@@ -1,11 +1,11 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
 <!-- V141 note (Apr 11, 2026): Paper queue is ALL DONE (63/63). Current
-     experiment counts (380 indexed) and test counts (1,962) are in the root
+     experiment counts (384 indexed) and test counts (1,962) are in the root
      README.md. This file preserves the V126 per-paper detail. -->
-<!-- V162 note (May 11, 2026): LTEE GuideStone Queue section added.
-     10 papers (B1-B8, E1, E5) seeded. B7 STARTED — sovereign genomics
-     pipeline (Tenaillon 2016, 264 NCBI genomes). -->
+<!-- V164 note (May 12, 2026): LTEE GuideStone Queue — 10 papers
+     (B1-B8, E1, E5). B7 TIER 1 COMPLETE — Python baseline + expected
+     values JSON for lithoSpore module 6. 9 queued. -->
 
 # wetSpring — Paper Review Queue
 

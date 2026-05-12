@@ -10,7 +10,7 @@ Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
            (58 scripts)        (1,962+ tests)      (44 GPU modules)
 
 Tier 2: Rust validation     →  NUCLEUS composition patterns
-           (342 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
+           (344 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
 
 Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
            (42 niche caps)     (18 IPC roundtrips)    (63/63 checks)
@@ -28,8 +28,8 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | | |
 |---|---|
 | **Tests** | 1,962 (lib) + 97 integration + 18 IPC roundtrip, 0 failed |
-| **Validation checks** | 5,900+ across 364 binaries (342 barracuda + 22 forge) |
-| **Experiments** | 380 completed + 3 proposed (383 indexed) |
+| **Validation checks** | 5,900+ across 366 binaries (344 barracuda + 22 forge) |
+| **Experiments** | 381 completed + 3 proposed (384 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 42 niche, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch, 21 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V163:** Unified socket discovery — facade, nestgate, petalTongue fallback paths now honor `family_id()` for multi-instance parity (was hardcoded `-default.sock`). Deep debt audit: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable, all deps pure Rust, `deny.toml` effective. Clippy `cast_precision_loss` resolved. V162b: Tier 4 IPC-first defaults (`default = []`). 4 PG gaps closed. metalForge/forge barracuda dep optional. LTEE B7 STARTED. 1,962 lib tests, 0 failed. 63/63 papers reproduced. **4 gaps open (all external), 18 resolved/closed.**
+**Current release — V164b:** Foundation 10/10 threads active (wired threads 3/8/9/10). Pending datasets tracker (`specs/PENDING_DATASETS.md`). Deep debt audit confirmed clean. V164: Thread 4 expression authored, LTEE B7 Tier 1 complete (Python baseline + expected values JSON for lithoSpore module 6), projectNUCLEUS workload TOML, `--format json` on UniBin subcommands. V163: Unified socket discovery, Tier 4 IPC-first defaults (`default = []`). 1,962 lib tests, 0 failed. 63/63 papers reproduced. LTEE B7 TIER 1 COMPLETE, 9 queued. **4 gaps open (all external), 18 resolved/closed.**
 
 ---
 

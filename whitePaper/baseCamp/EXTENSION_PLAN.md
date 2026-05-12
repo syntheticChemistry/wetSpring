@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** May 11, 2026 (V163 update)
-**Author:** wetSpring V163 (ecoPrimals)
-**Foundation:** 383 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,962 lib tests, 364 binaries, 91.20% coverage. **V163:** Unified socket discovery (family_id parity). Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. guideStone Level 4 (38/38, 4 skip). Tier 4 IPC-first defaults (`default = []`). 4 gaps open (all external, PG-01–PG-22, 18 resolved/closed). primalSpring v0.9.17. Zero local WGSL, clippy **ZERO WARNINGS**.
+**Date:** May 12, 2026 (V164b update)
+**Author:** wetSpring V164b (ecoPrimals)
+**Foundation:** 384 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,962 lib tests, 366 binaries, 91.20% coverage. **V164b:** Foundation 10/10 threads active. LTEE B7 Tier 1 complete. `--format json` on UniBin. projectNUCLEUS workload. Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. guideStone Level 4 (38/38, 4 skip). Tier 4 IPC-first defaults (`default = []`). 4 gaps open (all external, PG-01–PG-22, 18 resolved/closed). primalSpring v0.9.25. Zero local WGSL, clippy **ZERO WARNINGS**.
 
 ---
 

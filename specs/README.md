@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: May 11, 2026
-**Status**: V163 — unified socket discovery (family_id parity). Deep debt audit clean. Tier 4 IPC-first defaults. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 4 composition gaps open (all external, 18 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0). *(Detailed validation tables below reflect their respective phases.)*
+**Last Updated**: May 12, 2026
+**Status**: V164b — foundation 10/10 threads active, pending datasets tracker. V164: Thread 4 expression, LTEE B7 Tier 1 complete, `--format json` on UniBin, projectNUCLEUS workload. V163: Unified socket discovery. Tier 4 IPC-first defaults. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 4 composition gaps open (all external, 18 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0).
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

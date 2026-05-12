@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 11, 2026 (V163 — unified socket discovery (family_id parity). Deep debt audit clean. Tier 4 IPC-first defaults (`default = []`). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 364 binaries (342 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, one justified `dyn` exception (`gillespie.rs` SSA — heterogeneous reaction vec), clippy ZERO WARNINGS pedantic+nursery. 4 primal gaps open (all external), 18 resolved/closed. 63/63 papers reproduced.)
+**Updated:** May 12, 2026 (V164b — foundation 10/10 threads active. LTEE B7 Tier 1 complete. `--format json` on UniBin. Tier 4 IPC-first defaults (`default = []`). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 366 binaries (344 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, one justified `dyn` exception (`gillespie.rs` SSA — heterogeneous reaction vec), clippy ZERO WARNINGS pedantic+nursery. 4 primal gaps open (all external), 18 resolved/closed. 63/63 papers reproduced.)
 
 ---
 

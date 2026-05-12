@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V163:** Unified socket discovery (facade, nestgate, petalTongue fallback all honor `family_id()` — was hardcoded `-default.sock`). Deep debt audit clean. V162b: Tier 4 IPC-first defaults (`default = []`). 4 PG gaps closed (PG-06/10/17/18). metalForge/forge barracuda dep optional. Bio modules feature-gated. LTEE B7 STARTED. 1,962 lib tests, 0 failed. 63/63 papers reproduced. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
+**Current release — V164b:** Foundation 10/10 threads active. Pending datasets tracker. V164: Thread 4 expression, LTEE B7 Tier 1 complete, projectNUCLEUS workload TOML, `--format json` on UniBin. V163: Unified socket discovery, Tier 4 IPC-first defaults (`default = []`). 1,962 lib tests, 0 failed. 63/63 papers reproduced. LTEE B7 TIER 1 COMPLETE, 9 queued. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
 
 ## Role in the Ecosystem
 
@@ -24,11 +24,11 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 364 validation/benchmark binaries (342 barracuda + 22 forge)
+- **Architecture:** 2 library crates + 366 validation/benchmark binaries (344 barracuda + 22 forge)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
-- **Validation checks:** 5,900+ across 364 binaries
+- **Validation checks:** 5,900+ across 366 binaries
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)

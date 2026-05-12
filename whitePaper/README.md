@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** May 11, 2026
-**Status:** V163 — unified socket discovery (family_id parity). Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. Tier 4 IPC-first defaults. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 364 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs). **Tier 3:** Live NUCLEUS IPC. 383 experiments, `barraCuda` v0.3.12. 4 primal gaps open (all external, 18 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
+**Date:** May 12, 2026
+**Status:** V164b — foundation 10/10 threads active, LTEE B7 Tier 1 complete, `--format json` on UniBin, projectNUCLEUS workload, pending datasets tracker. Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. Tier 4 IPC-first defaults. **guideStone Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 366 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs). **Tier 3:** Live NUCLEUS IPC. 384 experiments, `barraCuda` v0.3.12. 4 primal gaps open (all external, 18 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---

@@ -11,8 +11,8 @@ fuzz_target!(|data: &[u8]| {
     let path = f.path().to_path_buf();
 
     // Should not panic regardless of input
-    let _ = wetspring_barracuda::io::ms2::parse_ms2(&path);
+    let _ = wetspring_barracuda::io::ms2::Ms2Iter::open(&path)
+        .and_then(Iterator::collect::<std::result::Result<Vec<_>, _>>);
 
-    // Also test stats_from_file
     let _ = wetspring_barracuda::io::ms2::stats_from_file(&path);
 });

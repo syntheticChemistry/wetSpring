@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** May 11, 2026  
+**Date:** May 12, 2026  
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -9,18 +9,16 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V163** | `handoffs/WETSPRING_V163_UNIFIED_DISCOVERY_UPSTREAM_HANDOFF_MAY11_2026.md` | May 11 | **V163 unified socket discovery + upstream handoff**: family_id parity for facade/nestgate/petalTongue, deep debt audit clean, primal/spring team evolution patterns, NUCLEUS composition guidance. |
-| **V161** | `handoffs/WETSPRING_V161_UPSTREAM_PRIMAL_SPRING_HANDOFF_MAY11_2026.md` | May 11 | **Upstream primal & spring team handoff**: NestGate live deployment (P0), provenance trio JSON-RPC (P0), full data/compute chain dependencies. Patterns for handler-level primal-proof wiring, legacy surface separation, foundation seeding. projectNUCLEUS deployment readiness matrix. |
-| V161 | `handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md` | May 11 | PG-12 resolved + foundation seeded: Legacy surface separated. Thread 04 seeded (36 targets). Deep debt audit clean. Zero internal gaps. 4 open (all external), 18 resolved/closed. |
-| V160 | `handoffs/WETSPRING_V160_TIER4_PRIMAL_PROOF_HANDOFF_MAY11_2026.md` | May 11 | PG-09 resolved — Tier 4 handler-level primal-proof complete. All 5 handlers wired. plasmidBin binary placed (1.4M). |
-| V159 | `handoffs/WETSPRING_V159_DEEP_DEBT_PRIMAL_EVOLUTION_HANDOFF_MAY11_2026.md` | May 11 | Deep debt audit + barraCuda IPC routing: `ipc/barracuda_route.rs` module, `primal-proof` handler wiring (3 science handlers), comprehensive deep debt audit (zero debt), broken provenance reference fixed, all docs synchronized. |
-| V158 | `handoffs/WETSPRING_V158_GAP_CLOSURE_FOUNDATION_HANDOFF_MAY11_2026.md` | May 11 | Post-interstadial gap closure + foundation seeding: skunkBat IPC module wired, CI cross-sync updated to 413, capability-oriented discovery, 4 gaps closed + 2 advanced (8 open/14 resolved), foundation seeding targets for NCBI 16S/cold seep/Fajgenbaum. |
-| V157 | `handoffs/WETSPRING_V157_DEEP_DEBT_EVOLUTION_HANDOFF_MAY10_2026.md` | May 10 | Deep debt evolution + upstream handoff: IPC timeouts centralized, GPU API evolved, shared validation harness, skunkBat wired, biomeOS v3.51 consumed, CI cross-sync, 3 gaps closed. |
-| V155 | `handoffs/WETSPRING_V155_DEEP_DEBT_DOCS_HANDOFF_MAY09_2026.md` | May 9 | Deep debt resolution + docs cleanup: formal `#[expect(reason)]` on 193 lint attrs, env-configurable data-source URLs, zero clippy warnings workspace-wide, upstream primal handoff, doc version sync. |
-| V154 | `handoffs/WETSPRING_V154_INTERSTADIAL_EUKARYOTIC_HANDOFF_MAY09_2026.md` | May 9 | Interstadial eukaryotic evolution: per-trio provenance split, certification module, validation scenarios, UniBin binary, primal-proof feature, fossilization. |
-| V153 | `handoffs/WETSPRING_V153_DEEP_DEBT_EVOLUTION_HANDOFF_MAY08_2026.md` | May 8 | Deep debt evolution: hardcoding → env-configurable, shared helpers, doc drift fixes. |
-| V153 | `handoffs/WETSPRING_V153_UPSTREAM_PRIMAL_HANDOFF_MAY08_2026.md` | May 8 | Upstream primal handoff: gaps, patterns, composition debt for primal teams. |
-|| | *Superseded → `handoffs/archive/`* | | V152 and earlier archived (**168** files). |
+| **V164b** | `handoffs/WETSPRING_V164B_UPSTREAM_DEEP_DEBT_HANDOFF_MAY12_2026.md` | May 12 | **Deep debt audit + foundation sync**: foundation 10/10 threads active, pending datasets tracker, 13 docs synced to V164b, fuzz targets fixed, archive cleanup. Upstream patterns for all spring teams + projectNUCLEUS + lithoSpore. |
+| **V164** | `handoffs/WETSPRING_V164_DOWNSTREAM_SEEDING_HANDOFF_MAY12_2026.md` | May 12 | **Downstream seeding sprint**: Thread 4 expression authored, LTEE B7 Tier 1 complete, projectNUCLEUS workload TOML, `--format json` on UniBin. |
+| **V163** | `handoffs/WETSPRING_V163_UNIFIED_DISCOVERY_UPSTREAM_HANDOFF_MAY11_2026.md` | May 11 | V163 unified socket discovery + upstream handoff. |
+| V161 | `handoffs/WETSPRING_V161_UPSTREAM_PRIMAL_SPRING_HANDOFF_MAY11_2026.md` | May 11 | Upstream primal & spring team handoff. |
+| V161 | `handoffs/WETSPRING_V161_DEEP_DEBT_FOUNDATION_SEED_HANDOFF_MAY11_2026.md` | May 11 | PG-12 resolved + foundation seeded. |
+| V160 | `handoffs/WETSPRING_V160_TIER4_PRIMAL_PROOF_HANDOFF_MAY11_2026.md` | May 11 | PG-09 resolved — Tier 4 handler-level primal-proof. |
+| V159 | `handoffs/WETSPRING_V159_DEEP_DEBT_PRIMAL_EVOLUTION_HANDOFF_MAY11_2026.md` | May 11 | Deep debt + barraCuda IPC routing. |
+| V158 | `handoffs/WETSPRING_V158_GAP_CLOSURE_FOUNDATION_HANDOFF_MAY11_2026.md` | May 11 | Post-interstadial gap closure + foundation seeding. |
+| V157 | `handoffs/WETSPRING_V157_DEEP_DEBT_EVOLUTION_HANDOFF_MAY10_2026.md` | May 10 | IPC timeouts, GPU API, shared harness, skunkBat, biomeOS v3.51. |
+|| | *Superseded → `handoffs/archive/`* | | V155 and earlier archived (**172** files). |
 
 ## Cross-Spring Documents
 
