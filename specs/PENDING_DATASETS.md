@@ -2,7 +2,7 @@
 
 # wetSpring — Pending Datasets & Downloads
 
-**Last Updated**: May 12, 2026 (V164b)
+**Last Updated**: May 13, 2026 (V166)
 **Purpose**: Consolidated tracker for datasets referenced but not yet downloaded,
 hardware not yet available, or GPU shaders not yet written.
 
@@ -15,7 +15,7 @@ hardware not yet available, or GPU shaders not yet written.
 | EPA UCMR 5 — national drinking water PFAS survey (2023-2025) | EPA | Exp041 | Download + parse | Medium |
 | EPA PFOS surface water — GPS + concentration time-series | EPA | Exp041 | Download + parse | Medium |
 | Jones Lab full PFAS library (175 compounds) | Jones Lab / Zenodo | Exp018 | Data access | Low |
-| NCBI PRJNA294072 — 264 *E. coli* LTEE genomes (Tenaillon 2016) | NCBI SRA | Exp380 (B7) | Tier 2 pipeline | High |
+| NCBI PRJNA294072 — 264 *E. coli* LTEE genomes (Tenaillon 2016) | NCBI SRA | Exp380 (B7) | **B7 Tier 2 COMPLETE** — download for sovereign pipeline | Medium |
 
 ## LTEE Queue — Datasets Needed for Queued Papers
 
@@ -54,7 +54,7 @@ wetSpring contributes to foundation threads 1, 3, 4, 5, 6, 7. Status:
 |--------|---------|---------|-----------|-------|
 | 1 (WCM) | Anchored | Anchored | Partial | ABG community data |
 | 3 (Immuno) | wetSpring Gonzales data | 12 targets | 0 | Blocked on upstream NestGate |
-| 4 (Enviro) | 23 sources seeded | 40 targets (incl. 4 LTEE B7) | 0 LTEE targets | B7 Tier 2 needed |
-| 5 (LTEE) | Via groundSpring | 18 targets | 0 wetSpring-specific | B7 feeds module 6 |
+| 4 (Enviro) | 23 sources seeded | 40 targets (incl. 4 LTEE B7) | 0 LTEE targets | B7 Tier 2 complete — targets await lithoSpore integration |
+| 5 (LTEE) | Via groundSpring | 18 targets | 0 wetSpring-specific | B7 Tier 2 complete, feeds module 6 |
 | 6 (Ag) | Via airSpring | 36 targets | 36 (airSpring) | Complete |
 | 7 (Anderson) | 11 sources | 23 targets | Partial | Cross-cutting |
