@@ -22,8 +22,8 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use serde_json::{Value, json};
 
-const GUIDESTONE_VERSION: &str = "wetspring-gonzales-guideStone v0.1.0";
-const GUIDESTONE_CHECKS: &str = "29/29 PASS";
+const GUIDESTONE_VERSION: &str = "wetspring-gonzales-guideStone v0.2.0";
+const GUIDESTONE_CHECKS: &str = "38/38 PASS";
 const WETSPRING_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const REPRODUCTION_MANIFEST: &str = include_str!("../../data/reproduction_manifest.toml");

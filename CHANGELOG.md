@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V167b] — 2026-05-13
+
+### Doc Cleanup + Debris Audit
+
+- **18 docs synced to V167 banner:** README, CONTEXT, GAPS, barracuda/README, EVOLUTION_READINESS, ABSORPTION_MANIFEST, sporeprint, IPC_MAPPING, whitePaper (3), experiments, specs (4), wateringHole. Fixed metric inconsistencies (binary counts 333→367, test counts 1902→1962, CPU modules 49→41, gap counts 4/18→2/20, guideStone Level 4→5).
+- **4 Rust source fixes:** `wetspring_guidestone.rs` reference table (Level 4→5), `discover.rs` PG-03 doc wording (future→resolved), `validate_ltee_b7_v1.rs` version string (V165→V167), `facade/provenance.rs` guideStone checks (29/29→38/38).
+- **Debris audit clean:** 0 TODO/FIXME/HACK in `.rs`, 0 V166 in `.rs`, 0 orphan `.toml` workloads, 58 Python baselines registered in `provenance_registry.rs`, 19 shell scripts validated.
+- **Upstream handoff:** Primal evolution learnings for bearDog, skunkBat, Songbird, NestGate, Provenance Trio, lithoSpore, projectNUCLEUS. Composition patterns documented.
+- V166b handoff archived (185 total).
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (exit 0)
+
 ## [V167] — 2026-05-13
 
 ### guideStone Level 5 — Primal Proof + Wire Hygiene + B7 Documentation

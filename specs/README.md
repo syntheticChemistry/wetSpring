@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: May 12, 2026
-**Status**: V166 — Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. LTEE B7 Tier 2 (27/27 PASS). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 composition gaps open (deployment-only, 20 resolved/closed). **guideStone Level 5** (38/38 pass, 4 skip, exit 0).
+**Last Updated**: May 13, 2026
+**Status**: V167 — **guideStone Level 5** (primal proof). Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore. PG-03+PG-05 RESOLVED. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 composition gaps open (deployment-only, 20 resolved/closed).
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

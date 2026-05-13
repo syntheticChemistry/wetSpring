@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-13 (V166: Tier 2 contract aligned. LTEE B7 Tier 2 (27/27 PASS). 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). **guideStone Level 5** (38/38, 4 skip). 12 paper notebooks. 63/63 papers. 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Updated**: 2026-05-13 (V167: guideStone Level 5 (primal proof). Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore. PG-03+PG-05 RESOLVED. 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 2 primal gaps open (deployment-only), 20 resolved/closed.)
 
 ---
 
@@ -422,9 +422,9 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
-**Total validation checks**: 5,800+
-**Rust tests**: **1,592+** lib tests **+ 18 IPC** roundtrip (0 failures)
-**Binaries**: **340** workspace total (**318** barracuda + **22** forge)
+**Total validation checks**: 5,900+
+**Rust tests**: **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures)
+**Binaries**: **367** workspace total (**345** barracuda + **22** forge)
 **barraCuda primitives**: 150+ consumed (standalone v0.3.12, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)
 **Local WGSL shaders**: 0 (all absorbed)
@@ -656,7 +656,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V166):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 5 (NUCLEUS 38/38 pass, 4 skip, v0.9.17 manifest). 2 primal gaps open (deployment-only), 20 resolved/closed. V164b: Foundation 10/10 threads active. V164: Thread 4 expression, LTEE B7 Tier 1, --format json, projectNUCLEUS workload. V163: Unified socket discovery. V162: Tier 4 IPC-first defaults.
+**Totals (V167):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 5 (primal proof, 38/38 pass, 4 environmental skip). 2 primal gaps open (deployment-only), 20 resolved/closed. PG-03+PG-05 RESOLVED. Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -686,7 +686,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V166): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). guideStone Level 5 (38/38 NUCLEUS, 4 skip, v0.9.17). Zero internal gaps. Tier 4 IPC-first defaults. 2 gaps open (deployment-only), 20 resolved/closed.**
+**Totals (V167): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). guideStone Level 5 (primal proof, 38/38 NUCLEUS, 4 environmental skip). Zero internal gaps. Tier 4 IPC-first defaults. 2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

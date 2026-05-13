@@ -4,8 +4,8 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-13 (V166 — Tier 2 contract aligned, IPC mapping documented, plasmidBin musl verified.
-V165b: toadstool.validate + barracuda.precision.route wired. V165: LTEE B7 Tier 2 (27/27 PASS).
+Last updated: 2026-05-13 (V167 — guideStone Level 5 (primal proof). PG-03+PG-05 RESOLVED.
+Wire hygiene verified. B7 Tenaillon Tier 2. Clippy pedantic+nursery zero warnings.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 
 ---

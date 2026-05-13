@@ -73,7 +73,7 @@ evolution pipeline.
 Tier 1: Python baseline  → Rust CPU parity  → GPU validation
            (58 scripts)     (1,962 tests)      (44 GPU modules)
 Tier 2: Rust validation   → NUCLEUS composition patterns
-           (364 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
+           (367 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
 Tier 3: Composition       → IPC parity → Niche gate
            (L2+L3)          (Exp401)     (Exp402)
 Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest

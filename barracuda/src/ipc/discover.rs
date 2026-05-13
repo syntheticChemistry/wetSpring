@@ -124,9 +124,9 @@ pub fn discover_skunkbat() -> Option<PathBuf> {
 ///
 /// Maps a capability domain to the primal that serves it, then resolves
 /// the socket via the standard name-based cascade. This is the
-/// capability-oriented abstraction (PG-03 evolution path): when Songbird
-/// implements `capability.resolve`, this function becomes the single
-/// point of migration — callers never change.
+/// capability-oriented abstraction (PG-03 RESOLVED): `Songbird`
+/// `capability.resolve` is wired as primary, with static table
+/// fallback — callers never change.
 ///
 /// Returns `None` if the capability domain is unrecognized or the
 /// providing primal has no reachable socket.

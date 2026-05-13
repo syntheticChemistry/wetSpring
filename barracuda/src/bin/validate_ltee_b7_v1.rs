@@ -168,7 +168,7 @@ fn main() {
     println!("  Baseline:   experiments/results/ltee_b7_expected_values.json");
     println!("  Tier:       2 (Rust validation binary)");
     println!("  lithoSpore: Module 6 (ltee-genomics)");
-    println!("  Spring:     wetSpring V165");
+    println!("  Spring:     wetSpring V167");
 
     v.finish();
 }

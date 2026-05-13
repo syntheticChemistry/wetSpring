@@ -65,7 +65,7 @@
 //! | Binary | `wetspring_guidestone` |
 //! | Date | 2026-04-20 |
 //! | Command | `cargo run --features guidestone --bin wetspring_guidestone` |
-//! | Reference | primalSpring v0.9.17 guideStone (Level 4, 67/67 + genomeBin v5.1) |
+//! | Reference | primalSpring v0.9.17 guideStone (Level 5, 38/38 NUCLEUS + 4 env skip) |
 //! | Bare mode | 16/16 pass, exit 2 |
 //! | NUCLEUS | 38/38 pass (4 skip), exit 0 — 5 primals alive over IPC |
 

@@ -2,7 +2,7 @@
 
 # wetSpring — Primal Proof IPC Mapping
 
-**Last Updated:** May 13, 2026 (V166)
+**Last Updated:** May 13, 2026 (V167 — guideStone Level 5)
 
 When `--features primal-proof` is enabled, wetSpring routes cross-primal calls
 through IPC rather than linking primal libraries. This document maps each domain

@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 13, 2026 (V166 — Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 367 binaries (345 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, one justified `dyn` exception (`gillespie.rs` SSA — heterogeneous reaction vec), clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers reproduced.)
+**Updated:** May 13, 2026 (V167 — guideStone Level 5 (primal proof). Wire hygiene verified. B7 Tier 2 for lithoSpore. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 367 binaries (345 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, one justified `dyn` exception (`gillespie.rs` SSA — heterogeneous reaction vec), clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers reproduced.)
 
 ---
 
@@ -16,11 +16,11 @@ baseline through Rust CPU to GPU acceleration via barraCuda.
 
 ```
 wetspring-barracuda
-├── 49 CPU bio modules          (pure Rust math, no external C deps)
+├── 41 CPU bio modules          (pure Rust math, no external C deps)
 ├── 44 GPU bio modules          (44 Lean/Compose, 0 Passthrough)
 ├── 1 provenance module         (barracuda::shaders::provenance wiring)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 333 validation/benchmark binaries
+├── 367 validation/benchmark binaries
 └── depends on: barracuda via path dependency
 ```
 
@@ -159,10 +159,10 @@ Builder patterns wired: `HmmForwardArgs`, `Dada2DispatchArgs`, `GillespieModel`.
 | `#![deny(unsafe_code)]` | Enforced crate-wide (test-only `allow` for `env::set_var` in edition 2024) |
 | `#![deny(clippy::expect_used, unwrap_used)]` | Enforced |
 | External C dependencies | 0 (`flate2` uses `rust_backend`) |
-| Tests | 1,902 total (unit + integration + property + doc) |
+| Tests | 1,962 lib + 97 integration + 18 IPC (unit + integration + property + doc) |
 | ESN ridge regression | Proper Cholesky solve (not diagonal approximation) |
 | I/O parsers | Streaming-first; buffering APIs deprecated |
-| Validation checks | 8,431+ across 333 validation/benchmark binaries |
+| Validation checks | 8,431+ across 367 validation/benchmark binaries |
 
 ## Quick Start
 
