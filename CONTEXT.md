@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V166b:** Upstream convergence: PG-03 RESOLVED (Songbird `capability.resolve` wired), PG-05 RESOLVED (toadStool S254 live). PG-02/PG-04 narrowed to deployment-only. V166: Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. guideStone Level 4. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V167:** guideStone Level 5 (primal proof). Wire hygiene verified (bearDog base64, skunkBat audit). B7 Tenaillon provenance updated to Tier 2. V166b: PG-03/PG-05 RESOLVED, PG-02/PG-04 deployment-only. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 
@@ -29,7 +29,7 @@ evolution pipeline.
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
 - **Validation checks:** 5,900+ across 367 binaries
-- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
+- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
@@ -78,7 +78,7 @@ Tier 3: Composition       → IPC parity → Niche gate
            (L2+L3)          (Exp401)     (Exp402)
 Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest
            (48 consumed)     (5 primals, check_skip)    (plasmidBin)
-Tier 5: guideStone        → Self-validating NUCLEUS node (Level 4+)
+Tier 5: guideStone        → Self-validating NUCLEUS node (Level 5 — primal proof)
            (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
 ```
 

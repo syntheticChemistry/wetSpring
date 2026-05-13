@@ -6,7 +6,7 @@
   "ltee_queue_id": "B7",
   "litho_module": 6,
   "foundation_thread": 5,
-  "tier": "Tier 1 (Python baseline)",
+  "tier": "Tier 2 (Rust reproduction, 27/27 PASS)",
   "targets": {
     "n_populations": {
       "value": 12,
@@ -83,8 +83,8 @@
     "rate_per_bp_per_gen": 8.9e-11
   },
   "provenance": {
-    "pipeline": "wetSpring Exp380 Tier 1",
-    "version": "V164",
+    "pipeline": "wetSpring Exp380 Tier 2 (27/27 PASS)",
+    "version": "V167",
     "spring": "wetSpring",
     "ncbi_fetch": "ncbi/efetch.rs sovereign pipeline"
   }

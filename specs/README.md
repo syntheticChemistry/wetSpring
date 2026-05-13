@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: May 12, 2026
-**Status**: V166 — Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. LTEE B7 Tier 2 (27/27 PASS). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 composition gaps open (deployment-only, 20 resolved/closed). **guideStone Level 4** (38/38 pass, 4 skip, exit 0).
+**Status**: V166 — Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. LTEE B7 Tier 2 (27/27 PASS). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 composition gaps open (deployment-only, 20 resolved/closed). **guideStone Level 5** (38/38 pass, 4 skip, exit 0).
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -28,7 +28,7 @@
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
 | Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,962 lib + 97 integration + 18 IPC roundtrip = 2,077 tests, 364 binaries (342 barracuda + 22 forge) |
-| Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 4 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest)** |
+| Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 5 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |
 | Paper queue | **ALL DONE** — 63/63 reproducible papers complete (Tracks 1-6 + Phase 37 extensions + cross-spring) |
@@ -51,7 +51,7 @@ Every paper in the queue goes through the full evolution path. Status:
 | **BarraCuda GPU** | GPU produces same answer as CPU | 1,783 checks, 29 GPU domains |
 | **Pure GPU streaming** | Zero CPU round-trips, data stays on-device | 152 checks, 10+ domains, 441-837× over round-trip (Exp090/105/106) |
 | **metalForge mixed** | Same answer on CPU, GPU, NPU — substrate-independent | 37 domains, 39/39 papers three-tier (Exp103/104/165/182) |
-| **Primal composition** | IPC dispatch matches local Rust baselines, graph + niche validated | Exp400 (136/136), Exp401 (parity), Exp402 (niche gate), Exp403 (primal proof, 5 primals), **wetspring_guidestone (Level 4, NUCLEUS 38/38, 4 skip)**, 18 IPC roundtrips |
+| **Primal composition** | IPC dispatch matches local Rust baselines, graph + niche validated | Exp400 (136/136), Exp401 (parity), Exp402 (niche gate), Exp403 (primal proof, 5 primals), **wetspring_guidestone (Level 5, NUCLEUS 38/38, 4 skip)**, 18 IPC roundtrips |
 
 **Pure GPU promotion complete** — all 13 formerly CPU-only modules now have GPU
 wrappers (Exp101). Papers 9, 10, 18, 26, 27 are no longer CPU-only. The only

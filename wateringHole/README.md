@@ -9,9 +9,9 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V166b** | `handoffs/WETSPRING_V166B_DEEP_DEBT_CONVERGENCE_HANDOFF_MAY13_2026.md` | May 13 | **Deep debt resolution + upstream convergence**: 19→0 clippy warnings, PG-03+PG-05 resolved, Songbird capability.resolve wired. Full audit. |
-| V166 | `handoffs/WETSPRING_V166_TIER2_CONVERGENCE_UPSTREAM_HANDOFF_MAY13_2026.md` | May 13 | Tier 2 convergence: contract alignment, IPC mapping, plasmidBin musl. |
-|| | *Superseded → `handoffs/archive/`* | | V165B and earlier archived (**183** files). |
+| **V167** | `handoffs/WETSPRING_V167_NICHE_ATOMIC_CONVERGENCE_HANDOFF_MAY13_2026.md` | May 13 | **Niche atomic convergence**: guideStone L5 (primal proof), wire hygiene, B7 Tenaillon Tier 2 for lithoSpore. |
+| V166b | `handoffs/WETSPRING_V166B_DEEP_DEBT_CONVERGENCE_HANDOFF_MAY13_2026.md` | May 13 | Deep debt resolution: 19→0 clippy warnings, PG-03+PG-05 resolved. |
+|| | *Superseded → `handoffs/archive/`* | | V166 and earlier archived (**184** files). |
 
 ## Cross-Spring Documents
 

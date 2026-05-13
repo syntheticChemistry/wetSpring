@@ -451,7 +451,7 @@ fn main() {
         match rpc_call(
             sock,
             "crypto.hash",
-            &json!({"data": "wetspring_primal_parity_test", "algorithm": "blake3"}),
+            &json!({"data": "d2V0c3ByaW5nX3ByaW1hbF9wYXJpdHlfdGVzdA==", "algorithm": "blake3"}),
         ) {
             Ok(result) => {
                 v.check_pass(

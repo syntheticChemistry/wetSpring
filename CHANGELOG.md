@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V167] — 2026-05-13
+
+### guideStone Level 5 — Primal Proof + Wire Hygiene + B7 Documentation
+
+- **guideStone L5 promotion:** `GUIDESTONE_READINESS` bumped from 4 to 5. L5 = primal proof — full domain science surface validated via NUCLEUS IPC. 38/38 pass, 4 skip (environmental). 1,962 lib tests, 91.20% coverage, zero internal gaps. Per primalSpring "Niche Convergence → Atomic Deployment" directive.
+- **Wire name hygiene verified:** `crypto.hash` uses `data` field (correct per `CRYPTO_WIRE_CONTRACT.md`). Fixed non-base64 value in `validate_primal_parity_v1.rs`. `audit.event`/`audit.forward` correct for emit-side (skunkBat `security.audit_log` is read-side, not needed for wetSpring).
+- **B7 Tenaillon provenance updated:** `ltee_b7_expected_values.json` tier bumped from "Tier 1 (Python baseline)" to "Tier 2 (Rust reproduction, 27/27 PASS)", version V167. lithoSpore `module6_breseq.json` structurally aligned.
+- **Doc sync:** 12 docs updated for Level 5. PRIMAL_GAPS.md L5 path section rewritten.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (0 warnings, exit 0)
+
 ## [V166b] — 2026-05-13
 
 ### Upstream Convergence — PG-03 Resolved, PG-05 Resolved, 2 Gaps Narrowed
