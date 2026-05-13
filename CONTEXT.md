@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V166:** Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. V165b: `toadstool.validate` + `barracuda.precision.route` wired. V165: LTEE B7 Tier 2 (27/27 PASS). 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
+**Current release — V166b:** Upstream convergence: PG-03 RESOLVED (Songbird `capability.resolve` wired), PG-05 RESOLVED (toadStool S254 live). PG-02/PG-04 narrowed to deployment-only. V166: Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. guideStone Level 4. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 
@@ -35,7 +35,7 @@ evolution pipeline.
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 4 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 18 resolved/closed. Zero wetSpring-internal gaps.
+- **Primal gaps:** 2 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 20 resolved/closed. Zero wetSpring-internal gaps.
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities

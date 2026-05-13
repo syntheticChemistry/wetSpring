@@ -145,10 +145,57 @@ pub fn discover_skunkbat() -> Option<PathBuf> {
 /// | `"render"`, `"shader"` | petalTongue |
 /// | `"ai"`, `"inference"` | Squirrel |
 /// | `"audit"` | skunkBat |
+///
+/// When Songbird is available, attempts `capability.resolve` RPC first
+/// (Wave 199+ live resolution). Falls back to the static
+/// [`capability_to_primal`] table when Songbird is absent or returns an error.
 #[must_use]
 pub fn discover_by_capability(capability_domain: &str) -> Option<PathBuf> {
+    if let Some(socket) = resolve_via_songbird(capability_domain) {
+        return Some(socket);
+    }
     let primal = capability_to_primal(capability_domain)?;
     discover_primal(primal)
+}
+
+/// Attempt live capability resolution via Songbird `capability.resolve`.
+///
+/// Returns `Some(socket_path)` if Songbird is running and resolves the
+/// domain to a live primal socket. Returns `None` on any failure
+/// (Songbird absent, RPC error, domain not found) — callers fall back
+/// to the static table.
+fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
+    use std::io::{BufRead, BufReader, Write};
+    use std::os::unix::net::UnixStream;
+
+    let songbird_socket = discover_primal(super::primal_names::SONGBIRD)?;
+
+    let request = format!(
+        r#"{{"jsonrpc":"2.0","method":"capability.resolve","params":{{"domain":"{capability_domain}"}},"id":1}}"#,
+    );
+
+    let stream = UnixStream::connect(&songbird_socket).ok()?;
+    stream
+        .set_read_timeout(Some(super::timeouts::DISCOVERY))
+        .ok()?;
+    stream
+        .set_write_timeout(Some(super::timeouts::DISCOVERY))
+        .ok()?;
+
+    let mut writer = std::io::BufWriter::new(&stream);
+    writer.write_all(request.as_bytes()).ok()?;
+    writer.write_all(b"\n").ok()?;
+    writer.flush().ok()?;
+
+    let mut reader = BufReader::new(&stream);
+    let mut line = String::new();
+    reader.read_line(&mut line).ok()?;
+
+    let v: serde_json::Value = serde_json::from_str(&line).ok()?;
+    let result = v.get("result")?;
+    let socket_path = result.get("socket")?.as_str()?;
+    let path = PathBuf::from(socket_path);
+    if path.exists() { Some(path) } else { None }
 }
 
 /// Map a capability domain prefix to the canonical primal name that serves it.
@@ -431,5 +478,11 @@ mod tests {
         assert!(discover_by_capability("tensor").is_none());
         assert!(discover_by_capability("audit").is_none());
         assert!(discover_by_capability("nonexistent").is_none());
+    }
+
+    #[test]
+    fn resolve_via_songbird_returns_none_when_absent() {
+        assert!(resolve_via_songbird("tensor").is_none());
+        assert!(resolve_via_songbird("unknown_domain").is_none());
     }
 }

@@ -4,10 +4,10 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-13 (V166 — Tier 2 contract aligned (NUCLEUS spec), IPC mapping
-documented, plasmidBin musl verified. V165b: toadstool.validate + barracuda.precision.route.
-V165: LTEE B7 Tier 2 (27/27 PASS). Tier 4 IPC-first defaults.
-4 gaps open (all external), 18 resolved/closed. 1,962 tests.)
+Last updated: 2026-05-13 (V166b — Upstream convergence: PG-03 RESOLVED (Songbird
+capability.resolve wired), PG-05 RESOLVED (toadStool S254 factory live). PG-02
+narrowed (GAP-36 aliases shipped). PG-04 narrowed (content.* 4-surface parity).
+2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 
 ---
 
@@ -37,10 +37,10 @@ PG-02). Drift is caught in CI.
 
 ---
 
-## PG-02: Provenance Trio — IPC Clients Partially Wired
+## PG-02: Provenance Trio — Upstream Resolved, Awaiting Live Deployment
 
 **Owner:** rhizoCrypt, loamSpine, sweetGrass teams
-**Status:** Partial — IPC wiring exists, trio endpoints not yet live
+**Status:** Narrowed (V166b) — upstream GAP-36 RESOLVED, awaiting live stack deployment
 
 V142 progress:
 - `ipc/provenance.rs` sends `capability.call` to `dag.session.create`,
@@ -55,40 +55,52 @@ V142 progress:
 - Graceful degradation: all trio calls fall back to local session tracking
   when Neural API socket is unavailable
 
-**Remaining:** Trio primals reaching IPC-ready status with stable endpoints.
-Once live, wetSpring's existing IPC paths will route to them transparently.
+V166b upstream resolution (GAP-36):
+- rhizoCrypt S68: `normalize_method()` maps `provenance.*` → `dag.*` (21 aliases)
+- loamSpine v0.9.16: `session.*` → `spine.*` aliases (38 methods, all dispatched)
+- sweetGrass v0.7.35: `braid.attribution.create` → `braid.create` alias (91.7%)
+- rhizoCrypt S66: UDS transport operational, provenance trio integration test added
+- JH-5 pipeline (skunkBat → rhizoCrypt → sweetGrass) confirmed operational
 
-**Blocked by:** Trio primals reaching IPC-ready status.
+**Remaining:** Deploy trio primals locally and verify live IPC roundtrip.
+wetSpring's method names (`dag.*`, `session.commit`, `braid.create`) align
+with upstream alias targets. No code changes needed — gap is deployment only.
+
+**Blocked by:** Local deployment of trio stack (not upstream code).
 
 ---
 
-## PG-03: Capability Discovery Is Name-Based
+## PG-03: Capability Discovery — Songbird Live Resolution Wired
 
-**Owner:** Songbird team / biomeOS + wetSpring (partial)
-**Status:** Partial (V158) — capability-oriented abstraction wired, runtime
-discovery still name-based pending Songbird `capability.resolve`
+**Owner:** Songbird team / biomeOS + wetSpring
+**Status:** Resolved (V166b) — Songbird `capability.resolve` wired with static fallback
 
 V158 progress:
 - `discover_by_capability(domain)` maps capability domains to provider
-  primals and resolves sockets — single migration point when Songbird
-  ships `capability.resolve`
+  primals and resolves sockets
 - `capability_to_primal(domain)` provides the canonical mapping (15 domains
   covering all 13 primals) at `const` time
-- All callers can migrate from `discover_primal("barracuda")` to
-  `discover_by_capability("tensor")` — decouples intent from identity
 - Tests cover all known domain mappings and unknown-domain handling
 
-**Remaining:** Songbird implementing `capability.resolve` → socket path
-mapping. When that ships, `discover_by_capability` swaps its internals
-from `capability_to_primal → discover_primal` to a single Songbird RPC
-call. Callers unchanged.
+V166b resolution (Songbird Wave 199-201):
+- `discover_by_capability` now attempts Songbird `capability.resolve` RPC first
+- `resolve_via_songbird(domain)` sends `capability.resolve` JSON-RPC to Songbird
+  socket, parses the `socket` field from the response, and verifies the path exists
+- On any failure (Songbird absent, RPC error, domain unknown), falls back
+  transparently to the static `capability_to_primal → discover_primal` table
+- Callers unchanged — same `discover_by_capability("tensor")` API
+- No `unsafe`, timeouts via `ipc::timeouts::DISCOVERY` (5s)
+
+**Remaining:** None — Songbird is live upstream (Wave 199-201 wire parity).
+The static fallback ensures standalone mode continues to work.
 
 ---
 
-## PG-04: NestGate Storage — IPC Wired, Awaiting Live Deployment
+## PG-04: NestGate Storage — Upstream Content Surface Shipped, Awaiting Deployment
 
 **Owner:** NestGate team
-**Status:** Partial — IPC routing implemented (V152), NestGate not yet deployed live
+**Status:** Narrowed (V166b) — NestGate S60 shipped `content.*` 4-surface parity,
+deployment stack needed
 
 V152 progress:
 - `data_fetch.rs` routes all external fetches through
@@ -98,15 +110,25 @@ V152 progress:
 - Pure primal composition: no fallbacks, gap reports on missing primals
 - exp400 validates NestGate health and cross-atomic store→retrieve pipeline
 
-**Remaining:** NestGate live deployment in NUCLEUS stack. IPC paths are
-wired and tested — gap is infrastructure, not code.
+V166b upstream resolution:
+- NestGate Session 60: all 8 `content.*` methods on 4 transport surfaces (UDS,
+  SemanticRouter, isomorphic IPC, HTTP) — fully shipped
+- `content.*` (CAS) vs `storage.*` (blob) confirmed intentional by biomeOS v3.53
+- Contract tests and graphs for `content.*` are live upstream
+
+**Remaining:** Deploy NestGate locally and verify `storage.*` IPC roundtrip.
+wetSpring's `storage.*` paths are wired and tested — gap is deployment only.
+Consider adopting `content.*` CAS paths for immutable artifacts alongside
+existing `storage.*` blob paths.
+
+**Blocked by:** Local NestGate deployment (not upstream code).
 
 ---
 
-## PG-05: toadStool Compute — IPC Discovery + barraCuda Optional
+## PG-05: toadStool Compute — Tier 2 Wired, Sovereign Dispatch Live
 
 **Owner:** toadStool team
-**Status:** Partial — discovery wired, barraCuda now optional (V152)
+**Status:** Resolved (V166b) — Tier 2 wiring complete, toadStool S254 live (AMD)
 
 V152 progress:
 - `discover_toadstool()` helper resolves toadStool socket
@@ -115,8 +137,19 @@ V152 progress:
 - exp400 validates `compute.health` via biomeOS
 - `deny.toml` bans `ring` crate for Tower crypto purity
 
-**Remaining:** Full compute dispatch via toadStool IPC (sovereign dispatch
-path). barraCuda library dep remains as default for validation/CI.
+V165b Tier 2 wiring:
+- `ipc/toadstool_validate.rs` — typed client for `toadstool.validate` + `toadstool.list_workloads`
+- `ipc/precision_route.rs` — typed client for `barracuda.precision.route`
+- V166: Contract aligned (dry_run echo, last_run timestamp per NUCLEUS spec)
+
+V166b upstream resolution (toadStool S254):
+- Phase D `LocalDeviceFactory` WIRED at `DispatchHandler` construction
+- AMD: full DRM compute dispatch live (GEM buffers, PM4 command streams, fence sync)
+- NVIDIA: FECS-gated (firmware bridge) — hardware caveat, not method absence
+- `compute.dispatch.submit` is LIVE per LIVE_SCIENCE_API.md
+
+**Remaining:** None — Tier 2 wiring is complete, upstream has shipped sovereign
+dispatch. NV path is FECS-gated (hardware caveat, not a code gap).
 
 ---
 
@@ -311,10 +344,10 @@ Exp403 itself continues to work against the live barraCuda primal.
 | # | Gap | Owner | Blocked By | Phase |
 |---|-----|-------|------------|-------|
 | PG-01 | Proto-nucleate not parsed | wetSpring | **Resolved V141** | -- |
-| PG-02 | Provenance trio IPC | rhizoCrypt/loamSpine/sweetGrass | Trio IPC readiness (partial V142) | 2 |
-| PG-03 | Name-based discovery | Songbird/biomeOS | **Partial V158** — capability abstraction wired | 3 |
-| PG-04 | NestGate IPC wired, deploy pending | NestGate | NestGate live deployment | 2 |
-| PG-05 | toadStool discovery + barraCuda optional | toadStool | Sovereign dispatch wiring | 2 |
+| PG-02 | Provenance trio — deploy only | rhizoCrypt/loamSpine/sweetGrass | **Narrowed V166b** — GAP-36 resolved, deploy needed | 2 |
+| PG-03 | Capability discovery | Songbird/biomeOS | **Resolved V166b** — `capability.resolve` wired | -- |
+| PG-04 | NestGate — deploy only | NestGate | **Narrowed V166b** — `content.*` shipped, deploy needed | 2 |
+| PG-05 | toadStool Tier 2 | toadStool | **Resolved V166b** — S254 live, Tier 2 wired | -- |
 | PG-06 | Ionic bond protocol | primalSpring Track 4 | **Closed V162** — deferred, no spec | -- |
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
 | PG-08 | Validate manifest binary name | primalSpring | **Closed V158** — informational, upstream | -- |
@@ -584,29 +617,27 @@ Tier 4 defaults: `default = []` (barracuda-lib removed from default features).
 PG-06 closed (deferred — no spec), PG-10 resolved (verified fixed upstream),
 PG-17 closed (informational — accepted API), PG-18 closed (subsumed by PG-02).
 
-**Remaining open gaps by owner:**
+**Remaining open gaps by owner (V166b):**
 - **wetSpring internal:** None — all wetSpring-owned gaps resolved
-- **Provenance Trio (1):** PG-02 (trio IPC readiness — rhizoCrypt/loamSpine/sweetGrass)
-- **Infrastructure (1):** PG-04 (NestGate live deployment)
-- **Mixed (1):** PG-03 (partial — Songbird `capability.resolve`, wetSpring side wired)
-- **Compute (1):** PG-05 (toadStool sovereign dispatch)
+- **Deployment only (2):** PG-02 (trio stack), PG-04 (NestGate stack)
+- **Resolved (2):** PG-03 (Songbird `capability.resolve` wired), PG-05 (toadStool S254 live)
+
+**Total: 2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 
-## V163 Upstream Block Summary
+## V166b Upstream Convergence Summary
 
-Per primalSpring primal composition sprint audit (May 11, 2026): all 4
-remaining gaps are blocked on upstream primal endpoints going live.
-wetSpring's side is fully prepared — IPC paths wired, graceful degradation
-confirmed, `CompositionContext` integrated. No further wetSpring code changes
-will close these gaps.
+Per primalSpring "Niche Atomic Convergence" audit (May 13, 2026): upstream
+primals have shipped all capabilities. 2 of 4 remaining gaps are now RESOLVED
+(PG-03, PG-05). 2 are narrowed to deployment-only (PG-02, PG-04).
 
-| PG | Upstream Owner | What's Blocked | wetSpring Ready |
-|----|----------------|----------------|-----------------|
-| PG-02 | rhizoCrypt / loamSpine / sweetGrass | Trio primals not speaking JSON-RPC on UDS | `ipc/provenance.rs`, `ipc/sweetgrass.rs`, `WireWitnessRef`, graceful degradation to local sessions |
-| PG-03 | Songbird / biomeOS | `capability.resolve` RPC not shipped | `discover_by_capability()` + `capability_to_primal()` — single-swap migration point |
-| PG-04 | NestGate | Live NUCLEUS deployment needed | `data_fetch.rs` routes through `capability.call("storage", ...)`, exp400 validates health + store/retrieve |
-| PG-05 | toadStool | Sovereign dispatch needs compiled GPU binary path | `discover_toadstool()`, `compute.dispatch` probe, `sovereign-dispatch` feature ready |
+| PG | Status | What Changed Upstream | wetSpring Action |
+|----|--------|----------------------|------------------|
+| PG-02 | **Narrowed** | GAP-36: trio aliases shipped (S68, v0.9.16, v0.7.35), UDS operational | Deploy trio locally, verify roundtrip |
+| PG-03 | **Resolved** | Songbird Wave 199-201: `capability.resolve` shipped | `resolve_via_songbird()` wired in `discover.rs` (V166b) |
+| PG-04 | **Narrowed** | NestGate S60: `content.*` 4-surface parity | Deploy NestGate, verify `storage.*` roundtrip |
+| PG-05 | **Resolved** | toadStool S254: `LocalDeviceFactory` wired, AMD live | Tier 2 wiring complete (V165b+V166) |
 
 ---
 
@@ -616,18 +647,21 @@ Current state: **L4** (38/38 pass, 4 skip, `GUIDESTONE_READINESS = 4`).
 
 The 4 skips blocking L5 certification:
 
-| Skip | Certification Layer | Blocked By |
-|------|-------------------|------------|
-| `stats.median` | 5 (domain science) | barraCuda `stats.median` IPC endpoint not yet exercised live |
-| `linalg.determinant` | 5 (domain science) | barraCuda `linalg.determinant` IPC endpoint not yet exercised live |
-| `compute.dispatch` | 4 (manifest) | toadStool sovereign dispatch — PG-05 |
-| `inference.complete` | 4 (manifest) | Squirrel AI backend (Ollama) — PG-14 (closed informational) |
+| Skip | Certification Layer | Blocked By | V166b Status |
+|------|-------------------|------------|-------------|
+| `stats.median` | 5 (domain science) | barraCuda `stats.median` live | barraCuda shipped (649 tests) — verify live |
+| `linalg.determinant` | 5 (domain science) | barraCuda `linalg.determinant` live | barraCuda shipped — verify live |
+| `compute.dispatch` | 4 (manifest) | toadStool sovereign dispatch | **PG-05 RESOLVED** — S254 live (AMD) |
+| `inference.complete` | 4 (manifest) | Squirrel AI backend (Ollama) | PG-14 (closed informational — infra) |
 
-**When L5 is achievable:** `stats.median` and `linalg.determinant` require
-a live barraCuda instance implementing these methods. Once confirmed:
-1. Flip `validate_parity_or_skip` → `validate_parity` for both
+**When L5 is achievable:** PG-05 is now resolved, which unblocks
+`compute.dispatch`. `stats.median` and `linalg.determinant` are shipped
+upstream (barraCuda 649 tests for precision.route). Once a live barraCuda
+instance is confirmed:
+1. Flip `validate_parity_or_skip` → `validate_parity` for `stats.median`,
+   `linalg.determinant`, and `compute.dispatch`
 2. Bump `GUIDESTONE_READINESS` to `5` in `niche.rs`
-3. `compute.dispatch` and `inference.complete` remain infrastructure-dependent
+3. `inference.complete` remains infrastructure-dependent (Ollama backend)
 
 `stats.weighted_mean` is already a **required** parity check (not skip) and
 passes. The domain science surface (`certification/health.rs:validate_domain_science`)

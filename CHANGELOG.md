@@ -3,6 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V166b] — 2026-05-13
+
+### Upstream Convergence — PG-03 Resolved, PG-05 Resolved, 2 Gaps Narrowed
+
+- **PG-03 RESOLVED:** Songbird `capability.resolve` wired into `discover_by_capability()`. `resolve_via_songbird(domain)` attempts live RPC first, falls back to static table when Songbird is absent. Upstream Songbird Wave 199-201 confirmed shipped.
+- **PG-05 RESOLVED:** toadStool S254 `LocalDeviceFactory` wired, AMD sovereign dispatch live. wetSpring Tier 2 wiring (V165b+V166) covers `toadstool.validate`, `toadstool.list_workloads`, `barracuda.precision.route`, `compute.dispatch.submit`. No remaining code gap.
+- **PG-02 NARROWED:** Upstream GAP-36 resolved — rhizoCrypt S68 aliases (`provenance.* → dag.*`), loamSpine v0.9.16 (`session.* → spine.*`), sweetGrass v0.7.35 (`braid.attribution.create → braid.create`). wetSpring method names align with alias targets. Gap is now deployment-only.
+- **PG-04 NARROWED:** NestGate S60 shipped `content.*` 4-surface parity. `content.* vs storage.*` confirmed intentional (biomeOS v3.53). Gap is now deployment-only.
+- **Gap count:** 2 open (deployment-only: PG-02, PG-04), 20 resolved/closed.
+- **gS L5 path:** `compute.dispatch` skip unblocked (PG-05 resolved). 3 of 4 L5 blockers now have upstream implementations — gate is live stack verification.
+- Build gate: `cargo build --features ipc --lib` (exit 0), `cargo clippy --features ipc --lib` (0 new warnings)
+
 ## [V166] — 2026-05-13
 
 ### Tier 2 Convergence — Contract Alignment + IPC Mapping

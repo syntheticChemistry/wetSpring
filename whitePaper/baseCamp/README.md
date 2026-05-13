@@ -4,7 +4,7 @@
 
 **Date:** May 12, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V166 — Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented (`docs/PRIMAL_PROOF_IPC_MAPPING.md`). plasmidBin musl verified. LTEE B7 Tier 2 (27/27 PASS). Deep debt audit clean: zero unsafe, zero `#[allow(]`, all URLs env-configurable. 12 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs) + IPC wired + contract aligned. **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4) + IPC-first defaults (`default = []`). **Tier 5:** Interactive composition. 384 experiments. **4** primal gaps open (all external, PG-01–PG-22, 18 resolved/closed).
+**Status:** V166 — Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented (`docs/PRIMAL_PROOF_IPC_MAPPING.md`). plasmidBin musl verified. LTEE B7 Tier 2 (27/27 PASS). Deep debt audit clean: zero unsafe, zero `#[allow(]`, all URLs env-configurable. 12 paper notebooks. 63/63 papers. 1,962 lib tests pass. guideStone **Level 4** (38/38 pass, 4 skip). **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs) + IPC wired + contract aligned. **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 4) + IPC-first defaults (`default = []`). **Tier 5:** Interactive composition. 384 experiments. **2** primal gaps open (deployment-only, PG-01–PG-22, 20 resolved/closed).
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).

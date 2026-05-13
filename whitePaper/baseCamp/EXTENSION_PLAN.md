@@ -4,7 +4,7 @@
 
 **Date:** May 13, 2026 (V166 update)
 **Author:** wetSpring V166 (ecoPrimals)
-**Foundation:** 384 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,962 lib tests, 367 binaries, 91.20% coverage. **V166:** Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. LTEE B7 Tier 2 (27/27 PASS). Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. guideStone Level 4 (38/38, 4 skip). Tier 4 IPC-first defaults (`default = []`). 4 gaps open (all external, PG-01–PG-22, 18 resolved/closed). primalSpring v0.9.25. Zero local WGSL, clippy **ZERO WARNINGS**.
+**Foundation:** 384 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,962 lib tests, 367 binaries, 91.20% coverage. **V166:** Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. LTEE B7 Tier 2 (27/27 PASS). Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. guideStone Level 4 (38/38, 4 skip). Tier 4 IPC-first defaults (`default = []`). 2 gaps open (deployment-only, PG-01–PG-22, 20 resolved/closed). primalSpring v0.9.25. Zero local WGSL, clippy **ZERO WARNINGS**.
 
 ---
 

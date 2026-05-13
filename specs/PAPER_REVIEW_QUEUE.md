@@ -10,7 +10,7 @@
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: May 13, 2026 (V166 — 384 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers. Tier 2 contract aligned. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 4 primal gaps open (all external), 18 resolved/closed.)
+**Last Updated**: May 13, 2026 (V166 — 384 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers. Tier 2 contract aligned. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---
