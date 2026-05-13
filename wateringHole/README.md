@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V165b** | `handoffs/WETSPRING_V165B_TIER2_WAVE_SYNC_HANDOFF_MAY12_2026.md` | May 12 | **Tier 2 wave sync**: `toadstool.validate` + `barracuda.precision.route` IPC clients wired. Absorption patterns for other springs. Tier 2 structurally complete. |
+| **V166** | `handoffs/WETSPRING_V166_TIER2_CONVERGENCE_UPSTREAM_HANDOFF_MAY13_2026.md` | May 13 | **Tier 2 convergence wave**: Contract alignment (dry_run echo, last_run), IPC mapping doc, plasmidBin musl verified, upstream gap observations. |
+| V165b | `handoffs/WETSPRING_V165B_TIER2_WAVE_SYNC_HANDOFF_MAY12_2026.md` | May 12 | Tier 2 wave sync: IPC clients wired. Absorption patterns. |
 | **V165** | `handoffs/WETSPRING_V165_LTEE_B7_TIER2_UPSTREAM_HANDOFF_MAY12_2026.md` | May 12 | **LTEE B7 Tier 2**: Rust validation binary (27/27 PASS). PG-02 through PG-05 readiness. lithoSpore module 6 artifacts. |
 | V164b | `handoffs/WETSPRING_V164B_UPSTREAM_DEEP_DEBT_HANDOFF_MAY12_2026.md` | May 12 | Deep debt audit + foundation 10/10 sync. |
 | V164 | `handoffs/WETSPRING_V164_DOWNSTREAM_SEEDING_HANDOFF_MAY12_2026.md` | May 12 | Thread 4 expression, LTEE B7 Tier 1, `--format json`, projectNUCLEUS workload. |

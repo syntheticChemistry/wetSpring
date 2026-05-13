@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V166] — 2026-05-13
+
+### Tier 2 Convergence — Contract Alignment + IPC Mapping
+
+- **`ValidateResult` contract alignment:** Added `dry_run` echo field and `WorkloadEntry.last_run` timestamp to match NUCLEUS spec. Updated `parse_validate_response` and `parse_list_response` parsers + tests.
+- **`PRIMAL_PROOF_IPC_MAPPING.md` created:** Documents all 19 inbound science methods, 7 outbound IPC clients, 10 domain-to-precision mappings, feature gate matrix, and fallback behavior. Addresses audit requirement for precision operation documentation.
+- **plasmidBin readiness confirmed:** musl static binary builds (`x86_64-unknown-linux-musl`), runs standalone, `version`/`validate --list`/`status --format json` all verified.
+- **15 docs synced to V165b** (prior commit): All root, whitePaper, experiments, specs, barracuda docs, sporePrint updated. V157–V161 handoffs archived (178 total).
+- Build gate: `cargo build --features ipc --lib` (exit 0), `cargo clippy --features ipc --lib` (0 new warnings)
+
 ## [V165b] — 2026-05-12
 
 ### Tier 2 IPC Wiring — toadstool.validate + barracuda.precision.route

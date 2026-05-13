@@ -30,6 +30,8 @@ pub struct ValidateResult {
     pub warnings: Vec<String>,
     /// Capabilities required by this workload.
     pub required_capabilities: Vec<String>,
+    /// Echo of the `dry_run` flag sent in the request (NUCLEUS spec).
+    pub dry_run: bool,
 }
 
 /// A single workload entry from `toadstool.list_workloads`.
@@ -41,6 +43,8 @@ pub struct WorkloadEntry {
     pub path: String,
     /// Current status (e.g. `"ready"`, `"running"`).
     pub status: String,
+    /// ISO 8601 timestamp of last execution (empty if never run).
+    pub last_run: String,
     /// Precision tier assigned to this workload.
     pub precision_tier: String,
 }
@@ -220,6 +224,10 @@ fn parse_validate_response(response: &str) -> Result<ValidateResult, ValidateErr
                     .collect()
             })
             .unwrap_or_default(),
+        dry_run: result
+            .get("dry_run")
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or(false),
     })
 }
 
@@ -261,6 +269,11 @@ fn parse_list_response(response: &str) -> Result<ListWorkloadsResult, ValidateEr
                         .and_then(|v| v.as_str())
                         .unwrap_or("")
                         .to_string(),
+                    last_run: w
+                        .get("last_run")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("")
+                        .to_string(),
                     precision_tier: w
                         .get("precision_tier")
                         .and_then(|v| v.as_str())
@@ -280,7 +293,7 @@ mod tests {
 
     #[test]
     fn parse_validate_response_ok() {
-        let json = r#"{"jsonrpc":"2.0","result":{"valid":true,"gpu_available":true,"precision_tier":"DF64","estimated_dispatch_time_ms":1200,"warnings":[],"required_capabilities":["compute","shader"]},"id":1}"#;
+        let json = r#"{"jsonrpc":"2.0","result":{"valid":true,"gpu_available":true,"precision_tier":"DF64","estimated_dispatch_time_ms":1200,"warnings":[],"required_capabilities":["compute","shader"],"dry_run":true},"id":1}"#;
         let result = parse_validate_response(json).expect("parse ok");
         assert!(result.valid);
         assert!(result.gpu_available);
@@ -288,6 +301,7 @@ mod tests {
         assert_eq!(result.estimated_dispatch_time_ms, 1200);
         assert!(result.warnings.is_empty());
         assert_eq!(result.required_capabilities, vec!["compute", "shader"]);
+        assert!(result.dry_run);
     }
 
     #[test]
@@ -299,11 +313,12 @@ mod tests {
 
     #[test]
     fn parse_list_response_ok() {
-        let json = r#"{"jsonrpc":"2.0","result":{"workloads":[{"id":"ws-16s","path":"workloads/wetspring/wetspring-16s-rust-validation.toml","status":"ready","precision_tier":"F32"}],"total":1},"id":2}"#;
+        let json = r#"{"jsonrpc":"2.0","result":{"workloads":[{"id":"ws-16s","path":"workloads/wetspring/wetspring-16s-rust-validation.toml","status":"ready","last_run":"2026-05-12T10:00:00Z","precision_tier":"F32"}],"total":1},"id":2}"#;
         let result = parse_list_response(json).expect("parse ok");
         assert_eq!(result.total, 1);
         assert_eq!(result.workloads.len(), 1);
         assert_eq!(result.workloads[0].id, "ws-16s");
+        assert_eq!(result.workloads[0].last_run, "2026-05-12T10:00:00Z");
     }
 
     #[test]

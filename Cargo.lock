@@ -195,7 +195,7 @@ dependencies = [
 
 [[package]]
 name = "barracuda"
-version = "0.3.13"
+version = "0.4.0"
 dependencies = [
  "barracuda-naga-exec",
  "blake3",
@@ -216,7 +216,7 @@ dependencies = [
 
 [[package]]
 name = "barracuda-naga-exec"
-version = "0.3.13"
+version = "0.4.0"
 dependencies = [
  "naga",
  "thiserror",
