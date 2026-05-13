@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V165b:** Tier 2 structurally complete — `toadstool.validate` + `barracuda.precision.route` IPC clients wired. V165: LTEE B7 Tier 2 Rust binary (27/27 PASS, `validate_ltee_b7_v1.rs`). lithoSpore module 6 ready. V164b: Foundation 10/10 threads active. V164: Thread 4 expression, `--format json` on UniBin. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **4 gaps open (all external), 18 resolved/closed.**
+**Current release — V166:** Tier 2 contract aligned (`dry_run` echo, `last_run` timestamp per NUCLEUS spec). IPC mapping documented (`docs/PRIMAL_PROOF_IPC_MAPPING.md`). plasmidBin musl binary verified. V165b: `toadstool.validate` + `barracuda.precision.route` wired. V165: LTEE B7 Tier 2 (27/27 PASS). 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **4 gaps open (all external), 18 resolved/closed.**
 
 ---
 

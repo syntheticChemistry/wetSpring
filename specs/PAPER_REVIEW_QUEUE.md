@@ -3,13 +3,14 @@
 <!-- V141 note (Apr 11, 2026): Paper queue is ALL DONE (63/63). Current
      experiment counts (384 indexed) and test counts (1,962) are in the root
      README.md. This file preserves the V126 per-paper detail. -->
-<!-- V165b note (May 12, 2026): LTEE GuideStone Queue — 10 papers
+<!-- V166 note (May 13, 2026): LTEE GuideStone Queue — 10 papers
      (B1-B8, E1, E5). B7 TIER 2 COMPLETE — Python baseline + Rust
-     binary (27/27 PASS) + lithoSpore module 6 ready. 9 queued. -->
+     binary (27/27 PASS) + lithoSpore module 6 ready. 9 queued.
+     Tier 2 contract aligned, IPC mapping documented. -->
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: May 12, 2026 (V165b — 384 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers. Tier 2 IPC wired. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 4 primal gaps open (all external), 18 resolved/closed.)
+**Last Updated**: May 13, 2026 (V166 — 384 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers. Tier 2 contract aligned. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 4 primal gaps open (all external), 18 resolved/closed.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

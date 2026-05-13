@@ -4,8 +4,8 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-12 (V165b — Tier 2 structurally complete (toadstool.validate + barracuda.precision.route IPC).
-V165: LTEE B7 Tier 2 Rust binary (27/27 PASS). V164b: Foundation 10/10 threads active.
+Last updated: 2026-05-13 (V166 — Tier 2 contract aligned, IPC mapping documented, plasmidBin musl verified.
+V165b: toadstool.validate + barracuda.precision.route wired. V165: LTEE B7 Tier 2 (27/27 PASS).
 4 gaps open (all external), 18 resolved/closed. 1,962 tests.)
 
 ---

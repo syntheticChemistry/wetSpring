@@ -2,7 +2,7 @@
 
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: May 12, 2026 (V165b — Tier 2 IPC wired. barraCuda v0.3.12, 150+ primitives consumed, fully lean, 1,962 lib tests, 4 PG gaps open (all external), 18 resolved/closed)
+**Last Updated**: May 13, 2026 (V166 — Tier 2 contract aligned. barraCuda v0.3.12, 150+ primitives consumed, fully lean, 1,962 lib tests, 4 PG gaps open (all external), 18 resolved/closed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

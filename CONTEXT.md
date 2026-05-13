@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V165b:** Tier 2 structurally complete (`toadstool.validate` + `barracuda.precision.route` IPC clients). V165: LTEE B7 Tier 2 Rust binary (27/27 PASS). V164b: Foundation 10/10 threads active. V164: Thread 4 expression, `--format json` on UniBin. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
+**Current release — V166:** Tier 2 contract aligned (NUCLEUS spec). IPC mapping documented. plasmidBin musl verified. V165b: `toadstool.validate` + `barracuda.precision.route` wired. V165: LTEE B7 Tier 2 (27/27 PASS). 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. guideStone Level 4. 4 gaps open (all external), 18 resolved/closed.
 
 ## Role in the Ecosystem
 
