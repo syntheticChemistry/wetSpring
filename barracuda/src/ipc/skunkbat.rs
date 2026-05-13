@@ -79,9 +79,12 @@ pub struct AuditEvent {
 
 /// Emit an audit event to skunkBat via `audit.event`.
 ///
-/// Returns `Ok(response)` on success. Returns `Err` if skunkBat is
-/// unreachable or rejects the event. Callers should log and continue —
+/// Returns `Ok(response)` on success. Callers should log and continue —
 /// audit failures must not block science operations.
+///
+/// # Errors
+///
+/// Returns `Err` if skunkBat is unreachable or rejects the event.
 pub fn emit_event(skunkbat_socket: &Path, event: &AuditEvent) -> crate::error::Result<Value> {
     let mut params = json!({
         "primal": crate::PRIMAL_NAME,
@@ -115,6 +118,10 @@ pub fn emit_event(skunkbat_socket: &Path, event: &AuditEvent) -> crate::error::R
 ///
 /// Used for cross-primal audit chains (JH-5 forwarding). The `target` is the
 /// destination primal name (e.g. `"rhizocrypt"` for DAG anchoring).
+///
+/// # Errors
+///
+/// Returns `Err` if skunkBat is unreachable or rejects the forward request.
 pub fn forward_event(
     skunkbat_socket: &Path,
     target: &str,

@@ -161,7 +161,7 @@ pub struct CrossSpringEntry {
     pub primitive: &'static str,
     /// Spring that evolved the primitive.
     pub evolved_by: &'static str,
-    /// ToadStool session where it was absorbed.
+    /// `ToadStool` session where it was absorbed.
     pub session: &'static str,
     /// CPU elapsed time in microseconds.
     pub cpu_us: f64,

@@ -37,9 +37,9 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 /// 3 = bare guideStone works, 4 = NUCLEUS guideStone works, 5 = certified.
 ///
 /// Promoted to 4: live NUCLEUS validation (38/38 pass, 4 skip, exit 0)
-/// against barraCuda, BearDog, NestGate, ToadStool, Squirrel over IPC.
-/// v0.9.17: stats.variance, stats.correlation, linalg.solve,
-/// linalg.eigenvalues, spectral.fft, spectral.power_spectrum now PASS.
+/// against `barraCuda`, `BearDog`, `NestGate`, `ToadStool`, Squirrel over IPC.
+/// v0.9.17: `stats.variance`, `stats.correlation`, `linalg.solve`,
+/// `linalg.eigenvalues`, `spectral.fft`, `spectral.power_spectrum` now PASS.
 /// 4 remaining skips: compute.dispatch, inference.complete,
 /// stats.median, linalg.determinant. Uses upstream `is_skip_error`
 /// from `primalspring::composition` (v0.9.17) for error classification.

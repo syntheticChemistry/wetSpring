@@ -34,7 +34,7 @@ const VALID_DOMAIN_PREFIXES: &[&str] = &[
 /// - `provenance`     — 3 provenance-trio lifecycle methods
 /// - `brain`          — 3 neural sentinel methods
 /// - `metrics`        — 1 server metrics capability
-/// - `data`           — 3 data ingestion methods (ChEMBL, PubChem, table)
+/// - `data`           — 3 data ingestion methods (`ChEMBL`, `PubChem`, table)
 /// - `vault`          — 3 consent-gated storage methods
 /// - `composition`    — 5 NUCLEUS composition health probes
 pub const DOMAINS: &[CapabilityDomain] = &[

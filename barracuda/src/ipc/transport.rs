@@ -19,6 +19,10 @@ use std::time::Duration;
 pub const UNIX_JSONRPC_TIMEOUT: Duration = super::timeouts::STANDARD_RPC;
 
 /// Send one newline-terminated JSON-RPC request and read one response line.
+///
+/// # Errors
+///
+/// Returns `Err(String)` if the socket connection fails or the RPC transport errors.
 pub fn unix_jsonrpc_line(socket: &Path, request_line: &str) -> Result<String, String> {
     let stream =
         UnixStream::connect(socket).map_err(|e| format!("connect {}: {e}", socket.display()))?;

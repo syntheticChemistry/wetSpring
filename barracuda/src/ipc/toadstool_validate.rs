@@ -58,7 +58,7 @@ pub struct ListWorkloadsResult {
     pub total: u64,
 }
 
-/// Errors from toadStool validate/list_workloads RPC calls.
+/// Errors from toadStool `validate`/`list_workloads` RPC calls.
 #[derive(Debug)]
 pub enum ValidateError {
     /// toadStool socket not discovered.

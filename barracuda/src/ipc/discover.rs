@@ -136,9 +136,9 @@ pub fn discover_skunkbat() -> Option<PathBuf> {
 /// | Capability domain | Provider primal |
 /// |-------------------|-----------------|
 /// | `"tensor"`, `"stats"`, `"compute"`, `"spectral"`, `"linalg"` | barraCuda |
-/// | `"crypto"`, `"security"` | BearDog |
+/// | `"crypto"`, `"security"` | `BearDog` |
 /// | `"discovery"` | Songbird |
-/// | `"storage"` | NestGate |
+/// | `"storage"` | `NestGate` |
 /// | `"dag"` | rhizoCrypt |
 /// | `"spine"`, `"entry"` | loamSpine |
 /// | `"braid"`, `"provenance"` | sweetGrass |

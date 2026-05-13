@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** May 12, 2026  
+**Date:** May 13, 2026  
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -9,10 +9,9 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V166** | `handoffs/WETSPRING_V166_TIER2_CONVERGENCE_UPSTREAM_HANDOFF_MAY13_2026.md` | May 13 | **Tier 2 convergence wave**: Contract alignment (dry_run echo, last_run), IPC mapping doc, plasmidBin musl verified, upstream gap observations. |
-| V165b | `handoffs/WETSPRING_V165B_TIER2_WAVE_SYNC_HANDOFF_MAY12_2026.md` | May 12 | Tier 2 wave sync: IPC clients wired. Absorption patterns. |
-| V165 | `handoffs/WETSPRING_V165_LTEE_B7_TIER2_UPSTREAM_HANDOFF_MAY12_2026.md` | May 12 | LTEE B7 Tier 2 (27/27 PASS). lithoSpore module 6 artifacts. |
-|| | *Superseded → `handoffs/archive/`* | | V164B and earlier archived (**181** files). |
+| **V166b** | `handoffs/WETSPRING_V166B_DEEP_DEBT_CONVERGENCE_HANDOFF_MAY13_2026.md` | May 13 | **Deep debt resolution + upstream convergence**: 19→0 clippy warnings, PG-03+PG-05 resolved, Songbird capability.resolve wired. Full audit. |
+| V166 | `handoffs/WETSPRING_V166_TIER2_CONVERGENCE_UPSTREAM_HANDOFF_MAY13_2026.md` | May 13 | Tier 2 convergence: contract alignment, IPC mapping, plasmidBin musl. |
+|| | *Superseded → `handoffs/archive/`* | | V165B and earlier archived (**183** files). |
 
 ## Cross-Spring Documents
 

@@ -149,7 +149,10 @@ impl LegacyEsn {
     /// Train readout weights via ridge regression on collected states.
     #[cfg_attr(
         not(feature = "barracuda-lib"),
-        expect(unused_variables, reason = "ridge regression requires barracuda-lib")
+        expect(
+            clippy::collection_is_never_read,
+            reason = "ridge regression requires barracuda-lib"
+        )
     )]
     pub fn train(&mut self, inputs: &[Vec<f64>], targets: &[Vec<f64>]) {
         let n_res = self.config.reservoir_size;
@@ -188,7 +191,11 @@ impl LegacyEsn {
     /// Train from sequences with reset between each trajectory.
     #[cfg_attr(
         not(feature = "barracuda-lib"),
-        expect(unused_variables, reason = "ridge regression requires barracuda-lib")
+        expect(
+            unused_variables,
+            clippy::collection_is_never_read,
+            reason = "ridge regression requires barracuda-lib"
+        )
     )]
     pub fn train_stateful(&mut self, trajectories: &[Vec<(Vec<f64>, Vec<f64>)>]) {
         let n_res = self.config.reservoir_size;
@@ -230,7 +237,10 @@ impl LegacyEsn {
     /// Train with reset before each sample (stateless: each window independent).
     #[cfg_attr(
         not(feature = "barracuda-lib"),
-        expect(unused_variables, reason = "ridge regression requires barracuda-lib")
+        expect(
+            clippy::collection_is_never_read,
+            reason = "ridge regression requires barracuda-lib"
+        )
     )]
     pub fn train_stateless(&mut self, inputs: &[Vec<f64>], targets: &[Vec<f64>]) {
         let n_res = self.config.reservoir_size;
