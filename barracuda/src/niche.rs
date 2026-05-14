@@ -48,8 +48,8 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 pub const GUIDESTONE_READINESS: u8 = 5;
 
 use crate::primal_names::{
-    BEARDOG, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SKUNKBAT, SONGBIRD, SQUIRREL,
-    SWEETGRASS, TOADSTOOL,
+    BEARDOG, CORALREEF, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SKUNKBAT, SONGBIRD,
+    SQUIRREL, SWEETGRASS, TOADSTOOL,
 };
 
 /// Primals this niche depends on (germination order matters).
@@ -113,6 +113,12 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
         role: "audit",
         required: false,
         capability: "audit",
+    },
+    NicheDependency {
+        name: CORALREEF,
+        role: "shader",
+        required: false,
+        capability: "shader",
     },
 ];
 

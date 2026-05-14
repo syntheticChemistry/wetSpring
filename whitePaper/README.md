@@ -3,7 +3,7 @@
 # wetSpring White Paper
 
 **Date:** May 13, 2026
-**Status:** V167 — **guideStone Level 5** (primal proof). Wire hygiene verified (bearDog base64, skunkBat audit). B7 Tenaillon Tier 2 documented for lithoSpore. PG-03+PG-05 RESOLVED. Deep debt audit clean. **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 367 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs) + IPC wired + contract aligned. **Tier 3:** Live NUCLEUS IPC. 384 experiments, `barraCuda` v0.3.12. 2 primal gaps open (deployment-only, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
+**Status:** V167 — **guideStone Level 5** (primal proof). Wire hygiene verified (bearDog base64, skunkBat audit). B7 Tenaillon Tier 2 documented for lithoSpore. PG-03+PG-05 RESOLVED. Deep debt audit clean. **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 367 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs) + IPC wired + contract aligned. **Tier 3:** Live NUCLEUS IPC. 384 experiments, `barraCuda` v0.4.0. 2 primal gaps open (deployment-only, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
 **License:** AGPL-3.0-or-later
 
 ---
@@ -58,7 +58,7 @@ implementations into upstream `barraCuda` primitives:
 5. **Lean** — wetSpring rewires to upstream imports, deletes local code
 
 **Current status:** 44 GPU modules — Lean phase (fully absorbed). All 44 lean on
-upstream `barraCuda` primitives (150+ consumed, v0.3.12 standalone, 784+ WGSL shaders).
+upstream `barraCuda` primitives (150+ consumed, v0.4.0 standalone, 784+ WGSL shaders).
 11 compose `barraCuda` primitives for GPU-accelerated workflows. Zero Passthrough, zero
 Tier B/C modules remain. The forge crate (`metalForge/forge/` v0.3.0) provides substrate
 discovery, capability-based dispatch, and shader origin tracking.

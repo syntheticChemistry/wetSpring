@@ -4,9 +4,9 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-13 (V166b — Upstream convergence: PG-03 RESOLVED (Songbird
-capability.resolve wired), PG-05 RESOLVED (toadStool S254 factory live). PG-02
-narrowed (GAP-36 aliases shipped). PG-04 narrowed (content.* 4-surface parity).
+Last updated: 2026-05-14 (V168 — barraCuda v0.4.0 absorption. coralReef v0.1.0
+declared in niche. plasmidBin deployment evolution confirmed. sourDough
+internalization noted. PG-02/PG-04 remain deployment-only.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 
 ---
@@ -662,6 +662,11 @@ The 4 remaining skips are **environmental** (absent primals), not code gaps:
 All 4 methods are wired and shipped upstream. Skips resolve to passes on
 live deployment. The guideStone exits 0 in NUCLEUS mode (skips do not
 count as failures per `ValidationResult::exit_code()`).
+
+**Compute trio wave (May 14, 2026):** barraCuda v0.4.0 released (precision/E2E,
+VFIO sovereign dispatch). coralReef v0.1.0 released (pure sovereign shader
+compiler, Blackwell + AMD). toadStool Phase C VFIO dispatch on critical path.
+wetSpring contract pin bumped to v0.4.0; coralReef declared in niche DEPENDENCIES.
 
 `stats.weighted_mean` is already a **required** parity check (not skip) and
 passes. The domain science surface (`certification/health.rs:validate_domain_science`)

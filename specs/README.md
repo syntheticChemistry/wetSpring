@@ -13,7 +13,7 @@
 | Metric | Value |
 |--------|-------|
 | CPU validation | 1,476+/1,476+ PASS — 47 modules, 379 experiments, 25 domains + 6 ODE flat + 3 layout + 13 GPU-promoted |
-| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.3.12, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
+| GPU validation | 1,945+/1,945+ PASS — 150+ primitives (standalone barraCuda v0.4.0, always-on, 264 ComputeDispatch ops), 0 local WGSL (fully lean) |
 | Dispatch validation | 35/35 PASS — 5 substrate configs (Exp080) |
 | BarraCuda CPU parity | 546/546 — 22.5x Rust speedup over Python (v1–v9) |
 | BarraCuda GPU parity | 29 domains (Exp064/087/101/164) — pure GPU math proven |
@@ -168,7 +168,7 @@ ToadStool's generic ODE framework (S51). 30,424 bytes of local WGSL deleted.
 - **NPU edge inference** — ESN reservoir on AKD1000, online evolution, adaptive sampling (V60)
 - **Field genomics** (planned) — Nanopore sequencing + NPU classification + metalForge routing. See [FIELD_GENOMICS_REQUIREMENTS.md](FIELD_GENOMICS_REQUIREMENTS.md)
 - **Data type profiling** — Biological data format catalog driving NestGate data primal evolution. See [DATA_TYPES.md](DATA_TYPES.md)
-- **Sovereign Rust bioinformatics** — 47 CPU + 47 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.3.12, always-on, zero fallback, 264 ComputeDispatch ops)
+- **Sovereign Rust bioinformatics** — 47 CPU + 47 GPU modules + 0 local WGSL (fully lean), 2 runtime dependencies (flate2 + bytemuck), 150+ primitives (standalone barraCuda v0.4.0, always-on, zero fallback, 264 ComputeDispatch ops)
 
 ### wetSpring IS NOT:
 - Sensor noise analysis (groundSpring)

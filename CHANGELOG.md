@@ -3,6 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V168] — 2026-05-14
+
+### Compute Trio Absorption — barraCuda v0.4.0 + coralReef v0.1.0 + Upstream Sync
+
+- **barraCuda v0.4.0 absorbed:** Contract pin bumped from 0.3.12 → 0.4.0 (`upstream_contract.rs`). Cargo.toml comment updated. All 18 doc files referencing v0.3.12 updated to v0.4.0. Contract test passes (`version_ge("0.4.0", "0.4.0")` = true). Precision/E2E and VFIO sovereign dispatch from upstream.
+- **coralReef v0.1.0 declared in niche:** Added to `DEPENDENCIES` in `niche.rs` as optional (`role: "shader"`, `capability: "shader"`). Import added. Already consumed via `shader.compile.wgsl` in `CONSUMED_CAPABILITIES` and referenced in deploy graphs + plasmidBin cell.
+- **protocol.rs doc updated:** barraCuda version reference in `normalize_method` doc comment bumped.
+- **PRIMAL_GAPS.md updated:** Header synced to V168. Compute trio wave section added under guideStone L5.
+- **Upstream stale data identified** for primalSpring handoff: CROSS_SPRING_PARITY_SCORECARD shows gS L4/1,613 tests/LTEE "STARTED" for wetSpring (should be L5/1,962/COMPLETE). infra/wateringHole README shows V163. plasmidBin manifest shows tests=1902.
+- **sourDough internalization noted:** plasmidBin shell patterns mapping to sourDough v0.3.0–v0.6.0. No local changes needed yet.
+- Build gate: `cargo test --lib -- upstream_contract` (3 passed), `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (exit 0)
+
 ## [V167b] — 2026-05-13
 
 ### Doc Cleanup + Debris Audit

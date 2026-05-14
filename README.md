@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V167:** guideStone Level 5 (primal proof). Wire hygiene verified (bearDog base64, skunkBat audit). B7 Tenaillon Tier 2 documented for lithoSpore. Songbird `capability.resolve` wired (PG-03 RESOLVED). toadStool S254 live (PG-05 RESOLVED). Clippy pedantic+nursery zero warnings. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V168:** barraCuda v0.4.0 absorbed (compute trio wave). coralReef v0.1.0 declared in niche. guideStone Level 5 (primal proof). plasmidBin deployment evolution confirmed. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

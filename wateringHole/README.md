@@ -9,9 +9,9 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V167b** | `handoffs/WETSPRING_V167B_DOC_CLEANUP_HANDOFF_MAY13_2026.md` | May 13 | **Doc cleanup + debris audit**: 18 docs synced V167, 4 source fixes, primal evolution learnings for upstream teams. |
-| V167 | `handoffs/WETSPRING_V167_NICHE_ATOMIC_CONVERGENCE_HANDOFF_MAY13_2026.md` | May 13 | Niche atomic convergence: guideStone L5 (primal proof), wire hygiene, B7 Tenaillon Tier 2 for lithoSpore. |
-|| | *Superseded → `handoffs/archive/`* | | V166b and earlier archived (**185** files). |
+| **V168** | `handoffs/WETSPRING_V168_COMPUTE_TRIO_ABSORPTION_HANDOFF_MAY14_2026.md` | May 14 | **Compute trio absorption**: barraCuda v0.4.0, coralReef v0.1.0 niche, plasmidBin confirmed, upstream stale data identified. |
+| V167b | `handoffs/WETSPRING_V167B_DOC_CLEANUP_HANDOFF_MAY13_2026.md` | May 13 | Doc cleanup + debris audit: 18 docs synced V167, 4 source fixes, primal evolution learnings. |
+|| | *Superseded → `handoffs/archive/`* | | V167 and earlier archived (**186** files). |
 
 ## Cross-Spring Documents
 
@@ -23,7 +23,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V166 and earlier (**184** files).  
+Superseded handoffs in `handoffs/archive/` — V167 and earlier (**186** files).  
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → guideStone → ecoBin harvest.
 
 ## Convention

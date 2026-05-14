@@ -425,7 +425,7 @@ thresholds from `src/tolerances.rs`.
 **Total validation checks**: 5,900+
 **Rust tests**: **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures)
 **Binaries**: **367** workspace total (**345** barracuda + **22** forge)
-**barraCuda primitives**: 150+ consumed (standalone v0.3.12, wgpu 28, Fp64Strategy, fused ops)
+**barraCuda primitives**: 150+ consumed (standalone v0.4.0, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)
 **Local WGSL shaders**: 0 (all absorbed)
 **GPU modules**: **44** total
@@ -656,7 +656,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V167):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.3.12, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 5 (primal proof, 38/38 pass, 4 environmental skip). 2 primal gaps open (deployment-only), 20 resolved/closed. PG-03+PG-05 RESOLVED. Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore.
+**Totals (V167):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 5 (primal proof, 38/38 pass, 4 environmental skip). 2 primal gaps open (deployment-only), 20 resolved/closed. PG-03+PG-05 RESOLVED. Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 

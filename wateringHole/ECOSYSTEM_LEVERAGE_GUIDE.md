@@ -2,7 +2,7 @@
 
 > **V161 note (May 11, 2026):** This guide was written at V128. Current
 > metrics: **364** binaries, **1,962** tests, **150+** barraCuda primitives
-> (v0.3.12), **42** niche capabilities, **48** barraCuda IPC consumed
+> (v0.4.0), **42** niche capabilities, **48** barraCuda IPC consumed
 > capabilities (33 v0.9.17 canonical + 15 legacy, machine-readable in `niche.rs`).
 > **guideStone Level 4** (38/38, 4 skip). PG-09 + PG-12 resolved.
 > Foundation Thread 04 seeded (36 targets). **6** primal gaps open (all external,

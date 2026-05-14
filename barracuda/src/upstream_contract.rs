@@ -6,7 +6,7 @@
 //! absorbed. Absorbed from neuralSpring S174 `upstream_contract` pattern.
 
 /// Minimum barraCuda version wetSpring was validated against.
-pub const PINNED_BARRACUDA_VERSION: &str = "0.3.12";
+pub const PINNED_BARRACUDA_VERSION: &str = "0.4.0";
 
 /// Verify that the barraCuda Cargo.toml version matches expectations.
 ///

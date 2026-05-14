@@ -197,7 +197,7 @@ cargo run --features gpu --release --bin validate_barracuda_gpu_full
 
 ## Dependencies
 
-- `barracuda` — standalone math primal via path: `../../barraCuda/crates/barracuda` (v0.3.12, `2a6c072`)
+- `barracuda` — standalone math primal via path: `../../barraCuda/crates/barracuda` (v0.4.0, `2a6c072`)
 - `flate2` (pure Rust backend) — gzip decompression
 - `serde_json` (optional, `json` feature) — model import for 2 binaries
 - `wgpu` 28 (via `gpu` feature) — GPU device management

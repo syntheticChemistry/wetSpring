@@ -4,7 +4,7 @@
 
 **Date:** May 13, 2026 (V167 update)
 **Author:** wetSpring V167 (ecoPrimals)
-**Foundation:** 384 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.3.12), 1,962 lib tests, 367 binaries, 91.20% coverage. **V167:** guideStone Level 5 (primal proof). Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore. PG-03+PG-05 RESOLVED. Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. Tier 4 IPC-first defaults (`default = []`). 2 gaps open (deployment-only, PG-01–PG-22, 20 resolved/closed). primalSpring v0.9.25. Zero local WGSL, clippy **ZERO WARNINGS**.
+**Foundation:** 384 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 367 binaries, 91.20% coverage. **V167:** guideStone Level 5 (primal proof). Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore. PG-03+PG-05 RESOLVED. Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable. Tier 4 IPC-first defaults (`default = []`). 2 gaps open (deployment-only, PG-01–PG-22, 20 resolved/closed). primalSpring v0.9.25. Zero local WGSL, clippy **ZERO WARNINGS**.
 
 ---
 
@@ -415,7 +415,7 @@ brings multiple primals into the pipeline, coordinated through biomeOS.
 |--------|----------|------|-----------------|
 | **biomeOS** | phase2/biomeOS/ | Orchestrator | Graph execution, capability registry, Neural API (124+ capabilities), lifecycle management |
 | **NestGate** | Referenced in ncbi/nestgate/ | Data layer | Content-addressed storage, NCBI provider, SRA, ZFS cold storage (Westgate 76TB) |
-| **ToadStool** | primals/toadStool/ | Compute | 800+ WGSL shaders, MultiHeadEsn, spectral, 150+ primitives consumed by wetSpring (barraCuda v0.3.12) |
+| **ToadStool** | primals/toadStool/ | Compute | 800+ WGSL shaders, MultiHeadEsn, spectral, 150+ primitives consumed by wetSpring (barraCuda v0.4.0) |
 | **Songbird** | Referenced in IPC | Discovery | Primal discovery, mesh routing, HTTPS stack |
 | **BearDog** | Referenced in IPC | Trust | Crypto, TLS 1.3, key hierarchy, SoloKey FIDO2 anchors |
 

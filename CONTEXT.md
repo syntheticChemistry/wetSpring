@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V167:** guideStone Level 5 (primal proof). Wire hygiene verified (bearDog base64, skunkBat audit). B7 Tenaillon provenance updated to Tier 2. V166b: PG-03/PG-05 RESOLVED, PG-02/PG-04 deployment-only. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V168:** barraCuda v0.4.0 absorbed (compute trio wave). coralReef v0.1.0 declared in niche. guideStone Level 5 (primal proof). plasmidBin deployment evolution confirmed. sourDough internalization noted. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 
@@ -47,7 +47,7 @@ evolution pipeline.
 - **Math biology:** ODE systems (QS, bistable, cooperation, phage, capacitor)
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, drug-target scoring
-- **GPU acceleration:** 44 GPU modules via barraCuda v0.3.12, 150+ primitives consumed
+- **GPU acceleration:** 44 GPU modules via barraCuda v0.4.0, 150+ primitives consumed
 - **IPC:** 37 JSON-RPC methods, 42 niche capabilities, 21 domains, 1 composition health handler (science_health), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
