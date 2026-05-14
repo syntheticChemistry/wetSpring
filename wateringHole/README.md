@@ -9,9 +9,9 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V168** | `handoffs/WETSPRING_V168_COMPUTE_TRIO_ABSORPTION_HANDOFF_MAY14_2026.md` | May 14 | **Compute trio absorption**: barraCuda v0.4.0, coralReef v0.1.0 niche, plasmidBin confirmed, upstream stale data identified. |
-| V167b | `handoffs/WETSPRING_V167B_DOC_CLEANUP_HANDOFF_MAY13_2026.md` | May 13 | Doc cleanup + debris audit: 18 docs synced V167, 4 source fixes, primal evolution learnings. |
-|| | *Superseded → `handoffs/archive/`* | | V167 and earlier archived (**186** files). |
+| **V168b** | `handoffs/WETSPRING_V168B_LIVE_NUCLEUS_DOC_SYNC_HANDOFF_MAY14_2026.md` | May 14 | **Live NUCLEUS doc sync**: 20 docs synced V168, live guideStone 30/31 documented, fossil notes updated, upstream stale data for primalSpring. |
+| V168 | `handoffs/WETSPRING_V168_COMPUTE_TRIO_ABSORPTION_HANDOFF_MAY14_2026.md` | May 14 | Compute trio absorption: barraCuda v0.4.0, coralReef v0.1.0 niche, plasmidBin confirmed. |
+|| | *Superseded → `handoffs/archive/`* | | V167b and earlier archived (**187** files). |
 
 ## Cross-Spring Documents
 
@@ -23,7 +23,7 @@
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V167 and earlier (**186** files).  
+Superseded handoffs in `handoffs/archive/` — V167b and earlier (**187** files).  
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → guideStone → ecoBin harvest.
 
 ## Convention

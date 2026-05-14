@@ -3,6 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V168b] — 2026-05-14
+
+### Doc Sync + Live NUCLEUS Results
+
+- **20 docs synced to V168 banner:** All header/status lines updated from V167→V168. Live NUCLEUS guideStone result (30/31 pass, 9 skip, 1 fail) documented across all status banners.
+- **Fossil record margin notes updated:** `ECOSYSTEM_LEVERAGE_GUIDE.md` and `CROSS_SPRING_SHADER_EVOLUTION.md` — guideStone Level 4→Level 5, gaps 6/14→2/20, composition: composed.
+- **`validate_ltee_b7_v1.rs`**: version string V167→V168.
+- **`specs/README.md`**: binary count 364→367.
+- **`experiments/README.md`**: Totals updated with live NUCLEUS results and plasmidBin validation.
+- V167b handoff archived (187 total).
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (exit 0)
+
 ## [V168] — 2026-05-14
 
 ### Compute Trio Absorption — barraCuda v0.4.0 + coralReef v0.1.0 + Upstream Sync

@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-13 (V167: guideStone Level 5 (primal proof). Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore. PG-03+PG-05 RESOLVED. 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Updated**: 2026-05-14 (V168: barraCuda v0.4.0 absorbed. coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass. Composition: composed. 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 2 primal gaps open (deployment-only), 20 resolved/closed.)
 
 ---
 
@@ -656,7 +656,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V167):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, primalSpring v0.9.25. 48 consumed IPC capabilities. guideStone Level 5 (primal proof, 38/38 pass, 4 environmental skip). 2 primal gaps open (deployment-only), 20 resolved/closed. PG-03+PG-05 RESOLVED. Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore.
+**Totals (V168):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. plasmidBin all compositions validated. 2 primal gaps open (deployment-only), 20 resolved/closed.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -686,7 +686,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V167): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). guideStone Level 5 (primal proof, 38/38 NUCLEUS, 4 environmental skip). Zero internal gaps. Tier 4 IPC-first defaults. 2 gaps open (deployment-only), 20 resolved/closed.**
+**Totals (V168): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

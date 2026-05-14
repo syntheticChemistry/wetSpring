@@ -1,12 +1,12 @@
 # Ecosystem Leverage Guide — wetSpring V128 (fossil record)
 
-> **V161 note (May 11, 2026):** This guide was written at V128. Current
-> metrics: **364** binaries, **1,962** tests, **150+** barraCuda primitives
+> **V168 note (May 14, 2026):** This guide was written at V128. Current
+> metrics: **367** binaries, **1,962** tests, **150+** barraCuda primitives
 > (v0.4.0), **42** niche capabilities, **48** barraCuda IPC consumed
 > capabilities (33 v0.9.17 canonical + 15 legacy, machine-readable in `niche.rs`).
-> **guideStone Level 4** (38/38, 4 skip). PG-09 + PG-12 resolved.
-> Foundation Thread 04 seeded (36 targets). **6** primal gaps open (all external,
-> 14 resolved/closed). Deep debt audit clean — zero internal gaps.
+> **guideStone Level 5** (primal proof). Live NUCLEUS 30/31 pass, 9 skip, 1 fail.
+> Composition: composed. **2** primal gaps open (deployment-only,
+> **20** resolved/closed). Deep debt audit clean — zero internal gaps.
 > See `docs/PRIMAL_GAPS.md`.
 
 **Date:** March 18, 2026

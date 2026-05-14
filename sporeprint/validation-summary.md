@@ -1,7 +1,7 @@
 +++
 title = "wetSpring Validation Summary"
 description = "Life-science and analytical-chemistry spring — 1,962+ tests, 19 science methods, 367 binaries, pure primal composition"
-date = 2026-05-13
+date = 2026-05-14
 
 [taxonomies]
 primals = ["biomeos", "barracuda", "toadstool", "nestgate", "beardog", "songbird", "squirrel", "rhizocrypt", "loamspine", "sweetgrass", "petaltongue", "coralreef"]
@@ -14,7 +14,7 @@ springs = ["wetspring"]
 - **367 binaries** (336 validators + 1 guidestone + 30 other)
 - **19 science IPC methods** across 6 domain categories
 - **56 experiment directories** with 64+ frozen JSON baselines
-- **guideStone Level 5** (primal proof) — V167
+- **guideStone Level 5** (primal proof) — V168, live NUCLEUS 30/31 pass
 - **Zero sovereign HTTP fallbacks** — pure primal composition
 - **Structured gap reports** when deployment primals are unavailable
 - **BLAKE3 content hashing** on all data paths

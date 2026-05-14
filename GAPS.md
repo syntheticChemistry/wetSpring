@@ -4,8 +4,8 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-13 (V167 — guideStone Level 5 (primal proof). PG-03+PG-05 RESOLVED.
-Wire hygiene verified. B7 Tenaillon Tier 2. Clippy pedantic+nursery zero warnings.
+Last updated: 2026-05-14 (V168 — barraCuda v0.4.0 absorbed, coralReef v0.1.0 in niche.
+Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 
 ---

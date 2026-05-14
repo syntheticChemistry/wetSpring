@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 13, 2026 (V167 — guideStone Level 5 (primal proof). Wire hygiene verified. B7 Tier 2 for lithoSpore. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 367 binaries (345 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, one justified `dyn` exception (`gillespie.rs` SSA — heterogeneous reaction vec), clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers reproduced.)
+**Updated:** May 14, 2026 (V168 — barraCuda v0.4.0 absorbed. coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 367 binaries (345 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)` at workspace level, zero `#[allow()]`, one justified `dyn` exception (`gillespie.rs` SSA — heterogeneous reaction vec), clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers reproduced.)
 
 ---
 

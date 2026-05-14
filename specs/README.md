@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: May 13, 2026
-**Status**: V167 — **guideStone Level 5** (primal proof). Wire hygiene verified. B7 Tenaillon Tier 2 for lithoSpore. PG-03+PG-05 RESOLVED. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 composition gaps open (deployment-only, 20 resolved/closed).
+**Last Updated**: May 14, 2026
+**Status**: V168 — **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`, one justified `dyn` exception (gillespie SSA). 42 niche capabilities, 48 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 composition gaps open (deployment-only, 20 resolved/closed).
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -27,7 +27,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,962 lib + 97 integration + 18 IPC roundtrip = 2,077 tests, 364 binaries (342 barracuda + 22 forge) |
+| Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,962 lib + 97 integration + 18 IPC roundtrip = 2,077 tests, 367 binaries (345 barracuda + 22 forge) |
 | Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 5 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |

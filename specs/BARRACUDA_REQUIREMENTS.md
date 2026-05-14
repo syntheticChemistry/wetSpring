@@ -2,7 +2,7 @@
 
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: May 13, 2026 (V167 — guideStone Level 5. barraCuda v0.4.0, 150+ primitives consumed, fully lean, 1,962 lib tests, 2 PG gaps open (deployment-only), 20 resolved/closed)
+**Last Updated**: May 14, 2026 (V168 — barraCuda v0.4.0 absorbed. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. 1,962 lib tests, 2 PG gaps open (deployment-only), 20 resolved/closed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

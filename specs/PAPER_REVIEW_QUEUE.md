@@ -3,14 +3,13 @@
 <!-- V141 note (Apr 11, 2026): Paper queue is ALL DONE (63/63). Current
      experiment counts (384 indexed) and test counts (1,962) are in the root
      README.md. This file preserves the V126 per-paper detail. -->
-<!-- V167 note (May 13, 2026): guideStone Level 5 (primal proof).
-     LTEE GuideStone Queue — 10 papers (B1-B8, E1, E5).
-     B7 TIER 2 COMPLETE — Rust binary (27/27 PASS) + lithoSpore
-     module 6 ready. 9 queued. Wire hygiene verified. -->
+<!-- V168 note (May 14, 2026): barraCuda v0.4.0. coralReef v0.1.0.
+     Live NUCLEUS guideStone 30/31 pass. LTEE GuideStone Queue —
+     10 papers (B1-B8, E1, E5). B7 TIER 2 COMPLETE. 9 queued. -->
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: May 13, 2026 (V167 — guideStone Level 5. 384 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Last Updated**: May 14, 2026 (V168 — barraCuda v0.4.0. Live NUCLEUS 30/31. 384 experiments, 5,900+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

@@ -641,7 +641,7 @@ primals have shipped all capabilities. 2 of 4 remaining gaps are now RESOLVED
 
 ---
 
-## guideStone Level 5 — Primal Proof (V167)
+## guideStone Level 5 — Primal Proof (V167→V168)
 
 Current state: **L5** (38/38 pass, 4 skip, `GUIDESTONE_READINESS = 5`).
 
