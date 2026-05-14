@@ -1,11 +1,11 @@
 # wetSpring guideStone CHECKSUMS — BLAKE3
-# Generated: 2026-04-27
+# Generated: 2026-05-14
 # Files: 6
 #
 # Verify: primalspring::checksums::verify_manifest()
-fb2e7e1231fc519a2ec7a3be35c8f20db500b05a275dfa68325988d60632f5e3  barracuda/src/bin/wetspring_guidestone.rs
-f8db1e288b97f100eb896c9278ca3f769b7c6576e1aec5c477171660525a7bdf  barracuda/src/niche.rs
+96ab441445840e16380251076760169298ef671f00cab778bd8520f0837776fd  barracuda/src/bin/wetspring_guidestone.rs
+b296df557db5d919fcc4362173a445137bf3d756ea4901d9f52149e09313c325  barracuda/src/niche.rs
 f085f4f95801cfe6ac29f16c12979b66e5610bebe517228df6fea8b2c946e4cf  barracuda/src/tolerances/mod.rs
-911522016a5a8218d43ac26b7a98433d578c3a2f260141471ad622edf12e16ac  barracuda/src/lib.rs
-e7a05a52133c53b42d3373a32abb919e27d31e975cc961092216caabd0b0ee28  barracuda/Cargo.toml
-ddb592092ec5a4fe9501e0d1a117bc53d6898dc7b13e4ea7c80324f95e1b4db7  Cargo.toml
+f4a94156251eac8f7e9108d03f9560ee03e630caa9204a2f0c22b865b22cd7dc  barracuda/src/lib.rs
+cd79d0363ecfd7e5f68448c437011f7fd37582ffcfeecbcc6204b88569f90c75  barracuda/Cargo.toml
+5c880ae2996b13b8f7c1abbbebdf652ce0b46421ff19c2d1507b55c5386e8d21  Cargo.toml
