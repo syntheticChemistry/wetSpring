@@ -162,6 +162,37 @@ fn composition_science_health_roundtrip() {
         assert!(result["subsystems"]["math"].as_bool().unwrap_or(false));
         assert!(result["science_domains"].as_array().is_some());
         assert!(result["capabilities_count"].as_u64().unwrap_or(0) > 30);
+
+        let trio = &result["subsystems"]["provenance_trio"];
+        assert!(
+            trio.is_object(),
+            "V171: provenance_trio must be a live-probing object, not a deferred string: {trio}"
+        );
+        assert!(trio.get("rhizocrypt").is_some());
+        assert!(trio.get("loamspine").is_some());
+        assert!(trio.get("sweetgrass").is_some());
+        assert!(trio.get("summary").is_some());
+
+        let nestgate = &result["subsystems"]["nestgate"];
+        assert!(
+            nestgate.is_string(),
+            "V171: nestgate must be a live status string: {nestgate}"
+        );
+
+        let biome_os = &result["biome_os"];
+        assert!(
+            biome_os.get("neural_api").is_some(),
+            "V171: biome_os.neural_api required"
+        );
+        assert!(
+            biome_os.get("schema_parity").is_some(),
+            "V171: biome_os.schema_parity required"
+        );
+        assert_eq!(
+            biome_os["wave"].as_u64().unwrap_or(0),
+            20,
+            "V171: biome_os.wave must be 20"
+        );
     });
 }
 

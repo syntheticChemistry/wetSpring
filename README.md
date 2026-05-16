@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V170:** Wave 20 schema standardization absorbed. `capability.list` canonical envelope (`count` field). `primal.announce` fully adopted. Registry synced to 452 methods (`primal.list`). nest.store / nest.commit signal dispatch wired. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V171:** Live composition health — `composition.science_health` now performs runtime probing of Provenance Trio, NestGate, and biomeOS Neural API (replacing static deferred checks). Wave 20 schema parity self-check on every health call. Graceful degradation (bare-science still healthy). New `ipc/composition_health.rs` module. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. Registry 452. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

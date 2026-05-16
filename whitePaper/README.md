@@ -3,7 +3,7 @@
 # wetSpring White Paper
 
 **Date:** May 16, 2026
-**Status:** V170 — Wave 20 schema standard (`count` in capability.list, registry 452, primal.announce adopted). **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. Composition: composed. **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 367 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs) + IPC wired. **Tier 3:** Live NUCLEUS IPC. 384 experiments. 2 primal gaps open (deployment-only, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry synced 452.
+**Status:** V171 — Live composition health: runtime probing of trio, NestGate, biomeOS replaces deferred checks. Wave 20 schema parity self-check. **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. Composition: composed, live-probing. **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 367 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs) + IPC wired. **Tier 3:** Live NUCLEUS IPC. 384 experiments. 2 primal gaps open (deployment-only, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry synced 452.
 **License:** AGPL-3.0-or-later
 
 ---

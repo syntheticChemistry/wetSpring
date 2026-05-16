@@ -4,8 +4,8 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-16 (V170 — Wave 20 schema standard: count in
-capability.list, registry 452, primal.announce adopted. Signal dispatch wired.
+Last updated: 2026-05-16 (V171 — Live composition health: runtime probing of
+trio, NestGate, biomeOS replaces deferred checks. Wave 20 schema parity self-check.
 PG-02/PG-04 remain deployment-only.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 

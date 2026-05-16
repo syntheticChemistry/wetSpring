@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V170:** Wave 20 schema standardization absorbed. `capability.list` canonical envelope (`count` field). `primal.announce` fully adopted. Registry synced to 452 methods (`primal.list`). nest.store / nest.commit signal dispatch wired. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V171:** Live composition health — `composition.science_health` performs runtime probing of Provenance Trio, NestGate, biomeOS Neural API (replacing static deferred checks). Wave 20 schema parity self-check. Graceful degradation. New `ipc/composition_health.rs` module. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). Registry 452. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 
@@ -48,7 +48,7 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, drug-target scoring
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.4.0, 150+ primitives consumed
-- **IPC:** 37 JSON-RPC methods, 42 niche capabilities, 21 domains, 1 composition health handler (science_health), 8 MCP tools, Wire Standard L2+L3
+- **IPC:** 37 JSON-RPC methods, 42 niche capabilities, 21 domains, 1 live composition health handler (science_health — runtime probing), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 

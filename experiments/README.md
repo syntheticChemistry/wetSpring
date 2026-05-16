@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-16 (V170: Wave 20 schema standard — count in capability.list, registry 452, primal.announce adopted. barraCuda v0.4.0. coralReef v0.1.0 in niche. 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Updated**: 2026-05-16 (V171: Live composition health — runtime probing of trio, NestGate, biomeOS replaces deferred checks. Wave 20 schema parity self-check. barraCuda v0.4.0. coralReef v0.1.0 in niche. 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 2 primal gaps open (deployment-only), 20 resolved/closed.)
 
 ---
 
@@ -656,7 +656,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V170):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, coralReef v0.1.0 in niche. Wave 20 schema standard (count, registry 452). 50 consumed capabilities. Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. 2 primal gaps open (deployment-only), 20 resolved/closed.
+**Totals (V171):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, coralReef v0.1.0 in niche. Live composition health (runtime probing). Wave 20 schema standard (count, registry 452). 50 consumed capabilities. Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. 2 primal gaps open (deployment-only), 20 resolved/closed.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -686,7 +686,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V170): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Wave 20 schema standard. 50 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
+**Totals (V171): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 50 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

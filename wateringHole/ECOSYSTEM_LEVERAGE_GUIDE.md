@@ -1,12 +1,13 @@
 # Ecosystem Leverage Guide — wetSpring V128 (fossil record)
 
-> **V169 note (May 16, 2026):** This guide was written at V128. Current
+> **V171 note (May 16, 2026):** This guide was written at V128. Current
 > metrics: **367** binaries, **1,962** tests, **150+** barraCuda primitives
 > (v0.4.0), **42** niche capabilities, **50** consumed capabilities (33 v0.9.17
 > canonical + 15 legacy + 2 Wave 17, registry 452). **guideStone Level 5** (primal
-> proof). Wave 17 signal adoption (nest.store, nest.commit, primal.announce).
+> proof). Live composition health: runtime probing of trio, NestGate, biomeOS
+> (replacing deferred checks). Wave 20 schema parity self-check.
 > Clippy pedantic+nursery zero warnings (both crates). Live NUCLEUS 30/31 pass.
-> Composition: composed. **2** primal gaps open (deployment-only,
+> Composition: composed, live-probing. **2** primal gaps open (deployment-only,
 > **20** resolved/closed). Deep debt audit clean — zero internal gaps.
 > See `docs/PRIMAL_GAPS.md`.
 

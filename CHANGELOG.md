@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V171] — 2026-05-16
+
+### Live Composition Health — Runtime Probing Replaces Deferred Checks
+
+- **`composition.science_health` evolved to live probing:** `handle_composition_science_health()` now performs runtime socket discovery and `health.liveness` RPC probes against the Provenance Trio (`rhizoCrypt`, `loamSpine`, `sweetGrass`), `NestGate`, and biomeOS Neural API. Replaces all `"deferred_check"` and `"deferred_to_live"` static strings with live truth.
+- **New module `ipc/composition_health.rs`:** Encapsulates all probing logic — `probe_trio_status()`, `probe_nestgate_status()`, `probe_biomeos_status()`, `probe_schema_parity()`. Each probe uses a 500ms timeout and degrades gracefully (`"live"` / `"discovered"` / `"absent"`).
+- **Trio reports per-component:** Response now includes `{ rhizocrypt: "...", loamspine: "...", sweetgrass: "...", summary: "..." }` object instead of a flat `"deferred_check"` string.
+- **Schema parity self-check:** Validates own `capability.list` response against Wave 20 canonical shape (`capabilities` array + `count` field match) on every health call.
+- **biomeOS live status:** `biome_os.neural_api` now reports actual socket state. `primal_count` populated via `primal.list` (Wave 20) when biomeOS is live. `schema_parity` included.
+- **Graceful degradation:** Bare-science mode (CI, no sockets) remains `healthy: true`. All probes return `"absent"` without errors or panics.
+- **7 new unit tests + updated dispatch and integration tests:** `composition_health::tests` (7), `dispatch::tests::composition_science_health_live_probing` (1), `ipc_roundtrip::composition_science_health_roundtrip` updated for new response shape.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (zero warnings), all tests pass.
+
 ## [V170] — 2026-05-16
 
 ### Wave 20 Schema Standardization — `count` + Registry 452 + `primal.announce` Adopted

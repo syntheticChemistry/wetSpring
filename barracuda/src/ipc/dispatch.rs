@@ -395,6 +395,35 @@ mod tests {
         assert_eq!(subs["ipc"], true);
     }
 
+    #[test]
+    fn composition_science_health_live_probing() {
+        let result = dispatch("composition.science_health", &json!({})).unwrap();
+        assert_eq!(result["healthy"], true);
+        assert_eq!(result["spring"], "wetSpring");
+
+        let trio = &result["subsystems"]["provenance_trio"];
+        assert!(trio.is_object(), "trio must be a live-probing object");
+        for key in &["rhizocrypt", "loamspine", "sweetgrass", "summary"] {
+            assert!(
+                trio.get(key).is_some(),
+                "trio missing key: {key}"
+            );
+        }
+
+        let nestgate = &result["subsystems"]["nestgate"];
+        assert!(nestgate.is_string(), "nestgate must be a status string");
+
+        let biome_os = &result["biome_os"];
+        assert!(biome_os.get("neural_api").is_some());
+        assert!(biome_os.get("schema_parity").is_some());
+        let schema = &biome_os["schema_parity"];
+        assert_eq!(
+            schema["conformant"], true,
+            "own schema parity must be conformant"
+        );
+        assert_eq!(biome_os["wave"], 20);
+    }
+
     mod proptests {
         use super::*;
         use proptest::prelude::*;

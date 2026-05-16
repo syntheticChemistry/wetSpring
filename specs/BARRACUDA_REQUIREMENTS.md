@@ -2,7 +2,7 @@
 
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: May 16, 2026 (V170 — Wave 20 schema standard. barraCuda v0.4.0. coralReef v0.1.0 in niche. 50 consumed (registry 452). Clippy zero workspace. 1,962 lib tests, 2 PG gaps open (deployment-only), 20 resolved/closed)
+**Last Updated**: May 16, 2026 (V171 — Live composition health. barraCuda v0.4.0. coralReef v0.1.0 in niche. 50 consumed (registry 452). Clippy zero workspace. 1,962 lib tests, 2 PG gaps open (deployment-only), 20 resolved/closed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

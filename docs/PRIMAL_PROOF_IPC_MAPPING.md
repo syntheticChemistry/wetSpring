@@ -2,7 +2,7 @@
 
 # wetSpring — Primal Proof IPC Mapping
 
-**Last Updated:** May 16, 2026 (V170 — Wave 20 schema standard: `count` in capability.list, registry 452, primal.announce adopted.)
+**Last Updated:** May 16, 2026 (V171 — Live composition health: runtime probing replaces deferred checks. Wave 20 schema parity self-check. Registry 452.)
 
 When `--features primal-proof` is enabled, wetSpring routes cross-primal calls
 through IPC rather than linking primal libraries. This document maps each domain

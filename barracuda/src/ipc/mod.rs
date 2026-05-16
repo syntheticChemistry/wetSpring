@@ -53,6 +53,8 @@ pub mod stream_item;
 pub mod barracuda_route;
 #[cfg(feature = "ipc")]
 pub mod capability_domains;
+#[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
+pub mod composition_health;
 #[cfg(feature = "ipc")]
 pub mod compute_dispatch;
 #[cfg(all(feature = "ipc", feature = "barracuda-lib"))]

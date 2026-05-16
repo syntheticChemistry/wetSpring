@@ -239,12 +239,23 @@ pub fn handle_health_readiness() -> Result<Value, RpcError> {
     }))
 }
 
-/// Cross-spring composition health check for the science subsystem.
+/// Cross-spring composition health with **live probing**.
 ///
-/// Follows primalSpring's `composition.*_health` pattern. Reports subsystem
-/// readiness so remote springs or primalSpring validators can verify this
-/// NUCLEUS is operational before attempting ionic bond interactions.
+/// Follows primalSpring's `composition.*_health` pattern (Wave 20). Instead of
+/// static `"deferred_check"` flags, this handler probes the Provenance Trio,
+/// `NestGate`, and biomeOS Neural API sockets at runtime with a 500ms timeout
+/// per component. Reports live truth so primalSpring validators, guideStone,
+/// and peer springs get accurate composition status.
+///
+/// Degrades gracefully: bare-science (no sockets) is still `healthy: true`.
 pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcError> {
+    use crate::ipc::composition_health;
+
+    let trio = composition_health::probe_trio_status();
+    let nestgate = composition_health::probe_nestgate_status();
+    let biomeos = composition_health::probe_biomeos_status();
+    let schema = composition_health::probe_schema_parity();
+
     #[cfg(feature = "gpu")]
     let gpu_status = if try_gpu().is_some() {
         "available"
@@ -258,8 +269,8 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "ipc": true,
         "math": true,
         "gpu": gpu_status,
-        "provenance_trio": "deferred_check",
-        "nestgate": "deferred_check",
+        "provenance_trio": trio.to_json(),
+        "nestgate": nestgate.as_str(),
     });
 
     let science_domains = json!([
@@ -271,14 +282,14 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "cross_species",
     ]);
 
+    let biome_os_live = biomeos.to_json();
     let biome_os_status = json!({
-        "composition_status": "deferred_to_live",
-        "method_register": "deferred_to_live",
+        "neural_api": biome_os_live["neural_api"],
+        "primal_count": biome_os_live["primal_count"],
         "primal_announce": "adopted",
         "signal_dispatch": "adopted",
-        "audit_logging": "deferred_to_live",
-        "wave17": "signal_elevation_adopted",
-        "note": "Wave 17: primal.announce replaces 3-call registration; signal.dispatch (nest.store) replaces multi-call provenance. Fallback to method.register / capability.call on pre-v3.56 biomeOS."
+        "schema_parity": schema.to_json(),
+        "wave": 20,
     });
 
     Ok(json!({
@@ -289,6 +300,7 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "subsystems": subsystems,
         "science_domains": science_domains,
         "capabilities_count": CAPABILITIES.len(),
+        "count": CAPABILITIES.len(),
         "bonding_support": ["Covalent", "Ionic"],
         "biome_os": biome_os_status,
     }))
