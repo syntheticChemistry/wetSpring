@@ -5,7 +5,7 @@ Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
 Last updated: 2026-05-16 (V169b — Wave 17 signal adoption + clippy zero workspace.
-barraCuda v0.4.0, coralReef v0.1.0 in niche. 50 consumed capabilities (registry 451).
+barraCuda v0.4.0, coralReef v0.1.0 in niche. 50 consumed capabilities (registry 452).
 Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 

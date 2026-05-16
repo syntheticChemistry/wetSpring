@@ -4,8 +4,8 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-16 (V169 — Wave 17 signal adoption: nest.store,
-nest.commit, primal.announce consumed. Registry 451. GAP-GS-015 verified.
+Last updated: 2026-05-16 (V170 — Wave 20 schema standard: count in
+capability.list, registry 452, primal.announce adopted. Signal dispatch wired.
 PG-02/PG-04 remain deployment-only.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 
@@ -579,7 +579,7 @@ declared, capability discovery wired, `BARRACUDA` constant added).
 **New infrastructure wired V158:**
 - `ipc/skunkbat.rs` — audit event emitter (`audit.event`, `audit.forward`,
   graceful degradation, 12 tests)
-- CI cross-sync updated to 451 canonical methods (was 413, Wave 17)
+- CI cross-sync updated to 452 canonical methods (was 451, Wave 20)
 - `discover_by_capability()` + `capability_to_primal()` in `ipc/discover.rs`
 - `BARRACUDA` added to `primal_names.rs`
 - `SKUNKBAT` re-exported from `ipc/primal_names.rs`

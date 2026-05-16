@@ -3,7 +3,7 @@
 > **V169 note (May 16, 2026):** This guide was written at V128. Current
 > metrics: **367** binaries, **1,962** tests, **150+** barraCuda primitives
 > (v0.4.0), **42** niche capabilities, **50** consumed capabilities (33 v0.9.17
-> canonical + 15 legacy + 2 Wave 17, registry 451). **guideStone Level 5** (primal
+> canonical + 15 legacy + 2 Wave 17, registry 452). **guideStone Level 5** (primal
 > proof). Wave 17 signal adoption (nest.store, nest.commit, primal.announce).
 > Clippy pedantic+nursery zero warnings (both crates). Live NUCLEUS 30/31 pass.
 > Composition: composed. **2** primal gaps open (deployment-only,

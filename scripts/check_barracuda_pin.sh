@@ -3,7 +3,7 @@
 # Run in CI to catch upstream version drift early.
 set -euo pipefail
 
-PINNED="0.3.7"
+PINNED="0.4.0"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BC_TOML="$SCRIPT_DIR/../../barraCuda/Cargo.toml"
