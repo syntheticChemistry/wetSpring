@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V169:** Wave 17 Neural API Signal Elevation adopted. nest.store / nest.commit signal dispatch wired (composition collapse, fallback for pre-v3.56 biomeOS). primal.announce consumed. Registry synced to 451 methods. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V170:** Wave 20 schema standardization absorbed. `capability.list` canonical envelope (`count` field). `primal.announce` fully adopted. Registry synced to 452 methods (`primal.list`). nest.store / nest.commit signal dispatch wired. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

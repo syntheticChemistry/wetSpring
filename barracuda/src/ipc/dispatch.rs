@@ -320,6 +320,14 @@ mod tests {
         assert_eq!(methods.len(), 37, "Wire Standard L2: flat methods array");
         assert!(methods.iter().any(|m| m == "science.diversity"));
         assert!(methods.iter().any(|m| m == "health.liveness"));
+
+        let caps = result["capabilities"].as_array().unwrap();
+        let count = result["count"].as_u64().unwrap();
+        assert_eq!(
+            count as usize,
+            caps.len(),
+            "Wave 20 canonical: count MUST match capabilities array length"
+        );
     }
 
     #[test]

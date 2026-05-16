@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V169:** Wave 17 Neural API Signal Elevation adopted. nest.store and nest.commit signal dispatch wired (composition collapse with fallback). primal.announce consumed. Registry synced to 451 methods. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V170:** Wave 20 schema standardization absorbed. `capability.list` canonical envelope (`count` field). `primal.announce` fully adopted. Registry synced to 452 methods (`primal.list`). nest.store / nest.commit signal dispatch wired. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 

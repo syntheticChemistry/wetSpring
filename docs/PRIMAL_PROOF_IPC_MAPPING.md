@@ -2,7 +2,7 @@
 
 # wetSpring — Primal Proof IPC Mapping
 
-**Last Updated:** May 16, 2026 (V169 — Wave 17 signal adoption: nest.store / nest.commit dispatch, primal.announce. Registry 451.)
+**Last Updated:** May 16, 2026 (V170 — Wave 20 schema standard: `count` in capability.list, registry 452, primal.announce adopted.)
 
 When `--features primal-proof` is enabled, wetSpring routes cross-primal calls
 through IPC rather than linking primal libraries. This document maps each domain

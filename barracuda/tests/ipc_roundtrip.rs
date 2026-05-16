@@ -128,6 +128,18 @@ fn capability_list_includes_all_domains() {
             result["consumed_capabilities"].as_array().is_some(),
             "consumed_capabilities declared (Wire Standard L3)"
         );
+
+        let caps = result["capabilities"]
+            .as_array()
+            .expect("capabilities array (Wave 20 canonical)");
+        let count = result["count"]
+            .as_u64()
+            .expect("count field (Wave 20 canonical)");
+        assert_eq!(
+            count as usize,
+            caps.len(),
+            "Wave 20: count must match capabilities array length"
+        );
     });
 }
 

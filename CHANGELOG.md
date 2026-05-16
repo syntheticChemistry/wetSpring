@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V170] — 2026-05-16
+
+### Wave 20 Schema Standardization — `count` + Registry 452 + `primal.announce` Adopted
+
+- **`count` field added to `capability.list` response:** Canonical envelope now includes `"count": caps.len()` per primalSpring Wave 20 schema standard. biomeOS v3.57+ and projectNUCLEUS/projectFOUNDATION consumers validate `count` matches `capabilities` array length.
+- **Registry synced to 452 methods:** `primal.list` added by primalSpring Wave 20. `ci_cross_sync.rs` updated — threshold 440→442, doc comment 451→452. Module doc updated to reflect Wave 20 directive.
+- **`primal.announce` moved to adopted:** `capability_registry.toml` `[signals].pending` cleared — `primal.announce` now in `adopted` alongside `nest.store` and `nest.commit`. Wave field bumped 17→20, `registry_sync` 451→452.
+- **Test coverage for `count` field:** Unit test (`capability_list_wire_standard_l2`) and integration test (`capability_list_includes_all_domains`) both validate `count == capabilities.len()`.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (zero warnings), `cargo test --features ipc --lib` (252 pass), `ci_cross_sync` (7/7 pass), `ipc_roundtrip` (18/18 pass)
+
 ## [V169b] — 2026-05-16
 
 ### Deep Debt Resolution — Clippy Zero + Idiomatic Rust + Doc Hygiene

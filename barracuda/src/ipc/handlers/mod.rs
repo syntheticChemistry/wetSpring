@@ -126,10 +126,11 @@ fn try_gpu() -> Option<&'static GpuF64> {
 
 /// Capability listing per Capability Wire Standard v1.0.
 ///
-/// Returns the canonical `{primal, version, methods}` envelope (Level 2) plus
-/// `provided_capabilities`, `consumed_capabilities`, `cost_estimates`, and
-/// `operation_dependencies` (Level 3). biomeOS v2.93+ reads `result.methods`
-/// first and skips format detection.
+/// Returns the canonical `{primal, version, capabilities, count}` envelope
+/// (primalSpring Wave 20 schema standard) plus `provided_capabilities`,
+/// `consumed_capabilities`, `cost_estimates`, and `operation_dependencies`
+/// (Level 3). biomeOS v2.93+ reads `result.methods` first; v3.57+ validates
+/// the `capabilities` + `count` canonical subset.
 pub fn handle_capability_list() -> Result<Value, RpcError> {
     use crate::ipc::capability_domains::{DOMAINS, all_methods};
     use crate::niche::CONSUMED_CAPABILITIES;
@@ -145,6 +146,7 @@ pub fn handle_capability_list() -> Result<Value, RpcError> {
         })
         .collect();
 
+    let caps = CAPABILITIES;
     let mut response = json!({
         "primal": crate::PRIMAL_NAME,
         "version": env!("CARGO_PKG_VERSION"),
@@ -152,7 +154,8 @@ pub fn handle_capability_list() -> Result<Value, RpcError> {
         "methods": all_methods(),
         "provided_capabilities": provided_capabilities,
         "consumed_capabilities": CONSUMED_CAPABILITIES,
-        "capabilities": CAPABILITIES,
+        "capabilities": caps,
+        "count": caps.len(),
     });
 
     #[cfg(feature = "json")]

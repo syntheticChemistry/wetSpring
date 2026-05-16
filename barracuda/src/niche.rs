@@ -129,7 +129,9 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 /// which primals provide what.
 ///
 /// barraCuda surface aligned to primalSpring v0.9.17 canonical (33 methods).
-/// Wave 17: `primal.announce` + `signal.dispatch` added (registry 451).
+/// Wave 17: `primal.announce` + `signal.dispatch` added.
+/// Wave 20: registry synced to 452 (`primal.list` added). `count` field in
+/// `capability.list` response. `primal.announce` fully adopted.
 /// Legacy methods separated into [`CONSUMED_CAPABILITIES_LEGACY`] for
 /// explicit tracking (PG-12 resolution).
 pub const CONSUMED_CAPABILITIES: &[&str] = &[

@@ -6,10 +6,10 @@
     reason = "integration test: CI cross-sync validations use unwrap for diagnostic clarity"
 )]
 //! CI Cross-Sync: validates wetSpring's local capability surface against the
-//! primalSpring canonical registry (`config/capability_registry.toml`, 451 methods).
+//! primalSpring canonical registry (`config/capability_registry.toml`, 452 methods).
 //!
-//! Per primalSpring Wave 17 directive: "CI cross-sync — validate your local
-//! capability methods against primalSpring canonical 451. Zero drift is the target."
+//! Per primalSpring Wave 20 directive: "CI cross-sync — validate your local
+//! capability methods against primalSpring canonical 452. Zero drift is the target."
 //!
 //! Seven checks:
 //! 1. Local capability_registry.toml methods == dispatch table methods
@@ -17,7 +17,7 @@
 //! 3. Niche DEPENDENCIES includes all infrastructure primals
 //! 4. Consumed capabilities include biomeOS lifecycle + Wave 17 signal methods
 //! 5. Consumed capabilities reference recognized ecosystem domains
-//! 6. Canonical primalSpring registry accessible and non-trivial (451+)
+//! 6. Canonical primalSpring registry accessible and non-trivial (452+)
 //! 7. `skunkBat` IPC module wired and discoverable
 
 use std::collections::BTreeSet;
@@ -167,7 +167,7 @@ fn consumed_capabilities_use_recognized_domains() {
     }
 }
 
-/// Cross-check: canonical primalSpring registry file exists and contains 451+
+/// Cross-check: canonical primalSpring registry file exists and contains 452+
 /// methods. This validates our CI can access the canonical source of truth.
 #[test]
 fn canonical_registry_accessible_and_nontrivial() {
@@ -193,8 +193,8 @@ fn canonical_registry_accessible_and_nontrivial() {
         .count();
 
     assert!(
-        method_count >= 440,
-        "canonical registry has only {method_count} method entries — expected 451+"
+        method_count >= 442,
+        "canonical registry has only {method_count} method entries — expected 452+"
     );
 }
 

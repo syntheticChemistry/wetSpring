@@ -245,12 +245,11 @@ domain = "health"
 description = "Readiness probe (subsystems + substrate)"
 gpu_accelerated = false
 
-# ── Wave 17 Signal Adoption ────────────────────────────────────────────
-# primalSpring Wave 17 Neural API Signal Elevation.
-# primalSpring registry: 451 methods, 41 scenarios.
+# ── Wave 20 Signal Adoption ────────────────────────────────────────────
+# primalSpring Wave 20: schema standardization + `primal.list` added.
+# primalSpring registry: 452 methods, 42 scenarios.
 
 [signals]
-adopted = ["nest.store", "nest.commit"]
-pending = ["primal.announce"]
-wave = 17
-registry_sync = 451
+adopted = ["nest.store", "nest.commit", "primal.announce"]
+wave = 20
+registry_sync = 452

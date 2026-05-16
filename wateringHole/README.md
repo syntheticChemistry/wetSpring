@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V169b** | `handoffs/WETSPRING_V169B_DEEP_DEBT_DOC_SYNC_HANDOFF_MAY16_2026.md` | May 16 | **Deep debt resolution**: clippy zero workspace, 15 docs synced V169, stale refs fixed, upstream learnings for primal teams. |
+| **V170** | `handoffs/WETSPRING_V170_WAVE20_SCHEMA_STANDARD_HANDOFF_MAY16_2026.md` | May 16 | **Wave 20 schema standardization**: `count` field in capability.list, registry 452, primal.announce adopted, tests verified. |
+| V169b | `handoffs/WETSPRING_V169B_DEEP_DEBT_DOC_SYNC_HANDOFF_MAY16_2026.md` | May 16 | Deep debt resolution: clippy zero workspace, 15 docs synced V169, stale refs fixed, upstream learnings. |
 | V169 | `handoffs/WETSPRING_V169_WAVE17_SIGNAL_ADOPTION_HANDOFF_MAY16_2026.md` | May 16 | Wave 17 signal adoption: nest.store + nest.commit dispatch, primal.announce consumed, registry 451. |
 | V168b | `handoffs/WETSPRING_V168B_LIVE_NUCLEUS_DOC_SYNC_HANDOFF_MAY14_2026.md` | May 14 | Live NUCLEUS doc sync: guideStone 30/31, fossil notes, upstream stale data. |
 | V168 | `handoffs/WETSPRING_V168_COMPUTE_TRIO_ABSORPTION_HANDOFF_MAY14_2026.md` | May 14 | Compute trio absorption: barraCuda v0.4.0, coralReef v0.1.0 niche, plasmidBin confirmed. |
