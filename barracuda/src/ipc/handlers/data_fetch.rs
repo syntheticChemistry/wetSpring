@@ -3,8 +3,8 @@
 //!
 //! wetSpring is a science consumer. All infrastructure is primal composition:
 //!
-//! - **NestGate** (Nest atomic): TLS, content-addressed storage, caching
-//! - **BearDog** (Tower atomic): authorization, consent tokens
+//! - **`NestGate`** (Nest atomic): TLS, content-addressed storage, caching
+//! - **`BearDog`** (Tower atomic): authorization, consent tokens
 //! - **Provenance Trio**: session tracking, Merkle roots, semantic braids
 //! - **biomeOS**: capability routing between primals
 //!
@@ -30,9 +30,9 @@ fn pubchem_base() -> String {
 
 // ── Public handlers ─────────────────────────────────────────────────────
 
-/// Fetch JAK inhibitor panel data from ChEMBL via primal composition.
+/// Fetch JAK inhibitor panel data from `ChEMBL` via primal composition.
 ///
-/// biomeOS routes to NestGate which handles TLS to `ebi.ac.uk`, content-
+/// biomeOS routes to `NestGate` which handles TLS to `ebi.ac.uk`, content-
 /// addresses, caches, and returns the payload. wetSpring never opens a
 /// network connection.
 ///
@@ -92,9 +92,9 @@ pub fn handle_chembl_fetch(params: &Value) -> Result<Value, RpcError> {
     }
 }
 
-/// Fetch compound data from PubChem via primal composition.
+/// Fetch compound data from `PubChem` via primal composition.
 ///
-/// biomeOS routes to NestGate which handles TLS to
+/// biomeOS routes to `NestGate` which handles TLS to
 /// `pubchem.ncbi.nlm.nih.gov`. wetSpring never opens a network connection.
 ///
 /// Override: `WETSPRING_PUBCHEM_BASE_URL`
@@ -157,7 +157,7 @@ pub fn handle_pubchem_fetch(params: &Value) -> Result<Value, RpcError> {
 /// Register a published paper table as a reference data point.
 ///
 /// BLAKE3-hashes the canonical JSON representation (science computation),
-/// stores via NestGate (primal composition), and wraps in a provenance
+/// stores via `NestGate` (primal composition), and wraps in a provenance
 /// session.
 pub fn handle_register_table(params: &Value) -> Result<Value, RpcError> {
     let doi = params
@@ -216,8 +216,8 @@ struct GapReport {
 /// Attempt to fetch external data via primal composition only.
 ///
 /// Tier 1: biomeOS `capability.call("storage", "fetch_external")` — full
-///         composition routing through NestGate.
-/// Tier 2: NestGate direct `storage.retrieve` — cache hit without biomeOS.
+///         composition routing through `NestGate`.
+/// Tier 2: `NestGate` direct `storage.retrieve` — cache hit without biomeOS.
 ///
 /// No fallbacks. Missing primals produce a [`GapReport`].
 fn fetch_via_composition(
@@ -273,7 +273,7 @@ fn fetch_via_composition(
     Err(GapReport { missing: gaps })
 }
 
-/// Tier 1: biomeOS → NestGate `fetch_external`. NestGate handles TLS.
+/// Tier 1: biomeOS → `NestGate` `fetch_external`. `NestGate` handles TLS.
 fn fetch_external_via_biomeos(
     socket: &std::path::Path,
     url: &str,
@@ -308,7 +308,7 @@ fn fetch_external_via_biomeos(
     Some((parsed, hash))
 }
 
-/// Tier 2: NestGate `storage.retrieve` for cached data.
+/// Tier 2: `NestGate` `storage.retrieve` for cached data.
 fn nestgate_cache_retrieve(socket: &std::path::Path, cache_key: &str) -> Option<(Value, String)> {
     let request = json!({
         "jsonrpc": "2.0",
@@ -363,7 +363,7 @@ fn blake3_hash_json(val: &Value) -> String {
     blake3::hash(&bytes).to_hex().to_string()
 }
 
-/// Best-effort store via NestGate `capability.call("storage", "store")`.
+/// Best-effort store via `NestGate` `capability.call("storage", "store")`.
 fn nestgate_store(key: &str, data: &Value, content_hash: &str) {
     let Some(socket) = trio::neural_api_socket() else {
         return;

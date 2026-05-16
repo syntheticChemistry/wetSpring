@@ -3,6 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V169b] — 2026-05-16
+
+### Deep Debt Resolution — Clippy Zero + Idiomatic Rust + Doc Hygiene
+
+- **Clippy pedantic+nursery ZERO for entire workspace:** Both `wetspring-barracuda` and `wetspring-forge` now produce zero warnings. Previously 23 warnings across both crates.
+- **`map_unwrap_or` → `map_or` / `is_ok_and`:** Fixed 5 instances — `provenance/mod.rs` (2× `now_nanos`, `local_session_id`), `skunkbat.rs` (`now_nanos`), `data.rs` (`nestgate_has_dataset`), `ncbi.rs` (`metadata`).
+- **`sort_by` → `sort_by_key(Reverse)`:** Fixed 3 instances — `kmer.rs` (`top_n`), `chimera/detection.rs` (parent candidates), `dada2/core.rs` (ASV abundance sort).
+- **`manual_checked_ops` → `checked_div`:** Fixed `metrics.rs` average timing calculation.
+- **`doc_markdown` hygiene:** Fixed 15 backtick violations across `data_fetch.rs` (`NestGate`, `BearDog`, `ChEMBL`, `PubChem`), `gonzales.rs` (`W_c`), `vault_ipc.rs` (`BearDog`).
+- **Missing `# Panics` doc:** Added to `hormesis_viz.rs::hormesis_scenario()`.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (exit 0, both crates zero warnings), `cargo test --features ipc --lib` (252 pass)
+
 ## [V169] — 2026-05-16
 
 ### Wave 17 Neural API Signal Adoption — nest.store + nest.commit + primal.announce

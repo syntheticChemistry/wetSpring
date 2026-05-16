@@ -16,7 +16,7 @@ use crate::ipc::provenance as trio;
 /// Store encrypted data in the genomic vault.
 ///
 /// Required params: `owner_id`, `label`, `data` (base64-encoded plaintext).
-/// The lineage key must be derivable from the family seed (via BearDog).
+/// The lineage key must be derivable from the family seed (via `BearDog`).
 pub fn handle_vault_store(params: &Value) -> Result<Value, RpcError> {
     let owner_id = params
         .get("owner_id")

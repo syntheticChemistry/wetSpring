@@ -270,7 +270,7 @@ impl NcbiClient {
             let filename = format!("{accession}.fna.gz");
             let path = dir.join(&filename);
             if path.exists() {
-                let size = std::fs::metadata(&path).map(|m| m.len()).unwrap_or(0);
+                let size = std::fs::metadata(&path).map_or(0, |m| m.len());
                 return Ok(AssemblyResult {
                     accession: accession.to_string(),
                     source: AssemblySource::LocalFile(path.clone()),

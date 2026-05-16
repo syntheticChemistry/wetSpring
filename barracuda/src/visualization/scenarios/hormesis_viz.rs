@@ -18,6 +18,10 @@ use super::{edge, gauge, node, scaffold, timeseries};
     clippy::expect_used,
     reason = "compile-time constants (0.3, 10.0, 2.0, 100.0, 2.0) are all positive — infallible"
 )]
+/// # Panics
+///
+/// Panics if the hardcoded hormesis parameters fail validation (infallible
+/// for the compile-time constants used).
 pub fn hormesis_scenario() -> (EcologyScenario, Vec<ScenarioEdge>) {
     let mut s = scaffold(
         "Hormesis Dose-Response",

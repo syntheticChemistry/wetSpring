@@ -344,7 +344,7 @@ pub fn handle_biome_atlas(_params: &Value) -> Result<Value, RpcError> {
     }))
 }
 
-/// Anderson disorder parameter sweep with W_c estimation (Exp131/150).
+/// Anderson disorder parameter sweep with `W_c` estimation (Exp131/150).
 ///
 /// Computes level spacing ratio across a range of disorder values for a
 /// given lattice size, identifying the critical disorder threshold.

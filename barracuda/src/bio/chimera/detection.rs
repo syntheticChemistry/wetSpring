@@ -68,7 +68,7 @@ pub fn detect_chimeras(
             .iter()
             .map(|&j| (j, sketch_similarity(query_sketch, &sketches[j])))
             .collect();
-        scored.sort_unstable_by(|a, b| b.1.cmp(&a.1));
+        scored.sort_unstable_by_key(|e| std::cmp::Reverse(e.1));
 
         let top_k = scored.len().min(MAX_PARENT_CANDIDATES);
         let candidates: Vec<usize> = scored[..top_k].iter().map(|&(j, _)| j).collect();

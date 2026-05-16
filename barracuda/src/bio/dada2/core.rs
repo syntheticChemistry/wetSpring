@@ -372,7 +372,7 @@ pub fn denoise(seqs: &[UniqueSequence], params: &Dada2Params) -> (Vec<Asv>, Dada
 
     assign_to_centers(&seqs, &centers, &err, &mut partition);
     let mut asvs = build_asvs(&seqs, &partition, &centers);
-    asvs.sort_by(|a, b| b.abundance.cmp(&a.abundance));
+    asvs.sort_by_key(|a| std::cmp::Reverse(a.abundance));
 
     let output_reads: usize = asvs.iter().map(|a| a.abundance).sum();
     let output_asvs = asvs.len();

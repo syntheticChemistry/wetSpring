@@ -117,7 +117,7 @@ impl Metrics {
             .map_or(serde_json::Value::Null, |map| {
                 let mut methods = serde_json::Map::new();
                 for (name, m) in &*map {
-                    let avg_us = if m.calls > 0 { m.total_us / m.calls } else { 0 };
+                    let avg_us = m.total_us.checked_div(m.calls).unwrap_or(0);
                     let min_us = if m.min_us == u64::MAX { 0 } else { m.min_us };
                     methods.insert(
                         name.clone(),
