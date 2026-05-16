@@ -16,7 +16,7 @@ Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
            (42 niche caps)     (18 IPC roundtrips)    (63/63 checks)
 
 Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
-           (48 consumed caps)   (5 primals, check_skip)    (plasmidBin)
+           (50 consumed caps)   (5 primals, check_skip)    (plasmidBin)
 
 Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 5 — primal proof)
            (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
@@ -31,7 +31,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **Validation checks** | 5,900+ across 367 binaries (345 barracuda + 22 forge) |
 | **Experiments** | 381 completed + 3 proposed (384 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 42 niche, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch, 21 domains |
+| **IPC capabilities** | 42 niche, 50 consumed (33 v0.9.17 canonical + 15 legacy + 2 Wave 17), 37 dispatch, 21 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V168:** barraCuda v0.4.0 absorbed (compute trio wave). coralReef v0.1.0 declared in niche. guideStone Level 5 (primal proof). plasmidBin deployment evolution confirmed. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V169:** Wave 17 Neural API Signal Elevation adopted. nest.store / nest.commit signal dispatch wired (composition collapse, fallback for pre-v3.56 biomeOS). primal.announce consumed. Registry synced to 451 methods. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

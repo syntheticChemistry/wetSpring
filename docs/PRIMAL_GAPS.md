@@ -4,9 +4,9 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-14 (V168 — barraCuda v0.4.0 absorption. coralReef v0.1.0
-declared in niche. plasmidBin deployment evolution confirmed. sourDough
-internalization noted. PG-02/PG-04 remain deployment-only.
+Last updated: 2026-05-16 (V169 — Wave 17 signal adoption: nest.store,
+nest.commit, primal.announce consumed. Registry 451. GAP-GS-015 verified.
+PG-02/PG-04 remain deployment-only.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
 
 ---

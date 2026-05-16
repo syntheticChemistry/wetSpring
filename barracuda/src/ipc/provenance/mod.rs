@@ -231,6 +231,58 @@ pub(crate) fn capability_call(
         .ok_or_else(|| IpcError::EmptyResponse.into())
 }
 
+/// Wave 17: send `signal.dispatch` to biomeOS for a named signal.
+///
+/// Returns `None` if biomeOS is pre-v3.56 (no `signal.dispatch` method).
+fn signal_dispatch(socket_path: &Path, signal: &str, payload: &Value) -> Option<Value> {
+    let request = json!({
+        "jsonrpc": "2.0",
+        "method": "signal.dispatch",
+        "params": {
+            "signal": signal,
+            "payload": payload,
+        },
+        "id": 1,
+    });
+
+    let payload_str = serde_json::to_string(&request).ok()?;
+
+    let stream = std::os::unix::net::UnixStream::connect(socket_path).ok()?;
+    stream.set_read_timeout(Some(RPC_TIMEOUT)).ok();
+    stream.set_write_timeout(Some(RPC_TIMEOUT)).ok();
+
+    let mut writer = std::io::BufWriter::new(&stream);
+    writer.write_all(payload_str.as_bytes()).ok()?;
+    writer.write_all(b"\n").ok()?;
+    writer.flush().ok()?;
+    drop(writer);
+    stream.shutdown(std::net::Shutdown::Write).ok()?;
+
+    let mut reader = BufReader::new(&stream);
+    let mut line = String::new();
+    reader.read_line(&mut line).ok()?;
+
+    let parsed: Value = serde_json::from_str(line.trim()).ok()?;
+    parsed.get("result").cloned()
+}
+
+/// Wave 17: attempt `nest.commit` via signal dispatch.
+///
+/// biomeOS atomically runs: dehydrate → commit → braid for the session.
+fn try_nest_commit_signal(socket_path: &Path, session_id: &str) -> Option<Value> {
+    let payload = json!({
+        "session_id": session_id,
+        "spring_id": "wetspring",
+    });
+
+    let result = signal_dispatch(socket_path, "nest.commit", &payload)?;
+    if result.get("commit_id").is_some() || result.get("provenance").is_some() {
+        Some(result)
+    } else {
+        None
+    }
+}
+
 fn local_session_id() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
     let ts = SystemTime::now()
@@ -244,6 +296,10 @@ fn local_session_id() -> String {
 ///
 /// Three-phase completion following the wateringHole provenance trio pattern.
 /// Each phase degrades gracefully if the downstream primal is unavailable.
+///
+/// Wave 17: tries `signal.dispatch("nest.commit")` first — biomeOS manages
+/// the dehydrate → commit → braid graph atomically. Falls back to the
+/// three-phase multi-call sequence for pre-v3.56 biomeOS.
 pub fn complete_session(session_id: &str) -> Value {
     let Some(socket) = neural_api_socket() else {
         return json!({
@@ -252,6 +308,11 @@ pub fn complete_session(session_id: &str) -> Value {
         });
     };
 
+    if let Some(signal_result) = try_nest_commit_signal(&socket, session_id) {
+        return signal_result;
+    }
+
+    // Fallback: multi-call sequence for pre-Wave 17 biomeOS.
     // Phase 1: Dehydrate (rhizoCrypt)
     let Ok(dehydration) = rhizocrypt::dehydrate(&socket, session_id) else {
         return json!({

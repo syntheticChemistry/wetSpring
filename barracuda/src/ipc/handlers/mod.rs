@@ -271,8 +271,11 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
     let biome_os_status = json!({
         "composition_status": "deferred_to_live",
         "method_register": "deferred_to_live",
+        "primal_announce": "adopted",
+        "signal_dispatch": "adopted",
         "audit_logging": "deferred_to_live",
-        "note": "biomeOS v3.51 composition.status / method.register / skunkBat audit wired in niche; populated at runtime via CompositionContext"
+        "wave17": "signal_elevation_adopted",
+        "note": "Wave 17: primal.announce replaces 3-call registration; signal.dispatch (nest.store) replaces multi-call provenance. Fallback to method.register / capability.call on pre-v3.56 biomeOS."
     });
 
     Ok(json!({

@@ -198,6 +198,15 @@ pub fn try_tier2(method: &str, params: &Value, result_hash: &str) -> Option<Valu
 fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Value> {
     let neural_socket = neural_api_socket()?;
 
+    // Wave 17: try nest.store signal dispatch first (composition collapse).
+    // biomeOS manages the graph: session.create → event.append → dehydrate →
+    // commit → braid.create in one atomic operation.
+    if let Some(signal_result) = try_nest_store_signal(&neural_socket, method, params, result_hash)
+    {
+        return Some(signal_result);
+    }
+
+    // Fallback: multi-call provenance sequence for pre-Wave 17 biomeOS.
     // 1. rhizoCrypt: dag.session.create
     let session = capability_call(
         &neural_socket,
@@ -476,6 +485,46 @@ fn now_epoch() -> u64 {
 
 fn now_iso8601() -> String {
     format!("{}", now_epoch())
+}
+
+/// Wave 17: attempt `nest.store` signal dispatch via `signal.dispatch`.
+///
+/// biomeOS manages the full graph (session → event → dehydrate → commit →
+/// braid) atomically. Falls back to `capability.call` routing if biomeOS
+/// is pre-v3.56 (no `signal.dispatch`).
+fn try_nest_store_signal(
+    socket_path: &std::path::Path,
+    method: &str,
+    params: &Value,
+    result_hash: &str,
+) -> Option<Value> {
+    let params_hash = blake3_hash_json(params);
+    let computation_witness = witness_hash(result_hash, &format!("tier2:computation:{method}"));
+    let ingest_witness = witness_hash(&params_hash, &format!("tier2:params_hash:{method}"));
+
+    let signal_params = json!({
+        "signal": "nest.store",
+        "payload": {
+            "method": method,
+            "params_hash": params_hash,
+            "result_hash": result_hash,
+            "witnesses": [computation_witness, ingest_witness],
+            "session_type": { "Experiment": { "spring_id": "wetspring" } },
+            "agents": [{
+                "did": "did:key:wetspring",
+                "role": "computation",
+                "contribution": 1.0,
+            }],
+        },
+    });
+
+    let result = call_neural(socket_path, "signal.dispatch", &signal_params)?;
+    if result.get("session_id").is_some() || result.get("braid_id").is_some() {
+        trio_record_success();
+        Some(result)
+    } else {
+        None
+    }
 }
 
 fn neural_api_socket() -> Option<std::path::PathBuf> {

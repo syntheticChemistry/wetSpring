@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V168:** barraCuda v0.4.0 absorbed (compute trio wave). coralReef v0.1.0 declared in niche. guideStone Level 5 (primal proof). plasmidBin deployment evolution confirmed. sourDough internalization noted. 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V169:** Wave 17 Neural API Signal Elevation adopted. nest.store and nest.commit signal dispatch wired (composition collapse with fallback). primal.announce consumed. Registry synced to 451 methods. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). 1,962 lib tests, 0 failed. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 
@@ -25,7 +25,7 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 367 validation/benchmark binaries (345 barracuda + 22 forge)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 48 consumed (33 v0.9.17 canonical + 15 legacy), 37 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 50 consumed (33 v0.9.17 canonical + 15 legacy + 2 Wave 17), 37 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
 - **Validation checks:** 5,900+ across 367 binaries

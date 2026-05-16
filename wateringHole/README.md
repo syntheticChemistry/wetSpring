@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** May 13, 2026  
+**Date:** May 16, 2026  
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V168b** | `handoffs/WETSPRING_V168B_LIVE_NUCLEUS_DOC_SYNC_HANDOFF_MAY14_2026.md` | May 14 | **Live NUCLEUS doc sync**: 20 docs synced V168, live guideStone 30/31 documented, fossil notes updated, upstream stale data for primalSpring. |
+| **V169** | `handoffs/WETSPRING_V169_WAVE17_SIGNAL_ADOPTION_HANDOFF_MAY16_2026.md` | May 16 | **Wave 17 signal adoption**: nest.store + nest.commit dispatch, primal.announce consumed, registry 451, GAP-GS-015 verified, 14 docs synced. |
+| V168b | `handoffs/WETSPRING_V168B_LIVE_NUCLEUS_DOC_SYNC_HANDOFF_MAY14_2026.md` | May 14 | Live NUCLEUS doc sync: guideStone 30/31, fossil notes, upstream stale data. |
 | V168 | `handoffs/WETSPRING_V168_COMPUTE_TRIO_ABSORPTION_HANDOFF_MAY14_2026.md` | May 14 | Compute trio absorption: barraCuda v0.4.0, coralReef v0.1.0 niche, plasmidBin confirmed. |
 || | *Superseded → `handoffs/archive/`* | | V167b and earlier archived (**187** files). |
 

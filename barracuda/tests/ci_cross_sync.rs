@@ -93,9 +93,9 @@ fn niche_dependencies_include_infrastructure() {
     );
 }
 
-/// `niche::CONSUMED_CAPABILITIES` must include biomeOS v3.51 lifecycle methods.
+/// `niche::CONSUMED_CAPABILITIES` must include biomeOS lifecycle + Wave 17 signal methods.
 #[test]
-fn consumed_includes_biomeos_v351_lifecycle() {
+fn consumed_includes_biomeos_lifecycle_and_signals() {
     let consumed: BTreeSet<&str> = niche::CONSUMED_CAPABILITIES.iter().copied().collect();
 
     assert!(
@@ -104,11 +104,19 @@ fn consumed_includes_biomeos_v351_lifecycle() {
     );
     assert!(
         consumed.contains("method.register"),
-        "CONSUMED_CAPABILITIES missing method.register (biomeOS v3.51)"
+        "CONSUMED_CAPABILITIES missing method.register (biomeOS v3.51 — fallback for announce)"
     );
     assert!(
         consumed.contains("audit.event"),
         "CONSUMED_CAPABILITIES missing audit.event (skunkBat JH-5)"
+    );
+    assert!(
+        consumed.contains("primal.announce"),
+        "CONSUMED_CAPABILITIES missing primal.announce (Wave 17 — replaces 3-call registration)"
+    );
+    assert!(
+        consumed.contains("signal.dispatch"),
+        "CONSUMED_CAPABILITIES missing signal.dispatch (Wave 17 — composition collapse)"
     );
 }
 
@@ -145,6 +153,8 @@ fn consumed_capabilities_use_recognized_domains() {
         "composition.",
         "method.",
         "defense.",
+        "primal.",
+        "signal.",
     ];
 
     for cap in niche::CONSUMED_CAPABILITIES {
@@ -157,7 +167,7 @@ fn consumed_capabilities_use_recognized_domains() {
     }
 }
 
-/// Cross-check: canonical primalSpring registry file exists and contains 413+
+/// Cross-check: canonical primalSpring registry file exists and contains 451+
 /// methods. This validates our CI can access the canonical source of truth.
 #[test]
 fn canonical_registry_accessible_and_nontrivial() {
@@ -183,8 +193,8 @@ fn canonical_registry_accessible_and_nontrivial() {
         .count();
 
     assert!(
-        method_count >= 400,
-        "canonical registry has only {method_count} method entries — expected 413+"
+        method_count >= 440,
+        "canonical registry has only {method_count} method entries — expected 451+"
     );
 }
 

@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** May 14, 2026
-**Status:** V168 — **guideStone Level 5** (primal proof). barraCuda v0.4.0 absorbed. coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. Deep debt audit clean. **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 367 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs) + IPC wired + contract aligned. **Tier 3:** Live NUCLEUS IPC. 384 experiments, `barraCuda` v0.4.0. 2 primal gaps open (deployment-only, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced.
+**Date:** May 16, 2026
+**Status:** V169 — Wave 17 signal adoption (nest.store, nest.commit, primal.announce). **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. **Tier 1:** Python→Rust (5,900+ checks, 1,962 lib + 97 integration + 18 IPC, 367 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs) + IPC wired + contract aligned. **Tier 3:** Live NUCLEUS IPC. 384 experiments, `barraCuda` v0.4.0. 2 primal gaps open (deployment-only, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers reproduced. Registry synced 451.
 **License:** AGPL-3.0-or-later
 
 ---

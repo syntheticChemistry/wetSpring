@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V169] — 2026-05-16
+
+### Wave 17 Neural API Signal Adoption — nest.store + nest.commit + primal.announce
+
+- **`nest.store` signal dispatch adopted:** `facade/provenance.rs` `try_tier2_inner()` now attempts `signal.dispatch("nest.store")` first, collapsing the 5-call provenance sequence (session.create → event.append → dehydrate → commit → braid.create) into one atomic biomeOS signal. Falls back to multi-call sequence for pre-v3.56 biomeOS.
+- **`nest.commit` signal dispatch adopted:** `ipc/provenance/mod.rs` `complete_session()` now attempts `signal.dispatch("nest.commit")` first, collapsing the 3-phase sequence (dehydrate → commit → braid) into one atomic signal. Falls back to multi-call for older biomeOS.
+- **`primal.announce` + `signal.dispatch` consumed:** Added to `CONSUMED_CAPABILITIES` in `niche.rs`. `primal.announce` replaces the 3-call registration pattern (method.register + capability.register + lifecycle.register). `signal.dispatch` enables composition collapse.
+- **Registry synced to 451 methods:** `ci_cross_sync.rs` updated — threshold 400→440, doc comment 413→451. Added `primal.` and `signal.` domain prefixes to recognized list. Renamed test to `consumed_includes_biomeos_lifecycle_and_signals`.
+- **GAP-GS-015 verified:** `ALL_CAPS`/`BTSP_EXTRA_CAPS` re-export from primalSpring `composition/mod.rs` confirmed. `cargo check --features guidestone --lib` passes.
+- **`capability_registry.toml`:** Wave 17 signal adoption block added (adopted: nest.store, nest.commit; pending: primal.announce; registry_sync: 451).
+- **IPC health status updated:** `ipc/handlers/mod.rs` biome_os status includes `primal_announce: adopted`, `signal_dispatch: adopted`, `wave17: signal_elevation_adopted`.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (exit 0), `cargo test --features ipc --test ci_cross_sync` (7/7 pass), `cargo test --features ipc --lib` (252 pass)
+
 ## [V168b] — 2026-05-14
 
 ### Doc Sync + Live NUCLEUS Results
