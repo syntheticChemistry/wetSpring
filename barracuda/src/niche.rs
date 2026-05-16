@@ -36,7 +36,7 @@ pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
 /// 0 = not started, 1 = validation exists, 2 = properties documented,
 /// 3 = bare guideStone works, 4 = NUCLEUS guideStone works, 5 = primal proof.
 ///
-/// Promoted to 5 (V167): primal proof — full domain science surface validated
+/// Promoted to 5 (V167, Wave 17 signals V169): primal proof — full domain science surface validated
 /// via NUCLEUS IPC. 38/38 pass, 4 skip (infra-dependent), exit 0. 1,962 lib
 /// tests, 91.20% coverage, zero internal gaps. Science surface wired: all 15
 /// manifest capabilities + N2 extended domain science + N3 cross-atomic pipeline.

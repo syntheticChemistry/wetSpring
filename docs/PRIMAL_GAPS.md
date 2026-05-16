@@ -579,7 +579,7 @@ declared, capability discovery wired, `BARRACUDA` constant added).
 **New infrastructure wired V158:**
 - `ipc/skunkbat.rs` — audit event emitter (`audit.event`, `audit.forward`,
   graceful degradation, 12 tests)
-- CI cross-sync updated to 413 canonical methods (was 403)
+- CI cross-sync updated to 451 canonical methods (was 413, Wave 17)
 - `discover_by_capability()` + `capability_to_primal()` in `ipc/discover.rs`
 - `BARRACUDA` added to `primal_names.rs`
 - `SKUNKBAT` re-exported from `ipc/primal_names.rs`

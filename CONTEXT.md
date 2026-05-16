@@ -77,7 +77,7 @@ Tier 2: Rust validation   → NUCLEUS composition patterns
 Tier 3: Composition       → IPC parity → Niche gate
            (L2+L3)          (Exp401)     (Exp402)
 Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest
-           (48 consumed)     (5 primals, check_skip)    (plasmidBin)
+           (50 consumed)     (5 primals, check_skip)    (plasmidBin)
 Tier 5: guideStone        → Self-validating NUCLEUS node (Level 5 — primal proof)
            (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
 ```

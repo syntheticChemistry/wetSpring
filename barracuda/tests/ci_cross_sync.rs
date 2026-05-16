@@ -6,19 +6,19 @@
     reason = "integration test: CI cross-sync validations use unwrap for diagnostic clarity"
 )]
 //! CI Cross-Sync: validates wetSpring's local capability surface against the
-//! primalSpring canonical registry (`config/capability_registry.toml`, 413 methods).
+//! primalSpring canonical registry (`config/capability_registry.toml`, 451 methods).
 //!
-//! Per primalSpring post-interstadial directive (May 10, 2026): "CI cross-sync —
-//! validate your local capability methods against primalSpring canonical 413.
-//! Zero drift is the target."
+//! Per primalSpring Wave 17 directive: "CI cross-sync — validate your local
+//! capability methods against primalSpring canonical 451. Zero drift is the target."
 //!
-//! Six checks:
+//! Seven checks:
 //! 1. Local capability_registry.toml methods == dispatch table methods
 //! 2. Niche CAPABILITIES ⊇ dispatch methods
 //! 3. Niche DEPENDENCIES includes all infrastructure primals
-//! 4. Consumed capabilities include biomeOS v3.51 lifecycle methods
+//! 4. Consumed capabilities include biomeOS lifecycle + Wave 17 signal methods
 //! 5. Consumed capabilities reference recognized ecosystem domains
-//! 6. Canonical primalSpring registry accessible and non-trivial (413+)
+//! 6. Canonical primalSpring registry accessible and non-trivial (451+)
+//! 7. `skunkBat` IPC module wired and discoverable
 
 use std::collections::BTreeSet;
 

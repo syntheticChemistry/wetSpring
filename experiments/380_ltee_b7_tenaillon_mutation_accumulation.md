@@ -2,7 +2,7 @@
 
 # Exp380: LTEE B7 — Tenaillon 2016 Mutation Accumulation Pipeline
 
-**Status:** TIER 2 COMPLETE (V165)
+**Status:** TIER 2 COMPLETE (V165, current V169)
 **Paper:** Tenaillon et al. "Tempo and mode of genome evolution in a
 50,000-generation experiment" *Nature* 536, 165–170 (2016)
 **BioProject:** PRJNA294072

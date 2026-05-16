@@ -656,7 +656,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V168):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. plasmidBin all compositions validated. 2 primal gaps open (deployment-only), 20 resolved/closed.
+**Totals (V169):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, coralReef v0.1.0 in niche. Wave 17 signal adoption (nest.store, nest.commit). 50 consumed capabilities (registry 451). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. plasmidBin all compositions validated. 2 primal gaps open (deployment-only), 20 resolved/closed.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -686,7 +686,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
 exp097/exp098.
 
-**Totals (V168): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
+**Totals (V169): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Wave 17 signal adoption. 50 consumed (registry 451). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 
