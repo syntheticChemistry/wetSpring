@@ -171,9 +171,44 @@ fn cmd_validate(
 }
 
 fn cmd_serve() {
-    eprintln!("wetspring_unibin serve: delegating to wetspring IPC server");
-    eprintln!("(Use `wetspring serve` for full IPC server — UniBin serve is scaffolded)");
-    std::process::exit(0);
+    tracing_subscriber::fmt::init();
+
+    tracing::info!(
+        primal = wetspring_barracuda::PRIMAL_NAME,
+        version = env!("CARGO_PKG_VERSION"),
+        "starting science primal (UniBin)"
+    );
+
+    let server = match wetspring_barracuda::ipc::Server::bind_default() {
+        Ok(s) => s,
+        Err(e) => {
+            tracing::error!(error = %e, "cannot bind socket");
+            std::process::exit(1);
+        }
+    };
+
+    tracing::info!(socket = %server.socket_path().display(), "bound");
+
+    let _heartbeat = wetspring_barracuda::ipc::songbird::discover_socket().map_or_else(
+        || {
+            tracing::info!("Songbird not found, standalone mode");
+            None
+        },
+        |songbird_socket| {
+            tracing::info!(songbird = %songbird_socket.display(), "Songbird discovered");
+            Some(wetspring_barracuda::ipc::songbird::start_heartbeat_loop(
+                songbird_socket,
+                server.socket_path().to_path_buf(),
+            ))
+        },
+    );
+
+    tracing::info!(
+        capabilities = wetspring_barracuda::ipc::handlers::CAPABILITIES.len(),
+        "ready"
+    );
+
+    server.run();
 }
 
 fn cmd_status(format: cli::OutputFormat) {

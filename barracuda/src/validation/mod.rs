@@ -90,6 +90,35 @@ pub fn check_count(label: &str, actual: usize, expected: usize) -> bool {
     pass
 }
 
+/// Convert a dense `n×n` matrix (row-major) to the upstream
+/// [`barracuda::spectral::SpectralCsrMatrix`] sparse format.
+///
+/// Values whose absolute magnitude is at or below
+/// [`crate::tolerances::JACOBI_ELEMENT_SKIP`] are treated as structural zeros.
+#[cfg(feature = "barracuda-lib")]
+#[must_use]
+pub fn dense_to_csr(matrix: &[f64], n: usize) -> barracuda::spectral::SpectralCsrMatrix {
+    let mut row_ptr = vec![0usize];
+    let mut col_idx = Vec::new();
+    let mut values = Vec::new();
+    for i in 0..n {
+        for j in 0..n {
+            let val = matrix[i * n + j];
+            if val.abs() > crate::tolerances::JACOBI_ELEMENT_SKIP {
+                col_idx.push(j);
+                values.push(val);
+            }
+        }
+        row_ptr.push(col_idx.len());
+    }
+    barracuda::spectral::SpectralCsrMatrix {
+        n,
+        row_ptr,
+        col_idx,
+        values,
+    }
+}
+
 /// Print summary and return whether all checks passed.
 ///
 /// Returns `false` when `total == 0` — a validator that runs no checks

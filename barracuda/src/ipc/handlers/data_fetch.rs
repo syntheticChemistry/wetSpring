@@ -228,13 +228,13 @@ fn fetch_via_composition(
 
     let Some(socket) = trio::neural_api_socket() else {
         gaps.push(json!({
-            "primal": "biomeOS",
+            "primal": crate::primal_names::BIOMEOS_DISPLAY,
             "capability": "Neural API socket",
             "required_for": "capability.call routing",
             "deploy": "start biomeOS orchestrator",
         }));
         gaps.push(json!({
-            "primal": "NestGate",
+            "primal": crate::primal_names::NESTGATE_DISPLAY,
             "capability": "storage.fetch_external",
             "required_for": "TLS fetch + content-addressed caching",
             "deploy": "start NestGate with fetch_external capability",
@@ -247,7 +247,7 @@ fn fetch_via_composition(
         Some((data, hash)) => return Ok((data, hash, "nestgate_via_biomeos")),
         None => {
             gaps.push(json!({
-                "primal": "NestGate",
+                "primal": crate::primal_names::NESTGATE_DISPLAY,
                 "capability": "storage.fetch_external",
                 "required_for": "TLS fetch of external URL",
                 "url": url,
@@ -261,7 +261,7 @@ fn fetch_via_composition(
         Some((data, hash)) => return Ok((data, hash, "nestgate_cache")),
         None => {
             gaps.push(json!({
-                "primal": "NestGate",
+                "primal": crate::primal_names::NESTGATE_DISPLAY,
                 "capability": "storage.retrieve",
                 "required_for": "cached data retrieval",
                 "cache_key": cache_key,
@@ -414,7 +414,8 @@ mod tests {
             .filter_map(|g| g["primal"].as_str())
             .collect();
         assert!(
-            primal_names.contains(&"biomeOS") || primal_names.contains(&"NestGate"),
+            primal_names.contains(&crate::primal_names::BIOMEOS_DISPLAY)
+                || primal_names.contains(&crate::primal_names::NESTGATE_DISPLAY),
             "gap must name the missing primal, got: {primal_names:?}"
         );
     }

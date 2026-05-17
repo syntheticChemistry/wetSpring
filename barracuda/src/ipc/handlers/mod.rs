@@ -294,7 +294,7 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
 
     Ok(json!({
         "healthy": true,
-        "spring": "wetSpring",
+        "spring": crate::primal_names::SELF_DISPLAY,
         "deploy_graph": DEPLOY_GRAPH_NAME,
         "version": env!("CARGO_PKG_VERSION"),
         "subsystems": subsystems,

@@ -48,6 +48,47 @@ pub const SQUIRREL: &str = "squirrel";
 /// skunkBat audit logging — cross-primal event instrumentation.
 pub const SKUNKBAT: &str = "skunkbat";
 
+// ── Display names (human-readable, for JSON gap reports / UX) ──
+
+/// Human-readable display name for this primal.
+pub const SELF_DISPLAY: &str = "wetSpring";
+
+/// `biomeOS` display name (for gap reports and composition JSON).
+pub const BIOMEOS_DISPLAY: &str = "biomeOS";
+
+/// `NestGate` display name.
+pub const NESTGATE_DISPLAY: &str = "NestGate";
+
+/// `ToadStool` display name.
+pub const TOADSTOOL_DISPLAY: &str = "ToadStool";
+
+/// `rhizoCrypt` display name.
+pub const RHIZOCRYPT_DISPLAY: &str = "rhizoCrypt";
+
+/// `loamSpine` display name.
+pub const LOAMSPINE_DISPLAY: &str = "loamSpine";
+
+/// `sweetGrass` display name.
+pub const SWEETGRASS_DISPLAY: &str = "sweetGrass";
+
+/// `skunkBat` display name.
+pub const SKUNKBAT_DISPLAY: &str = "skunkBat";
+
+/// `BearDog` display name.
+pub const BEARDOG_DISPLAY: &str = "BearDog";
+
+/// `Songbird` display name.
+pub const SONGBIRD_DISPLAY: &str = "Songbird";
+
+/// `petalTongue` display name.
+pub const PETALTONGUE_DISPLAY: &str = "petalTongue";
+
+/// `Squirrel` display name.
+pub const SQUIRREL_DISPLAY: &str = "Squirrel";
+
+/// `coralReef` display name.
+pub const CORALREEF_DISPLAY: &str = "coralReef";
+
 /// Legacy JSON-RPC method prefix (`{SELF_NAME}.`) on the wire — must match [`SELF_NAME`] + `.`.
 pub const LEGACY_SELF_METHOD_PREFIX: &str = "wetspring.";
 

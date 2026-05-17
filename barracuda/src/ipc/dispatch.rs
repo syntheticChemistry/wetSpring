@@ -399,7 +399,7 @@ mod tests {
     fn composition_science_health_live_probing() {
         let result = dispatch("composition.science_health", &json!({})).unwrap();
         assert_eq!(result["healthy"], true);
-        assert_eq!(result["spring"], "wetSpring");
+        assert_eq!(result["spring"], crate::primal_names::SELF_DISPLAY);
 
         let trio = &result["subsystems"]["provenance_trio"];
         assert!(trio.is_object(), "trio must be a live-probing object");

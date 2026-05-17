@@ -54,8 +54,7 @@ use barracuda::linalg::{
 use barracuda::numerical::numerical_hessian;
 use barracuda::sample::{BoltzmannResult, boltzmann_sampling};
 use barracuda::spectral::{
-    SpectralCsrMatrix, anderson_hamiltonian, find_all_eigenvalues, lanczos, lanczos_eigenvalues,
-    level_spacing_ratio,
+    anderson_hamiltonian, find_all_eigenvalues, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 use barracuda::{
     BatchFitnessGpu, LocusVarianceGpu, PairwiseHammingGpu, PairwiseJaccardGpu, SpatialPayoffGpu,
@@ -66,29 +65,7 @@ use wgpu::util::DeviceExt;
 
 use wetspring_barracuda::tolerances;
 use wetspring_barracuda::validation::OrExit;
-use wetspring_barracuda::validation::{self, CrossSpringEntry, Validator};
-
-fn dense_to_csr(matrix: &[f64], n: usize) -> SpectralCsrMatrix {
-    let mut row_ptr = vec![0usize];
-    let mut col_idx = Vec::new();
-    let mut values = Vec::new();
-    for i in 0..n {
-        for j in 0..n {
-            let val = matrix[i * n + j];
-            if val.abs() > tolerances::JACOBI_ELEMENT_SKIP {
-                col_idx.push(j);
-                values.push(val);
-            }
-        }
-        row_ptr.push(col_idx.len());
-    }
-    SpectralCsrMatrix {
-        n,
-        row_ptr,
-        col_idx,
-        values,
-    }
-}
+use wetspring_barracuda::validation::{self, CrossSpringEntry, Validator, dense_to_csr};
 
 fn eigenvalues_from_dense(matrix: &[f64], n: usize) -> Vec<f64> {
     let csr = dense_to_csr(matrix, n);

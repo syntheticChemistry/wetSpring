@@ -390,7 +390,7 @@ pub fn ferment_vertex(
             "agents": [
                 {
                     "type": "primal",
-                    "id": "wetSpring",
+                    "id": crate::primal_names::SELF_DISPLAY,
                     "version": WETSPRING_VERSION,
                 },
                 {

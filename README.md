@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V172:** Wave 20 debt resolution — CI cross-sync threshold tightened (442→452), `primal.list` declared in `CONSUMED_CAPABILITIES`, V158 attribution corrected. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. Registry 452. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V173:** Deep debt resolution — UniBin `serve` evolved to live IPC server, `dense_to_csr` extracted to library, display-name constants centralized. Zero `unsafe`, zero `TODO`/`FIXME`/`HACK`, all mocks test-gated. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. Registry 452, 51 consumed capabilities. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V173] — 2026-05-17
+
+### Deep Debt Resolution — Stub Evolution, Library Extraction, Display-Name Hygiene
+
+- **UniBin `serve` evolved from stub to live IPC server:** `cmd_serve()` now binds the Unix domain socket via `Server::bind_default()`, discovers Songbird for capability registration, starts the heartbeat loop, and runs the full JSON-RPC server. Replaces the `eprintln!` + `exit(0)` scaffold.
+- **`dense_to_csr` extracted to validation library:** The dense-matrix → CSR conversion helper (used by cross-spring validators) moved from the `validate_cross_spring_s57` binary into `validation::dense_to_csr()` (feature-gated behind `barracuda-lib`). Binary updated to import from library. Reduces s57 binary by 20 lines.
+- **Display-name constants centralized:** 13 `*_DISPLAY` constants added to `primal_names.rs` (`SELF_DISPLAY`, `BIOMEOS_DISPLAY`, `NESTGATE_DISPLAY`, etc.). Hardcoded CamelCase string literals in `ipc/handlers/mod.rs`, `ipc/handlers/data_fetch.rs`, `ipc/dispatch.rs`, and `facade/provenance.rs` replaced with constants. Single source of truth for both wire names (lowercase) and display names (CamelCase).
+- **Audit findings (no action needed):** Zero `unsafe` blocks. Zero `TODO`/`FIXME`/`HACK`. All mocks `#[cfg(test)]`-gated. `unwrap_used = "deny"` enforced. External deps are pure Rust (`flate2` rust_backend; `wgpu` is the only system/GPU driver dependency). 4 large binaries (>800L) are validation harnesses with justified `#[expect(clippy::too_many_lines)]` — sequential domain checks in single `main()`.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (zero warnings), `cargo test --features ipc --lib` (252 pass), `cargo check --features guidestone --bin wetspring_unibin` (clean).
+
 ## [V172] — 2026-05-17
 
 ### Wave 20 Debt Resolution — primalSpring Audit Fixes
