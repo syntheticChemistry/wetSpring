@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V175:** Doc sync + primal team handoff. 20 docs bumped to V174 metrics. V174 handoff crafted: composition patterns (self-knowledge, capability discovery, live health probing, Neural API deployment, UniBin), upstream learnings for all primal teams, absorption-ready items, open gaps for review. Archive audit clean — zero stale scripts, zero orphan .py, zero debris. 384/384 experiments, 370 binaries, 5,957+ checks. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V176:** lithoSpore audit response. New `provenance.export_braid` method — ferment transcript braid export in lithoSpore wire format. loamSpine capability routing fixed (`"session"` → `"ledger"` per trio integration guide v2.0). `braid_handoff.rs` module with `FermentTranscriptBraid` struct, 5 tests. 43 niche capabilities, 51 consumed, registry 453. 384/384 experiments, 370 binaries, 5,957+ checks. **2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

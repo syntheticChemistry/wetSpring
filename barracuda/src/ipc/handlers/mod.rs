@@ -87,6 +87,7 @@ pub const CAPABILITIES: &[&str] = &[
     "provenance.begin",
     "provenance.record",
     "provenance.complete",
+    "provenance.export_braid",
     "brain.observe",
     "brain.attention",
     "brain.urgency",

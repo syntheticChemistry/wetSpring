@@ -67,6 +67,7 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "provenance.begin" => provenance::handle_provenance_begin(params),
         "provenance.record" => provenance::handle_provenance_record(params),
         "provenance.complete" => provenance::handle_provenance_complete(params),
+        "provenance.export_braid" => provenance::braid_handoff::handle_export_braid(params),
 
         // Brain (attention, urgency)
         "brain.observe" => handlers::handle_brain_observe(params),
@@ -317,7 +318,7 @@ mod tests {
         assert_eq!(result["domain"], "ecology");
 
         let methods = result["methods"].as_array().unwrap();
-        assert_eq!(methods.len(), 37, "Wire Standard L2: flat methods array");
+        assert_eq!(methods.len(), 38, "Wire Standard L2: flat methods array");
         assert!(methods.iter().any(|m| m == "science.diversity"));
         assert!(methods.iter().any(|m| m == "health.liveness"));
 
@@ -365,7 +366,7 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 37);
+        assert_eq!(total_methods, 38);
     }
 
     #[test]

@@ -127,6 +127,7 @@ pub const DOMAINS: &[CapabilityDomain] = &[
             "provenance.begin",
             "provenance.record",
             "provenance.complete",
+            "provenance.export_braid",
         ],
     },
     // ── brain sentinel ──────────────────────────────────────────────
@@ -251,13 +252,13 @@ mod tests {
             "21 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 37, "37 total capability methods");
+        assert_eq!(total_methods, 38, "38 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 37);
+        assert_eq!(methods.len(), 38);
         assert!(methods.contains(&"science.diversity"));
         assert!(methods.contains(&"health.liveness"));
         assert!(methods.contains(&"health.readiness"));

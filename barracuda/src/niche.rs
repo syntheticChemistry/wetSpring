@@ -278,6 +278,7 @@ pub const CAPABILITIES: &[&str] = &[
     "provenance.begin",
     "provenance.record",
     "provenance.complete",
+    "provenance.export_braid",
     // ── brain sentinel ──
     "brain.observe",
     "brain.attention",
@@ -336,6 +337,7 @@ pub fn operation_dependencies() -> serde_json::Value {
         "provenance.begin": ["experiment_name"],
         "provenance.record": ["session_id", "step_data"],
         "provenance.complete": ["session_id"],
+        "provenance.export_braid": ["session_id", "dataset_id"],
         "brain.observe": ["observation_data"],
         "brain.attention": ["head_group"],
         "brain.urgency": ["domain"],
@@ -364,6 +366,7 @@ pub fn cost_estimates() -> serde_json::Value {
         "provenance.begin":       { "latency_ms": 10.0, "cpu": "low", "memory_bytes": 512 },
         "provenance.record":      { "latency_ms": 5.0, "cpu": "low", "memory_bytes": 1024 },
         "provenance.complete":    { "latency_ms": 50.0, "cpu": "medium", "memory_bytes": 2048 },
+        "provenance.export_braid": { "latency_ms": 60.0, "cpu": "medium", "memory_bytes": 4096 },
         "brain.observe":          { "latency_ms": 1.0, "cpu": "low", "memory_bytes": 4096 },
         "brain.attention":        { "latency_ms": 0.5, "cpu": "low", "memory_bytes": 2048 },
         "brain.urgency":          { "latency_ms": 0.3, "cpu": "low", "memory_bytes": 1024 },
@@ -463,8 +466,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            42,
-            "5 health/meta + 19 science + 3 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 3 ecosystem integrations"
+            43,
+            "5 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 3 ecosystem integrations"
         );
     }
 

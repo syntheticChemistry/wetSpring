@@ -160,6 +160,33 @@ requires this for its economic sustainability.
 
 ---
 
+## 8. Ferment Transcript Braid Pipeline (lithoSpore Audit — V176)
+
+**Owner:** wetSpring
+**Priority:** High — lithoSpore's highest-priority request for wetSpring
+
+lithoSpore ships ~3.4 MB summary statistics on USB but the raw upstream data
+(Tenaillon 2016: ~200 GB, Barrick 2009: ~15 GB) cannot travel with the artifact.
+The ferment transcript pattern requires wetSpring to:
+
+1. Run the computation (breseq pipeline on raw NCBI/SRA data)
+2. Record provenance via the trio (DAG + spine + braid)
+3. Export a portable `FermentTranscriptBraid` JSON for lithoSpore
+
+**V176 progress:** `provenance.export_braid` method wired, `FermentTranscriptBraid`
+struct implemented, loamSpine capability routing fixed to canonical `ledger.commit`.
+**Remaining:** breseq pipeline binary, actual data processing on NCBI datasets,
+first braid handoff to lithoSpore `data.toml`.
+
+| Dataset | Size | Status |
+|---------|------|--------|
+| Tenaillon 2016 (264 genomes) | ~200 GB | Spec in Exp380, not started |
+| Barrick 2009 (19 genomes) | ~15 GB | In paper queue, not started |
+| Good 2017 (metagenomic) | ~50 GB | In paper queue, not started |
+| Blount 2012 (replay seq) | ~30 GB | In paper queue, not started |
+
+---
+
 ## Summary Table
 
 | # | Gap | Owner | Priority | Phase |
@@ -171,6 +198,7 @@ requires this for its economic sustainability.
 | 5 | Interactive composition | ludoSpring + esotericWebb | Low | 4 |
 | 6 | Physics simulations | hotSpring | Low | 4 |
 | 7 | Radiating attribution | sweetGrass + sunCloud | Low | 4 |
+| 8 | Ferment transcript pipeline | wetSpring | High | 2 |
 
 ---
 

@@ -9,7 +9,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V174** | `handoffs/WETSPRING_V174_PRIMAL_HANDOFF_MAY17_2026.md` | May 17 | **Primal team handoff**: Exp377–379 hormesis chain (57/57), deep debt resolved, composition patterns + NUCLEUS deployment guide for primal/spring evolution. |
+| **V176** | `handoffs/WETSPRING_V176_LITHOSPORE_AUDIT_RESPONSE_MAY17_2026.md` | May 17 | **lithoSpore audit response**: ferment transcript braid export, loamSpine capability fix, trio adoption status update. |
+| V174 | `handoffs/WETSPRING_V174_PRIMAL_HANDOFF_MAY17_2026.md` | May 17 | Primal team handoff: Exp377–379 hormesis chain (57/57), deep debt resolved, composition patterns + NUCLEUS deployment guide. |
 | V171 | `handoffs/WETSPRING_V171_LIVE_COMPOSITION_HEALTH_HANDOFF_MAY16_2026.md` | May 16 | Live composition health: runtime probing of trio, NestGate, biomeOS replaces deferred checks. Schema parity self-check. |
 | V170 | `handoffs/WETSPRING_V170_WAVE20_SCHEMA_STANDARD_HANDOFF_MAY16_2026.md` | May 16 | Wave 20 schema standardization: `count` field in capability.list, registry 452, primal.announce adopted, tests verified. |
 | V169b | `handoffs/WETSPRING_V169B_DEEP_DEBT_DOC_SYNC_HANDOFF_MAY16_2026.md` | May 16 | Deep debt resolution: clippy zero workspace, 15 docs synced V169, stale refs fixed, upstream learnings. |

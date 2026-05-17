@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V175:** Doc sync + primal team handoff. 20 docs bumped to V174 metrics. V174 handoff crafted with composition patterns (self-knowledge, capability discovery, live health probing, Neural API deployment, UniBin), upstream learnings for all primal teams, absorption-ready items, open gaps. Archive audit clean. 384/384 experiments, 370 binaries, 5,957+ checks. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V176:** lithoSpore audit response. New `provenance.export_braid` — ferment transcript braid export in lithoSpore wire format. loamSpine capability routing fixed (`"session"` → `"ledger"` per trio integration guide v2.0). `braid_handoff.rs` module. 43 niche capabilities, 51 consumed, registry 453. 384/384 experiments, 370 binaries, 5,957+ checks. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 

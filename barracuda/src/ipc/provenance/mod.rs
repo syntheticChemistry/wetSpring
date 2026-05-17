@@ -25,10 +25,12 @@ use serde_json::{Value, json};
 
 use crate::ipc::protocol::RpcError;
 
+pub mod braid_handoff;
 pub mod loamspine;
 pub mod rhizocrypt;
 pub mod sweetgrass;
 
+pub use braid_handoff::FermentTranscriptBraid;
 pub use rhizocrypt::{begin_session, record_step};
 pub use sweetgrass::{
     BraidCommitRequest, BraidRequest, discover_socket, record_experiment_provenance,

@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V176] — 2026-05-17
+
+### lithoSpore Audit Response — Ferment Transcript Braid Export + Trio Reconciliation
+
+- **New: `provenance.export_braid` IPC method** — exports a ferment transcript braid in the wire format defined by `LITHOSPORE_FERMENT_TRANSCRIPT_BRAID_HANDOFF_MAY17_2026.md`. `FermentTranscriptBraid` struct with `dataset_id`, `spring`, `braid_id`, `dag_session_id`, `dag_merkle_root`, `spine_id`, `computation` metadata, `summary_blake3`, `timestamp`. Handler `handle_export_braid()` completes the session and packages all trio identifiers.
+- **New: `braid_handoff.rs` module** — `barracuda/src/ipc/provenance/braid_handoff.rs` with `FermentTranscriptBraid`, `ComputationMetadata`, `from_session_result()`, serialization roundtrip. 5 tests.
+- **Fix: loamSpine capability routing** — `loamspine.rs` corrected from `capability_call(socket, "session", "commit", ...)` to `capability_call(socket, "ledger", "commit", ...)` per `PROVENANCE_TRIO_INTEGRATION_GUIDE.md` v2.0 canonical method reference.
+- Niche capabilities: 42 → 43 (added `provenance.export_braid`). Capability domains updated (provenance: 3 → 4 methods). CI cross-sync threshold: 452 → 453. Dispatch method count: 37 → 38.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (zero warnings), `cargo test --features ipc --lib` (252 pass).
+
 ## [V175] — 2026-05-17
 
 ### Doc Sync + Primal Team Handoff
