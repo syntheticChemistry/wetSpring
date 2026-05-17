@@ -41,6 +41,20 @@ use wetspring_barracuda::validation::Validator;
 const REFERENCE_ACCESSION: &str = "CP000819.1";
 const REFERENCE_LENGTH_BP: u64 = 4_629_812;
 
+fn available_threads() -> usize {
+    std::thread::available_parallelism().map_or(4, std::num::NonZero::get)
+}
+
+/// Per-tool thread budget: breseq gets most threads since it's the bottleneck.
+/// Capped at 8 to avoid breseq memory scaling issues; minimum 2.
+fn breseq_threads() -> String {
+    available_threads().clamp(2, 8).to_string()
+}
+
+fn fasterq_threads() -> String {
+    available_threads().clamp(2, 8).to_string()
+}
+
 /// Barrick 2009 SRA runs: Ara-1 population clones across generations.
 const BARRICK_RUNS: &[(&str, &str)] = &[
     ("SRR032370", "REL1164M"),
@@ -138,13 +152,14 @@ fn download_sra_run(accession: &str, output_dir: &Path) -> Result<PathBuf, Strin
         return Err(format!("prefetch {accession} failed: {}", &stderr[..limit]));
     }
 
+    let fq_threads = fasterq_threads();
     let fasterq_out = run_in_env(
         "fasterq-dump",
         &[
             "--outdir", &output_dir.to_string_lossy(),
             "--split-3",
             "--skip-technical",
-            "--threads", "4",
+            "--threads", &fq_threads,
             accession,
         ],
         output_dir,
@@ -193,7 +208,8 @@ fn run_breseq(
     }
     std::fs::create_dir_all(&output_dir).map_err(|e| format!("mkdir breseq output: {e}"))?;
 
-    println!("    Running breseq on {clone_name} ({accession})...");
+    let bj = breseq_threads();
+    println!("    Running breseq on {clone_name} ({accession}) [-j {bj}]...");
 
     let output = run_in_env(
         "breseq",
@@ -201,7 +217,7 @@ fn run_breseq(
             "-r", &reference.to_string_lossy(),
             "-o", &output_dir.to_string_lossy(),
             "-n", clone_name,
-            "-j", "4",
+            "-j", &bj,
             &fastq_path.to_string_lossy(),
         ],
         workspace,
@@ -336,11 +352,20 @@ fn run_pipeline(v: &mut Validator) {
     v.section("P04: breseq variant calling");
     let mut mutation_counts: Vec<(&str, usize)> = Vec::new();
 
+    println!(
+        "  Thread budget: breseq={}, fasterq-dump={} (of {} available)",
+        breseq_threads(),
+        fasterq_threads(),
+        available_threads(),
+    );
+
     for (accession, clone_name, fastq_path) in &downloaded_runs {
+        let clone_t0 = Instant::now();
         match run_breseq(accession, clone_name, fastq_path, &reference, &workspace) {
             Ok(gd_path) => {
                 let count = count_mutations_in_gd(&gd_path);
-                println!("    {clone_name}: {count} mutations");
+                let clone_secs = clone_t0.elapsed().as_secs();
+                println!("    {clone_name}: {count} mutations ({clone_secs}s)");
                 let _ = provenance::record_step(
                     &prov_session.id,
                     &serde_json::json!({
@@ -348,6 +373,7 @@ fn run_pipeline(v: &mut Validator) {
                         "clone": clone_name,
                         "accession": accession,
                         "mutations": count,
+                        "wall_time_seconds": clone_secs,
                         "output_blake3": blake3_file(&gd_path),
                     }),
                 );
