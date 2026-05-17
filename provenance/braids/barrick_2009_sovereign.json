@@ -3,22 +3,62 @@
   "spring": "wetSpring",
   "spring_version": "0.1.0",
   "braid_id": "braid-sovereign-barrick2009",
-  "dag_session_id": "dag-wetspring-sovereign-1779053983605",
+  "dag_session_id": "dag-wetspring-sovereign-1779057601",
   "dag_merkle_root": "",
   "spine_id": "",
-  "timestamp": "1779053983",
+  "timestamp": "1779057601",
+  "status": "partial",
+  "clones_complete": 3,
+  "clones_total": 7,
   "computation": {
     "tool": "wetspring-sovereign-pipeline",
     "tool_version": "0.1.0",
     "substrate": "GPU+CPU hybrid",
-    "pipeline": "FM-index → SmithWatermanGpu → Tensor::scan → SnpCallingF64",
+    "gpu": "NVIDIA GeForce RTX 4060 (f64 native)",
+    "pipeline": "FM-index → seed-extend (CPU) → Tensor::scan (GPU) → SnpCallingF64 (GPU)",
     "input_accession": "SRP001569",
     "input_blake3": "aggregate",
-    "output_blake3": "fc642cc50ecfa44f",
-    "wall_time_seconds": 71,
-    "node_count": 7,
-    "sovereign_variants": 159,
-    "breseq_variants": 569,
-    "position_matches": 0
+    "reference": "REL606 (CP000819.1, 4629812 bp)",
+    "features": "4209 CDS annotations",
+    "wall_time_seconds_so_far": 4654,
+    "node_count": 3,
+    "clones": [
+      {
+        "name": "REL1164M",
+        "accession": "SRR032370",
+        "reads": 7516281,
+        "mapped": 3672315,
+        "coverage_pct": 98.5,
+        "mean_depth": 28.9,
+        "sovereign_variants": 34005,
+        "breseq_variants": 4,
+        "position_matches": 0,
+        "wall_seconds": 1490.5
+      },
+      {
+        "name": "REL2179M",
+        "accession": "SRR032371",
+        "reads": 7949339,
+        "mapped": 3866094,
+        "coverage_pct": 98.6,
+        "mean_depth": 30.5,
+        "sovereign_variants": 35282,
+        "breseq_variants": 11,
+        "position_matches": 7,
+        "wall_seconds": 1575.3
+      },
+      {
+        "name": "REL4536M",
+        "accession": "SRR032372",
+        "reads": 7933731,
+        "mapped": 3903267,
+        "coverage_pct": 98.4,
+        "mean_depth": 30.8,
+        "sovereign_variants": 33396,
+        "breseq_variants": 11,
+        "position_matches": 0,
+        "wall_seconds": 1587.7
+      }
+    ]
   }
 }
