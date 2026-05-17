@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** May 16, 2026
-**Status:** V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved. **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. Composition: composed, live-probing. **Tier 1:** Python→Rust (5,957+ checks, 1,962 lib + 97 integration + 18 IPC, 370 binaries). **Tier 2:** Composition (136/136 proto-nucleate, 7 graphs) + IPC wired. **Tier 3:** Live NUCLEUS IPC. 384/384 experiments. 2 primal gaps open (deployment-only, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry synced 452, 51 consumed.
+**Date:** May 17, 2026
+**Status:** V177 — Wave 20 PM lithoSpore audit absorption. Exp381: first real-data Nest Atomic composition (Barrick 2009 breseq, mutation accumulation confirmed). Gen4: compute-aware scheduling, DAG checkpoint, living-environment patterns. **Tier 1:** Python/C++→Rust (5,967+ checks, 252 lib + 97 integration + 18 IPC, 371 binaries). **Tier 2:** Composition (136/136, 7 graphs) + IPC. **Tier 3:** Live NUCLEUS IPC. 385 experiments (384 done + 1 in progress). 3 gaps open (deployment + cross-tier parity, 20 resolved/closed). `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry 452, 52 consumed.
 **License:** AGPL-3.0-or-later
 
 ---

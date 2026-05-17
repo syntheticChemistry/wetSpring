@@ -48,6 +48,25 @@ evolution finding innovations through historical contingency.
 2. Are Anderson anomalies more common in lineages with longer evolutionary histories?
 3. Does the LTEE predict which anomaly types should be most frequent?
 
+## Exp381: First Real-Data Composition (May 2026)
+
+| Clone | Generations | Mutations | Status |
+|-------|-----------|----------|--------|
+| REL1164M | ~2,000 | 579 | Done |
+| REL2179M | ~5,000 | 608 | Done |
+| REL4536M | ~10,000 | 604 | Done |
+| REL8593M | ~20,000 | 1108 | Done |
+| REL10926 | ~40,000 | 2296 | Done |
+
+Mutation accumulation trend confirmed (Barrick 2009 Fig. 1). First real-data
+Nest Atomic composition through the ecosystem. breseq (C++) serves as Tier 1
+validation baseline — the destination is sovereign Rust alignment + variant
+calling through barraCuda. See `gen4_compute_aware_pipeline.md`.
+
+**Profiling insight:** Hardcoded `-j 4` on 16-thread machine = 25% utilization.
+DAG checkpoint pattern proven: kill → optimize → restart costs 0s for completed
+clones. Living-environment scheduling is a composition primitive.
+
 ## Connection to Gen3 Thesis
 
 Chapter 14: Constrained evolution framework links Lenski LTEE to Anderson QS.

@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** May 16, 2026
+**Date:** May 17, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved: UniBin `serve` live, display-name hygiene, `dense_to_csr` extracted. **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. Composition: composed, live-probing. Registry synced 452, 51 consumed. 12 paper notebooks. 63/63 papers. 1,962 lib tests pass. **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,957+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs) + IPC wired. **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 5). **Tier 5:** Interactive composition. 384/384 experiments. **2** primal gaps open (deployment-only, 20 resolved/closed).
+**Status:** V177 — Wave 20 PM lithoSpore audit absorption. Stability tiers. Trio transaction semantics. Exp381: Barrick 2009 breseq pipeline (first real-data Nest Atomic composition — mutation accumulation confirmed, ferment braid exported). Gen4: compute-aware scheduling documented. 43 niche, 52 consumed (registry 452). 252 lib tests pass. 385 experiments (384 done + 1 in progress). **3** gaps open (deployment + cross-tier parity), 20 resolved/closed.
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).
@@ -324,16 +324,17 @@ All IPC validated in Exp203-208 (321 checks), NUCLEUS pipeline in Exp256-259 (87
 | Energy cost (10K samples) | Galaxy $0.40, Rust GPU **$0.02** | Exp016 |
 | Hardware | Consumer GPU (RTX 4070), no HPC | All |
 
-## Sub-theses (Gen3 Ch. 14)
+## Sub-theses (Gen3 Ch. 14) and Gen4 Evolution
 
 | # | Sub-thesis | File | Key Experiments |
 |:-:|-----------|------|-----------------|
 | 01 | Anderson-QS null hypothesis | [sub_thesis_01](sub_thesis_01_anderson_qs.md) | 107, 126–138, 144–156 |
-| 02 | LTEE constrained evolution | [sub_thesis_02](sub_thesis_02_ltee.md) | 143, 146 |
+| 02 | LTEE constrained evolution | [sub_thesis_02](sub_thesis_02_ltee.md) | 143, 146, **381** |
 | 03 | BioAg rhizosphere QS | [sub_thesis_03](sub_thesis_03_bioag.md) | 129, 142, 146, 151, 153 |
 | 04 | Sentinels + NPU deployment | [sub_thesis_04](sub_thesis_04_sentinels.md) | 114, 118, 123, 124, 147, 193–195 |
 | 05 | Cross-species eavesdropping | [sub_thesis_05](sub_thesis_05_cross_species.md) | 142, 144–146, 151, 153–154 |
 | 06 | Field genomics (nanopore + NPU) | [sub_thesis_06](sub_thesis_06_field_genomics.md) | 196a-c (pre-hardware done, 52 checks); planned: 197–202 |
+| G4 | Compute-aware scheduling + Rust-native pipeline | [gen4_compute_aware_pipeline](gen4_compute_aware_pipeline.md) | 381 (breseq baseline → sovereign Rust evolution) |
 
 ### Cross-Spring Rewire + Modern Benchmark (Phase 48, V44)
 
