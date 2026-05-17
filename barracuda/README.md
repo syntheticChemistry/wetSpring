@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 16, 2026 (V171 — Live composition health: runtime probing of trio, NestGate, biomeOS replaces deferred checks. Wave 20 schema parity self-check. barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 367 binaries (345 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers.)
+**Updated:** May 17, 2026 (V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved: UniBin `serve` live, display-name hygiene. barraCuda v0.4.0. coralReef v0.1.0. Live NUCLEUS guideStone 30/31 pass. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 370 binaries (348 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 51 consumed capabilities (registry 452). 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers.)
 
 ---
 

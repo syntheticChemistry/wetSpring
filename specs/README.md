@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: May 16, 2026
-**Status**: V171 — Live composition health: runtime probing of trio, NestGate, biomeOS replaces deferred checks. Wave 20 schema parity self-check. **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 50 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 gaps open (deployment-only, 20 resolved/closed). Registry synced to 452 methods.
+**Status**: V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved. **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 51 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 gaps open (deployment-only, 20 resolved/closed). Registry synced to 452 methods. 384/384 experiments, 370 binaries, 5,957+ checks.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

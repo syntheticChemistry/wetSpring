@@ -1,13 +1,13 @@
 # Cross-Spring Shader Evolution (fossil record — V126 provenance map)
 
-> **V171 note (May 16, 2026):** This document preserves the V126 shader
+> **V174 note (May 17, 2026):** This document preserves the V126 shader
 > provenance map as a fossil record. Current state: barraCuda v0.4.0,
 > coralReef v0.1.0 in niche. **800+** WGSL shaders, **150+** primitives
 > consumed, **zero** local WGSL (fully lean). **guideStone Level 5** (primal
-> proof). Live composition health: runtime probing of trio, NestGate, biomeOS.
-> Wave 20 schema parity self-check. 50 consumed capabilities (registry 452).
-> Clippy zero workspace. Live NUCLEUS 30/31 pass. **2** primal gaps open
-> (deployment-only, **20** resolved/closed). See `docs/PRIMAL_GAPS.md`.
+> proof). Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved.
+> 51 consumed capabilities (registry 452). Clippy zero workspace. Live
+> NUCLEUS 30/31 pass. **2** primal gaps open (deployment-only, **20**
+> resolved/closed). 384/384 experiments. See `docs/PRIMAL_GAPS.md`.
 
 **Last updated**: Mar 16, 2026 — V126 (fossil record)
 **Validated by**: V98+ cross-spring evolution (Exp319-320), upstream rewire (zero API breakage), Exp313-318 (173/173). Current: barraCuda v0.4.0, 1,962 lib tests

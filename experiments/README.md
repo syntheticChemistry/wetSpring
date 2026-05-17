@@ -656,37 +656,36 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V171):** 384 experiments indexed (381 completed + 3 PROPOSED), 367 binaries (345 barracuda + 22 forge), 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). barraCuda v0.4.0, coralReef v0.1.0 in niche. Live composition health (runtime probing). Wave 20 schema standard (count, registry 452). 50 consumed capabilities. Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. 2 primal gaps open (deployment-only), 20 resolved/closed.
+**Totals (V171):** 381 experiments completed at this point, 367 binaries (345 barracuda + 22 forge), 5,900+ checks. Live composition health (runtime probing). Wave 20 schema standard (count, registry 452). 50 consumed capabilities.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
 thiserror error derives; named cast helpers across 15 files (~60 casts replaced); upstream contract pinning for barraCuda; bitwise determinism tests; CI version pin script; provenance headers; hardcoded primal strings eliminated; `ipc/server.rs` refactored; CONTRIBUTING.md + SECURITY.md added. Absorption: groundSpring V122 (named casts), neuralSpring S174 (upstream contract), airSpring v0.10.0 (provenance headers), healthSpring V42 (CI pin + determinism tests), ludoSpring V30 (thiserror).
 
-### Exp377: Hormesis Biphasic Dose-Response Model (PROPOSED)
+### Exp377: Hormesis Biphasic Dose-Response Model (V174 — 17/17 PASS)
 
 Biphasic dose-response via Anderson localization: `bio::hormesis` model combining
 Hill stimulation and inhibition terms. Validates hormetic zone detection, dose→disorder
 mapping, and `predict_hormetic_zone_from_wc`. Module: `bio::hormesis` (14 unit tests
-passing). Cross-reference: Paper 14 (Anderson Hormesis).
+passing). Binary: `validate_hormesis_biphasic`. Cross-reference: Paper 14 (Anderson Hormesis).
 
-### Exp378: Trophic Cascade via Anderson Lattice (PROPOSED)
+### Exp378: Trophic Cascade via Anderson Lattice (V174 — 10/10 PASS)
 
 Multi-species trophic lattice under pesticide perturbation. Tests whether
 sublethal pesticide doses produce hormetic fitness increase in prey species
 (grasshopper hypothesis). Maps pesticide concentration to Anderson disorder W,
-predicts predator collapse before prey. Requires groundSpring soil transport
-and airSpring dispersal models.
+predicts predator collapse before prey. Binary: `validate_trophic_cascade`.
 
-### Exp379: Joint Colonization Resistance Surface — healthSpring × wetSpring (PROPOSED)
+### Exp379: Joint Colonization Resistance Surface — healthSpring × wetSpring (V174 — 30/30 PASS)
 
 3D colonization resistance surface sweep over (affinity, diversity, disorder).
 wetSpring provides Anderson lattice and diversity metrics; healthSpring provides
 PK/PD and binding landscape. Validates that diverse weak-binding communities
 resist pathogen colonization better than low-diversity strong-binding communities.
-Module: `bio::binding_landscape` (17 unit tests passing). Joint with healthSpring
-exp097/exp098.
+Module: `bio::binding_landscape` (17 unit tests passing). Binary: `validate_colonization_resistance`.
+Joint with healthSpring exp097/exp098.
 
-**Totals (V171): 384 experiments indexed, 367 binaries, 5,900+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 50 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
+**Totals (V174): 384/384 experiments completed, 370 binaries (348 barracuda + 22 forge), 5,957+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 51 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Deep debt resolved. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 

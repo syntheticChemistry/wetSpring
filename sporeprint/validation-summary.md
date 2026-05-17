@@ -14,7 +14,7 @@ springs = ["wetspring"]
 - **367 binaries** (336 validators + 1 guidestone + 30 other)
 - **19 science IPC methods** across 6 domain categories
 - **56 experiment directories** with 64+ frozen JSON baselines
-- **guideStone Level 5** (primal proof) — V171, live composition health probing, live NUCLEUS 30/31 pass
+- **guideStone Level 5** (primal proof) — V174, live composition health probing, Exp377–379 hormesis chain, live NUCLEUS 30/31 pass
 - **Zero sovereign HTTP fallbacks** — pure primal composition
 - **Structured gap reports** when deployment primals are unavailable
 - **BLAKE3 content hashing** on all data paths

@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** May 16, 2026 (V169 update)
-**Author:** wetSpring V169 (ecoPrimals)
-**Foundation:** 384 experiments, 5,900+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 367 binaries, 91.20% coverage. **V169:** Wave 17 signal adoption (nest.store, nest.commit, primal.announce). 50 consumed capabilities (registry 452). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS guideStone 30/31 pass, 9 skip, 1 fail. Composition: composed. Deep debt audit clean: zero unsafe, zero `#[allow(]`, zero production mocks, all URLs env-configurable, clippy pedantic+nursery **ZERO WARNINGS** (both crates). Tier 4 IPC-first defaults. 2 gaps open (deployment-only, PG-01–PG-22, 20 resolved/closed).
+**Date:** May 17, 2026 (V174 update)
+**Author:** wetSpring V174 (ecoPrimals)
+**Foundation:** 384/384 experiments, 5,957+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 370 binaries, 91.20% coverage. **V174:** Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved: UniBin `serve` live, display-name hygiene, `dense_to_csr` extracted. Live composition health. Wave 20 schema parity. 51 consumed capabilities (registry 452). barraCuda v0.4.0. coralReef v0.1.0. Live NUCLEUS guideStone 30/31 pass. Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 gaps open (deployment-only, 20 resolved/closed).
 
 ---
 

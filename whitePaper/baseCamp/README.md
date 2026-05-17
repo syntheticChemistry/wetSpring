@@ -4,7 +4,7 @@
 
 **Date:** May 16, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V171 — Live composition health: `composition.science_health` performs runtime probing of Provenance Trio, NestGate, biomeOS Neural API (replacing static deferred checks). Wave 20 schema parity self-check. **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. Composition: composed, live-probing. Registry synced 452. 12 paper notebooks. 63/63 papers. 1,962 lib tests pass. **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,900+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs) + IPC wired. **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 5). **Tier 5:** Interactive composition. 384 experiments. **2** primal gaps open (deployment-only, 20 resolved/closed).
+**Status:** V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved: UniBin `serve` live, display-name hygiene, `dense_to_csr` extracted. **guideStone Level 5** (primal proof). barraCuda v0.4.0. coralReef v0.1.0 in niche. Live NUCLEUS 30/31 pass. Composition: composed, live-probing. Registry synced 452, 51 consumed. 12 paper notebooks. 63/63 papers. 1,962 lib tests pass. **Tier 1:** Python→Rust (1,962 lib + 97 integration + 18 IPC, 5,957+ checks). **Tier 2:** Composition (136/136 proto-nucleate, 7 deploy graphs) + IPC wired. **Tier 3:** IPC parity + niche gate. **Tier 4:** guideStone (Level 5). **Tier 5:** Interactive composition. 384/384 experiments. **2** primal gaps open (deployment-only, 20 resolved/closed).
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).

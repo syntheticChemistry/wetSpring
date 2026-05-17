@@ -3,6 +3,15 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V175] — 2026-05-17
+
+### Doc Sync + Primal Team Handoff
+
+- **20 docs synced to V174 metrics:** whitePaper/README, baseCamp/README, baseCamp/EXTENSION_PLAN, specs/README, specs/BARRACUDA_REQUIREMENTS, specs/PAPER_REVIEW_QUEUE, specs/PENDING_DATASETS, barracuda/README, barracuda/ABSORPTION_MANIFEST, barracuda/EVOLUTION_READINESS, docs/PRIMAL_GAPS, docs/PRIMAL_PROOF_IPC_MAPPING, GAPS.md, sporeprint/validation-summary, wateringHole/README, ECOSYSTEM_LEVERAGE_GUIDE, CROSS_SPRING_SHADER_EVOLUTION, experiments/README (stale V171 totals and PROPOSED→DONE), Exp380 (V169→V174).
+- **V174 Primal Team Handoff crafted:** `wateringHole/handoffs/WETSPRING_V174_PRIMAL_HANDOFF_MAY17_2026.md`. Composition patterns: primal self-knowledge, capability-based discovery, live health probing, Neural API deployment via biomeOS, UniBin pattern. Upstream learnings for barraCuda, toadStool, coralReef, biomeOS, Provenance Trio, NestGate, metalForge. Absorption-ready items table. Open gaps for upstream review.
+- **Archive audit clean:** Zero stale .sh scripts (19 active CI/benchmark/data tools). Zero orphan .py files (60, all referenced in provenance registry + baseline manifest). Zero actionable TODO/FIXME/HACK in docs (all audit rhetoric). Zero near-empty source files. No fossilized/deprecated directories. Intentional archive: `wateringHole/handoffs/archive/` (187 files).
+- **experiments/README.md:** Exp377–379 updated from PROPOSED to DONE with binary names and check counts. Stale V171 totals block condensed, final V174 totals block added.
+
 ## [V174] — 2026-05-17
 
 ### Experiment Buildouts — Hormesis Chain (Exp377–379) + Control Validation

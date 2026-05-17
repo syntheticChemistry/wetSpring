@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V174:** Experiment buildouts — Exp377–379 hormesis chain (57/57 PASS). `CONTROL_EXPERIMENT_STATUS.md` created. 384/384 experiments, 370 binaries, 5,957+ checks. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5. Registry 452, 51 consumed capabilities. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V175:** Doc sync + primal team handoff. 20 docs bumped to V174 metrics. V174 handoff crafted: composition patterns (self-knowledge, capability discovery, live health probing, Neural API deployment, UniBin), upstream learnings for all primal teams, absorption-ready items, open gaps for review. Archive audit clean — zero stale scripts, zero orphan .py, zero debris. 384/384 experiments, 370 binaries, 5,957+ checks. **2 gaps open (deployment-only), 20 resolved/closed.**
 
 ---
 
