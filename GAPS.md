@@ -175,8 +175,18 @@ The ferment transcript pattern requires wetSpring to:
 
 **V176 progress:** `provenance.export_braid` method wired, `FermentTranscriptBraid`
 struct implemented, loamSpine capability routing fixed to canonical `ledger.commit`.
-**Remaining:** breseq pipeline binary, actual data processing on NCBI datasets,
-first braid handoff to lithoSpore `data.toml`.
+
+**Composition approach:** This is a Nest Atomic composition, not a standalone script.
+Data acquisition via NestGate `storage.fetch_external` (HTTPS → cache). Computation
+orchestrated as a NUCLEUS workload (primalSpring `spring_deploy_manifest.toml` already
+declares `science.ncbi_fetch` for wetSpring). Provenance recorded via trio during
+pipeline execution. Braid exported for lithoSpore handoff. Ionic bonding model applies
+for external collaborator access (Barrick Lab, UT Austin).
+
+**Workspace:** `/mnt/4tb-work/ecoPrimals/springs/wetSpring/datasets/ltee/` (3.4 TB free).
+
+**Remaining:** breseq pipeline binary, SRA toolkit + breseq installation, actual data
+processing, first braid handoff to lithoSpore `data.toml`.
 
 | Dataset | Size | Status |
 |---------|------|--------|

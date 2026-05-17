@@ -6,8 +6,9 @@ metalForge/forge/Cargo.lock
 # Galaxy (root-owned setup remnant, not tracked)
 control/
 
-# Datasets (downloaded separately)
+# Datasets (downloaded separately, symlinked to /mnt/4tb-work)
 data/
+datasets
 experiments/results/*.qza
 experiments/results/**/*.qza
 experiments/results/**/*.qzv
