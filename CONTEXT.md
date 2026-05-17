@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V171:** Live composition health — `composition.science_health` performs runtime probing of Provenance Trio, NestGate, biomeOS Neural API (replacing static deferred checks). Wave 20 schema parity self-check. Graceful degradation. New `ipc/composition_health.rs` module. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). Registry 452. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V172:** Wave 20 debt resolution — `ci_cross_sync.rs` threshold tightened (442→452), `primal.list` added to `CONSUMED_CAPABILITIES`, `PRIMAL_GAPS.md` V158 attribution corrected, `primal.announce` signal status confirmed adopted (V170). barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). Registry 452. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 

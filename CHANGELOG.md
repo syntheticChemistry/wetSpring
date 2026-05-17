@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V172] — 2026-05-17
+
+### Wave 20 Debt Resolution — primalSpring Audit Fixes
+
+- **`ci_cross_sync.rs` threshold tightened:** Assertion changed from `method_count >= 442` to `method_count >= 452`, matching the assertion text and the actual Wave 20 registry count. Previously would pass with 10 missing methods.
+- **`primal.list` added to `CONSUMED_CAPABILITIES`:** wetSpring consumes `primal.list` for composition health probing (`probe_biomeos_status` in `composition_health.rs`) — now properly declared in `niche.rs`.
+- **`PRIMAL_GAPS.md` V158 attribution clarified:** The 452 method threshold reflects the Wave 20 `primal.list` addition, not V158 work. Wording updated.
+- **`primal.announce` signal status (false positive):** Audit flagged `primal.announce` as pending, but it was already moved to `adopted` in V170 and has no `pending` key in `capability_registry.toml`. No code change required.
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (zero warnings), `cargo test --features ipc --lib` (252 pass).
+
 ## [V171] — 2026-05-16
 
 ### Live Composition Health — Runtime Probing Replaces Deferred Checks

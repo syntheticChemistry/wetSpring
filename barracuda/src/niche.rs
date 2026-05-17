@@ -130,8 +130,9 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 ///
 /// barraCuda surface aligned to primalSpring v0.9.17 canonical (33 methods).
 /// Wave 17: `primal.announce` + `signal.dispatch` added.
-/// Wave 20: registry synced to 452 (`primal.list` added). `count` field in
-/// `capability.list` response. `primal.announce` fully adopted.
+/// Wave 20: registry synced to 452 (`primal.list` added, consumed for
+/// composition health probing). `count` field in `capability.list` response.
+/// `primal.announce` fully adopted.
 /// Legacy methods separated into [`CONSUMED_CAPABILITIES_LEGACY`] for
 /// explicit tracking (PG-12 resolution).
 pub const CONSUMED_CAPABILITIES: &[&str] = &[
@@ -212,6 +213,8 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     // ── Wave 17 Neural API Signal Elevation ──
     "primal.announce",
     "signal.dispatch",
+    // ── Wave 20: schema standardization ──
+    "primal.list",
 ];
 
 /// Extended surface from Exp403 (Tier 2 IPC validation, pre-v0.9.17).

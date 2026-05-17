@@ -193,7 +193,7 @@ fn canonical_registry_accessible_and_nontrivial() {
         .count();
 
     assert!(
-        method_count >= 442,
+        method_count >= 452,
         "canonical registry has only {method_count} method entries — expected 452+"
     );
 }
