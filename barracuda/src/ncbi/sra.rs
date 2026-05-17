@@ -16,7 +16,7 @@
 //! | Phase | Strategy | Status |
 //! |-------|----------|--------|
 //! | Current | Capability-discovered `fasterq-dump` / `fastq-dump` | active |
-//! | Phase 2 | NestGate SRA provider via JSON-RPC socket | planned |
+//! | Phase 2 | NestGate SRA provider via composed tiered fetch | **active** |
 //! | Phase 3 | Sovereign SRA protocol (direct HTTP range requests) | research |
 
 use crate::error::Error;
@@ -66,6 +66,110 @@ pub fn download_sra_run(accession: &str, output_dir: &Path) -> crate::error::Res
 #[must_use]
 pub fn sra_tools_available() -> bool {
     discover_sra_backend().is_some()
+}
+
+/// Result of a composed SRA fetch — path plus provenance metadata.
+#[cfg(feature = "ipc")]
+#[derive(Debug)]
+pub struct SraFetchResult {
+    /// Path to the downloaded FASTQ file.
+    pub path: PathBuf,
+    /// BLAKE3 content hash of the downloaded file.
+    pub blake3: String,
+    /// How the data was acquired.
+    pub source: SraSource,
+}
+
+/// How the SRA data was sourced.
+#[cfg(feature = "ipc")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SraSource {
+    /// Already present on disk (cached from a previous run).
+    LocalCache,
+    /// Retrieved from NestGate storage primal.
+    NestGate,
+    /// Downloaded via SRA Toolkit (`fasterq-dump` / `fastq-dump`).
+    SraToolkit,
+}
+
+#[cfg(feature = "ipc")]
+impl std::fmt::Display for SraSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::LocalCache => f.write_str("local_cache"),
+            Self::NestGate => f.write_str("nestgate"),
+            Self::SraToolkit => f.write_str("sra_toolkit"),
+        }
+    }
+}
+
+/// Composed SRA fetch with NestGate routing and BLAKE3 content addressing.
+///
+/// Tiered strategy:
+/// 1. **Local cache** — if `output_dir/{accession}.fastq[.gz]` exists, return it
+/// 2. **NestGate** — if NestGate is available, check `sra:{accession}` cache key
+/// 3. **SRA Toolkit** — download via `fasterq-dump` / `fastq-dump`, register in NestGate
+///
+/// Every acquisition path produces a BLAKE3 hash for provenance.
+///
+/// # Errors
+///
+/// Returns `Err` if all tiers fail.
+#[cfg(feature = "ipc")]
+pub fn fetch_sra_composed(accession: &str, output_dir: &Path) -> crate::error::Result<SraFetchResult> {
+    validate_accession(accession)?;
+
+    std::fs::create_dir_all(output_dir).map_err(|e| {
+        Error::Ncbi(format!("cannot create output dir {}: {e}", output_dir.display()))
+    })?;
+
+    // Tier 1: local cache check
+    let local_candidates = [
+        output_dir.join(format!("{accession}.fastq")),
+        output_dir.join(format!("{accession}.fastq.gz")),
+    ];
+    for path in &local_candidates {
+        if path.exists() {
+            let hash = blake3_of_file(path);
+            return Ok(SraFetchResult { path: path.clone(), blake3: hash, source: SraSource::LocalCache });
+        }
+    }
+
+    // Tier 2: NestGate cache (path stored under key, not file contents)
+    let nestgate_socket = super::nestgate::discover_socket();
+    if let Some(ref sock) = nestgate_socket {
+        let cache_key = format!("sra:fastq:{accession}");
+        if super::nestgate::exists(sock, &cache_key).unwrap_or(false) {
+            if let Ok(cached_path_str) = super::nestgate::retrieve(sock, &cache_key) {
+                let cached_path = PathBuf::from(cached_path_str.trim());
+                if cached_path.exists() {
+                    let hash = blake3_of_file(&cached_path);
+                    return Ok(SraFetchResult { path: cached_path, blake3: hash, source: SraSource::NestGate });
+                }
+            }
+        }
+    }
+
+    // Tier 3: SRA Toolkit download
+    let downloaded = download_sra_run(accession, output_dir)?;
+    let hash = blake3_of_file(&downloaded);
+
+    // Register in NestGate for future cache hits
+    if let Some(ref sock) = nestgate_socket {
+        let cache_key = format!("sra:fastq:{accession}");
+        let _ = super::nestgate::store(sock, &cache_key, &downloaded.to_string_lossy());
+    }
+
+    Ok(SraFetchResult { path: downloaded, blake3: hash, source: SraSource::SraToolkit })
+}
+
+/// BLAKE3 hash of a file on disk; returns "unavailable" if the file can't be read.
+#[cfg(feature = "ipc")]
+fn blake3_of_file(path: &Path) -> String {
+    match std::fs::read(path) {
+        Ok(data) => blake3::hash(&data).to_hex().to_string(),
+        Err(_) => "unavailable".to_string(),
+    }
 }
 
 /// Discover the best available SRA download tool.

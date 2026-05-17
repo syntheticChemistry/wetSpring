@@ -25,6 +25,7 @@
 //! | Baseline | Exp381 breseq output (cached) |
 //! | Pipeline | FM-index → seed-extend SW → pileup → variant caller |
 //! | Composition | barraCuda GPU: SmithWatermanGpu, SnpCallingF64, Tensor::scan |
+//! | Provenance | Live trio via plasmidBin: rhizoCrypt DAG, loamSpine aglets, sweetGrass braid |
 
 use std::path::PathBuf;
 use std::time::Instant;
@@ -36,7 +37,13 @@ use wetspring_barracuda::bio::variant_caller::{self, CallerConfig};
 use wetspring_barracuda::io::fasta::{FastaRecord, GenBankRecord};
 use wetspring_barracuda::io::fastq;
 use wetspring_barracuda::io::sam;
+use wetspring_barracuda::ncbi::fetch_sra_composed;
 use wetspring_barracuda::validation::Validator;
+
+use wetspring_barracuda::ipc::provenance;
+use wetspring_barracuda::ipc::provenance::braid_handoff::{
+    ComputationMetadata, FermentTranscriptBraid,
+};
 
 #[cfg(feature = "gpu")]
 use wetspring_barracuda::gpu::GpuF64;
@@ -90,6 +97,16 @@ fn main() {
     #[cfg(not(feature = "gpu"))]
     println!("── Substrate: CPU only (build with --features gpu for GPU acceleration) ──");
 
+    // ── Provenance: begin DAG session (live trio via plasmidBin) ──
+    println!("\n── Provenance: DAG session ──");
+    let prov = provenance::begin_session("sovereign_resequencing_barrick_2009");
+    println!("  Session ID: {}", prov.id);
+    println!("  Trio available: {}", prov.available);
+    v.check_pass(
+        "provenance session started (live trio or degraded local)",
+        !prov.id.is_empty(),
+    );
+
     // ── Phase 1: Load reference genome ───────────────────────────
     println!("\n── Phase 1: Loading reference genome ──");
 
@@ -123,6 +140,15 @@ fn main() {
     println!("  Reference: {} bp", reference.len());
     v.check_pass("reference length > 4 Mb", reference.len() > 4_000_000);
 
+    let _ = provenance::record_step(
+        &prov.id,
+        &serde_json::json!({
+            "step": "load_reference",
+            "reference": "REL606 (CP000819.1)",
+            "length_bp": reference.len(),
+        }),
+    );
+
     // Load GenBank features if available
     let features = if ref_gbk_path.exists() {
         GenBankRecord::load(&ref_gbk_path)
@@ -140,6 +166,15 @@ fn main() {
     let idx_secs = idx_t0.elapsed().as_secs_f64();
     println!("  FM-index built in {idx_secs:.1}s ({} bp indexed)", fm_index.reference_len());
     v.check_pass("FM-index reference length matches", fm_index.reference_len() == reference.len());
+
+    let _ = provenance::record_step(
+        &prov.id,
+        &serde_json::json!({
+            "step": "build_fm_index",
+            "reference_len": fm_index.reference_len(),
+            "wall_seconds": idx_secs,
+        }),
+    );
 
     let mapper_config = MapperConfig {
         seed_k: 20,
@@ -163,23 +198,34 @@ fn main() {
         let clone_t0 = Instant::now();
         println!("\n  ── {clone_name} ({accession}) ──");
 
-        // Find FASTQ file (try reads/ then fastq/ for layout compatibility)
+        // Composed SRA fetch: NestGate → local cache → SRA Toolkit download
         let reads_dir = workspace.join("reads");
         let fastq_dir = workspace.join("fastq");
-        let candidates = [
-            reads_dir.join(format!("{accession}.fastq")),
-            reads_dir.join(format!("{accession}.fastq.gz")),
-            fastq_dir.join(format!("{accession}.fastq")),
-            fastq_dir.join(format!("{accession}.fastq.gz")),
-        ];
 
-        let fq_path = match candidates.iter().find(|p| p.exists()) {
-            Some(p) => p.clone(),
-            None => {
-                println!("    SKIP: no FASTQ for {accession}");
+        let sra_result = fetch_sra_composed(accession, &reads_dir)
+            .or_else(|_| fetch_sra_composed(accession, &fastq_dir));
+
+        let (fq_path, fq_blake3, fq_source) = match sra_result {
+            Ok(r) => {
+                println!("    FASTQ: {} via {}", r.path.display(), r.source);
+                let _ = provenance::record_step(
+                    &prov.id,
+                    &serde_json::json!({
+                        "step": "fetch_sra",
+                        "accession": accession,
+                        "clone": clone_name,
+                        "source": r.source.to_string(),
+                        "blake3": &r.blake3,
+                    }),
+                );
+                (r.path, r.blake3, r.source.to_string())
+            }
+            Err(e) => {
+                println!("    SKIP: no FASTQ for {accession} ({e})");
                 continue;
             }
         };
+        let _ = (fq_blake3, fq_source);
 
         // Full-depth processing for primal composition braid
         let max_reads = std::env::var("WETSPRING_MAX_READS")
@@ -296,6 +342,28 @@ fn main() {
 
         let clone_secs = clone_t0.elapsed().as_secs_f64();
         println!("    {clone_name}: completed in {clone_secs:.1}s");
+
+        // DAG event: clone node sealed
+        let clone_hash = blake3::hash(
+            format!("{clone_name}:{accession}:variants={}", sovereign_variants.len()).as_bytes(),
+        ).to_hex().to_string();
+
+        let _ = provenance::record_step(
+            &prov.id,
+            &serde_json::json!({
+                "step": "clone_complete",
+                "clone": clone_name,
+                "accession": accession,
+                "reads": reads.len(),
+                "mapped": mapped_count,
+                "coverage_pct": cov_stats.coverage_fraction * 100.0,
+                "mean_depth": cov_stats.mean_depth,
+                "sovereign_variants": sovereign_variants.len(),
+                "wall_seconds": clone_secs,
+                "output_blake3": clone_hash,
+            }),
+        );
+
         clones_processed += 1;
     }
 
@@ -311,65 +379,54 @@ fn main() {
 
     v.check_pass("at least 1 clone processed", clones_processed >= 1);
 
-    // ── Phase 5: Ferment Transcript Braid Export ─────────────────
-    println!("\n── Phase 5: Ferment Transcript Braid ──");
+    // ── Phase 5: Provenance completion — dehydrate → commit → braid ──
+    println!("\n── Phase 5: Provenance Completion (live trio) ──");
 
-    let wall_secs = t0.elapsed().as_secs();
+    let session_result = provenance::complete_session(&prov.id);
+    let prov_status = session_result["provenance"].as_str().unwrap_or("unknown");
+    println!("  Provenance status: {prov_status}");
+    v.check_pass(
+        "provenance session completed (complete or unavailable)",
+        prov_status == "complete" || prov_status == "unavailable",
+    );
 
-    let output_hash = {
-        use std::hash::{Hash, Hasher};
-        let mut hasher = std::hash::DefaultHasher::new();
-        total_sovereign_variants.hash(&mut hasher);
-        total_matches.hash(&mut hasher);
-        clones_processed.hash(&mut hasher);
-        format!("{:016x}", hasher.finish())
+    // BLAKE3 summary hash (real cryptographic hash, not SipHash)
+    let summary_str = format!(
+        "sovereign_variants={total_sovereign_variants},breseq_variants={total_breseq_variants},matches={total_matches},clones={clones_processed}"
+    );
+    let summary_hash = blake3::hash(summary_str.as_bytes()).to_hex().to_string();
+
+    let computation = ComputationMetadata {
+        tool: "wetspring-sovereign-pipeline".to_string(),
+        tool_version: "0.1.0".to_string(),
+        input_accession: "SRP001569".to_string(),
+        input_blake3: "aggregate".to_string(),
+        output_blake3: summary_hash.clone(),
+        wall_time_seconds: t0.elapsed().as_secs(),
+        node_count: u64::try_from(clones_processed).unwrap_or(0),
     };
 
-    let dag_session_id = format!(
-        "dag-wetspring-sovereign-{}",
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_millis()
+    let braid = FermentTranscriptBraid::from_session_result(
+        "barrick_2009_sovereign_resequencing",
+        &session_result,
+        computation,
+        &summary_hash,
     );
 
-    let timestamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs()
-        .to_string();
+    let braid_json = braid.to_json();
+    let braid_str = serde_json::to_string_pretty(&braid_json).unwrap_or_default();
 
-    let braid_json = format!(
-        r#"{{
-  "dataset_id": "barrick_2009_sovereign_resequencing",
-  "spring": "wetSpring",
-  "spring_version": "0.1.0",
-  "braid_id": "braid-sovereign-barrick2009",
-  "dag_session_id": "{dag_session_id}",
-  "dag_merkle_root": "",
-  "spine_id": "",
-  "timestamp": "{timestamp}",
-  "computation": {{
-    "tool": "wetspring-sovereign-pipeline",
-    "tool_version": "0.1.0",
-    "substrate": "{substrate_label}",
-    "pipeline": "FM-index → SmithWatermanGpu → Tensor::scan → SnpCallingF64",
-    "input_accession": "SRP001569",
-    "input_blake3": "aggregate",
-    "output_blake3": "{output_hash}",
-    "wall_time_seconds": {wall_secs},
-    "node_count": {clones_processed},
-    "sovereign_variants": {total_sovereign_variants},
-    "breseq_variants": {total_breseq_variants},
-    "position_matches": {total_matches}
-  }}
-}}"#
-    );
+    println!("  Braid ID: {}", braid.braid_id);
+    println!("  DAG session: {}", braid.dag_session_id);
+    println!("  Merkle root: {}", braid.dag_merkle_root);
+    println!("  Spine ID: {}", braid.spine_id);
+    println!("  Summary BLAKE3: {}", &summary_hash[..16]);
 
+    // Write braid to dataset provenance
     let braid_dir = workspace.join("provenance").join("braids");
     let _ = std::fs::create_dir_all(&braid_dir);
     let braid_path = braid_dir.join("barrick_2009_sovereign.json");
-    match std::fs::write(&braid_path, &braid_json) {
+    match std::fs::write(&braid_path, &braid_str) {
         Ok(()) => {
             println!("  Braid exported: {}", braid_path.display());
             v.check_pass("ferment transcript braid exported", true);
@@ -387,10 +444,10 @@ fn main() {
     if let Some(dir) = global_braid_dir {
         let _ = std::fs::create_dir_all(&dir);
         let global_path = dir.join("barrick_2009_sovereign.json");
-        if std::fs::write(&global_path, &braid_json).is_ok() {
+        if std::fs::write(&global_path, &braid_str).is_ok() {
             println!("  Global braid: {}", global_path.display());
         }
     }
 
-    let _ = v.finish();
+    v.finish();
 }

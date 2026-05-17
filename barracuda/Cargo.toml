@@ -2017,6 +2017,7 @@ required-features = ["ipc"]
 [[bin]]
 name = "validate_sovereign_resequencing"
 path = "src/bin/validate_sovereign_resequencing.rs"
+required-features = ["ipc"]
 
 # ── Checksum generation for guideStone Property 3 ──
 [[example]]
