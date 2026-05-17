@@ -2005,6 +2005,13 @@ path = "src/bin/validate_trophic_cascade.rs"
 name = "validate_colonization_resistance"
 path = "src/bin/validate_colonization_resistance.rs"
 
+# ── Exp381: breseq pipeline — Barrick 2009 Nest Atomic composition ──
+
+[[bin]]
+name = "validate_breseq_barrick_2009"
+path = "src/bin/validate_breseq_barrick_2009.rs"
+required-features = ["ipc"]
+
 # ── Checksum generation for guideStone Property 3 ──
 [[example]]
 name = "gen_checksums"

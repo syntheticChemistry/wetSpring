@@ -4,10 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-17 (V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt
-resolved. barraCuda v0.4.0, coralReef v0.1.0. 51 consumed capabilities (registry 452).
-Live NUCLEUS guideStone 30/31 pass. Composition: composed, live-probing.
-2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests.)
+Last updated: 2026-05-17 (V177 — Wave 20 PM lithoSpore audit absorption. Stability tiers
+annotated on all niche methods. Trio transaction semantics fixed (primals_reached). Consumed
+capabilities aligned to canonical names (dag.dehydrate, ledger.commit). Degradation behavior
+documented. Exp381: Barrick 2009 breseq pipeline executing (first real-data composition).
+Ferment transcript braid exported. 52 consumed capabilities (registry 452). 252 tests.)
 
 ---
 
@@ -176,6 +177,15 @@ The ferment transcript pattern requires wetSpring to:
 **V176 progress:** `provenance.export_braid` method wired, `FermentTranscriptBraid`
 struct implemented, loamSpine capability routing fixed to canonical `ledger.commit`.
 
+**V177 progress — Exp381 executing:** `validate_breseq_barrick_2009` binary built.
+Full Nest Atomic composition: `NestGate` → `breseq` → trio → braid. Environment:
+`micromamba breseq-env` on 4TB NVMe with `breseq 0.40.1`, `samtools`, `bowtie2`, `R`.
+Reference genome `CP000819.1` (REL606, 4.63 Mb). 7 SRA runs (SRP001569) downloaded.
+2/7 clones processed (REL1164M: 579 mutations, REL8593M: 1108 mutations) — mutation
+accumulation trend confirmed. Ferment transcript braid exported to
+`/mnt/4tb-work/.../provenance/braids/barrick_2009_mutations.json`. Re-running for
+full 7/7 completion.
+
 **Composition approach:** This is a Nest Atomic composition, not a standalone script.
 Data acquisition via NestGate `storage.fetch_external` (HTTPS → cache). Computation
 orchestrated as a NUCLEUS workload (primalSpring `spring_deploy_manifest.toml` already
@@ -185,15 +195,29 @@ for external collaborator access (Barrick Lab, UT Austin).
 
 **Workspace:** `/mnt/4tb-work/ecoPrimals/springs/wetSpring/datasets/ltee/` (3.4 TB free).
 
-**Remaining:** breseq pipeline binary, SRA toolkit + breseq installation, actual data
-processing, first braid handoff to lithoSpore `data.toml`.
-
 | Dataset | Size | Status |
 |---------|------|--------|
-| Tenaillon 2016 (264 genomes) | ~200 GB | Spec in Exp380, not started |
-| Barrick 2009 (19 genomes) | ~15 GB | In paper queue, not started |
-| Good 2017 (metagenomic) | ~50 GB | In paper queue, not started |
-| Blount 2012 (replay seq) | ~30 GB | In paper queue, not started |
+| Barrick 2009 (7 clones) | ~1.3 GB | **In progress** — 2/7 done, re-running for 7/7 |
+| Tenaillon 2016 (264 genomes) | ~200 GB | Spec in Exp380, next after Barrick |
+| Good 2017 (metagenomic) | ~50 GB | In paper queue |
+| Blount 2012 (replay seq) | ~30 GB | In paper queue |
+
+---
+
+## 9. Cross-Tier Parity (Wave 20 PM)
+
+**Owner:** wetSpring
+**Priority:** Medium — lithoSpore pattern adoption
+**Status:** Partially addressed
+
+wetSpring has extensive parity validators for CPU/GPU math (Anderson, diversity,
+kinetics, etc.) and `capability.list` schema parity. Missing the formal
+three-layer proof structure: Python baseline → Rust → Primal composition
+with structured `ParityResult` output per `VALIDATION_TIERS.md`.
+
+Existing parity binaries cover the math layer (Tier 2). The remaining work
+is formatting results as JSON-comparable outputs with documented tolerances
+and hooking into the lithoSpore `expected_values.json` contract.
 
 ---
 
@@ -208,7 +232,8 @@ processing, first braid handoff to lithoSpore `data.toml`.
 | 5 | Interactive composition | ludoSpring + esotericWebb | Low | 4 |
 | 6 | Physics simulations | hotSpring | Low | 4 |
 | 7 | Radiating attribution | sweetGrass + sunCloud | Low | 4 |
-| 8 | Ferment transcript pipeline | wetSpring | High | 2 |
+| 8 | Ferment transcript pipeline | wetSpring | **High** | 2 |
+| 9 | Cross-tier parity | wetSpring | Medium | 2 |
 
 ---
 

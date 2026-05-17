@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V177] — 2026-05-17
+
+### Wave 20 PM — lithoSpore Audit Absorption + Exp381 Barrick 2009 Pipeline
+
+- **Stability tier annotations**: All 43 niche methods annotated with `stability = "stable"` or `"evolving"` in `capability_registry.toml`, per `primalSpring/config/capability_registry.toml` tier definitions. Stable: science core, provenance, health, composition, metrics. Evolving: brain, vault, data ingestion, AI assist.
+- **Consumed capability alignment**: `CONSUMED_CAPABILITIES` reconciled against canonical registry. `spine.create` + `entry.append` → `dag.dehydrate` + `ledger.commit`. Wire names now match actual IPC calls in `rhizocrypt.rs` and `loamspine.rs`.
+- **Trio transaction semantics**: `complete_session()` now emits `primals_reached` field tracking which trio members responded (per `PROVENANCE_TRIO_INTEGRATION_GUIDE.md` Rule 4). Partial state distinguishable from "not attempted."
+- **Degradation behavior documented**: `docs/DEGRADATION_BEHAVIOR.md` — per-primal degradation table covering all 16 consumed primals. Pattern: socket-probe-based discovery, `ProvenanceResult { available: false }` fallbacks, gap reports. Science never gated behind provenance.
+- **Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic** — `validate_breseq_barrick_2009` binary (Rust, `--features ipc`). Full composition: `NestGate` → `breseq 0.40.1` → trio → braid. 7 SRA runs (SRP001569), reference genome CP000819.1 (REL606). Processed: REL1164M (579 mutations), REL8593M (1108 mutations). Mutation accumulation trend confirmed. Ferment transcript braid exported to `/mnt/4tb-work/.../provenance/braids/barrick_2009_mutations.json`.
+- **`provenance.export_braid` in registry**: Added to `capability_registry.toml` with `stability = "stable"`.
+- **Gap #9 opened**: Cross-tier parity (formal three-layer proof structure not yet adopted from lithoSpore pattern).
+- Build gate: `cargo clippy --features ipc --lib -- -D warnings` (zero), `cargo test --features ipc --lib` (252 pass).
+
 ## [V176] — 2026-05-17
 
 ### lithoSpore Audit Response — Ferment Transcript Braid Export + Trio Reconciliation

@@ -296,6 +296,8 @@ fn local_session_id() -> String {
 ///
 /// Three-phase completion following the wateringHole provenance trio pattern.
 /// Each phase degrades gracefully if the downstream primal is unavailable.
+/// Per `PROVENANCE_TRIO_INTEGRATION_GUIDE.md`: partial state is always
+/// reported via `primals_reached`, and domain logic never fails.
 ///
 /// Wave 17: tries `signal.dispatch("nest.commit")` first — biomeOS manages
 /// the dehydrate → commit → braid graph atomically. Falls back to the
@@ -305,6 +307,7 @@ pub fn complete_session(session_id: &str) -> Value {
         return json!({
             "provenance": "unavailable",
             "session_id": session_id,
+            "primals_reached": [],
         });
     };
 
@@ -312,14 +315,17 @@ pub fn complete_session(session_id: &str) -> Value {
         return signal_result;
     }
 
-    // Fallback: multi-call sequence for pre-Wave 17 biomeOS.
+    let mut primals_reached: Vec<&str> = Vec::new();
+
     // Phase 1: Dehydrate (rhizoCrypt)
     let Ok(dehydration) = rhizocrypt::dehydrate(&socket, session_id) else {
         return json!({
             "provenance": "unavailable",
             "session_id": session_id,
+            "primals_reached": primals_reached,
         });
     };
+    primals_reached.push("rhizoCrypt");
 
     let merkle_root = json_str_or(&dehydration, "merkle_root", "").to_string();
 
@@ -331,8 +337,10 @@ pub fn complete_session(session_id: &str) -> Value {
             "dehydrated": true,
             "committed": false,
             "merkle_root": merkle_root,
+            "primals_reached": primals_reached,
         });
     };
+    primals_reached.push("loamSpine");
 
     let commit_id = commit_result
         .get("commit_id")
@@ -345,6 +353,7 @@ pub fn complete_session(session_id: &str) -> Value {
     let braid_id = sweetgrass::create_attribution_braid(&socket, &commit_id)
         .ok()
         .and_then(|r| {
+            primals_reached.push("sweetGrass");
             let id = r.get("braid_id").or_else(|| r.get("id"));
             id.and_then(Value::as_str).map(str::to_string)
         })
@@ -356,6 +365,7 @@ pub fn complete_session(session_id: &str) -> Value {
         "merkle_root": merkle_root,
         "commit_id": commit_id,
         "braid_id": braid_id,
+        "primals_reached": primals_reached,
     })
 }
 

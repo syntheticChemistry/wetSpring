@@ -13,10 +13,10 @@ Tier 2: Rust validation     →  NUCLEUS composition patterns
            (345 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
 
 Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
-           (42 niche caps)     (18 IPC roundtrips)    (63/63 checks)
+           (43 niche caps)     (18 IPC roundtrips)    (63/63 checks)
 
 Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
-           (50 consumed caps)   (5 primals, check_skip)    (plasmidBin)
+           (52 consumed caps)   (5 primals, check_skip)    (plasmidBin)
 
 Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 5 — primal proof)
            (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
@@ -27,11 +27,11 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 
 | | |
 |---|---|
-| **Tests** | 1,962 (lib) + 97 integration + 18 IPC roundtrip, 0 failed |
-| **Validation checks** | 5,900+ across 367 binaries (345 barracuda + 22 forge) |
-| **Experiments** | 381 completed + 3 proposed (384 indexed) |
+| **Tests** | 252 (lib) + 97 integration + 18 IPC roundtrip, 0 failed |
+| **Validation checks** | 5,967+ across 371 binaries (349 barracuda + 22 forge) |
+| **Experiments** | 384 completed + 1 in progress (385 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 42 niche, 50 consumed (33 v0.9.17 canonical + 15 legacy + 2 Wave 17), 37 dispatch, 21 domains |
+| **IPC capabilities** | 43 niche, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch, 21 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -40,12 +40,12 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 2 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 20 resolved/closed). Zero internal gaps. |
+| **Primal gaps** | 3 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 20 resolved/closed). Zero internal gaps. |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V176:** lithoSpore audit response. New `provenance.export_braid` method — ferment transcript braid export in lithoSpore wire format. loamSpine capability routing fixed (`"session"` → `"ledger"` per trio integration guide v2.0). `braid_handoff.rs` module with `FermentTranscriptBraid` struct, 5 tests. 43 niche capabilities, 51 consumed, registry 453. 384/384 experiments, 370 binaries, 5,957+ checks. **2 gaps open (deployment-only), 20 resolved/closed.**
+**Current release — V177:** Wave 20 PM lithoSpore audit absorption. Stability tier annotations on all 43 niche methods. Consumed capabilities aligned to canonical registry (`dag.dehydrate`, `ledger.commit`). Trio transaction semantics fixed (`primals_reached`). Degradation behavior documented. Exp381: Barrick 2009 breseq pipeline — first real-data Nest Atomic composition (mutation accumulation confirmed, ferment transcript braid exported). 43 niche, 52 consumed, registry 452. 385 experiments (384 done + 1 in progress), 371 binaries, 5,967+ checks. **3 gaps open (deployment + cross-tier parity), 20 resolved/closed.**
 
 ---
 

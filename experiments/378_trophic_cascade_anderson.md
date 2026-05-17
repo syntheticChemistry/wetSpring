@@ -2,7 +2,7 @@
 
 **Status:** DONE (V174, 2026-05-17 — 10/10 PASS)
 **Date:** 2026-03-19
-**Binary:** `validate_trophic_cascade` (to create)
+**Binary:** `validate_trophic_cascade`
 **Feature gate:** none
 **Track:** Anderson Hormesis (cross-spring)
 

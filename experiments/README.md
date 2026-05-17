@@ -196,9 +196,10 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 318 | metalForge v16 | metalforge | DONE | Pipeline integration | Cross-system paper math, 6 domains, CPU=GPU=NPU | 24 |
 | 335 | R Industry Parity Baselines | cross | DONE | R/vegan + R/DADA2 + R/phyloseq | bio::diversity, bio::dada2, bio::phred, bio::unifrac | 53 |
 | 375 | [V115 Deep Audit](375_v115_deep_audit_unibin_capability_domains.md) | cross | DONE | V114 codebase audit | UniBin, capability_domains, tolerances, XDG, coverage | — |
-| 377 | [Hormesis Biphasic Model](377_hormesis_biphasic_model.md) | cross | PROPOSED | Calabrese & Mattson (2017) hormesis curves | `bio::hormesis` (unit tests) | — |
-| 378 | [Trophic Cascade Anderson](378_trophic_cascade_anderson.md) | cross | PROPOSED | Anderson lattice + pesticide perturbation | — | — |
-| 379 | [Joint Colonization Resistance](379_joint_colonization_resistance.md) | cross | PROPOSED | healthSpring × wetSpring joint surface | `bio::binding_landscape` (unit tests) | — |
+| 377 | [Hormesis Biphasic Model](377_hormesis_biphasic_model.md) | cross | DONE | Calabrese & Mattson (2017) hormesis curves | `bio::hormesis`, `validate_hormesis_biphasic` | 17 |
+| 378 | [Trophic Cascade Anderson](378_trophic_cascade_anderson.md) | cross | DONE | Anderson lattice + pesticide perturbation | `validate_trophic_cascade` | 10 |
+| 379 | [Joint Colonization Resistance](379_joint_colonization_resistance.md) | cross | DONE | healthSpring x wetSpring joint surface | `bio::binding_landscape`, `validate_colonization_resistance` | 30 |
+| 381 | [breseq Barrick 2009](381_breseq_barrick_2009_nest_atomic.md) | ltee | IN PROGRESS | breseq 0.40.1 on SRP001569 | `validate_breseq_barrick_2009` (Nest Atomic) | 10 |
 
 ---
 
@@ -686,6 +687,17 @@ Module: `bio::binding_landscape` (17 unit tests passing). Binary: `validate_colo
 Joint with healthSpring exp097/exp098.
 
 **Totals (V174): 384/384 experiments completed, 370 binaries (348 barracuda + 22 forge), 5,957+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 51 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Deep debt resolved. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
+
+### Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic (V177 — IN PROGRESS, 8/10)
+
+First real-data Nest Atomic composition. Downloads 7 SRA runs (SRP001569, Barrick 2009
+LTEE Ara-1) via sovereign SRA pipeline, runs breseq 0.40.1 variant calling against
+REL606 reference (CP000819.1), records provenance via trio, exports ferment transcript
+braid for lithoSpore. Binary: `validate_breseq_barrick_2009` (`--features ipc`).
+Environment: `micromamba breseq-env` on 4TB NVMe. REL1164M: 579 mutations, REL8593M:
+1108 mutations. Mutation accumulation trend confirmed. Braid exported.
+
+**Totals (V177): 385 experiments indexed (384 completed + 1 in progress), 371 binaries (349 barracuda + 22 forge), 5,967+ checks, 252 lib tests (0 failures). Wave 20 PM stability tiers adopted. 52 consumed capabilities (registry 452). Trio transaction semantics aligned (primals_reached). Degradation documented. 3 gaps open (deployment + cross-tier parity), 20 resolved/closed.**
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Status:** DONE (V174, 2026-05-17 — 30/30 PASS)
 **Date:** 2026-03-19
-**Binary:** `validate_colonization_resistance` (to create)
+**Binary:** `validate_colonization_resistance`
 **Feature gate:** none
 **Track:** Anderson Hormesis / Low-Affinity Binding (joint cross-spring)
 
@@ -62,6 +62,4 @@ Gonzales IC50 (Exp280) → Hormesis Model (Exp377) → **This**
 
 ## wateringHole Handoff
 
-```
-(handoff to be created when experiment completes — currently PROPOSED)
-```
+Completed V174. Included in `WETSPRING_V174_PRIMAL_HANDOFF_MAY17_2026.md`.

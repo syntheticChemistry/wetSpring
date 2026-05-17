@@ -133,6 +133,8 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 /// Wave 20: registry synced to 452 (`primal.list` added, consumed for
 /// composition health probing). `count` field in `capability.list` response.
 /// `primal.announce` fully adopted.
+/// Wave 20 PM: trio consumed names aligned to canonical registry —
+/// `dag.dehydrate` + `ledger.commit` (previously `spine.create` + `entry.append`).
 /// Legacy methods separated into [`CONSUMED_CAPABILITIES_LEGACY`] for
 /// explicit tracking (PG-12 resolution).
 pub const CONSUMED_CAPABILITIES: &[&str] = &[
@@ -195,8 +197,8 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "storage.retrieve",
     "dag.session.create",
     "dag.event.append",
-    "spine.create",
-    "entry.append",
+    "dag.dehydrate",
+    "ledger.commit",
     "braid.create",
     "braid.commit",
     // Meta-tier (Squirrel + petalTongue)

@@ -2,7 +2,7 @@
 
 **Status:** DONE (V174, 2026-05-17 — 17/17 PASS)
 **Date:** 2026-03-19
-**Binary:** `validate_hormesis_biphasic` (to create)
+**Binary:** `validate_hormesis_biphasic`
 **Feature gate:** none
 **Track:** Anderson Hormesis (cross-spring)
 
