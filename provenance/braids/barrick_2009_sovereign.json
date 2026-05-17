@@ -10,6 +10,79 @@
   "status": "partial",
   "clones_complete": 3,
   "clones_total": 7,
+  "dag": {
+    "topology": "fan-out",
+    "root": "dag-node-ref-load",
+    "nodes": [
+      {
+        "id": "dag-node-ref-load",
+        "type": "reference",
+        "sealed": true,
+        "spine_aglet": "spine-ref-rel606-4629812bp",
+        "output": "REL606 FM-index (4629812 bp, 4209 CDS)"
+      },
+      {
+        "id": "dag-node-REL1164M",
+        "parent": "dag-node-ref-load",
+        "type": "clone",
+        "sealed": true,
+        "spine_aglet": "spine-REL1164M-3672315mapped-34005var",
+        "accession": "SRR032370"
+      },
+      {
+        "id": "dag-node-REL2179M",
+        "parent": "dag-node-ref-load",
+        "type": "clone",
+        "sealed": true,
+        "spine_aglet": "spine-REL2179M-3866094mapped-35282var",
+        "accession": "SRR032371"
+      },
+      {
+        "id": "dag-node-REL4536M",
+        "parent": "dag-node-ref-load",
+        "type": "clone",
+        "sealed": true,
+        "spine_aglet": "spine-REL4536M-3903267mapped-33396var",
+        "accession": "SRR032372"
+      },
+      {
+        "id": "dag-node-REL7177M",
+        "parent": "dag-node-ref-load",
+        "type": "clone",
+        "sealed": false,
+        "spine_aglet": null,
+        "accession": "SRR032373",
+        "state": "mapping"
+      },
+      {
+        "id": "dag-node-REL8593M",
+        "parent": "dag-node-ref-load",
+        "type": "clone",
+        "sealed": false,
+        "spine_aglet": null,
+        "accession": "SRR032374",
+        "state": "pending"
+      },
+      {
+        "id": "dag-node-REL10379",
+        "parent": "dag-node-ref-load",
+        "type": "clone",
+        "sealed": false,
+        "spine_aglet": null,
+        "accession": "SRR032375",
+        "state": "pending"
+      },
+      {
+        "id": "dag-node-REL10926",
+        "parent": "dag-node-ref-load",
+        "type": "clone",
+        "sealed": false,
+        "spine_aglet": null,
+        "accession": "SRR032376",
+        "state": "pending"
+      }
+    ]
+  },
   "computation": {
     "tool": "wetspring-sovereign-pipeline",
     "tool_version": "0.1.0",
