@@ -9,7 +9,7 @@ sovereign computing ecosystem — a collection of self-contained binaries that
 coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
 between components.
 
-**Current release — V173:** Deep debt resolution — UniBin `serve` evolved from stub to live IPC server, `dense_to_csr` extracted to validation library, 13 display-name constants centralized in `primal_names.rs`, hardcoded CamelCase literals replaced. Zero `unsafe`, zero `TODO`/`FIXME`/`HACK`, all mocks `#[cfg(test)]`-gated, `unwrap_used = "deny"`. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). Registry 452, 51 consumed capabilities. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V174:** Experiment buildouts — Exp377–379 hormesis chain implemented (hormesis biphasic 17/17, trophic cascade 10/10, colonization resistance 30/30). `CONTROL_EXPERIMENT_STATUS.md` created. 384/384 experiments completed, 370 binaries, 5,957+ checks. barraCuda v0.4.0, coralReef v0.1.0. guideStone Level 5 (primal proof). Registry 452, 51 consumed capabilities. 1,962 lib tests, 0 failed. Clippy zero workspace. 63/63 papers. LTEE B7 TIER 2 COMPLETE, 9 queued. 2 gaps open (deployment-only), 20 resolved/closed.
 
 ## Role in the Ecosystem
 

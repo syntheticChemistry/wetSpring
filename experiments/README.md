@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-16 (V171: Live composition health — runtime probing of trio, NestGate, biomeOS replaces deferred checks. Wave 20 schema parity self-check. barraCuda v0.4.0. coralReef v0.1.0 in niche. 384 experiments indexed (381 completed + 3 PROPOSED), **367** binaries (**345** barracuda + **22** forge), 5,900+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Updated**: 2026-05-17 (V174: Exp377–379 hormesis chain implemented — 57/57 checks PASS. Deep debt resolved. 384 experiments indexed (384 completed), **370** binaries (**348** barracuda + **22** forge), 5,957+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 51 consumed capabilities (registry 452). 2 primal gaps open (deployment-only), 20 resolved/closed.)
 
 ---
 

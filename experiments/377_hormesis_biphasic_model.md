@@ -1,6 +1,6 @@
 # Exp377: Hormesis Biphasic Dose-Response Model
 
-**Status:** PROPOSED
+**Status:** DONE (V174, 2026-05-17 — 17/17 PASS)
 **Date:** 2026-03-19
 **Binary:** `validate_hormesis_biphasic` (to create)
 **Feature gate:** none

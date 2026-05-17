@@ -1991,6 +1991,20 @@ name = "wetspring_science_facade"
 path = "src/bin/wetspring_science_facade.rs"
 required-features = ["facade"]
 
+# ── Exp377-379: Hormesis / Trophic Cascade / Colonization Resistance ──
+
+[[bin]]
+name = "validate_hormesis_biphasic"
+path = "src/bin/validate_hormesis_biphasic.rs"
+
+[[bin]]
+name = "validate_trophic_cascade"
+path = "src/bin/validate_trophic_cascade.rs"
+
+[[bin]]
+name = "validate_colonization_resistance"
+path = "src/bin/validate_colonization_resistance.rs"
+
 # ── Checksum generation for guideStone Property 3 ──
 [[example]]
 name = "gen_checksums"

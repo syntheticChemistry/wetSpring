@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V174] — 2026-05-17
+
+### Experiment Buildouts — Hormesis Chain (Exp377–379) + Control Validation
+
+- **Exp377: Hormesis Biphasic Dose-Response Model** — `validate_hormesis_biphasic` (17/17 PASS). Validates `bio::hormesis` against Calabrese & Mattson (2017): baseline R(0)=1.0, asymptotic inhibition R(∞)→0, peak hormesis > 1.0, zone width > 0, regime classification (Subthreshold/Hormetic/Toxic), sweep consistency (1000 points), Anderson disorder mapping (dose→W in near-critical regime), disorder sweep with spectral analysis.
+- **Exp378: Trophic Cascade via Anderson Lattice** — `validate_trophic_cascade` (10/10 PASS). Differential predator/prey sensitivity: predators collapse (K_inh=30) before prey (K_inh=200). Anderson spectral sweep (L=8, 500 realizations, 8 W values). Trophic diversity (Shannon + Pielou) higher at low dose than high dose. Dose→disorder mapping verified.
+- **Exp379: Joint Colonization Resistance Surface** — `validate_colonization_resistance` (30/30 PASS). Diversity advantage (N=1→4→8→15 resistance monotonic). IPR(uniform)=1/N, IPR(concentrated)=1.0. Localization length ξ=N (uniform), ξ=1 (concentrated). Composite binding + selectivity index > 100. Site occupancy profile valid. Resistance surface sweep (3×3×3=27 points), weak binders + diversity wins over strong binders + monoculture.
+- **CONTROL_EXPERIMENT_STATUS.md created:** Tracks 5 control chains (Python→CPU→GPU, cross-spring evolution, NUCLEUS atomics, hormesis chain, paper queue). Hardware matrix (CPU/GPU/NPU).
+- 3 new `[[bin]]` entries in `Cargo.toml`. Experiment specs updated from PROPOSED to DONE. Experiment README totals updated (384/384 completed, 370 binaries, 5,957+ checks).
+- Build gate: `cargo clippy --features ipc --lib -- -W clippy::pedantic -W clippy::nursery` (zero warnings), `cargo test --features ipc --lib` (252 pass). All 3 new experiments pass in `--release`.
+
 ## [V173] — 2026-05-17
 
 ### Deep Debt Resolution — Stub Evolution, Library Extraction, Display-Name Hygiene

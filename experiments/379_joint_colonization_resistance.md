@@ -1,6 +1,6 @@
 # Exp379: Joint Colonization Resistance Surface (healthSpring × wetSpring)
 
-**Status:** PROPOSED
+**Status:** DONE (V174, 2026-05-17 — 30/30 PASS)
 **Date:** 2026-03-19
 **Binary:** `validate_colonization_resistance` (to create)
 **Feature gate:** none
