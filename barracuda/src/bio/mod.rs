@@ -117,6 +117,7 @@ pub mod pangenome;
 #[cfg(feature = "gpu")]
 pub mod pangenome_gpu;
 pub mod pcoa;
+pub mod pileup;
 #[cfg(feature = "gpu")]
 pub mod pcoa_gpu;
 #[cfg(feature = "barracuda-lib")]
@@ -135,7 +136,9 @@ pub mod random_forest;
 pub mod random_forest_gpu;
 #[cfg(feature = "gpu")]
 pub mod rarefaction_gpu;
+pub mod read_mapper;
 pub mod reconciliation;
+pub mod ref_index;
 #[cfg(feature = "gpu")]
 pub mod reconciliation_gpu;
 pub mod robinson_foulds;
@@ -168,6 +171,7 @@ pub mod unifrac;
 #[cfg(feature = "gpu")]
 pub mod unifrac_gpu;
 pub mod validation_helpers;
+pub mod variant_caller;
 
 /// Convenience re-export of `barracuda::linalg::nmf` for domain discovery.
 ///

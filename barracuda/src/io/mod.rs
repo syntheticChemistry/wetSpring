@@ -5,10 +5,12 @@
 
 #[cfg(feature = "json")]
 pub mod biom;
+pub mod fasta;
 pub mod fastq;
 pub mod jcamp;
 pub mod ms2;
 pub mod mzml;
 pub mod mzxml;
 pub mod nanopore;
+pub mod sam;
 pub mod xml;

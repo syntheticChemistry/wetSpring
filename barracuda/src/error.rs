@@ -180,6 +180,12 @@ pub enum Error {
     /// JCAMP-DX spectroscopy format parsing error.
     #[error("JCAMP-DX parse error: {0}")]
     Jcamp(String),
+    /// FASTA format parsing error (sovereign parser).
+    #[error("FASTA parse error: {0}")]
+    Fasta(String),
+    /// SAM/BAM alignment format error (sovereign parser).
+    #[error("SAM parse error: {0}")]
+    Sam(String),
 }
 
 /// Result type alias for wetSpring operations.
@@ -236,6 +242,8 @@ mod tests {
                 "IPC error",
             ),
             (Error::Jcamp("missing TITLE".into()), "JCAMP-DX parse error"),
+            (Error::Fasta("bad header".into()), "FASTA parse error"),
+            (Error::Sam("bad CIGAR".into()), "SAM parse error"),
         ];
         for (err, expected_prefix) in cases {
             let msg = err.to_string();
@@ -322,6 +330,8 @@ mod tests {
             Error::Npu("x".into()),
             Error::Nanopore("x".into()),
             Error::Jcamp("x".into()),
+            Error::Fasta("x".into()),
+            Error::Sam("x".into()),
         ];
         for err in &variants {
             assert!(std::error::Error::source(err).is_none());

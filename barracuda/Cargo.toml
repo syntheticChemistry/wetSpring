@@ -25,7 +25,7 @@ barracuda-lib = ["dep:barracuda"]
 # Enable with `cargo build --features gpu`.
 # Adds wgpu v28 (device creation), barraCuda GPU ops (144+ primitives),
 # and tokio (async device init). Zero local WGSL shaders (full lean).
-gpu = ["barracuda-lib", "barracuda/gpu", "barracuda/domain-esn", "dep:wgpu", "dep:tokio"]
+gpu = ["barracuda-lib", "barracuda/gpu", "barracuda/domain-esn", "barracuda/domain-genomics", "dep:wgpu", "dep:tokio"]
 # NPU acceleration via ToadStool akida-driver (BrainChip AKD1000/AKD1500).
 # Enable with `cargo build --features npu`.
 # Provides runtime discovery, capability-based dispatch, int8 inference.
@@ -2011,6 +2011,12 @@ path = "src/bin/validate_colonization_resistance.rs"
 name = "validate_breseq_barrick_2009"
 path = "src/bin/validate_breseq_barrick_2009.rs"
 required-features = ["ipc"]
+
+# ── Exp382: Sovereign Rust resequencing — Barrick 2009 parity ──
+
+[[bin]]
+name = "validate_sovereign_resequencing"
+path = "src/bin/validate_sovereign_resequencing.rs"
 
 # ── Checksum generation for guideStone Property 3 ──
 [[example]]
