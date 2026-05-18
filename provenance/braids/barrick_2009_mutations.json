@@ -1,0 +1,20 @@
+{
+  "braid_id": "",
+  "computation": {
+    "input_accession": "SRP001569",
+    "input_blake3": "aggregate",
+    "node_count": 7,
+    "output_blake3": "4e4e5c833e9bc44b2cfe5cf1af982d17cd9879bf13e0c81a8de02144fc1d825f",
+    "tool": "breseq",
+    "tool_version": "0.40.1",
+    "wall_time_seconds": 1956
+  },
+  "dag_merkle_root": "",
+  "dag_session_id": "local-wetspring-1779044795190",
+  "dataset_id": "barrick_2009_mutations",
+  "spine_id": "",
+  "spring": "wetSpring",
+  "spring_version": "0.1.0",
+  "summary_blake3": "4e4e5c833e9bc44b2cfe5cf1af982d17cd9879bf13e0c81a8de02144fc1d825f",
+  "timestamp": "1779046751"
+}
