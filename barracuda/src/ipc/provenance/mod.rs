@@ -157,7 +157,7 @@ pub fn neural_api_socket() -> Option<PathBuf> {
         Some(std::env::temp_dir().join(&sock_name)),
     ];
 
-    candidates.into_iter().flatten().find(|p| p.exists())
+    candidates.into_iter().flatten().find(|p| super::discover::socket_is_alive(p))
 }
 
 /// Send a `capability.call` JSON-RPC request to the Neural API.

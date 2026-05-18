@@ -4,11 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-17 (V177 — Wave 20 PM lithoSpore audit absorption. Stability tiers
-annotated on all niche methods. Trio transaction semantics fixed (primals_reached). Consumed
-capabilities aligned to canonical names (dag.dehydrate, ledger.commit). Degradation behavior
-documented. Exp381: Barrick 2009 breseq pipeline executing (first real-data composition).
-Ferment transcript braid exported. 52 consumed capabilities (registry 452). 252 tests.)
+Last updated: 2026-05-18 (V178 — Wave 22 stale socket audit absorption. Connect-probe
+`socket_is_alive()` replaces `path.exists()` in all 6 discovery tiers. `DEAD_SOCKET_CACHE`
+prevents repeated probe costs. `dag.partial_dehydrate` wired from rhizoCrypt S69. Caller
+refinement v1: quality-weighted frequencies, strand bias, Q20 base filter — 34K→78 variants
+(99.8% FP reduction). Parity evolution tracked in braids. 52 consumed capabilities.)
 
 ---
 
@@ -221,6 +221,48 @@ and hooking into the lithoSpore `expected_values.json` contract.
 
 ---
 
+## 10. Stale Socket Detection (Wave 22 — RESOLVED)
+
+**Owner:** wetSpring (consumer side), biomeOS (server side), plasmidBin (infra)
+**Priority:** RESOLVED — absorbed from primalSpring Wave 22 audit
+**Status:** Implemented
+
+Discovery functions used `path.exists()` to check UDS sockets, which returned
+true for stale sockets (file exists, no listener). This caused ~100ms timeouts
+per stale socket during trio discovery.
+
+**Resolution:**
+- `socket_is_alive()` connect-probe with 50ms timeout replaces `path.exists()`
+  in all 6 discovery tiers (`discover_socket`, `discover_by_capability`,
+  `neural_api_socket`, `resolve_via_songbird`, capability-named sockets)
+- `DEAD_SOCKET_CACHE` (`OnceLock<Mutex<HashSet<PathBuf>>>`) prevents repeated
+  probes for known-dead sockets within a session
+- Upstream report filed: `WETSPRING_UPSTREAM_BIOMEOS_STALE_SOCKETS_MAY18_2026.md`
+- Server-side cleanup confirmed across all 14 primals (primalSpring audit)
+
+---
+
+## 11. Variant Caller Parity (Active — Calibration Gap)
+
+**Owner:** wetSpring
+**Priority:** High — directly affects lithoSpore braid quality
+**Status:** In progress — v1 refinement deployed, parity improving
+
+Sovereign Rust pipeline over-calls variants vs breseq baseline. Root cause:
+simple frequency thresholds vs breseq's Bayesian mixture model with base
+quality weighting.
+
+**v0 (permissive):** ~34,000 variants per clone (8,500x over breseq)
+**v1 (refined):** ~60-78 variants per clone (15-19x over breseq)
+
+Remaining work: quality-weighted binomial model in SnpCallingF64 shader,
+mapper-level deduplication of repetitive region alignments.
+
+Parity evolution tracked in `provenance/braids/barrick_2009_refined_v1.json`
+with exact parameter derivations anchored — no magic numbers.
+
+---
+
 ## Summary Table
 
 | # | Gap | Owner | Priority | Phase |
@@ -234,6 +276,8 @@ and hooking into the lithoSpore `expected_values.json` contract.
 | 7 | Radiating attribution | sweetGrass + sunCloud | Low | 4 |
 | 8 | Ferment transcript pipeline | wetSpring | **High** | 2 |
 | 9 | Cross-tier parity | wetSpring | Medium | 2 |
+| 10 | Stale socket detection | wetSpring + biomeOS | **RESOLVED** | — |
+| 11 | Variant caller parity | wetSpring | **High** | 2 |
 
 ---
 

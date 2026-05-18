@@ -12,7 +12,58 @@
 //! No absolute paths or hardcoded primal names — discovery is parameterized
 //! by env var and primal name, following the Primal IPC Protocol.
 
-use std::path::PathBuf;
+use std::collections::HashSet;
+use std::path::{Path, PathBuf};
+use std::sync::{Mutex, OnceLock};
+
+/// Process-level negative cache for dead sockets.
+/// Prevents repeated ~100ms probe costs for known-dead sockets within a session.
+/// Absorbed from primalSpring `DEAD_SOCKET_CACHE` pattern (Wave 22).
+static DEAD_SOCKET_CACHE: OnceLock<Mutex<HashSet<PathBuf>>> = OnceLock::new();
+
+fn dead_cache() -> &'static Mutex<HashSet<PathBuf>> {
+    DEAD_SOCKET_CACHE.get_or_init(|| Mutex::new(HashSet::new()))
+}
+
+/// Check if a Unix domain socket has an active listener.
+///
+/// Uses a connect-probe with 50ms timeout instead of `path.exists()`.
+/// Live sockets respond in <1ms; dead sockets fail with ECONNREFUSED
+/// immediately. This eliminates the ~100ms timeout per stale socket that
+/// was observed in production (May 18, 2026 stale socket incident).
+///
+/// Results are negatively cached: once a socket is confirmed dead, it is
+/// not re-probed for the lifetime of the process.
+#[must_use]
+pub fn socket_is_alive(path: &Path) -> bool {
+    use std::os::unix::net::UnixStream;
+    use std::time::Duration;
+
+    if !path.exists() {
+        return false;
+    }
+
+    if let Ok(cache) = dead_cache().lock() {
+        if cache.contains(path) {
+            return false;
+        }
+    }
+
+    let alive = UnixStream::connect(path)
+        .and_then(|s| {
+            s.set_read_timeout(Some(Duration::from_millis(50)))?;
+            Ok(s)
+        })
+        .is_ok();
+
+    if !alive {
+        if let Ok(mut cache) = dead_cache().lock() {
+            cache.insert(path.to_path_buf());
+        }
+    }
+
+    alive
+}
 
 /// Resolve the active family identifier for multi-instance discovery.
 ///
@@ -195,7 +246,7 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     let result = v.get("result")?;
     let socket_path = result.get("socket")?.as_str()?;
     let path = PathBuf::from(socket_path);
-    if path.exists() { Some(path) } else { None }
+    if socket_is_alive(&path) { Some(path) } else { None }
 }
 
 /// Map a capability domain prefix to the canonical primal name that serves it.
@@ -229,7 +280,7 @@ pub const fn capability_to_primal(domain: &str) -> Option<&str> {
 pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
     if let Ok(path) = std::env::var(env_var) {
         let p = PathBuf::from(path);
-        if p.exists() {
+        if socket_is_alive(&p) {
             return Some(p);
         }
     }
@@ -242,13 +293,13 @@ pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
             super::primal_names::BIOMEOS,
             primal
         ));
-        if p.exists() {
+        if socket_is_alive(&p) {
             return Some(p);
         }
     }
 
     let fallback = std::env::temp_dir().join(format!("{primal}-{fam}.sock"));
-    if fallback.exists() {
+    if socket_is_alive(&fallback) {
         return Some(fallback);
     }
 
@@ -326,16 +377,35 @@ mod tests {
     }
 
     #[test]
-    fn discover_explicit_env_override() {
-        let sock = crate::ipc::test_socket_path("discover_explicit_env_override");
+    fn discover_rejects_stale_file_at_socket_path() {
+        let sock = crate::ipc::test_socket_path("discover_rejects_stale_file");
         crate::ipc::cleanup_test_socket(&sock);
         std::fs::write(&sock, "").unwrap();
 
         temp_env::with_var(
-            "WETSPRING_DISCOVER_TEST_SOCK",
+            "WETSPRING_DISCOVER_STALE_TEST",
             Some(sock.to_str().unwrap()),
             || {
-                let found = discover_socket("WETSPRING_DISCOVER_TEST_SOCK", "irrelevant");
+                let found = discover_socket("WETSPRING_DISCOVER_STALE_TEST", "irrelevant");
+                assert!(found.is_none(), "stale file should not pass connect-probe");
+            },
+        );
+        crate::ipc::cleanup_test_socket(&sock);
+    }
+
+    #[test]
+    fn discover_explicit_env_override_with_live_socket() {
+        use std::os::unix::net::UnixListener;
+
+        let sock = crate::ipc::test_socket_path("discover_env_override_live");
+        crate::ipc::cleanup_test_socket(&sock);
+        let _listener = UnixListener::bind(&sock).unwrap();
+
+        temp_env::with_var(
+            "WETSPRING_DISCOVER_LIVE_SOCK",
+            Some(sock.to_str().unwrap()),
+            || {
+                let found = discover_socket("WETSPRING_DISCOVER_LIVE_SOCK", "irrelevant");
                 assert_eq!(found, Some(sock.clone()));
             },
         );
@@ -387,6 +457,46 @@ mod tests {
         let found =
             resolve_socket_explicit(Some("/nonexistent/path.sock"), None, "unused", "unused");
         assert!(found.is_none());
+    }
+
+    #[test]
+    fn socket_is_alive_returns_false_for_nonexistent() {
+        assert!(!socket_is_alive(Path::new("/nonexistent/socket.sock")));
+    }
+
+    #[test]
+    fn socket_is_alive_returns_false_for_regular_file() {
+        let p = crate::ipc::test_socket_path("alive_regular_file");
+        crate::ipc::cleanup_test_socket(&p);
+        std::fs::write(&p, "").unwrap();
+        assert!(!socket_is_alive(&p), "regular file is not a live socket");
+        crate::ipc::cleanup_test_socket(&p);
+    }
+
+    #[test]
+    fn socket_is_alive_returns_true_for_live_listener() {
+        use std::os::unix::net::UnixListener;
+        let p = crate::ipc::test_socket_path("alive_live_listener");
+        crate::ipc::cleanup_test_socket(&p);
+        let _listener = UnixListener::bind(&p).unwrap();
+        assert!(socket_is_alive(&p));
+        crate::ipc::cleanup_test_socket(&p);
+    }
+
+    #[test]
+    fn dead_socket_cache_prevents_reprobe() {
+        let p = crate::ipc::test_socket_path("dead_cache_reprobe");
+        crate::ipc::cleanup_test_socket(&p);
+        std::fs::write(&p, "").unwrap();
+
+        assert!(!socket_is_alive(&p));
+        assert!(
+            dead_cache().lock().unwrap().contains(&p),
+            "dead socket should be cached after first probe"
+        );
+
+        assert!(!socket_is_alive(&p));
+        crate::ipc::cleanup_test_socket(&p);
     }
 
     #[test]
