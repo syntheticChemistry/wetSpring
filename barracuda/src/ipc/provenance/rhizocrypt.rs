@@ -96,6 +96,30 @@ pub(super) fn dehydrate(
     )
 }
 
+/// Compute a Merkle root over a subset of vertices without closing the session.
+///
+/// rhizoCrypt S69 `dag.partial_dehydrate`: produces a cryptographically valid
+/// root for sealed vertices while leaving the session open for further appends.
+/// Pass empty `vertex_ids` to dehydrate all current vertices.
+///
+/// This is the "aglet" pattern — seal the finished nodes, leave open branches.
+pub fn partial_dehydrate(
+    session_id: &str,
+    vertex_ids: &[String],
+) -> Option<Value> {
+    let socket = neural_api_socket()?;
+    capability_call(
+        &socket,
+        "dag",
+        "partial_dehydrate",
+        &json!({
+            "session_id": session_id,
+            "vertex_ids": vertex_ids,
+        }),
+    )
+    .ok()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

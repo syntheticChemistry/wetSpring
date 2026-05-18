@@ -108,16 +108,43 @@ pub struct CallerConfig {
     pub min_alt_count: u32,
     /// Minimum insertion/deletion fraction at a position to call an indel.
     pub min_indel_fraction: f64,
+    /// Minimum strand bias (fraction on minor strand) to accept a variant.
+    /// A true variant should appear on both strands. Range [0, 0.5].
+    /// 0.0 = no filter, 0.1 = at least 10% of variant reads on each strand.
+    pub min_strand_balance: f64,
+    /// Use quality-weighted base frequencies instead of raw counts.
+    /// When true, each base contributes its Phred error probability weight
+    /// rather than a flat count of 1.
+    pub quality_weighted: bool,
 }
 
 impl Default for CallerConfig {
     fn default() -> Self {
+        Self {
+            min_depth: 8,
+            min_alt_frequency: 0.75,
+            min_quality: 20.0,
+            min_alt_count: 3,
+            min_indel_fraction: 0.3,
+            min_strand_balance: 0.1,
+            quality_weighted: true,
+        }
+    }
+}
+
+impl CallerConfig {
+    /// Permissive configuration matching the original defaults.
+    /// Useful for exploratory calling or low-coverage data.
+    #[must_use]
+    pub fn permissive() -> Self {
         Self {
             min_depth: 5,
             min_alt_frequency: 0.1,
             min_quality: 6.0,
             min_alt_count: 2,
             min_indel_fraction: 0.1,
+            min_strand_balance: 0.0,
+            quality_weighted: false,
         }
     }
 }
@@ -236,7 +263,7 @@ pub fn call_variants_gpu(
     let seq_refs: Vec<&[u8]> = sequences.iter().map(Vec::as_slice).collect();
     let gpu_result = snp_gpu.call_snps(&seq_refs)?;
 
-    // Convert GPU results to CalledVariants
+    // Convert GPU results to CalledVariants with quality-weighted refinement
     let mut variants = Vec::new();
     let bases = [b'A', b'C', b'G', b'T'];
 
@@ -244,47 +271,63 @@ pub fn call_variants_gpu(
         let position_1based = col.position + 1;
         let ref_base = reference[col.position].to_ascii_uppercase();
 
-        // GPU SNP result
         if gpu_result.is_variant[col_idx] == 1 {
-            let alt_freq = gpu_result.alt_frequencies[col_idx];
-            if alt_freq >= config.min_alt_frequency {
-                let gpu_ref_idx = gpu_result.ref_alleles[col_idx] as usize;
-                let alt_base = if gpu_ref_idx < 4 {
-                    // Find the most common non-reference base
-                    col.base_counts[..4]
-                        .iter()
-                        .enumerate()
-                        .filter(|&(i, _)| i != gpu_ref_idx)
-                        .max_by_key(|(_, c)| *c)
-                        .map_or(b'N', |(i, _)| bases[i])
-                } else {
-                    b'N'
-                };
+            let gpu_ref_idx = gpu_result.ref_alleles[col_idx] as usize;
+            let (alt_base, alt_idx) = if gpu_ref_idx < 4 {
+                col.base_counts[..4]
+                    .iter()
+                    .enumerate()
+                    .filter(|&(i, _)| i != gpu_ref_idx)
+                    .max_by_key(|(_, c)| *c)
+                    .map_or((b'N', 4usize), |(i, _)| (bases[i], i))
+            } else {
+                (b'N', 4usize)
+            };
 
-                #[expect(
-                    clippy::cast_possible_truncation,
-                    clippy::cast_sign_loss,
-                    reason = "alt_count bounded by depth (u32)"
-                )]
-                let alt_count = (alt_freq * f64::from(col.depth)) as u32;
-                let quality = variant_quality(alt_count, col.depth, alt_freq);
+            let alt_count = col.base_counts.get(alt_idx).copied().unwrap_or(0);
+            if alt_count < config.min_alt_count {
+                continue;
+            }
 
-                if quality >= config.min_quality {
-                    variants.push(CalledVariant {
-                        position: position_1based,
-                        variant_type: VariantType::Snp,
-                        ref_allele: ref_base,
-                        alt_allele: alt_base,
-                        depth: col.depth,
-                        frequency: alt_freq,
-                        quality,
-                        gene: find_gene(position_1based, features),
-                    });
+            // Apply quality-weighted frequency from pileup (not GPU synthetic)
+            let frequency = if config.quality_weighted && alt_idx < 4 {
+                quality_weighted_freq(col, alt_idx)
+            } else {
+                gpu_result.alt_frequencies[col_idx]
+            };
+
+            if frequency < config.min_alt_frequency {
+                continue;
+            }
+
+            // Strand bias filter
+            if config.min_strand_balance > 0.0 {
+                let minor_strand = col.strand_bias().min(1.0 - col.strand_bias());
+                if minor_strand < config.min_strand_balance {
+                    continue;
                 }
+            }
+
+            let quality = if alt_idx < 4 {
+                variant_quality_bq(col, alt_idx, alt_count)
+            } else {
+                variant_quality(alt_count, col.depth, frequency)
+            };
+
+            if quality >= config.min_quality {
+                variants.push(CalledVariant {
+                    position: position_1based,
+                    variant_type: VariantType::Snp,
+                    ref_allele: ref_base,
+                    alt_allele: alt_base,
+                    depth: col.depth,
+                    frequency,
+                    quality,
+                    gene: find_gene(position_1based, features),
+                });
             }
         }
 
-        // Indels still on CPU (sparse — GPU overhead not worth it)
         if let Some(del) = call_deletion(col, reference, features, config) {
             variants.push(del);
         }
@@ -294,6 +337,40 @@ pub fn call_variants_gpu(
     }
 
     Ok(variants)
+}
+
+/// Compute quality-weighted frequency for a base index at a pileup column.
+///
+/// Each base contributes `1 - 10^(-Q/10)` (probability of being correct)
+/// instead of a flat 1.0. This down-weights low-quality bases that are
+/// likely sequencing errors.
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "Precision: quality sums bounded by coverage"
+)]
+fn quality_weighted_freq(col: &PileupColumn, base_idx: usize) -> f64 {
+    let weights: Vec<f64> = (0..4)
+        .map(|i| {
+            let count = f64::from(col.base_counts[i]);
+            if count == 0.0 {
+                return 0.0;
+            }
+            let mean_q = if col.base_counts[i] > 0 {
+                col.quality_sums[i] as f64 / count
+            } else {
+                0.0
+            };
+            // P(correct) = 1 - 10^(-Q/10)
+            let p_correct = 1.0 - 10.0_f64.powf(-mean_q / 10.0);
+            count * p_correct
+        })
+        .collect();
+
+    let total: f64 = weights.iter().sum();
+    if total <= 0.0 {
+        return 0.0;
+    }
+    weights[base_idx] / total
 }
 
 #[expect(
@@ -314,7 +391,6 @@ fn call_snp(
     let ref_idx = base_to_idx(ref_base);
     let bases = [b'A', b'C', b'G', b'T'];
 
-    // Find the most common non-reference base
     let mut best_alt_idx = None;
     let mut best_alt_count = 0u32;
 
@@ -330,20 +406,34 @@ fn call_snp(
         return None;
     }
 
-    let frequency = f64::from(best_alt_count) / f64::from(col.depth);
+    let frequency = if config.quality_weighted {
+        quality_weighted_freq(col, alt_idx)
+    } else {
+        f64::from(best_alt_count) / f64::from(col.depth)
+    };
+
     if frequency < config.min_alt_frequency {
         return None;
     }
 
-    let quality = variant_quality(best_alt_count, col.depth, frequency);
+    // Strand bias filter: variant reads should appear on both strands
+    if config.min_strand_balance > 0.0 && col.depth >= config.min_depth {
+        let strand_ratio = col.strand_bias();
+        let minor_strand = strand_ratio.min(1.0 - strand_ratio);
+        if minor_strand < config.min_strand_balance {
+            return None;
+        }
+    }
+
+    let quality = variant_quality_bq(col, alt_idx, best_alt_count);
     if quality < config.min_quality {
         return None;
     }
 
-    let gene = find_gene(col.position + 1, features); // 1-based for gene lookup
+    let gene = find_gene(col.position + 1, features);
 
     Some(CalledVariant {
-        position: col.position + 1, // 1-based output
+        position: col.position + 1,
         variant_type: VariantType::Snp,
         ref_allele: ref_base,
         alt_allele: bases[alt_idx],
@@ -433,28 +523,60 @@ fn call_insertion(
     })
 }
 
-/// Compute Phred-scaled variant quality.
+/// Compute Phred-scaled variant quality using per-base quality information.
 ///
-/// Uses a simple binomial model: Q = -10 log10(P(error)),
-/// where P(error) is approximated from the alternative allele count
-/// and expected error rate.
+/// Uses the actual mean quality of the alternative allele's supporting reads
+/// to compute the expected error rate, rather than assuming a flat Q30.
+/// Q = sum over alt reads of (-10 * log10(P_error_per_base)).
+///
+/// For low-quality alt bases, this naturally produces low variant quality,
+/// suppressing calls driven by sequencing error.
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "Precision: quality sums bounded by coverage"
+)]
+fn variant_quality_bq(col: &PileupColumn, alt_idx: usize, alt_count: u32) -> f64 {
+    if col.depth == 0 || alt_count == 0 {
+        return 0.0;
+    }
+
+    let alt_mean_q = if col.base_counts[alt_idx] > 0 {
+        col.quality_sums[alt_idx] as f64 / f64::from(col.base_counts[alt_idx])
+    } else {
+        0.0
+    };
+
+    // P(error) for the alt base = 10^(-Q/10)
+    let p_error = 10.0_f64.powf(-alt_mean_q / 10.0);
+    if p_error >= 1.0 {
+        return 0.0;
+    }
+
+    let alt = f64::from(alt_count);
+    let total = f64::from(col.depth);
+    let observed_freq = alt / total;
+
+    if observed_freq <= p_error {
+        return 0.0;
+    }
+
+    // Log-likelihood ratio: observed frequency vs per-base error rate
+    let lr = (observed_freq / p_error).log10();
+    (alt * lr * 10.0).min(999.0)
+}
+
+/// Legacy quality function (flat error rate assumption).
 fn variant_quality(alt_count: u32, total_depth: u32, _frequency: f64) -> f64 {
     if total_depth == 0 {
         return 0.0;
     }
-
-    // Expected error rate per position (Phred Q30 ≈ 0.001)
     let error_rate = 0.001;
     let alt = f64::from(alt_count);
     let total = f64::from(total_depth);
-
-    // Log-likelihood ratio: variant model vs error model
     let observed_freq = alt / total;
     if observed_freq <= error_rate {
         return 0.0;
     }
-
-    // Simplified quality: proportional to alt count × log10(freq/error)
     let lr = (observed_freq / error_rate).log10();
     (alt * lr * 10.0).min(999.0)
 }

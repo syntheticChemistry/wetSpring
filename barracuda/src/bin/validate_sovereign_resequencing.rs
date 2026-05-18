@@ -295,6 +295,13 @@ fn main() {
     };
 
     let caller_config = CallerConfig::default();
+    let pileup_config = pileup::PileupConfig {
+        min_base_quality: 20, // Q20 filter: exclude bases with >1% error probability
+    };
+    println!("  Caller: min_depth={}, min_alt_freq={:.2}, quality_weighted={}, strand_balance={:.2}, min_bq={}",
+        caller_config.min_depth, caller_config.min_alt_frequency,
+        caller_config.quality_weighted, caller_config.min_strand_balance,
+        pileup_config.min_base_quality);
 
     // ── Phase 3: Process each clone ──────────────────────────────
     println!("\n── Phase 3: Per-clone sovereign pipeline ──");
@@ -374,8 +381,8 @@ fn main() {
         let mut sorted_records = sam_records;
         sam::sort_by_position(&mut sorted_records);
 
-        // Generate pileup
-        let pileup_columns = pileup::generate_pileup(&sorted_records, reference.len());
+        // Generate pileup with base quality filtering
+        let pileup_columns = pileup::generate_pileup_filtered(&sorted_records, reference.len(), &pileup_config);
         let cov_stats = pileup::coverage_stats(&pileup_columns, reference.len());
         println!(
             "    Pileup: {} positions covered, mean depth {:.1}, coverage {:.1}%",
@@ -475,6 +482,17 @@ fn main() {
         );
 
         clones_processed += 1;
+
+        // Partial dehydrate: seal this clone's vertex in the DAG while
+        // keeping the session open for remaining clones (aglet pattern).
+        // rhizoCrypt S69 dag.partial_dehydrate computes Merkle root over
+        // sealed vertices without closing the session.
+        if let Some(partial) = provenance::rhizocrypt::partial_dehydrate(&prov.id, &[]) {
+            let partial_root = partial.get("merkle_root")
+                .and_then(|v| v.as_str())
+                .unwrap_or("pending");
+            println!("    DAG partial root ({clones_processed}/{} sealed): {partial_root}", clones.len());
+        }
     }
 
     // ── Phase 4: Summary ─────────────────────────────────────────

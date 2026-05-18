@@ -102,6 +102,23 @@ const fn base_to_idx(b: u8) -> usize {
     }
 }
 
+/// Pileup generation configuration.
+#[derive(Debug, Clone)]
+pub struct PileupConfig {
+    /// Minimum Phred quality score to include a base in counts.
+    /// Bases below this threshold are excluded from `base_counts` and `depth`.
+    /// Set to 0 to include all bases (previous behavior).
+    pub min_base_quality: u8,
+}
+
+impl Default for PileupConfig {
+    fn default() -> Self {
+        Self {
+            min_base_quality: 0,
+        }
+    }
+}
+
 /// Generate pileup from sorted SAM records.
 ///
 /// Records should be sorted by position (as in coordinate-sorted SAM/BAM).
@@ -113,6 +130,20 @@ const fn base_to_idx(b: u8) -> usize {
 /// * `ref_len` - Length of the reference sequence
 #[must_use]
 pub fn generate_pileup(records: &[SamRecord], ref_len: usize) -> Vec<PileupColumn> {
+    generate_pileup_filtered(records, ref_len, &PileupConfig::default())
+}
+
+/// Generate pileup with base quality filtering.
+///
+/// Like [`generate_pileup`] but applies `config.min_base_quality` to exclude
+/// low-quality bases from counts. This is the primary mechanism for reducing
+/// false-positive variant calls caused by sequencing errors.
+#[must_use]
+pub fn generate_pileup_filtered(
+    records: &[SamRecord],
+    ref_len: usize,
+    config: &PileupConfig,
+) -> Vec<PileupColumn> {
     let mut columns: Vec<PileupColumn> = (0..ref_len)
         .map(|i| PileupColumn {
             position: i,
@@ -136,13 +167,16 @@ pub fn generate_pileup(records: &[SamRecord], ref_len: usize) -> Vec<PileupColum
                 CigarType::Match | CigarType::SeqMatch | CigarType::SeqMismatch => {
                     for i in 0..len {
                         if ref_pos + i < ref_len && query_pos + i < record.seq.len() {
-                            let col = &mut columns[ref_pos + i];
                             let base = record.seq[query_pos + i];
                             let qual = if query_pos + i < record.qual.len() {
-                                record.qual[query_pos + i].saturating_sub(33) // Phred33
+                                record.qual[query_pos + i].saturating_sub(33)
                             } else {
-                                30 // default Q30
+                                30
                             };
+                            if qual < config.min_base_quality {
+                                continue;
+                            }
+                            let col = &mut columns[ref_pos + i];
                             let idx = base_to_idx(base);
                             col.depth += 1;
                             col.base_counts[idx] += 1;
@@ -182,7 +216,6 @@ pub fn generate_pileup(records: &[SamRecord], ref_len: usize) -> Vec<PileupColum
         }
     }
 
-    // Filter to positions with coverage (depth, deletions, or insertions)
     columns.retain(|c| c.depth > 0 || c.deletions > 0 || c.insertions > 0);
     columns
 }

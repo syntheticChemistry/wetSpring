@@ -3,15 +3,19 @@ use super::*;
 use crate::bio::pileup::PileupColumn;
 
 fn make_snp_column(position: usize, ref_count: u32, alt_count: u32, ref_idx: usize, alt_idx: usize) -> PileupColumn {
+    let total = ref_count + alt_count;
     let mut col = PileupColumn {
         position,
-        depth: ref_count + alt_count,
+        depth: total,
         ..PileupColumn::default()
     };
     col.base_counts[ref_idx] = ref_count;
     col.base_counts[alt_idx] = alt_count;
-    col.forward_depth = (ref_count + alt_count) / 2;
-    col.reverse_depth = (ref_count + alt_count) - col.forward_depth;
+    // Q30 per base so quality_weighted_freq produces meaningful results
+    col.quality_sums[ref_idx] = u64::from(ref_count) * 30;
+    col.quality_sums[alt_idx] = u64::from(alt_count) * 30;
+    col.forward_depth = total / 2;
+    col.reverse_depth = total - col.forward_depth;
     col
 }
 
@@ -37,7 +41,7 @@ fn skip_low_frequency() {
     let pileup = vec![make_snp_column(0, 95, 5, 0, 1)]; // 5% alt
     let config = CallerConfig {
         min_alt_frequency: 0.1,
-        ..CallerConfig::default()
+        ..CallerConfig::permissive()
     };
     let variants = call_variants(&pileup, reference, &[], &config);
     assert!(variants.is_empty());
@@ -64,7 +68,8 @@ fn call_deletion() {
         deletions: 30,
         ..PileupColumn::default()
     };
-    col.base_counts[1] = 40; // C
+    col.base_counts[1] = 40;
+    col.quality_sums[1] = 40 * 30;
     col.forward_depth = 20;
     col.reverse_depth = 20;
 
@@ -74,7 +79,7 @@ fn call_deletion() {
     let del = variants.iter().find(|v| v.variant_type == VariantType::Deletion);
     assert!(del.is_some());
     let del = del.unwrap();
-    assert_eq!(del.position, 2); // 1-based
+    assert_eq!(del.position, 2);
 }
 
 #[test]
@@ -87,6 +92,7 @@ fn call_insertion() {
         ..PileupColumn::default()
     };
     col.base_counts[1] = 50;
+    col.quality_sums[1] = 50 * 30;
     col.forward_depth = 25;
     col.reverse_depth = 25;
 
