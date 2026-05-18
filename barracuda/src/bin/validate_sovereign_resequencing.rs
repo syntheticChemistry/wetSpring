@@ -372,15 +372,28 @@ fn main() {
             continue;
         }
 
-        // Map reads — GPU SmithWatermanGpu for extension when available,
-        // CPU fallback for non-GPU builds.
+        // Map reads — GPU SmithWatermanGpu only for long reads (>100bp) where
+        // compute dominates dispatch overhead. Short reads (≤100bp, e.g. Barrick
+        // 2009 36bp Illumina) use CPU: per-read GPU dispatch overhead (~5-20μs
+        // per wgpu submission) × millions of reads exceeds compute savings.
+        // Empirical: 7.5M×36bp → 344min GPU vs 26min CPU (13x slower).
         let map_t0 = Instant::now();
+        let median_read_len = reads.get(reads.len() / 2).map_or(0, |(_, seq, _)| seq.len());
+        const GPU_MAPPING_MIN_READ_LEN: usize = 100;
+
         #[cfg(feature = "gpu")]
         let (sam_records, map_substrate) = if let Some(ref dev) = gpu_device {
-            let recs = read_mapper::map_reads_gpu(
-                &reads, &fm_index, &reference, "REL606", &mapper_config, dev,
-            );
-            (recs, "GPU SmithWatermanGpu")
+            if median_read_len >= GPU_MAPPING_MIN_READ_LEN {
+                let recs = read_mapper::map_reads_gpu(
+                    &reads, &fm_index, &reference, "REL606", &mapper_config, dev,
+                );
+                (recs, "GPU SmithWatermanGpu")
+            } else {
+                println!("    Reads {}bp < {}bp threshold — CPU mapping (GPU reserved for pileup+calling)",
+                    median_read_len, GPU_MAPPING_MIN_READ_LEN);
+                let recs = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
+                (recs, "CPU seed-extend (short reads)")
+            }
         } else {
             let recs = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
             (recs, "CPU seed-extend")
@@ -517,7 +530,7 @@ fn main() {
     println!("\n── Phase 4: Summary ──");
     #[cfg(feature = "gpu")]
     let substrate_label = if gpu.is_some() {
-        "Full GPU: SmithWatermanGpu (mapping) + Tensor::scan (coverage) + SnpCallingF64 (variants)"
+        "Adaptive: CPU mapping (short reads) + GPU Tensor::scan (coverage) + GPU SnpCallingF64 (variants)"
     } else {
         "CPU fallback (GPU init failed)"
     };
