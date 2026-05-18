@@ -123,10 +123,12 @@ pub fn fetch_sra_composed(accession: &str, output_dir: &Path) -> crate::error::R
         Error::Ncbi(format!("cannot create output dir {}: {e}", output_dir.display()))
     })?;
 
-    // Tier 1: local cache check
+    // Tier 1: local cache check (single-end, then paired-end forward mate)
     let local_candidates = [
         output_dir.join(format!("{accession}.fastq")),
         output_dir.join(format!("{accession}.fastq.gz")),
+        output_dir.join(format!("{accession}_1.fastq")),
+        output_dir.join(format!("{accession}_1.fastq.gz")),
     ];
     for path in &local_candidates {
         if path.exists() {

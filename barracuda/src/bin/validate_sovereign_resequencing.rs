@@ -8,24 +8,23 @@
     clippy::expect_used,
     reason = "validation harness: expect is fine for data loading"
 )]
-//! # Exp382: Sovereign Rust Resequencing — Barrick 2009 Parity
+//! # Sovereign Rust Resequencing — Primal Composition
 //!
-//! Runs the sovereign Rust resequencing pipeline (FM-index + seed-extend +
-//! pileup + variant caller) on the cached Barrick 2009 FASTQ data and
-//! compares mutation calls against breseq `output.gd` per clone.
+//! Data-driven sovereign resequencing pipeline. Discovers its dataset from the
+//! workspace: reads `clones.tsv` (accession\tname) if present, otherwise falls
+//! back to the Barrick 2009 default clone list.
 //!
-//! This is the cross-tier parity proof: Tier 2 (sovereign Rust) vs
-//! Tier 1 (breseq C++ baseline).
+//! Set `WETSPRING_WORKSPACE` to point at any LTEE dataset workspace.
+//! Set `WETSPRING_DATASET_ID` to override the dataset identifier for braids.
+//! Set `WETSPRING_ACCESSION` to override the project accession (e.g. SRP064605).
+//! Set `WETSPRING_MAX_CLONES` to limit the number of clones per batch.
+//! Set `WETSPRING_CLONE_OFFSET` to skip already-processed clones (for batched runs).
 //!
-//! # Provenance
+//! # Pipeline
 //!
-//! | Field | Value |
-//! |-------|-------|
-//! | Paper | Barrick et al. *Nature* 461, 1243–1247 (2009) |
-//! | Baseline | Exp381 breseq output (cached) |
-//! | Pipeline | FM-index → seed-extend SW → pileup → variant caller |
-//! | Composition | barraCuda GPU: SmithWatermanGpu, SnpCallingF64, Tensor::scan |
-//! | Provenance | Live trio via plasmidBin: rhizoCrypt DAG, loamSpine aglets, sweetGrass braid |
+//! FM-index → seed-extend SW → pileup → variant caller
+//! GPU composition: SmithWatermanGpu, SnpCallingF64, Tensor::scan
+//! Provenance: live trio via plasmidBin (rhizoCrypt DAG, loamSpine aglets, sweetGrass braid)
 
 use std::path::PathBuf;
 use std::time::Instant;
@@ -65,10 +64,114 @@ fn workspace_dir() -> PathBuf {
     )
 }
 
+fn find_file_by_ext(dir: &std::path::Path, ext: &str) -> Option<PathBuf> {
+    std::fs::read_dir(dir).ok()?.find_map(|entry| {
+        let path = entry.ok()?.path();
+        if path.extension().and_then(|e| e.to_str()) == Some(ext) {
+            Some(path)
+        } else {
+            None
+        }
+    })
+}
+
+fn dataset_id(workspace: &std::path::Path) -> String {
+    std::env::var("WETSPRING_DATASET_ID").unwrap_or_else(|_| {
+        workspace
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("unknown")
+            .to_string()
+    })
+}
+
+fn project_accession() -> String {
+    std::env::var("WETSPRING_ACCESSION").unwrap_or_else(|_| "SRP001569".to_string())
+}
+
+/// Load clone list from `clones.tsv` (accession\tname per line) or fall back
+/// to `accession_list.txt` (accession per line, name = accession) or the
+/// hardcoded Barrick 2009 default.
+fn clone_offset() -> usize {
+    std::env::var("WETSPRING_CLONE_OFFSET")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(0)
+}
+
+fn load_clones(workspace: &std::path::Path) -> Vec<(String, String)> {
+    let max_clones: usize = std::env::var("WETSPRING_MAX_CLONES")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(usize::MAX);
+    let offset = clone_offset();
+
+    let tsv_path = workspace.join("clones.tsv");
+    if tsv_path.exists() {
+        if let Ok(contents) = std::fs::read_to_string(&tsv_path) {
+            let clones: Vec<(String, String)> = contents
+                .lines()
+                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+                .skip(offset)
+                .take(max_clones)
+                .map(|line| {
+                    let mut parts = line.split('\t');
+                    let acc = parts.next().unwrap_or("").trim().to_string();
+                    let name = parts.next().map_or_else(|| acc.clone(), |n| n.trim().to_string());
+                    (acc, name)
+                })
+                .collect();
+            if !clones.is_empty() {
+                return clones;
+            }
+        }
+    }
+
+    let acc_path = workspace.join("accession_list.txt");
+    if acc_path.exists() {
+        if let Ok(contents) = std::fs::read_to_string(&acc_path) {
+            let clones: Vec<(String, String)> = contents
+                .lines()
+                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+                .skip(offset)
+                .take(max_clones)
+                .map(|line| {
+                    let acc = line.trim().to_string();
+                    let name = acc.clone();
+                    (acc, name)
+                })
+                .collect();
+            if !clones.is_empty() {
+                return clones;
+            }
+        }
+    }
+
+    BARRICK_CLONES
+        .iter()
+        .skip(offset)
+        .take(max_clones)
+        .map(|&(a, n)| (a.to_string(), n.to_string()))
+        .collect()
+}
+
 fn main() {
-    let mut v = Validator::new("Exp382: Sovereign Resequencing — Barrick 2009 Parity");
     let t0 = Instant::now();
     let workspace = workspace_dir();
+    let ds_id = dataset_id(&workspace);
+    let clones = load_clones(&workspace);
+    let accession = project_accession();
+
+    let title = format!("Sovereign Resequencing — {ds_id} ({} clones)", clones.len());
+    let mut v = Validator::new(&title);
+    let offset = clone_offset();
+    println!("  Dataset: {ds_id}");
+    println!("  Accession: {accession}");
+    println!("  Clones: {} (offset {offset}, source: {})", clones.len(),
+        if workspace.join("clones.tsv").exists() { "clones.tsv" }
+        else if workspace.join("accession_list.txt").exists() { "accession_list.txt" }
+        else { "built-in default" }
+    );
 
     // ── GPU init (if --features gpu) ─────────────────────────────
     #[cfg(feature = "gpu")]
@@ -99,7 +202,8 @@ fn main() {
 
     // ── Provenance: begin DAG session (live trio via plasmidBin) ──
     println!("\n── Provenance: DAG session ──");
-    let prov = provenance::begin_session("sovereign_resequencing_barrick_2009");
+    let session_name = format!("sovereign_resequencing_{ds_id}");
+    let prov = provenance::begin_session(&session_name);
     println!("  Session ID: {}", prov.id);
     println!("  Trio available: {}", prov.available);
     v.check_pass(
@@ -110,8 +214,14 @@ fn main() {
     // ── Phase 1: Load reference genome ───────────────────────────
     println!("\n── Phase 1: Loading reference genome ──");
 
-    let ref_fasta_path = workspace.join("reference").join("REL606.fasta");
-    let ref_gbk_path = workspace.join("reference").join("REL606.gbk");
+    let ref_dir = workspace.join("reference");
+    let ref_fasta_path = find_file_by_ext(&ref_dir, "fasta")
+        .or_else(|| find_file_by_ext(&ref_dir, "fa"))
+        .or_else(|| find_file_by_ext(&ref_dir, "fna"))
+        .unwrap_or_else(|| ref_dir.join("REL606.fasta"));
+    let ref_gbk_path = find_file_by_ext(&ref_dir, "gbk")
+        .or_else(|| find_file_by_ext(&ref_dir, "gb"))
+        .unwrap_or_else(|| ref_dir.join("REL606.gbk"));
 
     let reference = if ref_fasta_path.exists() {
         println!("  Loading FASTA: {}", ref_fasta_path.display());
@@ -194,16 +304,16 @@ fn main() {
     let mut total_matches = 0usize;
     let mut clones_processed = 0usize;
 
-    for &(accession, clone_name) in BARRICK_CLONES {
+    for (clone_accession, clone_name) in &clones {
         let clone_t0 = Instant::now();
-        println!("\n  ── {clone_name} ({accession}) ──");
+        println!("\n  ── {clone_name} ({clone_accession}) ──");
 
         // Composed SRA fetch: NestGate → local cache → SRA Toolkit download
         let reads_dir = workspace.join("reads");
         let fastq_dir = workspace.join("fastq");
 
-        let sra_result = fetch_sra_composed(accession, &reads_dir)
-            .or_else(|_| fetch_sra_composed(accession, &fastq_dir));
+        let sra_result = fetch_sra_composed(clone_accession, &reads_dir)
+            .or_else(|_| fetch_sra_composed(clone_accession, &fastq_dir));
 
         let (fq_path, fq_blake3, fq_source) = match sra_result {
             Ok(r) => {
@@ -212,7 +322,7 @@ fn main() {
                     &prov.id,
                     &serde_json::json!({
                         "step": "fetch_sra",
-                        "accession": accession,
+                        "accession": clone_accession,
                         "clone": clone_name,
                         "source": r.source.to_string(),
                         "blake3": &r.blake3,
@@ -221,7 +331,7 @@ fn main() {
                 (r.path, r.blake3, r.source.to_string())
             }
             Err(e) => {
-                println!("    SKIP: no FASTQ for {accession} ({e})");
+                println!("    SKIP: no FASTQ for {clone_accession} ({e})");
                 continue;
             }
         };
@@ -345,7 +455,7 @@ fn main() {
 
         // DAG event: clone node sealed
         let clone_hash = blake3::hash(
-            format!("{clone_name}:{accession}:variants={}", sovereign_variants.len()).as_bytes(),
+            format!("{clone_name}:{clone_accession}:variants={}", sovereign_variants.len()).as_bytes(),
         ).to_hex().to_string();
 
         let _ = provenance::record_step(
@@ -353,7 +463,7 @@ fn main() {
             &serde_json::json!({
                 "step": "clone_complete",
                 "clone": clone_name,
-                "accession": accession,
+                "accession": clone_accession,
                 "reads": reads.len(),
                 "mapped": mapped_count,
                 "coverage_pct": cov_stats.coverage_fraction * 100.0,
@@ -399,15 +509,21 @@ fn main() {
     let computation = ComputationMetadata {
         tool: "wetspring-sovereign-pipeline".to_string(),
         tool_version: "0.1.0".to_string(),
-        input_accession: "SRP001569".to_string(),
+        input_accession: accession.clone(),
         input_blake3: "aggregate".to_string(),
         output_blake3: summary_hash.clone(),
         wall_time_seconds: t0.elapsed().as_secs(),
         node_count: u64::try_from(clones_processed).unwrap_or(0),
     };
 
+    let braid_dataset = if offset > 0 {
+        format!("{ds_id}_sovereign_batch_{offset}")
+    } else {
+        format!("{ds_id}_sovereign_resequencing")
+    };
+
     let braid = FermentTranscriptBraid::from_session_result(
-        "barrick_2009_sovereign_resequencing",
+        &braid_dataset,
         &session_result,
         computation,
         &summary_hash,
@@ -425,7 +541,12 @@ fn main() {
     // Write braid to dataset provenance
     let braid_dir = workspace.join("provenance").join("braids");
     let _ = std::fs::create_dir_all(&braid_dir);
-    let braid_path = braid_dir.join("barrick_2009_sovereign.json");
+    let braid_filename = if offset > 0 {
+        format!("{ds_id}_sovereign_batch_{offset}.json")
+    } else {
+        format!("{ds_id}_sovereign.json")
+    };
+    let braid_path = braid_dir.join(&braid_filename);
     match std::fs::write(&braid_path, &braid_str) {
         Ok(()) => {
             println!("  Braid exported: {}", braid_path.display());
@@ -443,7 +564,7 @@ fn main() {
         .map(|p| p.join("provenance").join("braids"));
     if let Some(dir) = global_braid_dir {
         let _ = std::fs::create_dir_all(&dir);
-        let global_path = dir.join("barrick_2009_sovereign.json");
+        let global_path = dir.join(&braid_filename);
         if std::fs::write(&global_path, &braid_str).is_ok() {
             println!("  Global braid: {}", global_path.display());
         }
