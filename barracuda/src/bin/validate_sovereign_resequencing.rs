@@ -22,9 +22,13 @@
 //!
 //! # Pipeline
 //!
-//! FM-index → seed-extend SW → pileup → variant caller
-//! GPU composition: SmithWatermanGpu, SnpCallingF64, Tensor::scan
+//! FM-index (CPU) → SmithWatermanGpu (GPU mapping) → pileup (CPU, Q20-filtered) →
+//! Tensor::scan (GPU coverage) → SnpCallingF64 (GPU variant calling)
+//!
+//! Full GPU systems study: all compute-intensive stages dispatch to GPU via
+//! barraCuda primitives. CPU handles I/O, indexing, and orchestration.
 //! Provenance: live trio via plasmidBin (rhizoCrypt DAG, loamSpine aglets, sweetGrass braid)
+//! Discovery: connect-probe with DEAD_SOCKET_CACHE (Wave 22)
 
 use std::path::PathBuf;
 use std::time::Instant;
@@ -368,14 +372,28 @@ fn main() {
             continue;
         }
 
-        // Map reads — CPU is optimal for short-read SW (GPU per-pair overhead
-        // exceeds compute for 36bp reads). GPU dispatches downstream (pileup, SNP).
+        // Map reads — GPU SmithWatermanGpu for extension when available,
+        // CPU fallback for non-GPU builds.
         let map_t0 = Instant::now();
-        let sam_records = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
+        #[cfg(feature = "gpu")]
+        let (sam_records, map_substrate) = if let Some(ref dev) = gpu_device {
+            let recs = read_mapper::map_reads_gpu(
+                &reads, &fm_index, &reference, "REL606", &mapper_config, dev,
+            );
+            (recs, "GPU SmithWatermanGpu")
+        } else {
+            let recs = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
+            (recs, "CPU seed-extend")
+        };
+        #[cfg(not(feature = "gpu"))]
+        let (sam_records, map_substrate) = {
+            let recs = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
+            (recs, "CPU seed-extend")
+        };
         let map_secs = map_t0.elapsed().as_secs_f64();
 
         let mapped_count = sam_records.iter().filter(|r| r.is_mapped()).count();
-        println!("    Mapped: {mapped_count}/{} reads ({map_secs:.1}s, CPU seed-extend)", sam_records.len());
+        println!("    Mapped: {mapped_count}/{} reads ({map_secs:.1}s, {map_substrate})", sam_records.len());
 
         // Sort by position for pileup
         let mut sorted_records = sam_records;
@@ -497,7 +515,14 @@ fn main() {
 
     // ── Phase 4: Summary ─────────────────────────────────────────
     println!("\n── Phase 4: Summary ──");
-    let substrate_label = if cfg!(feature = "gpu") { "GPU+CPU hybrid" } else { "CPU only" };
+    #[cfg(feature = "gpu")]
+    let substrate_label = if gpu.is_some() {
+        "Full GPU: SmithWatermanGpu (mapping) + Tensor::scan (coverage) + SnpCallingF64 (variants)"
+    } else {
+        "CPU fallback (GPU init failed)"
+    };
+    #[cfg(not(feature = "gpu"))]
+    let substrate_label = "CPU only";
     println!("  Substrate: {substrate_label}");
     println!("  Clones processed: {clones_processed}");
     println!("  Total sovereign variants: {total_sovereign_variants}");
