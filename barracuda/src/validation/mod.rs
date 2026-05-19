@@ -24,6 +24,7 @@ mod data_dir;
 mod domain;
 mod harness;
 mod or_exit;
+pub mod parity;
 #[cfg(feature = "guidestone")]
 pub mod scenarios;
 pub mod sink;

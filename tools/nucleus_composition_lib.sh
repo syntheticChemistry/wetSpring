@@ -47,6 +47,30 @@ ok()   { echo -e "${GREEN}[$COMPOSITION_NAME]${NC} $*"; }
 warn() { echo -e "${YELLOW}[$COMPOSITION_NAME]${NC} $*"; }
 err()  { echo -e "${RED}[$COMPOSITION_NAME]${NC} $*" >&2; }
 
+# ── Socket Liveness (Wave 22 connect-probe pattern) ──────────────────
+
+# Session-level negative cache for dead sockets.
+declare -A _DEAD_SOCKETS=()
+
+socket_is_alive() {
+    local path="$1"
+    [[ -S "$path" ]] || return 1
+    [[ -n "${_DEAD_SOCKETS[$path]:-}" ]] && return 1
+    if python3 -c "
+import socket,sys
+s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+s.settimeout(0.05)
+try:
+    s.connect(sys.argv[1]); s.close()
+except: sys.exit(1)
+" "$path" 2>/dev/null; then
+        return 0
+    else
+        _DEAD_SOCKETS["$path"]=1
+        return 1
+    fi
+}
+
 # ── Capability Discovery ─────────────────────────────────────────────
 
 resolve_capability() {
@@ -54,14 +78,14 @@ resolve_capability() {
     local fallback_primal="${2:-}"
 
     local cap_sock="$SOCKET_DIR/${capability}-${FAMILY_ID}.sock"
-    if [[ -S "$cap_sock" ]]; then
+    if socket_is_alive "$cap_sock"; then
         echo "$cap_sock"
         return 0
     fi
 
     if [[ -n "$fallback_primal" ]]; then
         local primal_sock="$SOCKET_DIR/${fallback_primal}-${FAMILY_ID}.sock"
-        if [[ -S "$primal_sock" ]]; then
+        if socket_is_alive "$primal_sock"; then
             echo "$primal_sock"
             return 0
         fi

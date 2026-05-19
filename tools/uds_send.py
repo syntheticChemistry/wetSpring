@@ -7,8 +7,25 @@
 #
 # Usage: echo '{"jsonrpc":"2.0",...}' | python3 uds_send.py /path/to.sock
 
+import os
 import socket
 import sys
+
+_dead_sockets: set[str] = set()
+
+def socket_is_alive(path: str, timeout: float = 0.05) -> bool:
+    """Connect-probe for Unix domain socket liveness (Wave 22 pattern)."""
+    if not os.path.exists(path) or path in _dead_sockets:
+        return False
+    try:
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.settimeout(timeout)
+        s.connect(path)
+        s.close()
+        return True
+    except (ConnectionRefusedError, FileNotFoundError, OSError):
+        _dead_sockets.add(path)
+        return False
 
 def main():
     if len(sys.argv) < 2:
@@ -16,6 +33,11 @@ def main():
         sys.exit(1)
 
     sock_path = sys.argv[1]
+
+    if not socket_is_alive(sock_path):
+        print(f"error: socket dead or absent: {sock_path}", file=sys.stderr)
+        sys.exit(2)
+
     payload = sys.stdin.read().strip()
     if not payload:
         sys.exit(0)

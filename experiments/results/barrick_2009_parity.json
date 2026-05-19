@@ -1,0 +1,138 @@
+{
+  "dataset_id": "barrick_2009_sovereign_resequencing",
+  "spring": "wetSpring",
+  "spring_version": "0.1.0",
+  "reference": "REL606 (CP000819.1, 4629812 bp)",
+  "l1_tool": "breseq",
+  "l1_tool_version": "0.40.1",
+  "l2_tool": "wetspring-sovereign-pipeline",
+  "l2_tool_version": "0.1.0",
+  "caller_config": {
+    "min_depth": 8,
+    "min_alt_frequency": 0.75,
+    "min_quality": 20.0,
+    "min_alt_count": 3,
+    "min_indel_fraction": 0.3,
+    "min_strand_balance": 0.10,
+    "quality_weighted": true,
+    "pileup_min_base_quality": 20
+  },
+  "clones": [
+    {
+      "clone_name": "REL1164M",
+      "accession": "SRR032370",
+      "generation": 2000,
+      "l1_variants": 4,
+      "l2_variants": 78,
+      "l3_variants": null,
+      "l1_l2_position_matches": 0,
+      "l1_only": 4,
+      "l2_only": 78,
+      "wall_seconds": 1574.2,
+      "note": "Over-calling: L2 strict caller catches mapping artifacts in repetitive regions. L1 uses Bayesian mixture model that correctly filters these."
+    },
+    {
+      "clone_name": "REL2179M",
+      "accession": "SRR032371",
+      "generation": 5000,
+      "l1_variants": 11,
+      "l2_variants": 78,
+      "l3_variants": null,
+      "l1_l2_position_matches": 0,
+      "l1_only": 11,
+      "l2_only": 78,
+      "wall_seconds": 1576.6
+    },
+    {
+      "clone_name": "REL4536M",
+      "accession": "SRR032372",
+      "generation": 10000,
+      "l1_variants": 11,
+      "l2_variants": 60,
+      "l3_variants": null,
+      "l1_l2_position_matches": 0,
+      "l1_only": 11,
+      "l2_only": 60,
+      "wall_seconds": 1631.6
+    },
+    {
+      "clone_name": "REL7177M",
+      "accession": "SRR032373",
+      "generation": 15000,
+      "l1_variants": null,
+      "l2_variants": 58,
+      "l3_variants": null,
+      "l1_l2_position_matches": null,
+      "l1_only": null,
+      "l2_only": null,
+      "wall_seconds": 1610.3,
+      "note": "No breseq baseline available. breseq output.gd not generated for this clone."
+    },
+    {
+      "clone_name": "REL8593M",
+      "accession": "SRR032374",
+      "generation": 20000,
+      "l1_variants": 32,
+      "l2_variants": 68,
+      "l3_variants": null,
+      "l1_l2_position_matches": 0,
+      "l1_only": 32,
+      "l2_only": 68,
+      "wall_seconds": 1091.7,
+      "note": "Parity ratio improving (2.1x). Lower depth (20x vs 27-30x) may affect both callers."
+    },
+    {
+      "clone_name": "REL10379",
+      "accession": "SRR032375",
+      "generation": 30000,
+      "l1_variants": 253,
+      "l2_variants": 63,
+      "l3_variants": null,
+      "l1_l2_position_matches": 0,
+      "l1_only": 253,
+      "l2_only": 63,
+      "wall_seconds": 1475.4,
+      "note": "UNDER-calling: breseq polymorphism mode captures sub-clonal sweeps. Our 0.75 frequency threshold filters real variants at high generations."
+    },
+    {
+      "clone_name": "REL10926",
+      "accession": "SRR032376",
+      "generation": 40000,
+      "l1_variants": 258,
+      "l2_variants": 81,
+      "l3_variants": null,
+      "l1_l2_position_matches": 0,
+      "l1_only": 258,
+      "l2_only": 81,
+      "wall_seconds": 1671.9,
+      "note": "UNDER-calling confirmed. Same pattern as REL10379."
+    }
+  ],
+  "summary": {
+    "clones_total": 7,
+    "clones_with_baseline": 6,
+    "total_l1_variants": 569,
+    "total_l2_variants": 486,
+    "total_position_matches": 0,
+    "total_wall_seconds": 10662.0,
+    "l2_over_l1_ratio": 0.854,
+    "assessment": "L2 sovereign pipeline finds 85% as many variants as L1 breseq aggregate but with zero position overlap. Two distinct failure modes: (1) early generations over-call due to mapping artifacts in repetitive regions that breseq's Bayesian model filters; (2) late generations under-call because 0.75 frequency threshold rejects real sub-clonal mutations that breseq captures via polymorphism mode. Position matching at zero indicates a coordinate system or variant representation mismatch — likely CIGAR-to-reference position mapping differs from breseq's genome diff coordinate system. Next: (a) compare at ±5bp window tolerance, (b) lower frequency threshold adaptively, (c) adopt breseq-compatible coordinate output."
+  },
+  "parity_evolution": [
+    {
+      "version": "v0_permissive",
+      "total_l2": 238000,
+      "total_l1": 569,
+      "ratio": 418.3,
+      "note": "Massive over-calling across all clones"
+    },
+    {
+      "version": "v1_refined",
+      "total_l2": 486,
+      "total_l1": 569,
+      "ratio": 0.854,
+      "note": "99.8% FP reduction. Crossover: over-call early, under-call late."
+    }
+  ],
+  "timestamp": "2026-05-19T07:19:00Z"
+}

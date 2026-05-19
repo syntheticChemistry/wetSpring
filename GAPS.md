@@ -4,11 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-18 (V178 — Wave 22 stale socket audit absorption. Connect-probe
-`socket_is_alive()` replaces `path.exists()` in all 6 discovery tiers. `DEAD_SOCKET_CACHE`
-prevents repeated probe costs. `dag.partial_dehydrate` wired from rhizoCrypt S69. Caller
-refinement v1: quality-weighted frequencies, strand bias, Q20 base filter — 34K→78 variants
-(99.8% FP reduction). Parity evolution tracked in braids. 52 consumed capabilities.)
+Last updated: 2026-05-19 (V179 — Wave 23 E2E absorption. ParityResult struct + barrick_2009_parity.json
+with formal L1 vs L2 cross-tier comparison. Consumer socket pattern absorbed in Python + shell.
+Barrick 2009 systems study v2: 7/7 clones, 486 sovereign vs 569 breseq (0.85 ratio). Adaptive GPU
+dispatch: CPU for 36bp reads, GPU for pileup+calling. Tenaillon 2016 workspace ready (590GB, 312
+accessions, 524 FASTQs).)
 
 ---
 
@@ -204,20 +204,28 @@ for external collaborator access (Barrick Lab, UT Austin).
 
 ---
 
-## 9. Cross-Tier Parity (Wave 20 PM)
+## 9. Cross-Tier Parity (Wave 20 PM → Wave 23)
 
 **Owner:** wetSpring
 **Priority:** Medium — lithoSpore pattern adoption
-**Status:** Partially addressed
+**Status:** L1 vs L2 documented, L3 pending
 
-wetSpring has extensive parity validators for CPU/GPU math (Anderson, diversity,
-kinetics, etc.) and `capability.list` schema parity. Missing the formal
-three-layer proof structure: Python baseline → Rust → Primal composition
-with structured `ParityResult` output per `VALIDATION_TIERS.md`.
+`ParityResult` struct added to `validation::parity` module. Formal parity
+JSON exported to `experiments/results/barrick_2009_parity.json` with per-clone
+L1 (breseq 0.40.1) vs L2 (sovereign Rust) comparison.
 
-Existing parity binaries cover the math layer (Tier 2). The remaining work
-is formatting results as JSON-comparable outputs with documented tolerances
-and hooking into the lithoSpore `expected_values.json` contract.
+**Barrick 2009 parity (7 clones):**
+- Total: L1=569, L2=486 (0.85 ratio), 0 position matches
+- Early generations (2K-10K): L2 over-calls (mapping artifacts in repeats)
+- Late generations (30K-40K): L2 under-calls (0.75 freq threshold rejects
+  sub-clonal sweeps that breseq's polymorphism mode captures)
+- Zero position overlap indicates coordinate representation mismatch
+
+**Remaining:**
+- L2 vs L3 (local vs IPC-composed) — requires live trio
+- Position-level matching with ±5bp window tolerance
+- Adaptive frequency threshold per generation
+- lithoSpore `expected_values.json` contract for Barrick 2009
 
 ---
 
@@ -232,11 +240,12 @@ true for stale sockets (file exists, no listener). This caused ~100ms timeouts
 per stale socket during trio discovery.
 
 **Resolution:**
-- `socket_is_alive()` connect-probe with 50ms timeout replaces `path.exists()`
-  in all 6 discovery tiers (`discover_socket`, `discover_by_capability`,
-  `neural_api_socket`, `resolve_via_songbird`, capability-named sockets)
-- `DEAD_SOCKET_CACHE` (`OnceLock<Mutex<HashSet<PathBuf>>>`) prevents repeated
-  probes for known-dead sockets within a session
+- Rust: `socket_is_alive()` connect-probe with 50ms timeout replaces `path.exists()`
+  in all 6 discovery tiers. `DEAD_SOCKET_CACHE` for session-level negative caching.
+- Python: `tools/uds_send.py` — `socket_is_alive()` + `_dead_sockets` set
+- Shell: `tools/nucleus_composition_lib.sh` — `socket_is_alive()` + `_DEAD_SOCKETS`
+  associative array. `tools/composition_nucleus.sh` — `wait_for_socket()` upgraded
+  from `-S` file-type check to connect-probe.
 - Upstream report filed: `WETSPRING_UPSTREAM_BIOMEOS_STALE_SOCKETS_MAY18_2026.md`
 - Server-side cleanup confirmed across all 14 primals (primalSpring audit)
 

@@ -49,10 +49,23 @@ wants_primal() {
     echo " $PRIMAL_LIST " | grep -q " $name "
 }
 
+socket_is_alive() {
+    local path="$1"
+    [[ -S "$path" ]] || return 1
+    python3 -c "
+import socket,sys
+s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+s.settimeout(0.05)
+try:
+    s.connect(sys.argv[1]); s.close()
+except: sys.exit(1)
+" "$path" 2>/dev/null
+}
+
 wait_for_socket() {
     local sock="$1" timeout="${2:-10}" elapsed=0
     while [[ $elapsed -lt $timeout ]]; do
-        [[ -S "$sock" ]] && return 0
+        socket_is_alive "$sock" && return 0
         sleep 0.5
         elapsed=$((elapsed + 1))
     done
