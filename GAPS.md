@@ -4,11 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-19 (V179 — Wave 23 E2E absorption. ParityResult struct + barrick_2009_parity.json
-with formal L1 vs L2 cross-tier comparison. Consumer socket pattern absorbed in Python + shell.
-Barrick 2009 systems study v2: 7/7 clones, 486 sovereign vs 569 breseq (0.85 ratio). Adaptive GPU
-dispatch: CPU for 36bp reads, GPU for pileup+calling. Tenaillon 2016 workspace ready (590GB, 312
-accessions, 524 FASTQs).)
+Last updated: 2026-05-19 (V180 — River Delta audit absorption. WS-11 v2 calibration:
+GPU min_depth wired to CallerConfig (was hardcoded to 2), compare_calls now uses ±5bp
+window matching, PileupConfig gains min_mapq/skip_duplicates/skip_secondary filters,
+SamRecord::is_duplicate() added. Tenaillon batch 0: 2/5 clones validated at 500K reads
+(66 + 121 variants, 96.9-97.5% coverage). GPU mapping threshold raised to 250bp.)
 
 ---
 
@@ -197,7 +197,7 @@ for external collaborator access (Barrick Lab, UT Austin).
 
 | Dataset | Size | Status |
 |---------|------|--------|
-| Barrick 2009 (7 clones) | ~1.3 GB | **In progress** — 2/7 done, re-running for 7/7 |
+| Barrick 2009 (7 clones) | ~1.3 GB | **SEALED** — 7/7 done, parity JSON + USB handoff |
 | Tenaillon 2016 (264 genomes) | ~200 GB | Spec in Exp380, next after Barrick |
 | Good 2017 (metagenomic) | ~50 GB | In paper queue |
 | Blount 2012 (replay seq) | ~30 GB | In paper queue |
@@ -255,17 +255,39 @@ per stale socket during trio discovery.
 
 **Owner:** wetSpring
 **Priority:** High — directly affects lithoSpore braid quality
-**Status:** In progress — v1 refinement deployed, parity improving
+**Status:** In progress — v2 calibration deployed, structural bugs fixed
 
 Sovereign Rust pipeline over-calls variants vs breseq baseline. Root cause:
 simple frequency thresholds vs breseq's Bayesian mixture model with base
-quality weighting.
+quality weighting. v2 fixes several structural bugs that contributed to
+the parity gap.
 
 **v0 (permissive):** ~34,000 variants per clone (8,500x over breseq)
 **v1 (refined):** ~60-78 variants per clone (15-19x over breseq)
+**v2 (calibration):** Deployed — structural fixes, not yet re-measured
 
-Remaining work: quality-weighted binomial model in SnpCallingF64 shader,
-mapper-level deduplication of repetitive region alignments.
+**v2 fixes:**
+- GPU `SnpCallingF64` `min_depth` was hardcoded to 2; now wired to
+  `CallerConfig.min_depth` (8). The GPU pre-filter was passing columns
+  that the CPU post-filter would later reject, wasting cycles and
+  potentially interacting with the synthetic MSA encoding.
+- `compare_calls` now uses ±5bp window matching instead of exact position.
+  The prior 0 position overlap across all 7 Barrick clones was likely a
+  coordinate representation mismatch (left-alignment of indels, 0-vs-1-based
+  offset conventions) rather than zero true positives.
+- `PileupConfig` gains `min_mapq` (default 10 in sovereign pipeline),
+  `skip_duplicates` (honors SAM FLAG 0x400), and `skip_secondary` (skips
+  FLAG 0x100 | 0x800). These reduce pileup depth inflation from
+  low-confidence and duplicate mappings.
+- `SamRecord::is_duplicate()` added to SAM model.
+
+**Remaining work:**
+- [ ] Re-run Barrick 2009 with v2 pipeline to measure updated parity
+- [ ] Quality-weighted binomial model in SnpCallingF64 shader
+- [ ] Mapper-level deduplication of repetitive region alignments
+- [ ] Per-generation frequency threshold calibration
+- [ ] Cross-validate against breseq polymorphism mode for late-generation
+  sub-clonal sweeps
 
 Parity evolution tracked in `provenance/braids/barrick_2009_refined_v1.json`
 with exact parameter derivations anchored — no magic numbers.
@@ -286,7 +308,7 @@ with exact parameter derivations anchored — no magic numbers.
 | 8 | Ferment transcript pipeline | wetSpring | **High** | 2 |
 | 9 | Cross-tier parity | wetSpring | Medium | 2 |
 | 10 | Stale socket detection | wetSpring + biomeOS | **RESOLVED** | — |
-| 11 | Variant caller parity | wetSpring | **High** | 2 |
+| 11 | Variant caller parity (v2 deployed) | wetSpring | **High** | 2 |
 
 ---
 

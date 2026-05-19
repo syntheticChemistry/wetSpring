@@ -197,7 +197,7 @@ async fn main() {
     let cpu_snps = snp::call_snps(&snp_seqs);
     let cpu_variant_count = cpu_snps.variants.len();
     let snp_gpu_dev = SnpGpu::new(&device).or_exit("unexpected error");
-    let gpu_snps = snp_gpu_dev.call_snps(&snp_seqs).or_exit("unexpected error");
+    let gpu_snps = snp_gpu_dev.call_snps(&snp_seqs, 2).or_exit("unexpected error");
     let gpu_variant_count = gpu_snps.is_variant.iter().filter(|&&v| v == 1).count();
     v.check_count(
         "SNP variant count: CPU == GPU",

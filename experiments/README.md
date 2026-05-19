@@ -5,7 +5,12 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-17 (V174: Exp377–379 hormesis chain implemented — 57/57 checks PASS. Deep debt resolved. 384 experiments indexed (384 completed), **370** binaries (**348** barracuda + **22** forge), 5,957+ checks, **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers. 51 consumed capabilities (registry 452). 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Updated**: 2026-05-19 (V180: River Delta audit absorption. Exp381 DONE (7/7 Barrick breseq),
+Exp382 DONE (7/7 sovereign resequencing, SEALED). WS-11 v2 calibration deployed. Tenaillon 2016
+batch 0 validated (2/5 clones). 386 experiments indexed (385 completed + 1 in progress),
+**372** binaries (**350** barracuda + **22** forge), 5,967+ checks, **1,962** lib tests
+**+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers.
+52 consumed capabilities (registry 452). 2 gaps active (WS-9 L3, WS-11), 1 resolved (WS-10).)
 
 ---
 
@@ -199,7 +204,8 @@ Rust CPU and Rust GPU implementations against that baseline.
 | 377 | [Hormesis Biphasic Model](377_hormesis_biphasic_model.md) | cross | DONE | Calabrese & Mattson (2017) hormesis curves | `bio::hormesis`, `validate_hormesis_biphasic` | 17 |
 | 378 | [Trophic Cascade Anderson](378_trophic_cascade_anderson.md) | cross | DONE | Anderson lattice + pesticide perturbation | `validate_trophic_cascade` | 10 |
 | 379 | [Joint Colonization Resistance](379_joint_colonization_resistance.md) | cross | DONE | healthSpring x wetSpring joint surface | `bio::binding_landscape`, `validate_colonization_resistance` | 30 |
-| 381 | [breseq Barrick 2009](381_breseq_barrick_2009_nest_atomic.md) | ltee | IN PROGRESS | breseq 0.40.1 on SRP001569 | `validate_breseq_barrick_2009` (Nest Atomic) | 10 |
+| 381 | [breseq Barrick 2009](381_breseq_barrick_2009_nest_atomic.md) | ltee | DONE | breseq 0.40.1 on SRP001569 | `validate_breseq_barrick_2009` (Nest Atomic) | 10 |
+| 382 | [Sovereign Resequencing Barrick 2009](382_sovereign_resequencing_barrick_2009.md) | ltee | DONE | Exp381 breseq baseline | `validate_sovereign_resequencing` (GPU+CPU) | 13 |
 
 ---
 
@@ -688,7 +694,7 @@ Joint with healthSpring exp097/exp098.
 
 **Totals (V174): 384/384 experiments completed, 370 binaries (348 barracuda + 22 forge), 5,957+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 51 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Deep debt resolved. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
 
-### Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic (V177 — IN PROGRESS, 8/10)
+### Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic (V179 — DONE, 10/10)
 
 First real-data Nest Atomic composition. Downloads 7 SRA runs (SRP001569, Barrick 2009
 LTEE Ara-1) via sovereign SRA pipeline, runs breseq 0.40.1 variant calling against

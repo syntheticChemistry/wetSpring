@@ -194,7 +194,7 @@ async fn main() {
 
         let t_gpu = Instant::now();
         let gpu_snp = SnpGpu::new(&device).or_exit("SNP GPU shader");
-        let gpu_r = gpu_snp.call_snps(&seqs).or_exit("MetalForge full");
+        let gpu_r = gpu_snp.call_snps(&seqs, 2).or_exit("MetalForge full");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
         let cpu_cnt = cpu_snp.variants.len();

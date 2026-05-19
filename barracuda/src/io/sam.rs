@@ -246,6 +246,12 @@ impl SamRecord {
         self.flag & FLAG_SECONDARY == 0 && self.flag & FLAG_SUPPLEMENTARY == 0
     }
 
+    /// Whether this read is flagged as a PCR or optical duplicate.
+    #[must_use]
+    pub const fn is_duplicate(&self) -> bool {
+        self.flag & FLAG_DUPLICATE != 0
+    }
+
     /// End position on the reference (1-based, exclusive).
     #[must_use]
     pub fn end_pos(&self) -> u64 {

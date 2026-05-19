@@ -112,7 +112,7 @@ async fn main() {
 
     let t_gpu = Instant::now();
     let gpu_snp = SnpGpu::new(&device).or_exit("SNP GPU shader");
-    let gpu_snp_result = gpu_snp.call_snps(&snp_seqs).or_exit("cross substrate");
+    let gpu_snp_result = gpu_snp.call_snps(&snp_seqs, 2).or_exit("cross substrate");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let cpu_variant_count = cpu_snp.variants.len();

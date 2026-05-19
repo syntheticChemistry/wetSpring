@@ -206,7 +206,7 @@ fn validate_snp_gpu(gpu: &SnpGpu, v: &mut Validator, timings: &mut Vec<(&str, f6
     let cpu_result = snp::call_snps(&seqs);
 
     let t0 = Instant::now();
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| gpu.call_snps(&seqs)));
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| gpu.call_snps(&seqs, 2)));
     let gpu_us = t0.elapsed().as_micros();
 
     match result {

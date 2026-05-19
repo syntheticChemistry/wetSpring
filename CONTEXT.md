@@ -24,11 +24,11 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 367 validation/benchmark binaries (345 barracuda + 22 forge)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 42 niche capabilities, 50 consumed (33 v0.9.17 canonical + 15 legacy + 2 Wave 17), 37 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Architecture:** 2 library crates + 372 validation/benchmark binaries (350 barracuda + 22 forge)
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 43 niche capabilities, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
-- **Validation checks:** 5,900+ across 367 binaries
+- **Validation checks:** 5,967+ across 372 binaries
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)

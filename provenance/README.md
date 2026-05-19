@@ -11,21 +11,33 @@ and records what was computed, by whom, on what substrate, and when.
 
 ```
 NUCLEUS (4TB NVMe)                    Repo / USB / guideStone
-├── 200 GB raw reads                  ├── braids/barrick_2009_sovereign.json  (~1 KB)
-├── breseq output (GBs)         →     ├── braids/barrick_2009_breseq.json     (~1 KB)
-├── sovereign pipeline output         └── braids/tenaillon_2016_sovereign.json (~1 KB, pending)
-└── full provenance DAG sessions
+├── 200 GB raw reads                  ├── braids/barrick_2009_sovereign.json    (~1 KB)
+├── breseq output (GBs)         →     ├── braids/barrick_2009_breseq.json       (~1 KB)
+├── sovereign pipeline output         ├── braids/barrick_2009_mutations.json    (~1 KB)
+└── full provenance DAG sessions      ├── braids/barrick_2009_refined_v1.json   (~2 KB, calibration anchor)
+                                      ├── braids/barrick_2009_systems_study_v2.json (~6 KB, SEALED)
+                                      └── braids/tenaillon_2016_sovereign.json  (pending — batch 0 done)
 ```
 
 The spore can't carry the mountain. But it proves the mountain was climbed.
 
 ## Braids
 
-| Braid | Dataset | Pipeline | Substrate | Status |
-|-------|---------|----------|-----------|--------|
-| `barrick_2009_sovereign.json` | Barrick 2009 (7 clones) | Sovereign Rust + barraCuda GPU | GPU+CPU hybrid | READY |
-| `barrick_2009_breseq.json` | Barrick 2009 (7 clones) | breseq 0.40.1 (C++ baseline) | CPU | READY |
-| `tenaillon_2016_sovereign.json` | Tenaillon 2016 (264 genomes) | Sovereign Rust + barraCuda GPU | GPU+CPU hybrid | PENDING (downloading) |
+| Braid | Dataset | Pipeline | Status |
+|-------|---------|----------|--------|
+| `barrick_2009_systems_study_v2.json` | Barrick 2009 (7 clones) | Adaptive GPU dispatch: CPU mapping + GPU pileup/calling | **SEALED** — canonical artifact for lithoSpore USB |
+| `barrick_2009_sovereign.json` | Barrick 2009 (7 clones) | Sovereign Rust + barraCuda GPU | READY — parent braid (v0) |
+| `barrick_2009_breseq.json` | Barrick 2009 (7 clones) | breseq 0.40.1 (C++ baseline) | READY — L1 baseline |
+| `barrick_2009_mutations.json` | Barrick 2009 (7 clones) | breseq mutation extraction | READY — 7-node breseq run |
+| `barrick_2009_refined_v1.json` | Barrick 2009 (1/7 clones) | v0→v1 calibration (REL1164M) | PARTIAL — intentional calibration anchor |
+| `tenaillon_2016_sovereign.json` | Tenaillon 2016 (264 genomes) | Sovereign Rust + barraCuda GPU | PENDING — batch 0 (2/5 clones) validated |
+
+## Cross-Tier Parity
+
+Formal L1 vs L2 parity results in `experiments/results/barrick_2009_parity.json`:
+- L1 (breseq 0.40.1): 569 total variants
+- L2 (sovereign Rust): 486 total variants (0.85 ratio)
+- Position matches: 0 (coordinate representation mismatch — ±5bp window matching added in v2)
 
 ## Wire Format
 

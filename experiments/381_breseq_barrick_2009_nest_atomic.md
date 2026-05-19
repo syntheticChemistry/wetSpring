@@ -2,7 +2,7 @@
 
 # Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic Composition
 
-**Status:** IN PROGRESS (V177)
+**Status:** DONE — SEALED (V179, 7/7 clones, ferment transcript braid exported)
 **Paper:** Barrick et al. "Genome evolution and adaptation in a long-term experiment
 with *Escherichia coli*" *Nature* 461, 1243–1247 (2009)
 **SRA Study:** SRP001569

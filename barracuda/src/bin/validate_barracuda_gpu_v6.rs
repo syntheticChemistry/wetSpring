@@ -235,7 +235,7 @@ async fn main() {
     let snp_seqs: Vec<&[u8]> = vec![b"ATGCATGCATGCATGCATGCATGC", b"ATGGATGCATGCATGCATGCATGC"];
     let cpu_snps = snp::call_snps(&snp_seqs);
     let snp_gpu_dev = SnpGpu::new(&device).or_exit("unexpected error");
-    let gpu_snps = snp_gpu_dev.call_snps(&snp_seqs).or_exit("unexpected error");
+    let gpu_snps = snp_gpu_dev.call_snps(&snp_seqs, 2).or_exit("unexpected error");
     v.check_count(
         "SNP count: CPU == GPU",
         gpu_snps.is_variant.iter().filter(|&&x| x == 1).count(),

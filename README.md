@@ -27,9 +27,9 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 
 | | |
 |---|---|
-| **Tests** | 252 (lib) + 97 integration + 18 IPC roundtrip, 0 failed |
-| **Validation checks** | 5,967+ across 371 binaries (349 barracuda + 22 forge) |
-| **Experiments** | 384 completed + 1 in progress (385 indexed) |
+| **Tests** | 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed |
+| **Validation checks** | 5,967+ across 372 binaries (350 barracuda + 22 forge) |
+| **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 43 niche, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch, 21 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
@@ -45,7 +45,7 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V177:** Wave 20 PM lithoSpore audit absorption. Stability tier annotations on all 43 niche methods. Consumed capabilities aligned to canonical registry (`dag.dehydrate`, `ledger.commit`). Trio transaction semantics fixed (`primals_reached`). Degradation behavior documented. Exp381: Barrick 2009 breseq pipeline — first real-data Nest Atomic composition (mutation accumulation confirmed, ferment transcript braid exported). 43 niche, 52 consumed, registry 452. 385 experiments (384 done + 1 in progress), 371 binaries, 5,967+ checks. **3 gaps open (deployment + cross-tier parity), 20 resolved/closed.**
+**Current release — V180:** River Delta audit absorption. WS-11 v2 variant caller calibration: GPU `min_depth` wired, ±5bp window matching, MAPQ/duplicate/secondary filtering in pileup. GPU mapping threshold raised to 250bp. Barrick 2009 7/7 SEALED (L1 vs L2 parity: 486 vs 569, 0.85 ratio). Tenaillon 2016 batch 0 validated (2/5 clones: 66 + 121 variants). Upstream asks filed for WS-1/2/3/4. 386 experiments (385 done + 1 in progress), 372 binaries, 5,967+ checks. **2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10).**
 
 ---
 

@@ -300,12 +300,16 @@ fn main() {
 
     let caller_config = CallerConfig::default();
     let pileup_config = pileup::PileupConfig {
-        min_base_quality: 20, // Q20 filter: exclude bases with >1% error probability
+        min_base_quality: 20,
+        min_mapq: 10,
+        skip_duplicates: true,
+        skip_secondary: true,
     };
-    println!("  Caller: min_depth={}, min_alt_freq={:.2}, quality_weighted={}, strand_balance={:.2}, min_bq={}",
+    println!("  Caller: min_depth={}, min_alt_freq={:.2}, quality_weighted={}, strand_balance={:.2}, min_bq={}, min_mapq={}, skip_dup={}, skip_sec={}",
         caller_config.min_depth, caller_config.min_alt_frequency,
         caller_config.quality_weighted, caller_config.min_strand_balance,
-        pileup_config.min_base_quality);
+        pileup_config.min_base_quality, pileup_config.min_mapq,
+        pileup_config.skip_duplicates, pileup_config.skip_secondary);
 
     // ── Phase 3: Process each clone ──────────────────────────────
     println!("\n── Phase 3: Per-clone sovereign pipeline ──");
@@ -372,14 +376,16 @@ fn main() {
             continue;
         }
 
-        // Map reads — GPU SmithWatermanGpu only for long reads (>100bp) where
-        // compute dominates dispatch overhead. Short reads (≤100bp, e.g. Barrick
-        // 2009 36bp Illumina) use CPU: per-read GPU dispatch overhead (~5-20μs
-        // per wgpu submission) × millions of reads exceeds compute savings.
-        // Empirical: 7.5M×36bp → 344min GPU vs 26min CPU (13x slower).
+        // Map reads — GPU SmithWatermanGpu reserved for long reads (≥250bp)
+        // where per-read compute dominates wgpu dispatch overhead. Illumina
+        // short reads (36-150bp) always use CPU seed-extend: per-read GPU
+        // dispatch (~20-75μs: buffer create + queue submit + sync) × N reads
+        // exceeds SW compute savings at these lengths.
+        // Empirical: 7.5M×36bp → 344min GPU vs 26min CPU (13x);
+        //            500K×101bp → >17min GPU vs ~5min CPU (est 3-4x).
         let map_t0 = Instant::now();
         let median_read_len = reads.get(reads.len() / 2).map_or(0, |(_, seq, _)| seq.len());
-        const GPU_MAPPING_MIN_READ_LEN: usize = 100;
+        const GPU_MAPPING_MIN_READ_LEN: usize = 250;
 
         #[cfg(feature = "gpu")]
         let (sam_records, map_substrate) = if let Some(ref dev) = gpu_device {
@@ -530,7 +536,7 @@ fn main() {
     println!("\n── Phase 4: Summary ──");
     #[cfg(feature = "gpu")]
     let substrate_label = if gpu.is_some() {
-        "Adaptive: CPU mapping (short reads) + GPU Tensor::scan (coverage) + GPU SnpCallingF64 (variants)"
+        "Adaptive: CPU mapping (Illumina <250bp) + GPU Tensor::scan (coverage) + GPU SnpCallingF64 (variants)"
     } else {
         "CPU fallback (GPU init failed)"
     };

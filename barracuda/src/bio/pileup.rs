@@ -109,12 +109,22 @@ pub struct PileupConfig {
     /// Bases below this threshold are excluded from `base_counts` and `depth`.
     /// Set to 0 to include all bases (previous behavior).
     pub min_base_quality: u8,
+    /// Minimum mapping quality to include a read. Reads with MAPQ below this
+    /// threshold are excluded entirely. 0 = include all reads (previous behavior).
+    pub min_mapq: u8,
+    /// Skip reads flagged as PCR or optical duplicates (SAM FLAG 0x400).
+    pub skip_duplicates: bool,
+    /// Skip secondary and supplementary alignments (SAM FLAG 0x100 | 0x800).
+    pub skip_secondary: bool,
 }
 
 impl Default for PileupConfig {
     fn default() -> Self {
         Self {
             min_base_quality: 0,
+            min_mapq: 0,
+            skip_duplicates: false,
+            skip_secondary: false,
         }
     }
 }
@@ -153,6 +163,15 @@ pub fn generate_pileup_filtered(
 
     for record in records {
         if !record.is_mapped() || record.pos == 0 {
+            continue;
+        }
+        if config.skip_duplicates && record.is_duplicate() {
+            continue;
+        }
+        if config.skip_secondary && !record.is_primary() {
+            continue;
+        }
+        if record.mapq < config.min_mapq && record.mapq != 255 {
             continue;
         }
 

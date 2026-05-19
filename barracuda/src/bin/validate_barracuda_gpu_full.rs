@@ -229,7 +229,7 @@ async fn main() {
         let cpu_us = t_cpu.elapsed().as_micros() as f64;
         let t_gpu = Instant::now();
         let gpu_snp = SnpGpu::new(&device).or_exit("SNP GPU shader");
-        let gpu_r = gpu_snp.call_snps(&seqs).or_exit("GPU validation");
+        let gpu_r = gpu_snp.call_snps(&seqs, 2).or_exit("GPU validation");
         let gpu_us = t_gpu.elapsed().as_micros() as f64;
         let gpu_count = gpu_r.is_variant.iter().filter(|&&x| x != 0).count();
         v.check(

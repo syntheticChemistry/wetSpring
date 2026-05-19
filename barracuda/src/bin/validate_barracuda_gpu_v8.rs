@@ -231,7 +231,7 @@ async fn main() {
     let cpu_snps = snp::call_snps(&snp_seqs);
     let gpu_snps = SnpGpu::new(&device)
         .or_exit("unexpected error")
-        .call_snps(&snp_seqs)
+        .call_snps(&snp_seqs, 2)
         .or_exit("unexpected error");
     v.check_count(
         "SNP count",

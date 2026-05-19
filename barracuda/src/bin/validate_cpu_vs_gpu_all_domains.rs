@@ -164,7 +164,7 @@ fn validate_snp(
     let tg = Instant::now();
     let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         let snp_dev = SnpGpu::new(device).or_exit("SNP GPU");
-        let gpu_snp = snp_dev.call_snps(&seqs).or_exit("GPU/CPU validation");
+        let gpu_snp = snp_dev.call_snps(&seqs, 2).or_exit("GPU/CPU validation");
         gpu_snp.is_variant.iter().filter(|&&x| x != 0).count()
     }));
     let gpu_us = tg.elapsed().as_micros() as f64;

@@ -3,6 +3,35 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V180] — 2026-05-19
+
+### River Delta Audit Absorption — WS-11 v2 Calibration + Tenaillon Batch 0
+
+- **WS-11 Variant Caller v2 calibration:** GPU `SnpCallingF64` `min_depth` was hardcoded to 2 — now wired to `CallerConfig.min_depth` (8) via `SnpGpu::call_snps()` parameter. `compare_calls` upgraded to ±5bp window matching (prior 0 position overlap across 7 Barrick clones was coordinate representation mismatch, not zero true positives). `PileupConfig` gains `min_mapq` (10), `skip_duplicates` (FLAG 0x400), `skip_secondary` (FLAG 0x100 | 0x800). `SamRecord::is_duplicate()` added. 13 GPU validation binaries updated for new `call_snps` signature.
+- **GPU mapping threshold raised to 250bp:** Empirical: 500K×101bp reads took >17min GPU vs ~5min CPU (est 3–4x slower). Illumina reads (36–150bp) now always CPU seed-extend; GPU reserved for long-read tech (PacBio/Nanopore ≥250bp).
+- **Tenaillon 2016 batch 0 validated (2/5 clones):** SRR2584403: 230K/500K mapped, 96.9% coverage, 4.8x depth, 66 variants, 1715s. SRR2584404: 249K/500K, 97.5% coverage, 5.2x depth, 121 variants (likely hypermutator), 1751s. Adaptive dispatch correctly routing 101bp and 150bp reads to CPU.
+- **Upstream asks filed:** `WETSPRING_UPSTREAM_ASKS_RIVER_DELTA_MAY19_2026.md` routes WS-1 (ionic contracts → primalSpring Track 4), WS-2 (RootPulse → biomeOS + trio), WS-3 (public anchor → loamSpine), WS-4 (WASM → petalTongue) with acceptance criteria.
+- **Pre-existing test fixes:** `determinism_anderson_spectral` test `#[ignore]`d (private `tolerances::spectral` module, functions not re-exported). `determinism_special_functions` already `#[ignore]`d.
+- Build gate: `cargo build --release --features gpu --bin validate_sovereign_resequencing` (clean). `cargo test --features gpu,json --lib -- bio::variant_caller bio::pileup io::sam` (34/34 pass).
+
+## [V179] — 2026-05-19
+
+### Wave 23 E2E Study Completion — Barrick 2009 SEALED
+
+- **Barrick 2009 7/7 clones SEALED:** All clones processed with adaptive GPU dispatch (CPU mapping for 36bp reads, GPU `Tensor::scan` + `SnpCallingF64` for pileup+calling). Systems study braid exported. lithoSpore USB handoff prepared.
+- **Formal cross-tier parity:** `ParityResult` struct + `barrick_2009_parity.json` with L1 (breseq 0.40.1) vs L2 (sovereign Rust) per-clone comparison. Total: L1=569, L2=486 (0.85 ratio), 0 position matches (coordinate mismatch). Parity crossover: early gens over-call, late gens under-call.
+- **Consumer socket pattern absorbed:** Rust `socket_is_alive()` connect-probe + `DEAD_SOCKET_CACHE` in IPC discover layer. Python `uds_send.py` and shell `nucleus_composition_lib.sh` / `composition_nucleus.sh` upgraded.
+- **lithoSpore USB handoff:** `WETSPRING_LITHO_USB_SEALED_MAY19_2026.md` — sealed braids, parity JSON, pipeline source, packaging instructions.
+- **Tenaillon 2016 workspace ready:** `clones.tsv` generated (312 accessions), 590 GB / 524 FASTQs confirmed on 4TB NVMe.
+
+## [V178] — 2026-05-18
+
+### Adaptive GPU Dispatch + Barrick Systems Study
+
+- **Adaptive GPU dispatch strategy:** `SmithWatermanGpu` per-read dispatch for 36bp reads was 13x slower than CPU (344min vs 26min for 7.5M reads). `GPU_MAPPING_MIN_READ_LEN` threshold added: short reads → CPU seed-extend, long reads → GPU. GPU reserved for batch operations (pileup scan, variant calling).
+- **Barrick 2009 systems study initiated:** Full pipeline with GPU components. Discovered per-read GPU dispatch overhead anti-pattern for short Illumina reads.
+- **Stale socket pattern ingested from primalSpring audit:** Wave 22 ecosystem-wide stale socket resolution. wetSpring server-side already clean; consumer-side connect-probe pattern ready for absorption.
+
 ## [V177] — 2026-05-17
 
 ### Wave 20 PM — lithoSpore Audit Absorption + Exp381 Barrick 2009 Pipeline

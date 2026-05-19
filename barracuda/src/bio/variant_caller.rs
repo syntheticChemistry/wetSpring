@@ -261,7 +261,7 @@ pub fn call_variants_gpu(
     }
 
     let seq_refs: Vec<&[u8]> = sequences.iter().map(Vec::as_slice).collect();
-    let gpu_result = snp_gpu.call_snps(&seq_refs)?;
+    let gpu_result = snp_gpu.call_snps(&seq_refs, config.min_depth)?;
 
     // Convert GPU results to CalledVariants with quality-weighted refinement
     let mut variants = Vec::new();
@@ -631,20 +631,45 @@ pub fn parse_gd_file(contents: &str) -> Vec<(String, usize, String)> {
 
 /// Compare two sets of variant calls for parity.
 ///
+/// Uses a ±`window` bp tolerance for position matching to handle coordinate
+/// representation differences between callers (e.g. left-alignment of indels,
+/// 0-vs-1-based off-by-one, and flanking-base conventions).
+///
 /// Returns `(matches, only_in_a, only_in_b)` counts.
 #[must_use]
 pub fn compare_calls(
     sovereign: &[CalledVariant],
     baseline: &[(String, usize, String)],
 ) -> (usize, usize, usize) {
+    compare_calls_windowed(sovereign, baseline, 5)
+}
+
+/// Compare variant calls with a configurable position window.
+#[must_use]
+pub fn compare_calls_windowed(
+    sovereign: &[CalledVariant],
+    baseline: &[(String, usize, String)],
+    window: usize,
+) -> (usize, usize, usize) {
+    let mut baseline_matched = vec![false; baseline.len()];
     let mut matches = 0;
     let mut only_sovereign = 0;
 
     for call in sovereign {
         let type_str = call.variant_type.to_string();
-        let found = baseline
-            .iter()
-            .any(|(bt, bp, _)| bt == &type_str && *bp == call.position);
+        let found = baseline.iter().enumerate().any(|(i, (bt, bp, _))| {
+            if baseline_matched[i] {
+                return false;
+            }
+            let pos_match = call.position.abs_diff(*bp) <= window;
+            let type_match = bt == &type_str;
+            if pos_match && type_match {
+                baseline_matched[i] = true;
+                true
+            } else {
+                false
+            }
+        });
         if found {
             matches += 1;
         } else {
@@ -652,14 +677,7 @@ pub fn compare_calls(
         }
     }
 
-    let only_baseline = baseline
-        .iter()
-        .filter(|(bt, bp, _)| {
-            !sovereign
-                .iter()
-                .any(|c| c.variant_type.to_string() == *bt && c.position == *bp)
-        })
-        .count();
+    let only_baseline = baseline_matched.iter().filter(|&&m| !m).count();
 
     (matches, only_sovereign, only_baseline)
 }

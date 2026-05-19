@@ -1,8 +1,8 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V174 (2026-05-17)
-**Lib tests:** 252 passed, 0 failed, 1 ignored
-**Experiment binaries:** 384 indexed (384 completed, 0 PROPOSED)
+**Last updated:** V180 (2026-05-19)
+**Lib tests:** 1,962 passed, 0 failed, 2 ignored (pre-existing upstream module visibility)
+**Experiment binaries:** 386 indexed (385 completed, 1 in progress)
 **Clippy:** zero warnings (`--features ipc --lib -- -W clippy::pedantic -W clippy::nursery`)
 
 ## Experiment Summary

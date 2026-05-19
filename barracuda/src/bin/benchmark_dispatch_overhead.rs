@@ -129,7 +129,7 @@ async fn main() {
         });
         let gpu_snp = SnpGpu::new(&device).or_exit("SNP GPU shader");
         let gpu_t = bench(|| {
-            let _ = gpu_snp.call_snps(&seqs);
+            let _ = gpu_snp.call_snps(&seqs, 2);
         });
         row("SNP (3×12bp)", cpu, gpu_t);
         results.push(("SNP", cpu, gpu_t));

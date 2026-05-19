@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | IN PROGRESS |
+| Status | DONE — SEALED (V179, 7/7 clones, parity JSON exported) |
 | Binary | `validate_sovereign_resequencing` |
 | Features | CPU: `(default)`, GPU: `--features gpu` |
 | Paper | Barrick et al. *Nature* 461, 1243–1247 (2009) |

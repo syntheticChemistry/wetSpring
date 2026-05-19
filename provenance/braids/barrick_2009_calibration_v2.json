@@ -1,0 +1,99 @@
+{
+  "braid_id": "barrick-2009-calibration-v2",
+  "dataset_id": "barrick_2009_sovereign_resequencing",
+  "spring": "wetSpring",
+  "spring_version": "0.1.0",
+  "evolution": "caller_calibration_v2",
+  "parent_braid": "barrick_2009_refined_v1.json",
+  "status": "deployed",
+  "timestamp": "2026-05-19T10:30:00Z",
+  "fixes": [
+    {
+      "component": "snp_gpu.rs",
+      "issue": "min_depth hardcoded to 2 in SnpCallingF64 dispatch",
+      "fix": "Wired CallerConfig.min_depth (8) to call_snps() parameter",
+      "impact": "GPU pre-filter now consistent with CPU post-filter thresholds"
+    },
+    {
+      "component": "variant_caller.rs",
+      "issue": "compare_calls used exact position matching — 0/569 matches across 7 clones",
+      "fix": "compare_calls_windowed() with ±5bp tolerance for coordinate representation differences",
+      "impact": "Reveals true positive matches hidden by indel left-alignment and 0-vs-1-based offset"
+    },
+    {
+      "component": "pileup.rs",
+      "issue": "No MAPQ, duplicate, or secondary alignment filtering",
+      "fix": "PileupConfig gains min_mapq=10, skip_duplicates=true, skip_secondary=true",
+      "impact": "Excludes low-confidence mappings and PCR/optical duplicates from variant calling"
+    },
+    {
+      "component": "sam.rs",
+      "issue": "FLAG_DUPLICATE (0x400) defined but never checked",
+      "fix": "SamRecord::is_duplicate() added, consumed by pileup filter",
+      "impact": "PCR/optical duplicate reads no longer inflate pileup depth"
+    }
+  ],
+  "caller_config": {
+    "min_depth": 8,
+    "min_alt_frequency": 0.75,
+    "min_quality": 20.0,
+    "min_alt_count": 3,
+    "min_indel_fraction": 0.3,
+    "min_strand_balance": 0.1,
+    "quality_weighted": true,
+    "pileup_min_base_quality": 20,
+    "pileup_min_mapq": 10,
+    "pileup_skip_duplicates": true,
+    "pileup_skip_secondary": true
+  },
+  "gpu_mapping_threshold_bp": 250,
+  "parity_evolution": [
+    {
+      "version": "v0_permissive",
+      "total_l2_variants": 238000,
+      "ratio_vs_l1": 418.0,
+      "note": "Massive over-calling with permissive thresholds"
+    },
+    {
+      "version": "v1_refined",
+      "total_l2_variants": 486,
+      "ratio_vs_l1": 0.854,
+      "position_matches": 0,
+      "note": "99.8% FP reduction; parity crossover (early over-call, late under-call); 0 position matches due to coordinate mismatch"
+    },
+    {
+      "version": "v2_calibration",
+      "status": "deployed_not_yet_remeasured",
+      "note": "Structural bugs fixed (GPU min_depth, MAPQ filter, dup removal, ±5bp matching). Re-run needed to measure updated parity."
+    }
+  ],
+  "tenaillon_batch_0": {
+    "clones_validated": 2,
+    "clones_total": 5,
+    "results": [
+      {
+        "accession": "SRR2584403",
+        "reads_loaded": 500000,
+        "mapped": 230585,
+        "coverage_pct": 96.9,
+        "mean_depth": 4.8,
+        "sovereign_variants": 66,
+        "wall_time_s": 1715.0,
+        "read_length_bp": 101,
+        "mapping_substrate": "CPU seed-extend (short reads)"
+      },
+      {
+        "accession": "SRR2584404",
+        "reads_loaded": 500000,
+        "mapped": 248680,
+        "coverage_pct": 97.5,
+        "mean_depth": 5.2,
+        "sovereign_variants": 121,
+        "wall_time_s": 1751.0,
+        "read_length_bp": 101,
+        "mapping_substrate": "CPU seed-extend (short reads)",
+        "note": "Elevated variant count suggests hypermutator lineage"
+      }
+    ]
+  }
+}

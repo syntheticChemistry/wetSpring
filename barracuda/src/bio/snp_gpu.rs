@@ -54,6 +54,9 @@ impl SnpGpu {
     /// Sequences as byte slices (ASCII A/C/G/T, gaps as `-`/`.`/`N`).
     /// All sequences must have the same length.
     ///
+    /// `min_depth` controls the minimum column depth to flag a variant.
+    /// Pass `CallerConfig.min_depth` here to stay consistent with CPU calling.
+    ///
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer creation or readback fails.
@@ -61,7 +64,7 @@ impl SnpGpu {
         clippy::cast_possible_truncation,
         reason = "Truncation: n_sequences, aln_len fit u32"
     )]
-    pub fn call_snps(&self, sequences: &[&[u8]]) -> crate::error::Result<SnpGpuResult> {
+    pub fn call_snps(&self, sequences: &[&[u8]], min_depth: u32) -> crate::error::Result<SnpGpuResult> {
         let n_sequences = sequences.len();
         if n_sequences == 0 {
             return Ok(SnpGpuResult {
@@ -123,7 +126,7 @@ impl SnpGpu {
             .dispatch(
                 aln_len as u32,
                 n_sequences as u32,
-                2, // min_depth
+                min_depth,
                 &sequences_buf,
                 &variant_buf,
                 &ref_allele_buf,
@@ -192,7 +195,7 @@ mod tests {
             Err(_) => return,
         };
         let seqs = vec![b"ACGT" as &[u8], b"ACGG" as &[u8]];
-        let result = snp.call_snps(&seqs);
+        let result = snp.call_snps(&seqs, 2);
         assert!(result.is_ok(), "call_snps should succeed");
     }
 }

@@ -166,7 +166,7 @@ fn validate_snp(
 
     let t_gpu = Instant::now();
     let gpu_snp_mod = SnpGpu::new(device).or_exit("SNP GPU");
-    let gpu_snp = gpu_snp_mod.call_snps(&seqs).or_exit("MetalForge v2");
+    let gpu_snp = gpu_snp_mod.call_snps(&seqs, 2).or_exit("MetalForge v2");
     let gpu_us = t_gpu.elapsed().as_micros() as f64;
 
     let cpu_count = cpu_snp.variants.len();

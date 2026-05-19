@@ -189,7 +189,7 @@ fn bench_snp(device: &Arc<WgpuDevice>) {
         });
         let gpu_snp = SnpGpu::new(device).or_exit("SNP GPU shader");
         let gpu = time_fn(|| {
-            let _ = gpu_snp.call_snps(&refs);
+            let _ = gpu_snp.call_snps(&refs, 2);
         });
         row(
             &format!("SNP {n_seqs}×{seq_len}bp"),
