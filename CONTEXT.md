@@ -5,11 +5,10 @@
 wetSpring is a pure Rust scientific validation spring that reproduces published
 results in metagenomics, analytical chemistry (LC-MS, PFAS), and mathematical
 biology using the barraCuda GPU compute library. It is part of the ecoPrimals
-sovereign computing ecosystem — a collection of self-contained binaries that
-coordinate via JSON-RPC 2.0 over Unix sockets, with zero compile-time coupling
-between components.
+sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
+Unix sockets, with zero compile-time coupling.
 
-**Current release — V176:** lithoSpore audit response. New `provenance.export_braid` — ferment transcript braid export in lithoSpore wire format. loamSpine capability routing fixed (`"session"` → `"ledger"` per trio integration guide v2.0). `braid_handoff.rs` module. 43 niche capabilities, 51 consumed, registry 453. 384/384 experiments, 370 binaries, 5,957+ checks. 2 gaps open (deployment-only), 20 resolved/closed.
+**Current release — V182:** UniBin consolidation. 349 prokaryotic binaries consolidated into single `wetspring` eukaryotic UniBin. 345 scenarios (318 validation + 23 benchmark + 4 composition). Build time 25min → 1m44s. Cargo.toml 2028 → 160 lines.
 
 ## Role in the Ecosystem
 
@@ -24,12 +23,12 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 372 validation/benchmark binaries (350 barracuda + 22 forge)
+- **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 337 scenarios)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 43 niche capabilities, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
-- **Validation checks:** 5,967+ across 372 binaries
-- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), wetspring_guidestone (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
+- **Validation checks:** 5,967+ across 345 scenarios (UniBin)
+- **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), `wetspring certify` (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
@@ -48,7 +47,7 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, drug-target scoring
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.4.0, 150+ primitives consumed
-- **IPC:** 37 JSON-RPC methods, 42 niche capabilities, 21 domains, 1 live composition health handler (science_health — runtime probing), 8 MCP tools, Wire Standard L2+L3
+- **IPC:** 38 JSON-RPC methods, 43 niche capabilities, 21 domains, 1 live composition health handler (science_health — runtime probing), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 
@@ -70,21 +69,26 @@ evolution pipeline.
 ## Evolution Path
 
 ```
-Tier 1: Python baseline  → Rust CPU parity  → GPU validation
-           (58 scripts)     (1,962 tests)      (44 GPU modules)
-Tier 2: Rust validation   → NUCLEUS composition patterns
-           (367 binaries)   (136/136 proto-nucleate, 7 deploy graphs)
-Tier 3: Composition       → IPC parity → Niche gate
-           (L2+L3)          (Exp401)     (Exp402)
-Tier 4: Primal proof      → Live NUCLEUS IPC (Exp403) → ecoBin harvest
-           (50 consumed)     (5 primals, check_skip)    (plasmidBin)
-Tier 5: guideStone        → Self-validating NUCLEUS node (Level 5 — primal proof)
-           (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
+          ┌──────────────────────────────────────────────────┐
+          │  wetspring UniBin (1 binary, 345 scenarios)      │
+          │  certify · validate · benchmark · serve · status │
+          └──────────────────────────────────────────────────┘
+
+Tier 1: Python baseline → Rust CPU parity → GPU validation
+           (58 scripts)    (1,962 tests)     (44 GPU modules)
+Tier 2: UniBin scenarios → NUCLEUS composition patterns
+           (345 scenarios)  (136/136 proto-nucleate, 7 deploy graphs)
+Tier 3: Composition      → IPC parity → Niche gate
+           (L2+L3)         (Exp401)     (Exp402)
+Tier 4: Primal proof     → Live NUCLEUS IPC (Exp403) → ecoBin harvest
+           (52 consumed)    (5 primals, check_skip)    (plasmidBin)
+Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
+           (wetspring certify) (38/38 live NUCLEUS, v0.9.17 manifest)
 ```
 
 ## Design Philosophy
 
-These binaries are built using AI-assisted constrained evolution. Rust's
+Primals are built using AI-assisted constrained evolution. Rust's
 compiler constraints (ownership, lifetimes, type system) reshape the fitness
 landscape and drive specialization. Primals are self-contained — they know
 what they can do, never what others can do. Complexity emerges from runtime

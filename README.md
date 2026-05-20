@@ -6,29 +6,24 @@ against Rust implementations, then promotes to GPU acceleration via
 [barraCuda](https://github.com/ecoPrimals/barraCuda).
 
 ```
-Tier 1: Python/R baseline  →  Rust CPU parity  →  GPU acceleration
-           (58 scripts)        (1,962+ tests)      (44 GPU modules)
+                        ┌──────────────────────────────────┐
+                        │  wetspring (UniBin — 1 binary)   │
+                        │  345 scenarios (318+23+4 comp)   │
+                        │  Build: 1m44s (was 25min/349 bins)│
+                        └──────────────────────────────────┘
 
-Tier 2: Rust validation     →  NUCLEUS composition patterns
-           (345 binaries)      (136/136 proto-nucleate, 7 deploy graphs)
-
-Tier 3: Composition         →  IPC parity (Exp401) → Niche gate (Exp402)
-           (43 niche caps)     (18 IPC roundtrips)    (63/63 checks)
-
-Tier 4: Primal proof        →  Live NUCLEUS IPC (Exp403) → ecoBin harvest
-           (52 consumed caps)   (5 primals, check_skip)    (plasmidBin)
-
-Tier 5: guideStone          →  Self-validating NUCLEUS node (Level 5 — primal proof)
-           (wetspring_guidestone) (38/38 live NUCLEUS, v0.9.17 manifest)
-
-Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
-           (wetspring_composition.sh) (Phase 46 template, data viz lane)
+  wetspring certify      — Layered certification (L0–L6)
+  wetspring validate     — Two-tier scenario validation (--scenario, --track, --tier)
+  wetspring benchmark    — Performance benchmarks
+  wetspring serve        — JSON-RPC IPC server (biomeOS science primal)
+  wetspring status       — Composition health summary
+  wetspring version      — Version info
 ```
 
 | | |
 |---|---|
 | **Tests** | 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed |
-| **Validation checks** | 5,967+ across 372 binaries (350 barracuda + 22 forge) |
+| **Validation checks** | 5,967+ across 345 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 43 niche, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch, 21 domains |
@@ -40,12 +35,12 @@ Tier 6: Composition Explorer → Interactive NUCLEUS via shell composition
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 3 open in `docs/PRIMAL_GAPS.md` (PG-01–PG-22, 20 resolved/closed). Zero internal gaps. |
+| **Primal gaps** | 2 open in `docs/PRIMAL_GAPS.md` (PG-02, PG-04 deployment-only; 20 resolved/closed). Zero internal gaps. |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V180:** River Delta audit absorption. WS-11 v2 variant caller calibration: GPU `min_depth` wired, ±5bp window matching, MAPQ/duplicate/secondary filtering in pileup. GPU mapping threshold raised to 250bp. Barrick 2009 7/7 SEALED (L1 vs L2 parity: 486 vs 569, 0.85 ratio). Tenaillon 2016 batch 0 validated (2/5 clones: 66 + 121 variants). Upstream asks filed for WS-1/2/3/4. 386 experiments (385 done + 1 in progress), 372 binaries, 5,967+ checks. **2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10).**
+**Current release — V182:** UniBin eukaryotic consolidation. 349 prokaryotic binaries consolidated into single `wetspring` binary (345 scenarios: 318 validation + 23 benchmark + 4 composition). Build time: 25min → 1m44s. Cargo.toml: 2028 → 160 lines. `Validator::bridge_into` adapter, `BenchmarkRegistry`, clap subcommands (certify/validate/benchmark/serve/status/version). Wave 28 sporePrint surface validated. **2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10).**
 
 ---
 
@@ -118,17 +113,20 @@ cargo test --workspace --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo fmt --all -- --check
 
-# Run a validation binary
-cargo run --release --bin validate_diversity
+# Build the UniBin (single binary)
+cargo build --release --features guidestone,gpu
 
-# Run all validation binaries (meta-runner)
-cargo run --bin validate_all
+# Run a single scenario
+cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario diversity
+
+# Run all scenarios
+cargo run --release --features guidestone,gpu --bin wetspring -- validate
+
+# List available scenarios
+cargo run --release --features guidestone,gpu --bin wetspring -- validate --list
 
 # Coverage gate (workspace alias)
 cargo coverage-check
-
-# GPU validation (requires gpu feature + compatible hardware)
-cargo run --features gpu --release --bin validate_barracuda_cpu_v27
 
 # Coverage
 cargo llvm-cov --workspace --html

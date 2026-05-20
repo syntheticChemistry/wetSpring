@@ -1,0 +1,173 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//!
+//! Provenance: Gillespie stochastic simulation (Massie 2012 c-di-GMP birth–death) → `gillespie_baseline.py` → Rust sovereign (wetSpring V135)
+//! Validated against: `scripts/gillespie_baseline.py` ensemble statistics
+//! Validation: Gillespie SSA — Massie 2012 c-di-GMP birth-death model.
+//!
+//! Validates the Rust Gillespie implementation against the Python baseline
+//! (`scripts/gillespie_baseline.py`). Checks ensemble statistics, determinism,
+//! non-negativity, and Poisson convergence.
+//!
+//! Follows the `hotSpring` pattern: hardcoded expected values, explicit
+//! pass/fail, exit code 0/1.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `e4358c5` |
+//! | Baseline tool | `gillespie_baseline.py` |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 `scripts/gillespie_baseline.py` |
+//! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/gillespie_baseline.py` |
+//! | Data | Massie 2012 c-di-GMP birth-death model, N=1000 ensemble |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//!
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
+
+use crate::bio::gillespie;
+use crate::tolerances;
+use crate::validation::Validator;
+
+/// Python baseline values from `gillespie_python_baseline.json`.
+const K_DGC: f64 = 10.0;
+const K_PDE: f64 = 0.1;
+const T_MAX: f64 = 100.0;
+const N_RUNS: usize = 1000;
+const BASE_SEED: u64 = 42;
+
+const ANALYTICAL_MEAN: f64 = 100.0; // k_dgc / k_pde
+
+#[expect(
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_precision_loss
+)]
+/// Run the `validate_gillespie` experiment, recording checks into `v`.
+pub fn run(v: &mut crate::validation::Validator) {
+
+    v.section("── Determinism ──");
+
+    let traj1 = gillespie::birth_death_ssa(K_DGC, K_PDE, T_MAX, BASE_SEED);
+    let traj2 = gillespie::birth_death_ssa(K_DGC, K_PDE, T_MAX, BASE_SEED);
+    v.check_count(
+        "Same seed → same final count",
+        traj1.final_state()[0] as usize,
+        traj2.final_state()[0] as usize,
+    );
+    v.check_count(
+        "Same seed → same event count",
+        traj1.n_events(),
+        traj2.n_events(),
+    );
+
+    v.section("── Single Trajectory ──");
+
+    v.check(
+        "Final count non-negative",
+        traj1.final_state()[0] as f64,
+        traj1.final_state()[0].max(0) as f64,
+        tolerances::EXACT,
+    );
+    let all_non_neg = traj1.states_iter().all(|s| s[0] >= 0);
+    v.check(
+        "All states non-negative",
+        f64::from(u8::from(all_non_neg)),
+        1.0,
+        tolerances::EXACT,
+    );
+    let has_events = traj1.n_events() > 10;
+    v.check(
+        &format!("Has events: {} steps", traj1.n_events()),
+        f64::from(u8::from(has_events)),
+        1.0,
+        tolerances::EXACT,
+    );
+    let time_mono = traj1.times.windows(2).all(|w| w[1] >= w[0]);
+    v.check(
+        "Time monotonically increasing",
+        f64::from(u8::from(time_mono)),
+        1.0,
+        tolerances::EXACT,
+    );
+
+    v.section("── Ensemble Statistics (N=1000) ──");
+
+    let stats = gillespie::birth_death_ensemble(K_DGC, K_PDE, T_MAX, N_RUNS, BASE_SEED);
+
+    v.check(
+        "Ensemble mean ~ analytical (100.0)",
+        stats.mean,
+        ANALYTICAL_MEAN,
+        ANALYTICAL_MEAN * tolerances::GILLESPIE_MEAN_REL,
+    );
+    v.check(
+        "Fano factor ~ 1.0 (Poisson)",
+        stats.fano_factor,
+        1.0,
+        tolerances::GILLESPIE_FANO,
+    );
+    v.check(
+        "Std dev > 0 (stochastic variability)",
+        stats.std_dev,
+        stats.std_dev,
+        tolerances::EXACT,
+    );
+    let std_positive = stats.std_dev > 0.0;
+    v.check(
+        "Std dev strictly positive",
+        f64::from(u8::from(std_positive)),
+        1.0,
+        tolerances::EXACT,
+    );
+    let ensemble_non_neg = stats.final_counts.iter().all(|&c| c >= 0);
+    v.check(
+        "All ensemble final counts non-negative",
+        f64::from(u8::from(ensemble_non_neg)),
+        1.0,
+        tolerances::EXACT,
+    );
+
+    v.section("── Cross-Validation with Python Baseline ──");
+
+    // Python ensemble: mean=100.397, var=97.456, fano≈0.971
+    // We validate that Rust ensemble is in the same statistical regime.
+    // Since PRNG differs, we check statistical convergence not bitwise match.
+    v.check(
+        "Rust mean in Python range (100.0 ± 15%)",
+        stats.mean,
+        ANALYTICAL_MEAN,
+        ANALYTICAL_MEAN * tolerances::GILLESPIE_PYTHON_RANGE_REL,
+    );
+
+    v.check(
+        "Rust Fano factor in physical range [0.5, 2.0]",
+        stats.fano_factor,
+        1.0,
+        tolerances::GILLESPIE_FANO_PHYSICAL,
+    );
+
+}
+
+/// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
+pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) {
+    let mut v = crate::validation::Validator::silent("validate_gillespie");
+    run(&mut v);
+    v.bridge_into(result);
+}
+
+/// Scenario registration for the UniBin registry.
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
+    meta: crate::validation::scenarios::registry::ScenarioMeta {
+        id: "gillespie",
+        track: crate::validation::scenarios::registry::Track::Science,
+        tier: crate::validation::scenarios::registry::Tier::Rust,
+        provenance_crate: "validate_gillespie",
+        provenance_date: "2026-05-20",
+        description: "Validated against: `scripts/gillespie_baseline.py` ensemble statistics",
+    },
+    run: |v, _ctx| run_as_scenario(v),
+};

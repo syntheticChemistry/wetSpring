@@ -11,8 +11,10 @@
 //! - **Tier 1 (Rust)**: Pure structural validation, no IPC. Safe for CI.
 //! - **Tier 2 (Live)**: Requires deployed primals from plasmidBin.
 
+pub mod benchmark_registry;
 pub mod registry;
 
+pub use benchmark_registry::{BenchmarkRegistry, BenchmarkScenario};
 pub use registry::{Scenario, ScenarioMeta, ScenarioRegistry, Tier, Track};
 
 pub mod s_bare_science;
@@ -28,5 +30,12 @@ pub fn build_registry() -> ScenarioRegistry {
     r.register(s_manifest_ipc_parity::SCENARIO);
     r.register(s_cross_atomic_pipeline::SCENARIO);
     r.register(s_gonzales_provenance::SCENARIO);
+    super::experiments::register_all(&mut r);
     r
+}
+
+/// Build the benchmark registry.
+#[must_use]
+pub fn build_benchmark_registry() -> BenchmarkRegistry {
+    BenchmarkRegistry::new()
 }

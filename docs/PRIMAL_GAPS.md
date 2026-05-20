@@ -4,9 +4,9 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-17 (V174 — Exp377–379 hormesis chain (57/57 PASS). Deep
-debt resolved. PG-02/PG-04 remain deployment-only.
-2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests, 51 consumed
+Last updated: 2026-05-20 (V182 — UniBin consolidation. 345 scenarios, build 25min → 1m44s.
+Barrick SEALED, Tenaillon batch 0 COMPLETE. PG-02/PG-04 remain deployment-only.
+2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests, 52 consumed
 capabilities, registry 452.)
 
 ---
@@ -16,7 +16,7 @@ capabilities, registry 452.)
 - Gaps are **composition-specific**: missing primal capabilities, IPC
   misalignment, proto-nucleate drift, or bonding protocol holes.
 - Architectural gaps that are not composition-related live in
-  [GAPS.md](../GAPS.md) (7 architectural gaps documented).
+  [GAPS.md](../GAPS.md) (11 architectural gaps documented, WS-1 through WS-11).
 - Each gap references the downstream proto-nucleate manifest:
   `primalSpring/graphs/downstream/downstream_manifest.toml` (wetspring:
   `spring_name = "wetspring"`)
@@ -191,7 +191,7 @@ tests in `capability_domains::tests`.
 
 **V158 resolution:** Closed as informational — this is a primalSpring
 manifest maintenance item, not a wetSpring code gap. wetSpring's UniBin
-binary name is `wetspring_unibin` per the `[[bin]]` table in Cargo.toml.
+binary name is `wetspring` per the `[[bin]]` table in Cargo.toml (V182: renamed from `wetspring_unibin`).
 The inconsistency in upstream manifests does not affect wetSpring's build
 or validation. Handed off to primalSpring via wateringHole.
 

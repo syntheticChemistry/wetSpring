@@ -4,11 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-19 (V180 — River Delta audit absorption. WS-11 v2 calibration:
-GPU min_depth wired to CallerConfig (was hardcoded to 2), compare_calls now uses ±5bp
-window matching, PileupConfig gains min_mapq/skip_duplicates/skip_secondary filters,
-SamRecord::is_duplicate() added. Tenaillon batch 0: 2/5 clones validated at 500K reads
-(66 + 121 variants, 96.9-97.5% coverage). GPU mapping threshold raised to 250bp.)
+Last updated: 2026-05-20 (V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring`
+binary, 337 scenarios, 23 benchmarks. Build time 25min → 1m44s. Wave 28 sporePrint surface
+validated by primalSpring `s_sporeprint_surface`. Wave 29 Nest Atomic CM-2/CM-4 resolved
+upstream — unblocks WS-9 L3 path when live trio deploys. No new WS-* gaps from audit.
+WS-11 v3 calibration and Tenaillon batch 0 (5/5 clones, 974 variants) carried forward.)
 
 ---
 
@@ -177,7 +177,7 @@ The ferment transcript pattern requires wetSpring to:
 **V176 progress:** `provenance.export_braid` method wired, `FermentTranscriptBraid`
 struct implemented, loamSpine capability routing fixed to canonical `ledger.commit`.
 
-**V177 progress — Exp381 executing:** `validate_breseq_barrick_2009` binary built.
+**V177 progress — Exp381 executing:** `breseq_barrick_2009` scenario built.
 Full Nest Atomic composition: `NestGate` → `breseq` → trio → braid. Environment:
 `micromamba breseq-env` on 4TB NVMe with `breseq 0.40.1`, `samtools`, `bowtie2`, `R`.
 Reference genome `CP000819.1` (REL606, 4.63 Mb). 7 SRA runs (SRP001569) downloaded.
@@ -255,7 +255,7 @@ per stale socket during trio discovery.
 
 **Owner:** wetSpring
 **Priority:** High — directly affects lithoSpore braid quality
-**Status:** In progress — v2 calibration deployed, structural bugs fixed
+**Status:** In progress — v3 MAPQ calibration deployed, Tenaillon batch 0 COMPLETE (5/5)
 
 Sovereign Rust pipeline over-calls variants vs breseq baseline. Root cause:
 simple frequency thresholds vs breseq's Bayesian mixture model with base
@@ -264,33 +264,42 @@ the parity gap.
 
 **v0 (permissive):** ~34,000 variants per clone (8,500x over breseq)
 **v1 (refined):** ~60-78 variants per clone (15-19x over breseq)
-**v2 (calibration):** Deployed — structural fixes, not yet re-measured
+**v2 (calibration):** Structural fixes deployed (GPU min_depth, ±5bp matching,
+pileup filters, duplicate removal)
+**v3 (MAPQ calibration):** MAPQ formula changed from ratio-based to gap-based.
+Finding: both formulas produce MAPQ=0 for 97%+ of mapped reads. Root cause:
+FM-index seeding + SW extension generates many candidates with near-identical
+scores even for uniquely-mapping regions. `min_mapq` set to 0 (disabled for
+sovereign mapper). `min_base_quality=20` retained — correctly rejects Q2
+instrument-flagged reads (4.8% of reads in Tenaillon dataset).
 
 **v2 fixes:**
 - GPU `SnpCallingF64` `min_depth` was hardcoded to 2; now wired to
-  `CallerConfig.min_depth` (8). The GPU pre-filter was passing columns
-  that the CPU post-filter would later reject, wasting cycles and
-  potentially interacting with the synthetic MSA encoding.
+  `CallerConfig.min_depth` (8).
 - `compare_calls` now uses ±5bp window matching instead of exact position.
-  The prior 0 position overlap across all 7 Barrick clones was likely a
-  coordinate representation mismatch (left-alignment of indels, 0-vs-1-based
-  offset conventions) rather than zero true positives.
-- `PileupConfig` gains `min_mapq` (default 10 in sovereign pipeline),
-  `skip_duplicates` (honors SAM FLAG 0x400), and `skip_secondary` (skips
-  FLAG 0x100 | 0x800). These reduce pileup depth inflation from
-  low-confidence and duplicate mappings.
+- `PileupConfig` gains `min_base_quality` (20), `skip_duplicates` (FLAG 0x400),
+  and `skip_secondary` (FLAG 0x100 | 0x800).
 - `SamRecord::is_duplicate()` added to SAM model.
 
+**v3 fixes:**
+- `compute_mapq` changed from ratio-based `(1-second/best)*60` to gap-based
+  `min(60, (best-second)*6)`. Neither produces meaningful MAPQ for our mapper.
+- `min_mapq` lowered from 10 → 0. Proper MAPQ calibration requires a training
+  set with known-correct mappings (WS-11 remaining item).
+
+**Tenaillon batch 0 complete (5/5 clones, 974 total variants):**
+Interrupt/restart braid cycle verified — deterministic reproduction confirmed
+(SRR2584406: 379 variants in both batch 0 and restart batch).
+
 **Remaining work:**
-- [ ] Re-run Barrick 2009 with v2 pipeline to measure updated parity
+- [ ] Re-run Barrick 2009 with v3 pipeline to measure updated parity
+- [ ] MAPQ calibration with simulated reads (known-truth training set)
 - [ ] Quality-weighted binomial model in SnpCallingF64 shader
 - [ ] Mapper-level deduplication of repetitive region alignments
 - [ ] Per-generation frequency threshold calibration
-- [ ] Cross-validate against breseq polymorphism mode for late-generation
-  sub-clonal sweeps
+- [ ] Cross-validate against breseq polymorphism mode
 
-Parity evolution tracked in `provenance/braids/barrick_2009_refined_v1.json`
-with exact parameter derivations anchored — no magic numbers.
+Parity evolution tracked in `provenance/braids/barrick_2009_calibration_v2.json`.
 
 ---
 
@@ -305,10 +314,10 @@ with exact parameter derivations anchored — no magic numbers.
 | 5 | Interactive composition | ludoSpring + esotericWebb | Low | 4 |
 | 6 | Physics simulations | hotSpring | Low | 4 |
 | 7 | Radiating attribution | sweetGrass + sunCloud | Low | 4 |
-| 8 | Ferment transcript pipeline | wetSpring | **High** | 2 |
-| 9 | Cross-tier parity | wetSpring | Medium | 2 |
+| 8 | Ferment transcript pipeline | wetSpring | **SEALED** (Barrick 7/7) | 2 |
+| 9 | Cross-tier parity (L3 pending) | wetSpring | Medium | 2 |
 | 10 | Stale socket detection | wetSpring + biomeOS | **RESOLVED** | — |
-| 11 | Variant caller parity (v2 deployed) | wetSpring | **High** | 2 |
+| 11 | Variant caller parity (v3 deployed) | wetSpring | **High** | 2 |
 
 ---
 

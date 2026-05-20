@@ -22,6 +22,8 @@
 
 mod data_dir;
 mod domain;
+#[cfg(feature = "guidestone")]
+pub mod experiments;
 mod harness;
 mod or_exit;
 pub mod parity;

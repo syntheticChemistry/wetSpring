@@ -373,13 +373,19 @@ fn alignment_to_cigar(alignment: &AlignmentResult) -> Vec<CigarOp> {
     ops
 }
 
-/// Compute mapping quality from best and second-best scores.
+/// Compute mapping quality from best and second-best alignment scores.
 ///
-/// Uses the Phred-scaled probability that the mapping is wrong:
-/// MAPQ = -10 log10(P_wrong) ≈ score_ratio scaled to \[0, 60\].
+/// Uses score gap (best - second_best) rather than ratio, following BWA-MEM's
+/// approach. The ratio-based formula `(1 - second/best) * 60` produces near-zero
+/// MAPQ for almost all reads when candidates have similar scores (common with
+/// FM-index seeding + Smith-Waterman extension on bacterial genomes).
+///
+/// Gap-based: MAPQ = min(60, gap * 6). A gap of 10 alignment score points
+/// yields MAPQ 60 (confident unique placement). Gap of 0 yields MAPQ 0
+/// (ambiguous). Gap of 2 yields MAPQ 12 (passes typical min_mapq=10 filter).
 fn compute_mapq(candidates: &[MappingCandidate]) -> u32 {
     if candidates.len() < 2 {
-        return 60; // unique mapping
+        return 60;
     }
 
     let best = candidates[0].score;
@@ -393,12 +399,8 @@ fn compute_mapq(candidates: &[MappingCandidate]) -> u32 {
         return 60;
     }
 
-    let ratio = f64::from(second) / f64::from(best);
-    // Higher ratio = less unique; MAPQ decreases
-    #[expect(clippy::cast_possible_truncation, reason = "MAPQ fits in u32")]
-    #[expect(clippy::cast_sign_loss, reason = "clamped to [0, 60]")]
-    let mapq = ((1.0 - ratio) * 60.0).clamp(0.0, 60.0) as u32;
-    mapq
+    let gap = (best - second).max(0) as u32;
+    gap.saturating_mul(6).min(60)
 }
 
 fn unmapped_record(read_id: &str, read_seq: &[u8], read_qual: &[u8]) -> SamRecord {

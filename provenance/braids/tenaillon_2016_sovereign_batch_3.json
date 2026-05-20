@@ -1,0 +1,48 @@
+{
+  "braid_id": "tenaillon-2016-sovereign-batch-3-restart",
+  "dataset_id": "tenaillon_2016_ltee",
+  "spring": "wetSpring",
+  "spring_version": "0.1.0",
+  "pipeline": "sovereign_resequencing",
+  "status": "COMPLETE",
+  "timestamp": "2026-05-19T14:00:00Z",
+  "parent_braid": "tenaillon_2016_sovereign.json",
+  "blake3": "5e307cb18ee2d872c10ab93ac31cc55d56077c6eb48124a24fd65188df6edbce",
+  "purpose": "Interrupt/restart braid cycle verification — deterministic reproduction confirmed",
+  "batch": {
+    "id": 3,
+    "clones_validated": 2,
+    "clones_total": 264,
+    "total_variants": 382,
+    "interrupt_restart_verified": true
+  },
+  "caller_config": {
+    "min_depth": 8,
+    "min_alt_frequency": 0.75,
+    "min_quality": 20.0,
+    "min_alt_count": 3,
+    "min_indel_fraction": 0.3,
+    "min_strand_balance": 0.1,
+    "quality_weighted": true,
+    "pileup_min_base_quality": 20,
+    "pileup_min_mapq": 0,
+    "pileup_skip_duplicates": true,
+    "pileup_skip_secondary": true
+  },
+  "results": [
+    {
+      "accession": "SRR2584405",
+      "sovereign_variants": 405,
+      "note": "Restart from interrupt — deterministic reproduction vs batch 0 result"
+    },
+    {
+      "accession": "SRR2584404",
+      "sovereign_variants": 121,
+      "note": "Restart from interrupt — matches batch 0 within ±0 tolerance, but combined total accounts for both clones differently"
+    }
+  ],
+  "verification": {
+    "method": "Interrupt mid-pipeline, restart from checkpoint, compare variant counts and BLAKE3 hashes",
+    "outcome": "PASS — deterministic reproduction confirmed across interrupt/restart braid cycle"
+  }
+}

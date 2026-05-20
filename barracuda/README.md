@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 17, 2026 (V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved: UniBin `serve` live, display-name hygiene. barraCuda v0.4.0. coralReef v0.1.0. Live NUCLEUS guideStone 30/31 pass. 1,962 lib + 97 integration + 18 IPC tests (0 failures), 370 binaries (348 barracuda + 22 forge), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 51 consumed capabilities (registry 452). 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers.)
+**Updated:** May 20, 2026 (V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 SEALED (7/7). Tenaillon batch 0 COMPLETE (5/5). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 52 consumed capabilities (registry 452). 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers.)
 
 ---
 
@@ -20,7 +20,7 @@ wetspring-barracuda
 ├── 44 GPU bio modules          (44 Lean/Compose, 0 Passthrough)
 ├── 1 provenance module         (barracuda::shaders::provenance wiring)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 367 validation/benchmark binaries
+├── 1 UniBin (wetspring)        (337 scenarios, 23 benchmarks via clap dispatch)
 └── depends on: barracuda via path dependency
 ```
 
@@ -179,10 +179,10 @@ cargo clippy --lib -- -W clippy::pedantic -W clippy::nursery
 cargo doc --no-deps
 
 # CPU validation (1,291 checks)
-cargo run --release --bin validate_barracuda_cpu_full
+cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario barracuda_cpu_full
 
-# GPU validation (451 checks, needs --features gpu)
-cargo run --features gpu --release --bin validate_barracuda_gpu_full
+# GPU validation (451 checks)
+cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario barracuda_gpu_full
 ```
 
 ## Related Documents

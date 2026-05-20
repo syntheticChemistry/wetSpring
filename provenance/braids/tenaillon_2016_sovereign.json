@@ -1,0 +1,91 @@
+{
+  "braid_id": "tenaillon-2016-sovereign-batch-0",
+  "dataset_id": "tenaillon_2016_ltee",
+  "spring": "wetSpring",
+  "spring_version": "0.1.0",
+  "pipeline": "sovereign_resequencing",
+  "status": "COMPLETE",
+  "timestamp": "2026-05-19T12:00:00Z",
+  "parent_braid": "barrick_2009_calibration_v2.json",
+  "blake3": "623a2b3565a85b52ebf7efa1b1155e0a070f33255a2cd8d53fb1092c0ac78754",
+  "batch": {
+    "id": 0,
+    "clones_validated": 5,
+    "clones_total": 264,
+    "total_variants": 974,
+    "wall_time_s": 14942
+  },
+  "caller_config": {
+    "min_depth": 8,
+    "min_alt_frequency": 0.75,
+    "min_quality": 20.0,
+    "min_alt_count": 3,
+    "min_indel_fraction": 0.3,
+    "min_strand_balance": 0.1,
+    "quality_weighted": true,
+    "pileup_min_base_quality": 20,
+    "pileup_min_mapq": 0,
+    "pileup_skip_duplicates": true,
+    "pileup_skip_secondary": true
+  },
+  "results": [
+    {
+      "accession": "SRR2584403",
+      "reads_loaded": 500000,
+      "mapped": 230585,
+      "coverage_pct": 96.9,
+      "mean_depth": 4.8,
+      "sovereign_variants": 66,
+      "wall_time_s": 1596,
+      "read_length_bp": 101,
+      "mapping_substrate": "CPU seed-extend (short reads)"
+    },
+    {
+      "accession": "SRR2584404",
+      "reads_loaded": 500000,
+      "mapped": 248680,
+      "coverage_pct": 97.5,
+      "mean_depth": 5.2,
+      "sovereign_variants": 121,
+      "wall_time_s": 1724,
+      "read_length_bp": 101,
+      "mapping_substrate": "CPU seed-extend (short reads)",
+      "note": "Elevated variant count suggests hypermutator lineage"
+    },
+    {
+      "accession": "SRR2584405",
+      "reads_loaded": 500000,
+      "mapped": 266854,
+      "coverage_pct": 98.5,
+      "mean_depth": 7.7,
+      "sovereign_variants": 405,
+      "wall_time_s": 5684,
+      "read_length_bp": 150,
+      "mapping_substrate": "CPU seed-extend (short reads)",
+      "note": "150bp reads: higher mapping rate, deeper coverage, more variants"
+    },
+    {
+      "accession": "SRR2584406",
+      "reads_loaded": 500000,
+      "mapped": 266773,
+      "coverage_pct": 97.6,
+      "mean_depth": 8.0,
+      "sovereign_variants": 379,
+      "wall_time_s": 5623,
+      "read_length_bp": 150,
+      "mapping_substrate": "CPU seed-extend (short reads)"
+    },
+    {
+      "accession": "SRR2584407",
+      "reads_loaded": 500000,
+      "mapped": 258109,
+      "coverage_pct": 89.5,
+      "mean_depth": 3.1,
+      "sovereign_variants": 3,
+      "wall_time_s": 312,
+      "read_length_bp": 51,
+      "mapping_substrate": "CPU seed-extend (short reads)",
+      "note": "Short 51bp reads: lowest coverage, very few variants, fastest processing"
+    }
+  ]
+}

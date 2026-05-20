@@ -194,4 +194,21 @@ impl Validator {
     pub const fn all_passed(&self) -> bool {
         self.passed == self.total
     }
+
+    /// Forward accumulated results into a [`primalspring::validation::ValidationResult`].
+    ///
+    /// Used by the UniBin scenario registry to bridge `Validator`-based experiment
+    /// logic into the eukaryotic `ValidationResult` framework. Each accumulated
+    /// check becomes a single `check_bool` entry in the result.
+    #[cfg(feature = "guidestone")]
+    pub fn bridge_into(self, result: &mut primalspring::validation::ValidationResult) {
+        result.check_bool(
+            &format!("{} ({}/{})", self.name, self.passed, self.total),
+            self.passed == self.total && self.total > 0,
+            &format!(
+                "passed={}, total={}, provenance=validator-bridge",
+                self.passed, self.total
+            ),
+        );
+    }
 }

@@ -3,7 +3,7 @@
 
 /// wetSpring UniBin — single binary for certification, validation, and serve.
 #[derive(clap::Parser)]
-#[command(name = "wetspring_unibin", about = "wetSpring eukaryotic UniBin")]
+#[command(name = "wetspring", about = "wetSpring eukaryotic UniBin")]
 pub struct Cli {
     /// Subcommand to execute.
     #[command(subcommand)]
@@ -57,6 +57,18 @@ pub enum Commands {
     Serve,
     /// Print composition health status.
     Status {
+        /// Output format (text or json).
+        #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
+        format: OutputFormat,
+    },
+    /// Run benchmark scenarios.
+    Benchmark {
+        /// Run a single benchmark by id.
+        #[arg(long)]
+        scenario: Option<String>,
+        /// List all benchmarks without running them.
+        #[arg(long, default_value_t = false)]
+        list: bool,
         /// Output format (text or json).
         #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
         format: OutputFormat,

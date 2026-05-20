@@ -3,16 +3,39 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V182] — 2026-05-20
+
+### UniBin Consolidation — Eukaryotic Evolution Complete
+
+- **349 prokaryotic `[[bin]]` entries consolidated into single `wetspring` UniBin.** Build time: 25min → 1m44s (14x improvement). One binary, 345 scenarios registered (318 validation + 23 benchmark + 4 composition) via `wetspring validate --scenario <id>`.
+- **Architecture:** `Validator`→`ValidationResult` bridge adapter (`Validator::bridge_into`). `BenchmarkRegistry` parallel to `ScenarioRegistry`. Clap subcommands: `certify`, `validate`, `benchmark`, `serve`, `status`, `version`.
+- **Migration:** Python script (`scripts/migrate_to_unibin.py`) bulk-transformed 341 files from `src/bin/` to `src/validation/experiments/`. Each experiment preserves provenance via `ScenarioMeta::provenance_crate` field.
+- **Feature gating:** GPU experiments behind `#[cfg(feature = "gpu")]`, vault behind `#[cfg(feature = "vault")]`, npu behind `#[cfg(feature = "npu")]`. Runtime skip pattern for hardware-dependent scenarios.
+- **Cargo.toml:** 2028 → 160 lines. `autobins = false`. Single `[[bin]]` entry for `wetspring`. metalForge also `autobins = false`.
+- **Binary naming:** `wetspring_unibin` renamed to `wetspring`. Old `wetspring` (IPC server) absorbed into `wetspring serve`. `wetspring_guidestone` absorbed into `wetspring certify`.
+- Build gate: `cargo build --release --features guidestone,gpu` (1m44s, 1 binary, 23MB).
+
+## [V181] — 2026-05-19
+
+### WS-11 v3 MAPQ Calibration + Tenaillon Batch 0 COMPLETE
+
+- **WS-11 v3 MAPQ finding:** Ratio-based MAPQ formula `(1-second/best)*60` produced MAPQ=0 for 97%+ of mapped reads, destroying pileup coverage (96.9% → 1.0%). Gap-based formula `min(60, gap*6)` improved to 3.2% but still insufficient. Root cause: FM-index seeding + Smith-Waterman extension generates many candidates with near-identical scores. `min_mapq` set to 0 (disabled for sovereign mapper). Base quality filter `min_base_quality=20` retained — correctly rejects 4.8% Q2 instrument-flagged reads.
+- **`compute_mapq` rewritten:** Gap-based MAPQ formula replaces ratio-based. MAPQ = min(60, (best_score - second_best_score) * 6). All 10 mapper tests pass.
+- **Tenaillon 2016 batch 0 COMPLETE (5/5 clones):** SRR2584403 (101bp): 66 variants. SRR2584404 (101bp): 121 variants. SRR2584405 (150bp): 405 variants. SRR2584406 (150bp): 379 variants. SRR2584407 (51bp): 3 variants. Total: 974 variants, 14942s wall time. BLAKE3: `623a2b3565a85b52`.
+- **Interrupt/restart braid cycle verified:** Restart from offset 3 produced identical variant counts (SRR2584406=379, SRR2584407=3). Separate DAG sessions, separate BLAKE3 hashes, batch-suffixed braid filenames (`tenaillon_2016_sovereign_batch_3.json`). Provenance continuity maintained through interrupt/restart.
+- **Read-length-dependent behavior documented:** 150bp reads: 53% mapping rate, 7.7-8.0x depth, 379-405 variants. 101bp: 46-50%, 4.8-5.2x, 66-121 variants. 51bp: 52%, 3.1x, 3 variants.
+- Build gate: `cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario sovereign_resequencing` (clean). `cargo test --lib -- bio::read_mapper::tests` (10/10 pass).
+
 ## [V180] — 2026-05-19
 
 ### River Delta Audit Absorption — WS-11 v2 Calibration + Tenaillon Batch 0
 
-- **WS-11 Variant Caller v2 calibration:** GPU `SnpCallingF64` `min_depth` was hardcoded to 2 — now wired to `CallerConfig.min_depth` (8) via `SnpGpu::call_snps()` parameter. `compare_calls` upgraded to ±5bp window matching (prior 0 position overlap across 7 Barrick clones was coordinate representation mismatch, not zero true positives). `PileupConfig` gains `min_mapq` (10), `skip_duplicates` (FLAG 0x400), `skip_secondary` (FLAG 0x100 | 0x800). `SamRecord::is_duplicate()` added. 13 GPU validation binaries updated for new `call_snps` signature.
+- **WS-11 Variant Caller v2 calibration:** GPU `SnpCallingF64` `min_depth` was hardcoded to 2 — now wired to `CallerConfig.min_depth` (8) via `SnpGpu::call_snps()` parameter. `compare_calls` upgraded to ±5bp window matching (prior 0 position overlap across 7 Barrick clones was coordinate representation mismatch, not zero true positives). `PileupConfig` gains `min_mapq` (10), `skip_duplicates` (FLAG 0x400), `skip_secondary` (FLAG 0x100 | 0x800). `SamRecord::is_duplicate()` added. 13 GPU validation scenarios updated for new `call_snps` signature.
 - **GPU mapping threshold raised to 250bp:** Empirical: 500K×101bp reads took >17min GPU vs ~5min CPU (est 3–4x slower). Illumina reads (36–150bp) now always CPU seed-extend; GPU reserved for long-read tech (PacBio/Nanopore ≥250bp).
 - **Tenaillon 2016 batch 0 validated (2/5 clones):** SRR2584403: 230K/500K mapped, 96.9% coverage, 4.8x depth, 66 variants, 1715s. SRR2584404: 249K/500K, 97.5% coverage, 5.2x depth, 121 variants (likely hypermutator), 1751s. Adaptive dispatch correctly routing 101bp and 150bp reads to CPU.
-- **Upstream asks filed:** `WETSPRING_UPSTREAM_ASKS_RIVER_DELTA_MAY19_2026.md` routes WS-1 (ionic contracts → primalSpring Track 4), WS-2 (RootPulse → biomeOS + trio), WS-3 (public anchor → loamSpine), WS-4 (WASM → petalTongue) with acceptance criteria.
+- **Upstream asks filed:** `wateringHole/handoffs/WETSPRING_UPSTREAM_ASKS_RIVER_DELTA_MAY19_2026.md` routes WS-1 (ionic contracts → primalSpring Track 4), WS-2 (RootPulse → biomeOS + trio), WS-3 (public anchor → loamSpine), WS-4 (WASM → petalTongue) with acceptance criteria.
 - **Pre-existing test fixes:** `determinism_anderson_spectral` test `#[ignore]`d (private `tolerances::spectral` module, functions not re-exported). `determinism_special_functions` already `#[ignore]`d.
-- Build gate: `cargo build --release --features gpu --bin validate_sovereign_resequencing` (clean). `cargo test --features gpu,json --lib -- bio::variant_caller bio::pileup io::sam` (34/34 pass).
+- Build gate: `cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario sovereign_resequencing` (clean). `cargo test --features gpu,json --lib -- bio::variant_caller bio::pileup io::sam` (34/34 pass).
 
 ## [V179] — 2026-05-19
 

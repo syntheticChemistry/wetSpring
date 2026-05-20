@@ -1,0 +1,169 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Validation binary for Exp034: DTL Reconciliation.
+//!
+//! Validates Rust DTL reconciliation against Python baseline
+//! (Zheng et al. 2023, Bansal et al. 2012).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `e4358c5` |
+//! | Baseline tool | `zheng2023_dtl_reconciliation.py` |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 `scripts/zheng2023_dtl_reconciliation.py` |
+//! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/zheng2023_dtl_reconciliation.py` |
+//! | Data | synthetic host/parasite trees |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//!
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
+
+use crate::bio::reconciliation::{
+    DtlCosts, DtlEvent, FlatRecTree, reconcile_batch, reconcile_dtl,
+};
+use crate::validation::Validator;
+
+const NO_CHILD: u32 = u32::MAX;
+
+/// Run the `validate_reconciliation` experiment, recording checks into `v`.
+pub fn run(v: &mut crate::validation::Validator) {
+
+    let costs = DtlCosts::default();
+
+    // ── Test 1: Congruent 2-leaf trees (zero cost) ──
+    v.section("─── Congruent trees ───");
+    let host_2 = FlatRecTree {
+        names: vec!["H_A".into(), "H_B".into(), "H_AB".into()],
+        left_child: vec![NO_CHILD, NO_CHILD, 0],
+        right_child: vec![NO_CHILD, NO_CHILD, 1],
+    };
+    let para_2 = FlatRecTree {
+        names: vec!["P_A".into(), "P_B".into(), "P_AB".into()],
+        left_child: vec![NO_CHILD, NO_CHILD, 0],
+        right_child: vec![NO_CHILD, NO_CHILD, 1],
+    };
+    let tip_map_cong = vec![("P_A".into(), "H_A".into()), ("P_B".into(), "H_B".into())];
+    let r1 = reconcile_dtl(&host_2, &para_2, &tip_map_cong, &costs);
+    // Python: cost=0, host=H_AB
+    v.check_pass("Congruent: cost=0", r1.optimal_cost == 0);
+    v.check_pass("Congruent: mapped to H_AB", r1.optimal_host == "H_AB");
+    v.check_pass(
+        "Congruent: root event is speciation",
+        r1.event_table[2 * 3 + 2] == DtlEvent::Speciation,
+    );
+
+    // ── Test 2: Duplication scenario (4-leaf host) ──
+    v.section("─── Duplication scenario ───");
+    let host_4 = FlatRecTree {
+        names: vec![
+            "H_A".into(),
+            "H_B".into(),
+            "H_AB".into(),
+            "H_C".into(),
+            "H_D".into(),
+            "H_CD".into(),
+            "H_root".into(),
+        ],
+        left_child: vec![NO_CHILD, NO_CHILD, 0, NO_CHILD, NO_CHILD, 3, 2],
+        right_child: vec![NO_CHILD, NO_CHILD, 1, NO_CHILD, NO_CHILD, 4, 5],
+    };
+    let para_dup = FlatRecTree {
+        names: vec![
+            "P_1".into(),
+            "P_2".into(),
+            "P_12".into(),
+            "P_3".into(),
+            "P_root".into(),
+        ],
+        left_child: vec![NO_CHILD, NO_CHILD, 0, NO_CHILD, 2],
+        right_child: vec![NO_CHILD, NO_CHILD, 1, NO_CHILD, 3],
+    };
+    let tip_map_dup = vec![
+        ("P_1".into(), "H_A".into()),
+        ("P_2".into(), "H_A".into()),
+        ("P_3".into(), "H_C".into()),
+    ];
+    let r2 = reconcile_dtl(&host_4, &para_dup, &tip_map_dup, &costs);
+    // Python: cost=4, host=H_root
+    v.check_pass("Duplication: cost matches Python (4)", r2.optimal_cost == 4);
+    v.check_pass("Duplication: mapped to H_root", r2.optimal_host == "H_root");
+    v.check_pass("Duplication: cost > 0", r2.optimal_cost > 0);
+
+    // ── Test 3: Simple loss scenario ──
+    v.section("─── Loss/co-speciation scenario ───");
+    let host_3 = FlatRecTree {
+        names: vec![
+            "H_A".into(),
+            "H_B".into(),
+            "H_AB".into(),
+            "H_C".into(),
+            "H_root".into(),
+        ],
+        left_child: vec![NO_CHILD, NO_CHILD, 0, NO_CHILD, 2],
+        right_child: vec![NO_CHILD, NO_CHILD, 1, NO_CHILD, 3],
+    };
+    let para_loss = FlatRecTree {
+        names: vec!["P_A".into(), "P_C".into(), "P_root".into()],
+        left_child: vec![NO_CHILD, NO_CHILD, 0],
+        right_child: vec![NO_CHILD, NO_CHILD, 1],
+    };
+    let tip_map_loss = vec![("P_A".into(), "H_A".into()), ("P_C".into(), "H_C".into())];
+    let r3 = reconcile_dtl(&host_3, &para_loss, &tip_map_loss, &costs);
+    // Python: cost=1, host=H_root
+    v.check_pass("Loss: cost matches Python (1)", r3.optimal_cost == 1);
+    v.check_pass("Loss: mapped to H_root", r3.optimal_host == "H_root");
+
+    // ── Test 4: DP table dimensions ──
+    v.section("─── DP table checks ───");
+    v.check_pass(
+        "Table dimensions correct (congruent)",
+        r1.cost_table.len() == 3 * 3 && r1.event_table.len() == 3 * 3,
+    );
+    v.check_pass(
+        "Table dimensions correct (duplication)",
+        r2.cost_table.len() == 5 * 7 && r2.event_table.len() == 5 * 7,
+    );
+
+    // ── Test 5: Batch reconciliation ──
+    v.section("─── Batch reconciliation ───");
+    let batch_results = reconcile_batch(
+        &host_2,
+        &[(&para_2, &tip_map_cong), (&para_2, &tip_map_cong)],
+        &costs,
+    );
+    v.check_count("Batch: returns 2 results", batch_results.len(), 2);
+    v.check_pass(
+        "Batch: both congruent = 0",
+        batch_results[0].optimal_cost == 0 && batch_results[1].optimal_cost == 0,
+    );
+
+    // ── Test 6: Determinism ──
+    v.section("─── Determinism ───");
+    let r2b = reconcile_dtl(&host_4, &para_dup, &tip_map_dup, &costs);
+    v.check_pass("Deterministic (cost)", r2.optimal_cost == r2b.optimal_cost);
+    v.check_pass("Deterministic (host)", r2.optimal_host == r2b.optimal_host);
+
+}
+
+/// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
+pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) {
+    let mut v = crate::validation::Validator::silent("validate_reconciliation");
+    run(&mut v);
+    v.bridge_into(result);
+}
+
+/// Scenario registration for the UniBin registry.
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
+    meta: crate::validation::scenarios::registry::ScenarioMeta {
+        id: "reconciliation",
+        track: crate::validation::scenarios::registry::Track::Science,
+        tier: crate::validation::scenarios::registry::Tier::Rust,
+        provenance_crate: "validate_reconciliation",
+        provenance_date: "2026-05-20",
+        description: "Validation binary for Exp034: DTL Reconciliation",
+    },
+    run: |v, _ctx| run_as_scenario(v),
+};

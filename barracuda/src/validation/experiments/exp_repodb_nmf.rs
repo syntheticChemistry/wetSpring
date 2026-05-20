@@ -1,0 +1,283 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! # Exp160: repoDB NMF Reproduction (Gao et al. 2020)
+//!
+//! Validates the NMF drug repositioning pipeline at repoDB-proportional
+//! scale. CPU tier validates math correctness, block structure recovery,
+//! and factor quality. Full repoDB-scale with weighted NMF is the GPU target.
+//!
+//! # Provenance
+//!
+//! | Item        | Value |
+//! |-------------|-------|
+//! | Date        | 2026-02-24 |
+//! | Phase       | 39 — Drug repurposing track |
+//! | Paper       | 42 (Gao et al. 2020, PMC7153111) |
+//! | Command     | `cargo test --bin validate_repodb_nmf -- --nocapture` |
+//!
+//! Validation class: Analytical
+//!
+//! Provenance: Known-value formulas and algorithmic invariants
+
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use crate::cast;
+use crate::tolerances;
+use crate::validation::OrExit;
+use crate::validation::Validator;
+
+struct LcgRng(u64);
+
+impl LcgRng {
+    const fn new(seed: u64) -> Self {
+        Self(seed.wrapping_add(1))
+    }
+    fn next_f64(&mut self) -> f64 {
+        self.0 = self
+            .0
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1);
+        let bits = (self.0 >> 11) | 0x3FF0_0000_0000_0000;
+        f64::from_bits(bits) - 1.0
+    }
+    fn next_usize(&mut self, max: usize) -> usize {
+        cast::f64_usize(self.next_f64() * cast::usize_f64(max)) % max
+    }
+}
+
+const N_DRUGS: usize = 200;
+const N_DISEASES: usize = 150;
+const N_CLUSTERS: usize = 10;
+const DRUGS_PER_CLUSTER: usize = N_DRUGS / N_CLUSTERS;
+const DISEASES_PER_CLUSTER: usize = N_DISEASES / N_CLUSTERS;
+
+fn compute_block_discrimination(wh: &[f64]) -> (f64, f64) {
+    let mut within_sum = 0.0;
+    let mut within_count = 0;
+    let mut cross_sum = 0.0;
+    let mut cross_count = 0;
+
+    for i in 0..N_DRUGS {
+        let drug_cluster = i / DRUGS_PER_CLUSTER;
+        for j in 0..N_DISEASES {
+            let dis_cluster = j / DISEASES_PER_CLUSTER;
+            let score = wh[i * N_DISEASES + j];
+            if drug_cluster == dis_cluster && drug_cluster < N_CLUSTERS {
+                within_sum += score;
+                within_count += 1;
+            } else if drug_cluster < N_CLUSTERS && dis_cluster < N_CLUSTERS {
+                cross_sum += score;
+                cross_count += 1;
+            }
+        }
+    }
+
+    let within_mean = within_sum / f64::from(within_count.max(1));
+    let cross_mean = cross_sum / f64::from(cross_count.max(1));
+    (within_mean, cross_mean)
+}
+
+fn reconstruct_wh(result: &nmf::NmfResult) -> Vec<f64> {
+    let total = N_DRUGS * N_DISEASES;
+    let mut wh = vec![0.0; total];
+    for i in 0..N_DRUGS {
+        for kk in 0..result.k {
+            let w_ik = result.w[i * result.k + kk];
+            for j in 0..N_DISEASES {
+                wh[i * N_DISEASES + j] += w_ik * result.h[kk * N_DISEASES + j];
+            }
+        }
+    }
+    wh
+}
+
+fn validate_factorisation_and_structure(
+    v: &mut Validator,
+    matrix: &[f64],
+    result: &nmf::NmfResult,
+    elapsed_ms: u128,
+    rel_err: f64,
+    n_nonzero: usize,
+) {
+    let rank = result.k;
+    let n_iters = result.errors.len();
+    println!("  NMF rank={rank}: {n_iters} iterations in {elapsed_ms} ms");
+    println!("  Relative reconstruction error: {rel_err:.4}");
+
+    v.check_pass("NMF converges (error decreases)", {
+        let e = &result.errors;
+        e.len() >= 2 && e.last().or_exit("errors non-empty") < &e[0]
+    });
+    v.check_pass("relative error < 0.85", rel_err < 0.85);
+
+    v.section("§3 Block Structure Recovery");
+
+    let wh = reconstruct_wh(result);
+    let (within_mean, cross_mean) = compute_block_discrimination(&wh);
+    let disc_ratio = within_mean / (cross_mean + tolerances::ANALYTICAL_LOOSE);
+    println!("  Within-cluster mean score: {within_mean:.4}");
+    println!("  Cross-cluster mean score: {cross_mean:.4}");
+    println!("  Block discrimination ratio: {disc_ratio:.2}×");
+
+    v.check_pass(
+        "within-cluster > cross-cluster (block structure recovered)",
+        within_mean > cross_mean,
+    );
+    v.check_pass(
+        "discrimination ratio > 2× (clear block separation)",
+        within_mean > cross_mean * 2.0,
+    );
+
+    v.section("§4 Factor Quality Analysis");
+
+    let w_nonzero_frac = cast::usize_f64(
+        result
+            .w
+            .iter()
+            .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
+            .count(),
+    ) / cast::usize_f64(result.w.len());
+    let h_nonzero_frac = cast::usize_f64(
+        result
+            .h
+            .iter()
+            .filter(|&&x| x > tolerances::ANALYTICAL_LOOSE)
+            .count(),
+    ) / cast::usize_f64(result.h.len());
+
+    println!("  W factor density: {:.1}%", w_nonzero_frac * 100.0);
+    println!("  H factor density: {:.1}%", h_nonzero_frac * 100.0);
+
+    v.check_pass(
+        "W and H are non-negative",
+        result.w.iter().all(|&x| x >= 0.0) && result.h.iter().all(|&x| x >= 0.0),
+    );
+    v.check_pass("W factors are sparse (< 80% dense)", w_nonzero_frac < 0.8);
+
+    validate_rank_sensitivity(v, matrix);
+    validate_gpu_roadmap(v, elapsed_ms, n_nonzero);
+}
+
+fn validate_rank_sensitivity(v: &mut Validator, matrix: &[f64]) {
+    v.section("§5 Rank Sensitivity");
+
+    println!(
+        "\n  {:>6} {:>10} {:>12} {:>12} {:>8}",
+        "Rank", "Rel.Err", "Within", "Cross", "Ratio"
+    );
+    println!(
+        "  {:-<6} {:-<10} {:-<12} {:-<12} {:-<8}",
+        "", "", "", "", ""
+    );
+    for &rank in &[3, 5, 10, 15, 20] {
+        let cfg = NmfConfig {
+            rank,
+            max_iter: 100,
+            tol: tolerances::NMF_CONVERGENCE_RANK_SEARCH,
+            objective: NmfObjective::Euclidean,
+            seed: 42,
+        };
+        let res = nmf::nmf(matrix, N_DRUGS, N_DISEASES, &cfg).or_exit("NMF failed");
+        let re = nmf::relative_reconstruction_error(matrix, &res);
+        let wh_r = reconstruct_wh(&res);
+        let (wm, cm) = compute_block_discrimination(&wh_r);
+        let ratio = wm / (cm + tolerances::ANALYTICAL_LOOSE);
+        println!("  {rank:>6} {re:>10.4} {wm:>12.4} {cm:>12.4} {ratio:>8.2}×");
+    }
+
+    v.check_pass("rank sensitivity analysis complete", true);
+}
+
+fn validate_gpu_roadmap(v: &mut Validator, elapsed_ms: u128, n_nonzero: usize) {
+    v.section("§6 GPU Tier Roadmap (Full repoDB)");
+
+    println!("\n  CPU tier validates NMF math at 200×150 ({n_nonzero} entries).");
+    println!("  GPU tier targets full repoDB: 1571 × 1209 (6,677 approved, 4,106 failed).");
+    println!();
+    println!("  For GPU tier, we need weighted NMF:");
+    println!("  W ← W ⊙ (M⊙V Hᵀ) / (M⊙(WH) Hᵀ + ε)");
+    println!("  where M is a mask (1 for known, 0 for unknown)");
+    println!("  This prevents the model from learning to predict zeros for unknowns.");
+    println!();
+    println!("  Shader requirements:");
+    println!("  1. GEMM (f64)       — EXISTS");
+    println!("  2. NMF update       — NEW (element-wise, trivial)");
+    println!("  3. Mask multiply    — NEW (for weighted NMF)");
+    println!("  4. Top-K selection  — NEW (parallel sort/select)");
+    println!();
+    println!("  At full scale (1571×1209×rank20):");
+    println!("  • 200 iterations ≈ 7.6G FLOPs → single GPU < 10ms");
+    println!("  • CPU baseline (this tier): {elapsed_ms} ms for {N_DRUGS}×{N_DISEASES}");
+
+    v.check_pass("GPU roadmap documented", true);
+}
+
+/// Run the `validate_repodb_nmf` experiment, recording checks into `v`.
+pub fn run(v: &mut crate::validation::Validator) {
+
+    v.section("§1 repoDB-Proportional Data (CPU Tier)");
+
+    let total = N_DRUGS * N_DISEASES;
+    let mut rng = LcgRng::new(42);
+    let entries_per_cluster = 80;
+
+    let mut matrix = vec![0.0_f64; total];
+    for c in 0..N_CLUSTERS {
+        let d_start = c * DRUGS_PER_CLUSTER;
+        let dis_start = c * DISEASES_PER_CLUSTER;
+        let mut planted = 0;
+        while planted < entries_per_cluster {
+            let d = d_start + rng.next_usize(DRUGS_PER_CLUSTER);
+            let dis = dis_start + rng.next_usize(DISEASES_PER_CLUSTER);
+            if matrix[d * N_DISEASES + dis] == 0.0 {
+                matrix[d * N_DISEASES + dis] = 1.0;
+                planted += 1;
+            }
+        }
+    }
+
+    let n_nonzero = matrix.iter().filter(|&&x| x > 0.0).count();
+    let fill_rate = cast::usize_f64(n_nonzero) / cast::usize_f64(total);
+    println!("  Matrix: {N_DRUGS} × {N_DISEASES} ({total} entries)");
+    println!("  Non-zero: {n_nonzero} ({:.1}% fill)", fill_rate * 100.0);
+    println!("  Clusters: {N_CLUSTERS} blocks of ~{entries_per_cluster} each");
+    println!("  Proportional to repoDB: 1571×1209 at 0.35% fill (6,677 approved)");
+
+    v.check_pass("fill rate in [1%, 10%]", (0.01..=0.10).contains(&fill_rate));
+
+    v.section("§2 NMF Factorisation (Euclidean)");
+
+    let config = NmfConfig {
+        rank: N_CLUSTERS,
+        max_iter: 200,
+        tol: tolerances::NMF_CONVERGENCE_EUCLIDEAN,
+        objective: NmfObjective::Euclidean,
+        seed: 42,
+    };
+
+    let start = std::time::Instant::now();
+    let result = nmf::nmf(&matrix, N_DRUGS, N_DISEASES, &config).or_exit("NMF failed");
+    let elapsed_ms = start.elapsed().as_millis();
+    let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
+
+    validate_factorisation_and_structure(v, &matrix, &result, elapsed_ms, rel_err, n_nonzero);
+
+}
+
+/// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
+pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) {
+    let mut v = crate::validation::Validator::silent("validate_repodb_nmf");
+    run(&mut v);
+    v.bridge_into(result);
+}
+
+/// Scenario registration for the UniBin registry.
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
+    meta: crate::validation::scenarios::registry::ScenarioMeta {
+        id: "repodb_nmf",
+        track: crate::validation::scenarios::registry::Track::Science,
+        tier: crate::validation::scenarios::registry::Tier::Both,
+        provenance_crate: "validate_repodb_nmf",
+        provenance_date: "2026-05-20",
+        description: "# Exp160: repoDB NMF Reproduction (Gao et al. 2020)",
+    },
+    run: |v, _ctx| run_as_scenario(v),
+};

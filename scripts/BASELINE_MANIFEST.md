@@ -28,7 +28,7 @@ Python baseline script listed here. To re-verify a baseline:
 ```bash
 sha256sum scripts/<script>.py          # must match SHA-256 below
 python3 scripts/<script>.py            # re-run; compare output
-cargo run --bin <binary>               # Rust must match within tolerance
+cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario <id>  # Rust must match within tolerance
 ```
 
 ## Reproduction Environment

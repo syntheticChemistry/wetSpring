@@ -16,7 +16,9 @@ NUCLEUS (4TB NVMe)                    Repo / USB / guideStone
 ├── sovereign pipeline output         ├── braids/barrick_2009_mutations.json    (~1 KB)
 └── full provenance DAG sessions      ├── braids/barrick_2009_refined_v1.json   (~2 KB, calibration anchor)
                                       ├── braids/barrick_2009_systems_study_v2.json (~6 KB, SEALED)
-                                      └── braids/tenaillon_2016_sovereign.json  (pending — batch 0 done)
+                                      ├── braids/barrick_2009_calibration_v2.json (~4 KB, v2/v3 calibration)
+                                      ├── braids/tenaillon_2016_sovereign.json  (~1 KB, batch 0 COMPLETE)
+                                      └── braids/tenaillon_2016_sovereign_batch_3.json (~1 KB, restart verify)
 ```
 
 The spore can't carry the mountain. But it proves the mountain was climbed.
@@ -30,7 +32,9 @@ The spore can't carry the mountain. But it proves the mountain was climbed.
 | `barrick_2009_breseq.json` | Barrick 2009 (7 clones) | breseq 0.40.1 (C++ baseline) | READY — L1 baseline |
 | `barrick_2009_mutations.json` | Barrick 2009 (7 clones) | breseq mutation extraction | READY — 7-node breseq run |
 | `barrick_2009_refined_v1.json` | Barrick 2009 (1/7 clones) | v0→v1 calibration (REL1164M) | PARTIAL — intentional calibration anchor |
-| `tenaillon_2016_sovereign.json` | Tenaillon 2016 (264 genomes) | Sovereign Rust + barraCuda GPU | PENDING — batch 0 (2/5 clones) validated |
+| `barrick_2009_calibration_v2.json` | Barrick 2009 + Tenaillon batch 0 | v2/v3 calibration evolution (MAPQ, base quality, GPU min_depth) | **ACTIVE** — tracks parity evolution + all 5 Tenaillon batch 0 results |
+| `tenaillon_2016_sovereign.json` | Tenaillon 2016 (5/264 clones, batch 0) | Sovereign Rust + barraCuda GPU | **COMPLETE** — 974 variants, BLAKE3 `623a2b35` |
+| `tenaillon_2016_sovereign_batch_3.json` | Tenaillon 2016 (2 clones, restart) | Sovereign Rust + barraCuda GPU | **COMPLETE** — interrupt/restart verification, 382 variants |
 
 ## Cross-Tier Parity
 
@@ -42,7 +46,7 @@ Formal L1 vs L2 parity results in `experiments/results/barrick_2009_parity.json`
 ## Wire Format
 
 All braids follow the lithoSpore ferment transcript contract
-(see `infra/wateringHole/handoffs/LITHOSPORE_FERMENT_TRANSCRIPT_BRAID_HANDOFF_MAY17_2026.md`):
+(see `wateringHole/handoffs/archive/WETSPRING_V176_LITHOSPORE_AUDIT_RESPONSE_MAY17_2026.md`):
 
 ```json
 {
@@ -76,5 +80,5 @@ the previous version. The braid includes a timestamp and hash so each
 generation is distinguishable.
 
 ```bash
-cargo run --features gpu --bin validate_sovereign_resequencing --release
+cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario sovereign_resequencing
 ```

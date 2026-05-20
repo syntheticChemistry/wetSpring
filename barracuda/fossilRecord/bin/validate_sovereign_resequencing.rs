@@ -301,7 +301,7 @@ fn main() {
     let caller_config = CallerConfig::default();
     let pileup_config = pileup::PileupConfig {
         min_base_quality: 20,
-        min_mapq: 10,
+        min_mapq: 0,
         skip_duplicates: true,
         skip_secondary: true,
     };

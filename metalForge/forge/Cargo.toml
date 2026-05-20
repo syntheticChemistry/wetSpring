@@ -8,6 +8,7 @@ rust-version = "1.87"
 description = "Hardware discovery and cross-substrate dispatch for wetSpring"
 license = "AGPL-3.0-or-later"
 publish = false
+autobins = false
 
 # Workspace root is wetSpring/Cargo.toml.
 

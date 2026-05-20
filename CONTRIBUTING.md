@@ -32,14 +32,14 @@ cargo test --all-features
 ## Testing
 
 wetSpring validates against Python/Galaxy/QIIME2/R baselines.
-Every algorithm has a corresponding `validate_*` binary.
+Every algorithm has a corresponding UniBin scenario (dispatched via `wetspring validate --scenario <id>`).
 
 ```bash
 # Run CPU test suite
 cargo test
 
-# Run a specific validator
-cargo run --bin validate_diversity
+# Run a specific scenario via the UniBin
+cargo run --release --features guidestone,gpu --bin wetspring -- validate --scenario diversity
 
 # Run GPU tests (requires Vulkan-capable GPU)
 cargo test --features gpu

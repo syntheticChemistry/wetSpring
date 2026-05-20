@@ -3,8 +3,8 @@
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
 **Date:** May 17, 2026 (V174 update)
-**Author:** wetSpring V174 (ecoPrimals)
-**Foundation:** 384/384 experiments, 5,957+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 370 binaries, 91.20% coverage. **V174:** Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved: UniBin `serve` live, display-name hygiene, `dense_to_csr` extracted. Live composition health. Wave 20 schema parity. 51 consumed capabilities (registry 452). barraCuda v0.4.0. coralReef v0.1.0. Live NUCLEUS guideStone 30/31 pass. Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 gaps open (deployment-only, 20 resolved/closed).
+**Author:** wetSpring V182 (ecoPrimals)
+**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (337 scenarios, 23 benchmarks), 91.20% coverage. **V182:** UniBin consolidation (349 binaries → 1, build 25min → 1m44s). Barrick 2009 SEALED. Tenaillon batch 0 COMPLETE. 52 consumed capabilities (registry 452). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 PG gaps open (deployment-only, 20 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration).
 
 ---
 

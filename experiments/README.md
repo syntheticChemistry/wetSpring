@@ -5,10 +5,10 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-19 (V180: River Delta audit absorption. Exp381 DONE (7/7 Barrick breseq),
-Exp382 DONE (7/7 sovereign resequencing, SEALED). WS-11 v2 calibration deployed. Tenaillon 2016
-batch 0 validated (2/5 clones). 386 experiments indexed (385 completed + 1 in progress),
-**372** binaries (**350** barracuda + **22** forge), 5,967+ checks, **1,962** lib tests
+**Updated**: 2026-05-20 (V182: UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring`
+binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 SEALED (7/7).
+Tenaillon 2016 batch 0 COMPLETE (5/5 clones, 974 variants). 386 experiments indexed
+(385 completed + 1 in progress), 5,967+ checks, **1,962** lib tests
 **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers.
 52 consumed capabilities (registry 452). 2 gaps active (WS-9 L3, WS-11), 1 resolved (WS-10).)
 
@@ -281,9 +281,14 @@ experiments/
 
 ## Validation Binaries
 
-Each validation binary uses the `Validator` harness with provenance tables,
+Each validation scenario uses the `Validator` harness with provenance tables,
 hardcoded expected values from the baseline experiments, and tolerance
 thresholds from `src/tolerances.rs`.
+
+> **V182 note:** All binaries below were consolidated into the `wetspring` UniBin.
+> Run via `wetspring validate --scenario <id>` where `<id>` strips the `validate_`
+> prefix (e.g., `validate_diversity` → `wetspring validate --scenario diversity`).
+> The table preserves historical binary names for provenance.
 
 | Binary | Experiment | Checks | Command |
 |--------|------------|--------|---------|
@@ -692,18 +697,18 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Binary: `validate_colonization_resistance`.
 Joint with healthSpring exp097/exp098.
 
-**Totals (V174): 384/384 experiments completed, 370 binaries (348 barracuda + 22 forge), 5,957+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 51 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 30/31 pass. Deep debt resolved. Zero internal gaps. 2 gaps open (deployment-only), 20 resolved/closed.**
+**Totals (V182): 386 experiments indexed, 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition), 5,967+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 52 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 38/38 pass. 2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10). 2 PG open (deployment-only), 20 resolved/closed.**
 
 ### Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic (V179 — DONE, 10/10)
 
 First real-data Nest Atomic composition. Downloads 7 SRA runs (SRP001569, Barrick 2009
 LTEE Ara-1) via sovereign SRA pipeline, runs breseq 0.40.1 variant calling against
 REL606 reference (CP000819.1), records provenance via trio, exports ferment transcript
-braid for lithoSpore. Binary: `validate_breseq_barrick_2009` (`--features ipc`).
+braid for lithoSpore. Scenario: `breseq_barrick_2009` (`--features ipc`).
 Environment: `micromamba breseq-env` on 4TB NVMe. REL1164M: 579 mutations, REL8593M:
 1108 mutations. Mutation accumulation trend confirmed. Braid exported.
 
-**Totals (V177): 385 experiments indexed (384 completed + 1 in progress), 371 binaries (349 barracuda + 22 forge), 5,967+ checks, 252 lib tests (0 failures). Wave 20 PM stability tiers adopted. 52 consumed capabilities (registry 452). Trio transaction semantics aligned (primals_reached). Degradation documented. 3 gaps open (deployment + cross-tier parity), 20 resolved/closed.**
+**Totals (V182): 386 experiments indexed (385 completed + 1 in progress), 345 UniBin scenarios, 5,967+ checks. 52 consumed capabilities (registry 452). Barrick 2009 SEALED, Tenaillon batch 0 COMPLETE. 2 WS gaps active, 2 PG open (deployment-only), 20 resolved/closed.**
 
 ---
 
@@ -712,6 +717,8 @@ Environment: `micromamba breseq-env` on 4TB NVMe. REL1164M: 579 mutations, REL85
 1. Create `experiments/NNN_descriptive_name.md` with: date, status, objective,
    baseline tool, dataset, protocol, acceptance criteria.
 2. Run the baseline tool and save results to `experiments/results/NNN_name/`.
-3. Create `src/bin/validate_NNN.rs` with provenance table and `Validator` checks.
-4. Add the `[[bin]]` entry to `Cargo.toml`.
+3. Create `barracuda/src/validation/experiments/exp_NNN.rs` with `pub fn run(v: &mut Validator)`,
+   `pub fn run_as_scenario(result: &mut ValidationResult)`, and `pub const SCENARIO`.
+4. Add `pub mod exp_NNN;` to `barracuda/src/validation/experiments/mod.rs` and register
+   the scenario in `register_all()`.
 5. Update this README with the new experiment row.

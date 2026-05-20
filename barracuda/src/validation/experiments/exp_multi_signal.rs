@@ -1,0 +1,190 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Validation: Srivastava 2011 multi-input QS network (Exp024).
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `e4358c5` |
+//! | Paper | Srivastava et al. 2011, *J Bacteriology* 193:6331-41 |
+//! | Baseline script | `scripts/srivastava2011_multi_signal.py` |
+//! | Baseline output | `experiments/results/024_multi_signal/srivastava2011_python_baseline.json` |
+//! | Python version | 3.10.12 |
+//! | `scipy` integrator | `odeint` (LSODA) |
+//! | Rust integrator | RK4 fixed-step (dt = 0.001 h) |
+//! | Date | 2026-02-20 |
+//! | Exact command | `python3 scripts/srivastava2011_multi_signal.py` |
+//! | Hardware | i9-12900K, 64GB DDR5, RTX 4070, Ubuntu 24.04 |
+//!
+//! Validation class: Python-parity
+//!
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
+
+use crate::bio::multi_signal::{
+    MultiSignalParams, scenario_ai2_only, scenario_cai1_only, scenario_exogenous_cai1,
+    scenario_no_qs, scenario_wild_type,
+};
+use crate::bio::ode::steady_state_mean;
+use crate::tolerances;
+use crate::validation::Validator;
+
+const DT: f64 = 0.001;
+const SS_FRAC: f64 = 0.1;
+
+/// Run the `validate_multi_signal` experiment, recording checks into `v`.
+pub fn run(v: &mut crate::validation::Validator) {
+    let params = MultiSignalParams::default();
+
+    // ── Wild type ────────────────────────────────────────────────────
+    v.section("── Wild type (both signals) ──");
+    let r = scenario_wild_type(&params, DT);
+    let n_ss = steady_state_mean(&r, 0, SS_FRAC);
+    let h_ss = steady_state_mean(&r, 4, SS_FRAC);
+    let c_ss = steady_state_mean(&r, 5, SS_FRAC);
+    let b_ss = steady_state_mean(&r, 6, SS_FRAC);
+
+    v.check("WT: N_ss", n_ss, 0.975, tolerances::ODE_METHOD_PARITY);
+    v.check("WT: HapR_ss", h_ss, 0.543, tolerances::ODE_STEADY_STATE);
+    v.check("WT: CdG_ss", c_ss, 0.600, tolerances::ODE_STEADY_STATE);
+    v.check("WT: B_ss", b_ss, 0.413, tolerances::ODE_STEADY_STATE);
+    check_non_negative(v, &r, "WT");
+
+    // ── CAI-1 only (ΔluxS) ─────────────────────────────────────────
+    v.section("── CAI-1 only (ΔluxS) ──");
+    let r = scenario_cai1_only(&params, DT);
+    let h_ss = steady_state_mean(&r, 4, SS_FRAC);
+    let b_ss = steady_state_mean(&r, 6, SS_FRAC);
+
+    v.check("CAI1: HapR_ss", h_ss, 0.238, tolerances::ODE_STEADY_STATE);
+    v.check(
+        "CAI1: B_ss (more biofilm)",
+        b_ss,
+        0.676,
+        tolerances::ODE_STEADY_STATE,
+    );
+    check_non_negative(v, &r, "CAI1");
+
+    // ── AI-2 only (ΔcqsA) ──────────────────────────────────────────
+    v.section("── AI-2 only (ΔcqsA) ──");
+    let r = scenario_ai2_only(&params, DT);
+    let h_ss = steady_state_mean(&r, 4, SS_FRAC);
+    let b_ss = steady_state_mean(&r, 6, SS_FRAC);
+
+    v.check(
+        "AI2: HapR_ss (symmetric with CAI1)",
+        h_ss,
+        0.238,
+        tolerances::ODE_STEADY_STATE,
+    );
+    v.check(
+        "AI2: B_ss (symmetric with CAI1)",
+        b_ss,
+        0.676,
+        tolerances::ODE_STEADY_STATE,
+    );
+    check_non_negative(v, &r, "AI2");
+
+    // ── No QS (ΔluxS ΔcqsA) ────────────────────────────────────────
+    v.section("── No QS (ΔluxS ΔcqsA) ──");
+    let r = scenario_no_qs(&params, DT);
+    let h_ss = steady_state_mean(&r, 4, SS_FRAC);
+    let b_ss = steady_state_mean(&r, 6, SS_FRAC);
+
+    v.check(
+        "NoQS: HapR_ss (very low)",
+        h_ss,
+        0.031,
+        tolerances::GC_CONTENT,
+    );
+    v.check(
+        "NoQS: B_ss (constitutive biofilm)",
+        b_ss,
+        0.777,
+        tolerances::ODE_STEADY_STATE,
+    );
+    check_non_negative(v, &r, "NoQS");
+
+    // ── Exogenous CAI-1 ─────────────────────────────────────────────
+    v.section("── Exogenous CAI-1 (low density + signal) ──");
+    let r = scenario_exogenous_cai1(&params, DT);
+    let h_ss = steady_state_mean(&r, 4, SS_FRAC);
+
+    v.check(
+        "ExoCAI: HapR activated by exogenous signal",
+        h_ss,
+        0.543,
+        tolerances::ODE_STEADY_STATE,
+    );
+    check_non_negative(v, &r, "ExoCAI");
+
+    // ── Signal hierarchy ────────────────────────────────────────────
+    v.section("── Signal hierarchy ──");
+    let h_wt = steady_state_mean(&scenario_wild_type(&params, DT), 4, SS_FRAC);
+    let h_cai1 = steady_state_mean(&scenario_cai1_only(&params, DT), 4, SS_FRAC);
+    let h_noqs = steady_state_mean(&scenario_no_qs(&params, DT), 4, SS_FRAC);
+
+    v.check(
+        "Hierarchy: H_wt > H_cai1",
+        f64::from(u8::from(h_wt > h_cai1)),
+        1.0,
+        tolerances::EXACT,
+    );
+    v.check(
+        "Hierarchy: H_cai1 > H_noqs",
+        f64::from(u8::from(h_cai1 > h_noqs)),
+        1.0,
+        tolerances::EXACT,
+    );
+
+    // ── Determinism ─────────────────────────────────────────────────
+    v.section("── Determinism ──");
+    let r1 = scenario_wild_type(&params, DT);
+    let r2 = scenario_wild_type(&params, DT);
+    let max_diff: f64 = r1
+        .y_final
+        .iter()
+        .zip(&r2.y_final)
+        .map(|(a, b)| (a - b).abs())
+        .fold(0.0_f64, f64::max);
+    v.check(
+        "Deterministic: rerun bitwise identical",
+        max_diff,
+        0.0,
+        tolerances::EXACT,
+    );
+
+}
+
+fn check_non_negative(
+    v: &mut Validator,
+    result: &crate::bio::ode::OdeResult,
+    prefix: &str,
+) {
+    let min_val: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
+    v.check(
+        &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
+        min_val.max(0.0),
+        min_val.max(0.0),
+        tolerances::EXACT,
+    );
+}
+
+/// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
+pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) {
+    let mut v = crate::validation::Validator::silent("validate_multi_signal");
+    run(&mut v);
+    v.bridge_into(result);
+}
+
+/// Scenario registration for the UniBin registry.
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
+    meta: crate::validation::scenarios::registry::ScenarioMeta {
+        id: "multi_signal",
+        track: crate::validation::scenarios::registry::Track::Science,
+        tier: crate::validation::scenarios::registry::Tier::Rust,
+        provenance_crate: "validate_multi_signal",
+        provenance_date: "2026-05-20",
+        description: "Validation: Srivastava 2011 multi-input QS network (Exp024)",
+    },
+    run: |v, _ctx| run_as_scenario(v),
+};

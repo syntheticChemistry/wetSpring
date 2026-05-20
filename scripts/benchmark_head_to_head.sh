@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # wetSpring — Rust vs Python Head-to-Head Benchmark
-# Benchmarks v1–v10 CPU validators against Python baselines.
+# Benchmarks v1–v10 CPU scenarios against Python baselines via UniBin (V182+).
 # Full suite extends to v25; this script covers the core 10 for quick comparison.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"
-BARRACUDA="$ROOT/barracuda"
 RESULTS="$ROOT/experiments/results/benchmark_head_to_head"
 mkdir -p "$RESULTS"
+
+readonly FEATURES="guidestone,gpu"
+readonly BIN_ARGS="--release -p wetspring-barracuda --features $FEATURES --bin wetspring --"
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  wetSpring — Rust vs Python Head-to-Head Benchmark"
@@ -17,41 +19,31 @@ echo "  36+ domains | 455+ CPU parity checks | v1–v10"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 
-echo "─── Phase 1: Rust (release build) ───"
-cd "$BARRACUDA"
-cargo build --release \
-    --bin validate_barracuda_cpu \
-    --bin validate_barracuda_cpu_v2 \
-    --bin validate_barracuda_cpu_v3 \
-    --bin validate_barracuda_cpu_v4 \
-    --bin validate_barracuda_cpu_v5 \
-    --bin validate_barracuda_cpu_v6 \
-    --bin validate_barracuda_cpu_v7 \
-    --bin validate_barracuda_cpu_v8 \
-    --bin validate_barracuda_cpu_v9 \
-    --bin validate_barracuda_cpu_v10 2>&1 | tail -1
+echo "─── Phase 1: Rust (release build, UniBin dispatch) ───"
+cd "$ROOT"
+cargo build --release -p wetspring-barracuda --features "$FEATURES" --bin wetspring 2>&1 | tail -1
 
-BINS=(
-    "validate_barracuda_cpu:v1 (9 domains)"
-    "validate_barracuda_cpu_v2:v2 (5 batch domains)"
-    "validate_barracuda_cpu_v3:v3 (9 new domains)"
-    "validate_barracuda_cpu_v4:v4 (5 Track 1c domains)"
-    "validate_barracuda_cpu_v5:v5 (RF + GBM)"
-    "validate_barracuda_cpu_v6:v6 (6 ODE flat)"
-    "validate_barracuda_cpu_v7:v7 (Tier A layouts)"
-    "validate_barracuda_cpu_v8:v8 (13 promoted GPU domains)"
-    "validate_barracuda_cpu_v9:v9 (Track 3 drug repurposing)"
-    "validate_barracuda_cpu_v10:v10 (V59 science extensions)"
+SCENARIOS=(
+    "barracuda_cpu:v1 (9 domains)"
+    "barracuda_cpu_v2:v2 (5 batch domains)"
+    "barracuda_cpu_v3:v3 (9 new domains)"
+    "barracuda_cpu_v4:v4 (5 Track 1c domains)"
+    "barracuda_cpu_v5:v5 (RF + GBM)"
+    "barracuda_cpu_v6:v6 (6 ODE flat)"
+    "barracuda_cpu_v7:v7 (Tier A layouts)"
+    "barracuda_cpu_v8:v8 (13 promoted GPU domains)"
+    "barracuda_cpu_v9:v9 (Track 3 drug repurposing)"
+    "barracuda_cpu_v10:v10 (V59 science extensions)"
 )
 
 RUST_TOTAL=0
-for entry in "${BINS[@]}"; do
-    BIN="${entry%%:*}"
+for entry in "${SCENARIOS[@]}"; do
+    SCENARIO="${entry%%:*}"
     LABEL="${entry##*:}"
     echo ""
     echo "  Running $LABEL..."
     T_START=$(date +%s%N)
-    cargo run --release --bin "$BIN" 2>&1 | grep -E "TOTAL|RESULT"
+    cargo run $BIN_ARGS validate --scenario "$SCENARIO" 2>&1 | grep -E "TOTAL|RESULT"
     T_END=$(date +%s%N)
     T_US=$(( (T_END - T_START) / 1000 ))
     RUST_TOTAL=$(( RUST_TOTAL + T_US ))

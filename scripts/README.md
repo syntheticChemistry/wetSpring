@@ -5,9 +5,9 @@ shell helpers for CI-style checks.
 
 ## `validate_release.sh`
 
-Runs seven core `validate_*` binaries under `cargo run --release` with
-`--features gpu` (package `wetspring-barracuda`) to detect release-mode
-FMA/LTO float drift vs debug builds — same idea as groundSpring V120.
+Runs seven core scenarios via the `wetspring` UniBin under `--release` with
+`--features guidestone,gpu` to detect release-mode FMA/LTO float drift vs
+debug builds — same idea as groundSpring V120.
 
 From the workspace root:
 
@@ -15,8 +15,8 @@ From the workspace root:
 ./scripts/validate_release.sh
 ```
 
-The script records pass/fail and elapsed seconds per binary, prints a summary
-table, and exits `0` only if every validator exits successfully.
+The script records pass/fail and elapsed seconds per scenario, prints a summary
+table, and exits `0` only if every scenario exits successfully.
 
 ## Coverage (Rust)
 
@@ -71,6 +71,6 @@ python scripts/benchmark_python_baseline.py
 
 ## Relationship to Experiments
 
-Each `scripts/*.py` baseline corresponds to one or more `barracuda/src/bin/validate_*.rs`
-experiments. The Rust experiment proves parity with (or improvement over) the
-Python baseline.
+Each `scripts/*.py` baseline corresponds to one or more UniBin scenarios in
+`barracuda/src/validation/experiments/exp_*.rs`. The Rust scenario proves
+parity with (or improvement over) the Python baseline.

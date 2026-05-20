@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Run the wetSpring dashboard in live streaming mode against petalTongue.
+# Run wetspring UniBin status/validation in live streaming mode against petalTongue.
 # Requires petalTongue to be running and accessible via socket.
 #
 # Usage:
@@ -11,6 +11,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+readonly FEATURES="guidestone,gpu"
 
 if [[ -z "${PETALTONGUE_SOCKET:-}" ]]; then
     XDG="${XDG_RUNTIME_DIR:-/tmp}"
@@ -31,19 +33,15 @@ if [[ -z "${PETALTONGUE_SOCKET:-}" ]]; then
     echo "Discovered petalTongue at: $PETALTONGUE_SOCKET"
 fi
 
-echo "Building wetspring_dashboard (release)..."
-cargo build --manifest-path "$PROJECT_ROOT/barracuda/Cargo.toml" \
-    --features json \
-    --bin wetspring_dashboard \
-    --release 2>&1
+echo "Building wetspring UniBin (release)..."
+cargo build --release -p wetspring-barracuda --features "$FEATURES" --bin wetspring 2>&1
 
 echo ""
-echo "Launching live dashboard → petalTongue..."
-cargo run --manifest-path "$PROJECT_ROOT/barracuda/Cargo.toml" \
-    --features json \
-    --bin wetspring_dashboard \
-    --release
+echo "Launching wetspring status + validate → petalTongue..."
+cargo run --release -p wetspring-barracuda --features "$FEATURES" --bin wetspring -- status
+echo ""
+cargo run --release -p wetspring-barracuda --features "$FEATURES" --bin wetspring -- validate --format json
 
 echo ""
 echo "Dashboard session complete."
-echo "Scenarios also saved to: $PROJECT_ROOT/sandbox/scenarios/"
+echo "Scenario results also available via: wetspring validate --list"

@@ -1,0 +1,154 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+//! Validation binary for Exp033: Neighbor-Joining tree construction.
+//!
+//! Validates Rust NJ against Python baseline (Saitou & Nei 1987).
+//! Checks: topology (sister pairs), branch lengths, distance matrix
+//! symmetry, determinism.
+//!
+//! # Provenance
+//!
+//! | Field | Value |
+//! |-------|-------|
+//! | Baseline commit | `e4358c5` |
+//! | Baseline tool | `liu2009_neighbor_joining.py` |
+//! | Baseline version | scripts/ |
+//! | Baseline command | python3 `scripts/liu2009_neighbor_joining.py` |
+//! | Baseline date | 2026-02-19 |
+//! | Exact command | `python3 scripts/liu2009_neighbor_joining.py` |
+//! | Data | synthetic distance matrices, 3–5 taxa |
+//! | Hardware | Eastgate (i9-12900K, 64 GB, RTX 4070, Pop!\_OS 22.04) |
+//!
+//! Validation class: Python-parity
+//!
+//! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
+
+use crate::bio::neighbor_joining::{
+    distance_matrix, jukes_cantor_distance, neighbor_joining,
+};
+use crate::tolerances;
+use crate::validation::Validator;
+
+/// Run the `validate_neighbor_joining` experiment, recording checks into `v`.
+pub fn run(v: &mut crate::validation::Validator) {
+
+    // ── Test 1: 3-taxon ──
+    v.section("3-taxon (X,Y,Z)");
+    let labels_3: Vec<String> = vec!["X".into(), "Y".into(), "Z".into()];
+    #[rustfmt::skip]
+    let dist_3 = vec![
+        0.0, 0.2, 0.4,
+        0.2, 0.0, 0.4,
+        0.4, 0.4, 0.0,
+    ];
+    let r3 = neighbor_joining(&dist_3, &labels_3);
+    v.check_pass("3-taxon: 1 join", r3.n_joins == 1);
+    v.check_pass(
+        "3-taxon: X-Y sister pair",
+        r3.newick.contains("X:") && r3.newick.contains("Y:"),
+    );
+    v.check_pass("3-taxon: X branch ~0.1", r3.newick.contains("X:0.1"));
+    v.check_pass("3-taxon: Y branch ~0.1", r3.newick.contains("Y:0.1"));
+
+    // ── Test 2: 4-taxon ──
+    v.section("4-taxon (A,B,C,D)");
+    let labels_4: Vec<String> = vec!["A".into(), "B".into(), "C".into(), "D".into()];
+    #[rustfmt::skip]
+    let dist_4 = vec![
+        0.0, 0.3, 0.5, 0.6,
+        0.3, 0.0, 0.6, 0.5,
+        0.5, 0.6, 0.0, 0.3,
+        0.6, 0.5, 0.3, 0.0,
+    ];
+    let r4 = neighbor_joining(&dist_4, &labels_4);
+    v.check_pass("4-taxon: 2 joins", r4.n_joins == 2);
+    v.check_pass(
+        "4-taxon: all taxa present",
+        r4.newick.contains('A')
+            && r4.newick.contains('B')
+            && r4.newick.contains('C')
+            && r4.newick.contains('D'),
+    );
+    v.check_pass("4-taxon: valid Newick", r4.newick.ends_with(';'));
+
+    // ── Test 3: 5-taxon from JC distances ──
+    v.section("5-taxon from sequences");
+    let seqs: Vec<&[u8]> = vec![
+        b"ACGTACGTACGT",
+        b"ACGTACGTACTT",
+        b"ACTTACTTACTT",
+        b"TGCATGCATGCA",
+        b"TGCATGCATGCC",
+    ];
+    let labels_5: Vec<String> = (1..=5).map(|i| format!("S{i}")).collect();
+    let dm = distance_matrix(&seqs);
+    let r5 = neighbor_joining(&dm, &labels_5);
+    v.check_pass("5-taxon: 3 joins", r5.n_joins == 3);
+    v.check_pass("5-taxon: S1 and S2 close (should be sisters)", {
+        let nwk = &r5.newick;
+        nwk.contains("S1") && nwk.contains("S2")
+    });
+    v.check_pass(
+        "5-taxon: S4 and S5 close (should be sisters)",
+        r5.newick.contains("S4") && r5.newick.contains("S5"),
+    );
+
+    // ── Test 4: JC distance validation ──
+    v.section("JC distance checks");
+    let d_ident = jukes_cantor_distance(b"ACGTACGT", b"ACGTACGT");
+    v.check(
+        "JC: identical = 0",
+        d_ident,
+        0.0,
+        tolerances::ANALYTICAL_F64,
+    );
+    let d_small = jukes_cantor_distance(b"ACGTACGTACGT", b"ACGTACGTACTT");
+    v.check(
+        "JC: small diff matches Python",
+        d_small,
+        0.088_337_276_742_287_64,
+        tolerances::JC69_PROBABILITY,
+    );
+    let d_sat = jukes_cantor_distance(b"AAAA", b"CCCC");
+    v.check(
+        "JC: saturated = 10.0",
+        d_sat,
+        10.0,
+        tolerances::ANALYTICAL_F64,
+    );
+
+    // ── Test 5: Distance matrix symmetry ──
+    v.section("Distance matrix checks");
+    let n = seqs.len();
+    let symmetric = (0..n).all(|i| {
+        (0..n).all(|j| (dm[i * n + j] - dm[j * n + i]).abs() <= tolerances::ANALYTICAL_F64)
+    });
+    v.check_pass("Distance matrix symmetric", symmetric);
+    let diag_zero = (0..n).all(|i| dm[i * n + i].abs() <= tolerances::ANALYTICAL_F64);
+    v.check_pass("Distance matrix diagonal zero", diag_zero);
+
+    // ── Test 6: Determinism ──
+    v.section("Determinism");
+    let r5b = neighbor_joining(&dm, &labels_5);
+    v.check_pass("Deterministic", r5.newick == r5b.newick);
+
+}
+
+/// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
+pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) {
+    let mut v = crate::validation::Validator::silent("validate_neighbor_joining");
+    run(&mut v);
+    v.bridge_into(result);
+}
+
+/// Scenario registration for the UniBin registry.
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
+    meta: crate::validation::scenarios::registry::ScenarioMeta {
+        id: "neighbor_joining",
+        track: crate::validation::scenarios::registry::Track::Science,
+        tier: crate::validation::scenarios::registry::Tier::Rust,
+        provenance_crate: "validate_neighbor_joining",
+        provenance_date: "2026-05-20",
+        description: "Validation binary for Exp033: Neighbor-Joining tree construction",
+    },
+    run: |v, _ctx| run_as_scenario(v),
+};

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# run_three_tier_benchmark.sh — Unified three-tier benchmark runner
+# run_three_tier_benchmark.sh — Unified three-tier benchmark runner (V182+ UniBin)
 #
 # Executes Python baseline, Rust CPU, and Rust GPU benchmarks in sequence,
 # collecting JSON results into benchmarks/results/ and printing a merged
@@ -22,14 +22,16 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-BARRACUDA_DIR="$PROJECT_ROOT/barracuda"
 RESULTS_DIR="$PROJECT_ROOT/benchmarks/results"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
+
+readonly FEATURES="guidestone,gpu"
+readonly BIN_ARGS="--release -p wetspring-barracuda --features $FEATURES --bin wetspring --"
 
 mkdir -p "$RESULTS_DIR"
 
 echo "╔══════════════════════════════════════════════════════════════════════╗"
-echo "║  wetSpring Three-Tier Benchmark Runner                             ║"
+echo "║  wetSpring Three-Tier Benchmark Runner (UniBin V182+)              ║"
 echo "║  Timestamp: $TIMESTAMP                                    ║"
 echo "╚══════════════════════════════════════════════════════════════════════╝"
 
@@ -54,16 +56,16 @@ else
     echo "[SKIP] python3 not found"
 fi
 
-# ── Tier 2: Rust CPU (pipeline benchmark) ──────────────────────────────
+# ── Tier 2: Rust CPU (pipeline benchmark via UniBin) ──────────────────
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════"
-echo "  TIER 2: Rust CPU (BarraCUDA pipeline benchmark)"
+echo "  TIER 2: Rust CPU (wetspring benchmark --scenario pipeline)"
 echo "═══════════════════════════════════════════════════════════════════════"
 echo ""
 
 RUST_CPU_OK=0
 if command -v cargo &>/dev/null; then
-    (cd "$BARRACUDA_DIR" && cargo run --release --bin benchmark_pipeline 2>&1) && RUST_CPU_OK=1 || {
+    (cd "$PROJECT_ROOT" && cargo run $BIN_ARGS benchmark --scenario pipeline 2>&1) && RUST_CPU_OK=1 || {
         echo "[WARN] Rust CPU pipeline benchmark failed"
         RUST_CPU_OK=0
     }
@@ -71,17 +73,17 @@ else
     echo "[SKIP] cargo not found"
 fi
 
-# ── Tier 3: Rust GPU (CPU vs GPU benchmark) ────────────────────────────
+# ── Tier 3: Rust GPU (CPU vs GPU benchmark via UniBin) ────────────────
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════"
-echo "  TIER 3: Rust GPU (BarraCUDA CPU vs GPU benchmark)"
+echo "  TIER 3: Rust GPU (wetspring benchmark --scenario cpu_gpu)"
 echo "═══════════════════════════════════════════════════════════════════════"
 echo ""
 
 RUST_GPU_OK=0
 if command -v cargo &>/dev/null; then
     if command -v nvidia-smi &>/dev/null; then
-        (cd "$BARRACUDA_DIR" && cargo run --release --features gpu --bin benchmark_cpu_gpu 2>&1) && RUST_GPU_OK=1 || {
+        (cd "$PROJECT_ROOT" && cargo run $BIN_ARGS benchmark --scenario cpu_gpu 2>&1) && RUST_GPU_OK=1 || {
             echo "[WARN] Rust GPU benchmark failed (GPU may not be available)"
             RUST_GPU_OK=0
         }
@@ -99,28 +101,26 @@ echo "║                     THREE-TIER BENCHMARK SUMMARY                   ║
 echo "╠══════════════════════════════════════════════════════════════════════╣"
 
 if [ "$PYTHON_OK" -eq 1 ]; then
-    echo "║  ✓ Tier 1 (Python)   — completed                                  ║"
+    echo "║  Tier 1 (Python)   — completed                                    ║"
 else
-    echo "║  ✗ Tier 1 (Python)   — skipped/failed                             ║"
+    echo "║  Tier 1 (Python)   — skipped/failed                               ║"
 fi
 
 if [ "$RUST_CPU_OK" -eq 1 ]; then
-    echo "║  ✓ Tier 2 (Rust CPU) — completed                                  ║"
+    echo "║  Tier 2 (Rust CPU) — completed                                    ║"
 else
-    echo "║  ✗ Tier 2 (Rust CPU) — skipped/failed                             ║"
+    echo "║  Tier 2 (Rust CPU) — skipped/failed                               ║"
 fi
 
 if [ "$RUST_GPU_OK" -eq 1 ]; then
-    echo "║  ✓ Tier 3 (Rust GPU) — completed                                  ║"
+    echo "║  Tier 3 (Rust GPU) — completed                                    ║"
 else
-    echo "║  ✗ Tier 3 (Rust GPU) — skipped/failed                             ║"
+    echo "║  Tier 3 (Rust GPU) — skipped/failed                               ║"
 fi
 
 echo "╠══════════════════════════════════════════════════════════════════════╣"
 echo "║  Results directory: benchmarks/results/                            ║"
 
-# List generated JSON files
-echo "║  JSON files:                                                       ║"
 for f in "$RESULTS_DIR"/*.json; do
     [ -f "$f" ] || continue
     fname=$(basename "$f")
@@ -129,12 +129,8 @@ done
 
 echo "╚══════════════════════════════════════════════════════════════════════╝"
 
-# ── Merge into comparison table (if Python available) ──────────────────
 if [ "$PYTHON_OK" -eq 1 ] || [ "$RUST_GPU_OK" -eq 1 ]; then
     echo ""
     echo "To generate a merged comparison table, see:"
     echo "  benchmarks/PROTOCOL.md"
-    echo ""
-    echo "Individual JSON results can be compared manually or via:"
-    echo "  python3 -c \"import json, glob; [print(json.dumps(json.load(open(f)), indent=2)) for f in sorted(glob.glob('$RESULTS_DIR/*.json'))]\""
 fi

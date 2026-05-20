@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Release-mode validation: runs core `validate_*` binaries under `--release` with
-# `--features gpu` to catch FMA/LTO float drift vs debug builds (groundSpring V120 pattern).
+# Release-mode validation: runs core scenarios under `--release` with
+# `--features guidestone,gpu` to catch FMA/LTO float drift vs debug builds
+# (groundSpring V120 pattern). Uses the wetspring UniBin (V182+).
 # Invoke from anywhere; uses the wetSpring workspace root as CWD.
 
 set -euo pipefail
@@ -10,28 +11,31 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-readonly -a VALIDATORS=(
-  validate_diversity
-  validate_fastq
-  validate_alignment
-  validate_hmm
-  validate_gillespie
-  validate_cooperation
-  validate_barracuda_cpu
+readonly -a SCENARIOS=(
+  diversity
+  fastq
+  alignment
+  hmm
+  gillespie
+  cooperation
+  barracuda_cpu
 )
+
+readonly FEATURES="guidestone,gpu"
+readonly BIN_ARGS="--release -p wetspring-barracuda --features $FEATURES --bin wetspring --"
 
 declare -a RESULTS=()
 declare -a ELAPSED=()
 
-echo "Running ${#VALIDATORS[@]} release validators (package wetspring-barracuda, --features gpu)..."
+echo "Running ${#SCENARIOS[@]} release scenarios (wetspring UniBin, --features $FEATURES)..."
 echo
 
 failed=0
-for bin in "${VALIDATORS[@]}"; do
-  printf -- '── %s ──\n' "$bin"
+for scenario in "${SCENARIOS[@]}"; do
+  printf -- '── %s ──\n' "$scenario"
   start=$(date +%s.%N)
   set +e
-  cargo run --release -p wetspring-barracuda --bin "$bin" --features gpu
+  cargo run $BIN_ARGS validate --scenario "$scenario"
   code=$?
   set -e
   end=$(date +%s.%N)
@@ -47,16 +51,16 @@ for bin in "${VALIDATORS[@]}"; do
 done
 
 echo "═══════════════════════════════════════════════════════════"
-printf '%-28s %8s %10s\n' "Binary" "Status" "Time(s)"
+printf '%-28s %8s %10s\n' "Scenario" "Status" "Time(s)"
 echo "───────────────────────────────────────────────────────────"
-for i in "${!VALIDATORS[@]}"; do
-  printf '%-28s %8s %10s\n' "${VALIDATORS[$i]}" "${RESULTS[$i]}" "${ELAPSED[$i]}"
+for i in "${!SCENARIOS[@]}"; do
+  printf '%-28s %8s %10s\n' "${SCENARIOS[$i]}" "${RESULTS[$i]}" "${ELAPSED[$i]}"
 done
 echo "═══════════════════════════════════════════════════════════"
 
 if [[ "$failed" -ne 0 ]]; then
-  echo "RESULT: FAIL (one or more validators did not exit 0)"
+  echo "RESULT: FAIL (one or more scenarios did not exit 0)"
   exit 1
 fi
-echo "RESULT: PASS (all ${#VALIDATORS[@]} validators passed)"
+echo "RESULT: PASS (all ${#SCENARIOS[@]} scenarios passed)"
 exit 0

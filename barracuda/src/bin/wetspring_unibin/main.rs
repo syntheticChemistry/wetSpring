@@ -49,6 +49,11 @@ fn main() {
             list,
             format,
         ),
+        cli::Commands::Benchmark {
+            ref scenario,
+            list,
+            format,
+        } => cmd_benchmark(scenario.as_deref(), list, format),
         cli::Commands::Serve => cmd_serve(),
         cli::Commands::Status { format } => cmd_status(format),
         cli::Commands::Version => cmd_version(),
@@ -211,8 +216,87 @@ fn cmd_serve() {
     server.run();
 }
 
+fn cmd_benchmark(
+    scenario_id: Option<&str>,
+    list: bool,
+    format: cli::OutputFormat,
+) {
+    let registry = scenarios::build_benchmark_registry();
+    let json_mode = matches!(format, cli::OutputFormat::Json);
+
+    if list {
+        if json_mode {
+            let items: Vec<serde_json::Value> = registry
+                .all()
+                .iter()
+                .map(|b| {
+                    serde_json::json!({
+                        "id": b.meta.id,
+                        "track": format!("{}", b.meta.track),
+                        "tier": format!("{}", b.meta.tier),
+                        "description": b.meta.description,
+                    })
+                })
+                .collect();
+            if let Ok(json) = serde_json::to_string_pretty(&items) {
+                println!("{json}");
+            }
+        } else {
+            println!(
+                "  {:30} {:15} {:6} {}",
+                "ID", "TRACK", "TIER", "DESCRIPTION"
+            );
+            println!("  {}", "─".repeat(80));
+            for b in registry.all() {
+                println!(
+                    "  {:30} {:15} {:6} {}",
+                    b.meta.id, b.meta.track, b.meta.tier, b.meta.description
+                );
+            }
+        }
+        return;
+    }
+
+    let mut v = ValidationResult::new("wetSpring Benchmark Suite");
+    if !json_mode {
+        ValidationResult::print_banner("wetSpring Benchmark Suite");
+    }
+    let mut ctx = CompositionContext::from_live_discovery_with_fallback();
+    let mut ran = 0_u32;
+
+    for b in registry.all() {
+        if let Some(id) = scenario_id {
+            if b.meta.id != id {
+                continue;
+            }
+        }
+        v.section(&format!("Benchmark: {} [{}]", b.meta.id, b.meta.tier));
+        (b.run)(&mut v, &mut ctx);
+        ran += 1;
+    }
+
+    if ran == 0 {
+        if json_mode {
+            println!(r#"{{"error": "No benchmarks matched the filter."}}"#);
+        } else {
+            eprintln!("No benchmarks matched the filter.");
+        }
+        std::process::exit(1);
+    }
+
+    if json_mode {
+        if let Ok(json) = v.to_json() {
+            println!("{json}");
+        }
+    } else {
+        v.finish();
+    }
+    std::process::exit(v.exit_code());
+}
+
 fn cmd_status(format: cli::OutputFormat) {
     let registry = scenarios::build_registry();
+    let bench_registry = scenarios::build_benchmark_registry();
     let tier1 = registry.filter_by_tier(Tier::Rust).count();
     let tier2 = registry.filter_by_tier(Tier::Live).count();
     let _ctx = CompositionContext::from_live_discovery_with_fallback();
@@ -220,12 +304,13 @@ fn cmd_status(format: cli::OutputFormat) {
     match format {
         cli::OutputFormat::Json => {
             let status = serde_json::json!({
-                "binary": "wetspring_unibin",
+                "binary": "wetspring",
                 "version": env!("CARGO_PKG_VERSION"),
                 "domain": wetspring_barracuda::PRIMAL_DOMAIN,
                 "niche": wetspring_barracuda::niche::NICHE_DESCRIPTION,
                 "guidestone_level": wetspring_barracuda::niche::GUIDESTONE_READINESS,
                 "scenarios": registry.len(),
+                "benchmarks": bench_registry.len(),
                 "tier1_rust": tier1,
                 "tier2_live": tier2,
             });
@@ -246,6 +331,7 @@ fn cmd_status(format: cli::OutputFormat) {
                 wetspring_barracuda::niche::GUIDESTONE_READINESS
             );
             println!("  scenarios:   {}", registry.len());
+            println!("  benchmarks:  {}", bench_registry.len());
             println!("  tier 1 (rust): {tier1}");
             println!("  tier 2 (live): {tier2}");
             println!("  primals:     (live discovery attempted)");
@@ -254,5 +340,5 @@ fn cmd_status(format: cli::OutputFormat) {
 }
 
 fn cmd_version() {
-    println!("wetspring_unibin {}", env!("CARGO_PKG_VERSION"));
+    println!("wetspring {}", env!("CARGO_PKG_VERSION"));
 }
