@@ -7,7 +7,7 @@ refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 Last updated: 2026-05-20 (V182 — UniBin consolidation. 345 scenarios, build 25min → 1m44s.
 Barrick SEALED, Tenaillon batch 0 COMPLETE. PG-02/PG-04 remain deployment-only.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests, 52 consumed
-capabilities, registry 452.)
+capabilities, registry 445.)
 
 ---
 
@@ -579,7 +579,7 @@ declared, capability discovery wired, `BARRACUDA` constant added).
 **New infrastructure wired V158:**
 - `ipc/skunkbat.rs` — audit event emitter (`audit.event`, `audit.forward`,
   graceful degradation, 12 tests)
-- CI cross-sync threshold updated (was 451; 452 reflects Wave 20 `primal.list` addition)
+- CI cross-sync threshold updated (was 451→452→445; 445 reflects Wave 36 recount with test fixtures excluded)
 - `discover_by_capability()` + `capability_to_primal()` in `ipc/discover.rs`
 - `BARRACUDA` added to `primal_names.rs`
 - `SKUNKBAT` re-exported from `ipc/primal_names.rs`

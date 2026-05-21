@@ -3,7 +3,7 @@
 > **V174 note (May 17, 2026):** This guide was written at V128. Current
 > metrics: **370** binaries, **1,962** tests, **150+** barraCuda primitives
 > (v0.4.0), **42** niche capabilities, **51** consumed capabilities (33 v0.9.17
-> canonical + 15 legacy + 3 Wave 17/20, registry 452). **guideStone Level 5**
+> canonical + 15 legacy + 3 Wave 17/20, registry 445). **guideStone Level 5**
 > (primal proof). Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved:
 > UniBin `serve` live, display-name hygiene, `dense_to_csr` extracted.
 > Clippy pedantic+nursery zero warnings (both crates). Live NUCLEUS 30/31 pass.

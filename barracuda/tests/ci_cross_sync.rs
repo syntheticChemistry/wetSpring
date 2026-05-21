@@ -6,10 +6,10 @@
     reason = "integration test: CI cross-sync validations use unwrap for diagnostic clarity"
 )]
 //! CI Cross-Sync: validates wetSpring's local capability surface against the
-//! primalSpring canonical registry (`config/capability_registry.toml`, 452 methods).
+//! primalSpring canonical registry (`config/capability_registry.toml`, 445 methods).
 //!
 //! Per primalSpring Wave 20 directive: "CI cross-sync — validate your local
-//! capability methods against primalSpring canonical 452. Zero drift is the target."
+//! capability methods against primalSpring canonical 445. Zero drift is the target."
 //!
 //! Seven checks:
 //! 1. Local capability_registry.toml methods == dispatch table methods
@@ -167,7 +167,7 @@ fn consumed_capabilities_use_recognized_domains() {
     }
 }
 
-/// Cross-check: canonical primalSpring registry file exists and contains 452+
+/// Cross-check: canonical primalSpring registry file exists and contains 445+
 /// methods. This validates our CI can access the canonical source of truth.
 #[test]
 fn canonical_registry_accessible_and_nontrivial() {

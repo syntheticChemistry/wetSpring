@@ -10,7 +10,7 @@ binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 
 Tenaillon 2016 batch 0 COMPLETE (5/5 clones, 974 variants). 386 experiments indexed
 (385 completed + 1 in progress), 5,967+ checks, **1,962** lib tests
 **+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers.
-52 consumed capabilities (registry 452). 2 gaps active (WS-9 L3, WS-11), 1 resolved (WS-10).)
+52 consumed capabilities (registry 445). 2 gaps active (WS-9 L3, WS-11), 1 resolved (WS-10).)
 
 ---
 
@@ -668,7 +668,7 @@ primal discovery (env → XDG → BIOMEOS_SOCKET_DIR → temp), forge lint parit
 false-positives resolved (all `panic!()` and `unwrap()` confirmed test-only).
 31 IPC tests pass, 19 files changed (342+, 130−).
 
-**Totals (V171):** 381 experiments completed at this point, 367 binaries (345 barracuda + 22 forge), 5,900+ checks. Live composition health (runtime probing). Wave 20 schema standard (count, registry 452). 50 consumed capabilities.
+**Totals (V171):** 381 experiments completed at this point, 367 binaries (345 barracuda + 22 forge), 5,900+ checks. Live composition health (runtime probing). Wave 20 schema standard (count, registry 445). 50 consumed capabilities.
 
 ### V136 — Deep debt resolution + ecosystem absorption
 
@@ -697,7 +697,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Binary: `validate_colonization_resistance`.
 Joint with healthSpring exp097/exp098.
 
-**Totals (V182): 386 experiments indexed, 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition), 5,967+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 52 consumed (registry 452). Clippy zero workspace. Live NUCLEUS guideStone 38/38 pass. 2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10). 2 PG open (deployment-only), 20 resolved/closed.**
+**Totals (V182): 386 experiments indexed, 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition), 5,967+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 52 consumed (registry 445). Clippy zero workspace. Live NUCLEUS guideStone 38/38 pass. 2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10). 2 PG open (deployment-only), 20 resolved/closed.**
 
 ### Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic (V179 — DONE, 10/10)
 
@@ -708,7 +708,7 @@ braid for lithoSpore. Scenario: `breseq_barrick_2009` (`--features ipc`).
 Environment: `micromamba breseq-env` on 4TB NVMe. REL1164M: 579 mutations, REL8593M:
 1108 mutations. Mutation accumulation trend confirmed. Braid exported.
 
-**Totals (V182): 386 experiments indexed (385 completed + 1 in progress), 345 UniBin scenarios, 5,967+ checks. 52 consumed capabilities (registry 452). Barrick 2009 SEALED, Tenaillon batch 0 COMPLETE. 2 WS gaps active, 2 PG open (deployment-only), 20 resolved/closed.**
+**Totals (V182): 386 experiments indexed (385 completed + 1 in progress), 345 UniBin scenarios, 5,967+ checks. 52 consumed capabilities (registry 445). Barrick 2009 SEALED, Tenaillon batch 0 COMPLETE. 2 WS gaps active, 2 PG open (deployment-only), 20 resolved/closed.**
 
 ---
 

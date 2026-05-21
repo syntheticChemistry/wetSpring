@@ -4,7 +4,7 @@
 # Registry cross-sync test — wetSpring
 #
 # Validates that every method in wetSpring's capability_registry.toml
-# exists in primalSpring's canonical 452-method registry. Catches drift
+# exists in primalSpring's canonical 445-method registry. Catches drift
 # where wetSpring registers a method that the ecosystem doesn't know about.
 #
 # Also validates that every dotted method string used in Rust source

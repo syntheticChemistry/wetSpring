@@ -130,7 +130,7 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 ///
 /// barraCuda surface aligned to primalSpring v0.9.17 canonical (33 methods).
 /// Wave 17: `primal.announce` + `signal.dispatch` added.
-/// Wave 20: registry synced to 452 (`primal.list` added, consumed for
+/// Wave 20→36: registry synced to 445 (Wave 36 recount with test fixtures excluded,
 /// composition health probing). `count` field in `capability.list` response.
 /// `primal.announce` fully adopted.
 /// Wave 20 PM: trio consumed names aligned to canonical registry —

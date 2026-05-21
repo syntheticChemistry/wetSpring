@@ -4,13 +4,13 @@
      experiment counts (384 indexed) and test counts (1,962) are in the root
      README.md. This file preserves the V126 per-paper detail. -->
 <!-- V174 note (May 17, 2026): Exp377-379 hormesis chain (57/57 PASS). Deep
-     debt resolved. 51 consumed capabilities (registry 452). Clippy zero
+     debt resolved. 51 consumed capabilities (registry 445). Clippy zero
      workspace. Live NUCLEUS guideStone 30/31 pass. LTEE GuideStone Queue —
      10 papers (B1-B8, E1, E5). B7 TIER 2 COMPLETE. 9 queued. 384/384 experiments. -->
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: May 17, 2026 (V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved. 51 consumed (registry 452). Clippy zero workspace. 384/384 experiments, 5,957+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Last Updated**: May 17, 2026 (V174 — Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved. 51 consumed (registry 445). Clippy zero workspace. 384/384 experiments, 5,957+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

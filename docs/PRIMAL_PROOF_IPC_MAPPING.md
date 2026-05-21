@@ -2,7 +2,7 @@
 
 # wetSpring — Primal Proof IPC Mapping
 
-**Last Updated:** May 17, 2026 (V174 — Exp377–379 hormesis chain. Deep debt resolved. Live composition health. Registry 452, 51 consumed.)
+**Last Updated:** May 17, 2026 (V174 — Exp377–379 hormesis chain. Deep debt resolved. Live composition health. Registry 445, 51 consumed.)
 
 When `--features primal-proof` is enabled, wetSpring routes cross-primal calls
 through IPC rather than linking primal libraries. This document maps each domain

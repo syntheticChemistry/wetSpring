@@ -5,7 +5,7 @@
 > coralReef v0.1.0 in niche. **800+** WGSL shaders, **150+** primitives
 > consumed, **zero** local WGSL (fully lean). **guideStone Level 5** (primal
 > proof). Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved.
-> 51 consumed capabilities (registry 452). Clippy zero workspace. Live
+> 51 consumed capabilities (registry 445). Clippy zero workspace. Live
 > NUCLEUS 30/31 pass. **2** primal gaps open (deployment-only, **20**
 > resolved/closed). 384/384 experiments. See `docs/PRIMAL_GAPS.md`.
 

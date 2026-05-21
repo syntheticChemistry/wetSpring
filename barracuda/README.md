@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 20, 2026 (V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 SEALED (7/7). Tenaillon batch 0 COMPLETE (5/5). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 52 consumed capabilities (registry 452). 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers.)
+**Updated:** May 20, 2026 (V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 SEALED (7/7). Tenaillon batch 0 COMPLETE (5/5). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 52 consumed capabilities (registry 445). 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers.)
 
 ---
 

@@ -2,7 +2,7 @@
 
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: May 20, 2026 (V182 — UniBin consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build 25min → 1m44s. Barrick SEALED, Tenaillon batch 0 COMPLETE. 52 consumed (registry 452). 1,962 lib tests, 5,967+ checks. 2 PG gaps open (deployment-only), 20 resolved/closed)
+**Last Updated**: May 20, 2026 (V182 — UniBin consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build 25min → 1m44s. Barrick SEALED, Tenaillon batch 0 COMPLETE. 52 consumed (registry 445). 1,962 lib tests, 5,967+ checks. 2 PG gaps open (deployment-only), 20 resolved/closed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

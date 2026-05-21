@@ -4,7 +4,7 @@
 
 **Date:** May 17, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V177 — Wave 20 PM lithoSpore audit absorption. Stability tiers. Trio transaction semantics. Exp381: Barrick 2009 breseq pipeline (first real-data Nest Atomic composition — mutation accumulation confirmed, ferment braid exported). Gen4: compute-aware scheduling documented. 43 niche, 52 consumed (registry 452). 252 lib tests pass. 385 experiments (384 done + 1 in progress). **3** gaps open (deployment + cross-tier parity), 20 resolved/closed.
+**Status:** V177 — Wave 20 PM lithoSpore audit absorption. Stability tiers. Trio transaction semantics. Exp381: Barrick 2009 breseq pipeline (first real-data Nest Atomic composition — mutation accumulation confirmed, ferment braid exported). Gen4: compute-aware scheduling documented. 43 niche, 52 consumed (registry 445). 252 lib tests pass. 385 experiments (384 done + 1 in progress). **3** gaps open (deployment + cross-tier parity), 20 resolved/closed.
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).
