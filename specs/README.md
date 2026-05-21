@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: May 16, 2026
-**Status**: V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build 25min → 1m44s. Barrick SEALED, Tenaillon batch 0 COMPLETE. **guideStone Level 5** (primal proof). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 52 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 PG gaps open (deployment-only, 20 resolved/closed). Registry synced to 452 methods. 386 experiments (385 done + 1 in progress), 5,967+ checks.
+**Status**: V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build 25min → 1m44s. Barrick SEALED, Tenaillon batch 0 COMPLETE. **guideStone Level 5** (primal proof). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 52 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 PG gaps open (deployment-only, 20 resolved/closed). Registry synced to 445 methods. 386 experiments (385 done + 1 in progress), 5,967+ checks.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
