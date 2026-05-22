@@ -53,18 +53,8 @@ impl DarkForestConfig {
 
         let family_id = std::env::var("FAMILY_ID").unwrap_or_else(|_| "default".into());
 
-        let neural_api_socket = {
-            let runtime = std::env::var("XDG_RUNTIME_DIR")
-                .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
-            let path = std::path::PathBuf::from(runtime)
-                .join("biomeos")
-                .join(format!("neural-api-{family_id}.sock"));
-            if path.exists() {
-                Some(path.to_string_lossy().into_owned())
-            } else {
-                None
-            }
-        };
+        let neural_api_socket = crate::ipc::provenance::neural_api_socket()
+            .map(|p| p.to_string_lossy().into_owned());
 
         Self {
             enabled,

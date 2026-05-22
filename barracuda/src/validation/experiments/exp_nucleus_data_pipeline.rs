@@ -351,7 +351,7 @@ pub fn run(v: &mut crate::validation::Validator) {
         println!("  1. biomeos nucleus start --mode node --node-id eastgate");
     }
     if !has_wetspring {
-        println!("  2. cargo run --release --bin wetspring_server");
+        println!("  2. wetspring serve");
     }
     println!(
         "  3. WETSPRING_DATA_PROVIDER=nestgate cargo run --release --bin validate_nucleus_data_pipeline"

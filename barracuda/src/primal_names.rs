@@ -96,4 +96,18 @@ pub const LEGACY_SELF_METHOD_PREFIX: &str = "wetspring.";
 pub const VAULT_KEY_CONTEXT: &str = "wetspring-vault-encryption-v1";
 
 /// Default niche deploy graph path (relative to repo / packaging layout).
+///
+/// The *deploy* graph describes the base biomeOS composition for wetSpring
+/// (primals, gates, IPC wiring). See also [`NUCLEUS_GRAPH_REL_PATH`] for
+/// the science-specific NUCLEUS composition.
 pub const DEPLOY_GRAPH_REL_PATH: &str = "graphs/wetspring_deploy.toml";
+
+/// NUCLEUS science composition graph path (relative to repo / packaging layout).
+///
+/// The *nucleus* graph extends the deploy graph with science-specific
+/// services (neural API, facade, provenance trio). Used by the facade,
+/// IPC handlers, and reproduction manifests.
+pub const NUCLEUS_GRAPH_REL_PATH: &str = "graphs/wetspring_science_nucleus.toml";
+
+/// NUCLEUS graph filename (without directory prefix).
+pub const NUCLEUS_GRAPH_NAME: &str = "wetspring_science_nucleus.toml";

@@ -232,7 +232,7 @@ requirement for scientific and regulatory credibility.
 ### Reproduction
 
 ```bash
-cargo run --features gpu --release --bin validate_real_bloom_gpu
+wetspring validate --scenario real_bloom_gpu
 ```
 
 ---
@@ -294,7 +294,7 @@ position; it is a practical requirement for regulatory credibility.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_bloom_sentinel
+wetspring validate --scenario npu_bloom_sentinel
 ```
 
 ---
@@ -327,5 +327,5 @@ provides the expected 2–4 window early detection advantage.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_temporal_esn_bloom
+wetspring validate --scenario temporal_esn_bloom
 ```

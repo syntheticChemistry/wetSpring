@@ -31,9 +31,9 @@ gpu = ["barracuda-lib", "barracuda/gpu", "barracuda/domain-esn", "barracuda/doma
 # Enable with `cargo build --features npu`.
 # Provides runtime discovery, capability-based dispatch, int8 inference.
 npu = ["dep:akida-driver"]
-# JSON model import (2 bins: validate_pfas_decision_tree, benchmark_three_tier).
+# JSON model import (pfas_decision_tree, benchmark_three_tier scenarios).
 json = ["dep:serde", "dep:serde_json"]
-# IPC server for biomeOS science primal (wetspring-server binary).
+# IPC server for biomeOS science primal (wetspring serve subcommand).
 # Adds JSON-RPC 2.0 over Unix socket, Songbird registration, Neural API metrics.
 # BLAKE3 for data ingestion content hashing (data.fetch, vault handlers).
 ipc = ["json", "dep:tracing-subscriber", "dep:blake3"]

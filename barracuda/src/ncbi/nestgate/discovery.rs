@@ -92,10 +92,13 @@ fn resolve_primal_socket(
     }
 }
 
-/// Standalone discovery when the `ipc` feature is not enabled.
+/// Standalone socket discovery using `path.exists()` (no connect-probe).
+///
+/// Used when the `ipc` feature is not enabled so `ipc::discover` is unavailable.
+/// Also consumed by `visualization::ipc_push` for the same fallback path.
 /// Uses `FAMILY_ID` / `BIOMEOS_FAMILY_ID` for multi-instance parity with `ipc::discover`.
 #[cfg(not(feature = "ipc"))]
-fn discover_standalone(env_var: &str, primal: &str) -> Option<PathBuf> {
+pub(crate) fn discover_standalone(env_var: &str, primal: &str) -> Option<PathBuf> {
     if let Ok(path) = std::env::var(env_var) {
         let p = PathBuf::from(path);
         if p.exists() {

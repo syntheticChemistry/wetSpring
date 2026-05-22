@@ -106,6 +106,23 @@ else:
 - Color palette: `#2ecc71` (pass/ok), `#e74c3c` (fail), `#3498db` (info)
 - Always include chart titles with key numbers
 
+## UniBin Workflow (V182+)
+
+All validation and benchmark binaries are consolidated into a single `wetspring`
+UniBin. Notebooks should reference the new commands:
+
+```bash
+# Old (pre-V182):
+cargo run --bin validate_gonzales_ic50_s79
+cargo run --release --bin benchmark_23_domain_timing
+
+# New (V182+):
+wetspring validate --scenario gonzales_ic50_s79
+wetspring validate --scenario 23_domain_timing
+```
+
+Use `wetspring validate --list` to see all available scenarios.
+
 ## Adapting for Your Spring
 
 1. Copy this directory structure

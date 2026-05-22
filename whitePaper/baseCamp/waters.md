@@ -282,7 +282,7 @@ parameter landscape.
 ### Reproduction
 
 ```bash
-cargo run --features gpu --release --bin validate_vibrio_qs_landscape
+wetspring validate --scenario vibrio_qs_landscape
 ```
 
 ---
@@ -370,7 +370,7 @@ data would be impossible to audit.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_qs_classifier
+wetspring validate --scenario npu_qs_classifier
 ```
 
 ---
@@ -414,5 +414,5 @@ mutations that reduce genome size below the genus minimum.
 ### Reproduction
 
 ```bash
-cargo run --release --features gpu --bin validate_ncbi_vibrio_qs
+wetspring validate --scenario ncbi_vibrio_qs
 ```

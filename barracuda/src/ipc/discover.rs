@@ -173,35 +173,35 @@ pub fn discover_skunkbat() -> Option<PathBuf> {
 
 /// Discover a primal by the **capability** it provides.
 ///
-/// Maps a capability domain to the primal that serves it, then resolves
-/// the socket via the standard name-based cascade. This is the
-/// capability-oriented abstraction (PG-03 RESOLVED): `Songbird`
-/// `capability.resolve` is wired as primary, with static table
-/// fallback — callers never change.
+/// Resolution strategy (Songbird-first, static-table fallback):
+///
+/// 1. **With `ipc` feature**: attempts live `capability.resolve` RPC to
+///    Songbird first (Wave 199+). On any failure (Songbird absent, RPC
+///    error, domain unknown) falls back to the compile-time
+///    [`capability_to_primal`] bootstrap table.
+/// 2. **Without `ipc` feature**: uses only the static bootstrap table —
+///    no network I/O, no Songbird dependency.
 ///
 /// Returns `None` if the capability domain is unrecognized or the
 /// providing primal has no reachable socket.
 ///
-/// # Known mappings
+/// # Known bootstrap mappings
 ///
 /// | Capability domain | Provider primal |
 /// |-------------------|-----------------|
 /// | `"tensor"`, `"stats"`, `"compute"`, `"spectral"`, `"linalg"` | barraCuda |
-/// | `"crypto"`, `"security"` | `BearDog` |
+/// | `"crypto"`, `"security"` | bearDog |
 /// | `"discovery"` | Songbird |
-/// | `"storage"` | `NestGate` |
+/// | `"storage"` | NestGate |
 /// | `"dag"` | rhizoCrypt |
 /// | `"spine"`, `"entry"` | loamSpine |
 /// | `"braid"`, `"provenance"` | sweetGrass |
 /// | `"render"`, `"shader"` | petalTongue |
 /// | `"ai"`, `"inference"` | Squirrel |
 /// | `"audit"` | skunkBat |
-///
-/// When Songbird is available, attempts `capability.resolve` RPC first
-/// (Wave 199+ live resolution). Falls back to the static
-/// [`capability_to_primal`] table when Songbird is absent or returns an error.
 #[must_use]
 pub fn discover_by_capability(capability_domain: &str) -> Option<PathBuf> {
+    #[cfg(feature = "ipc")]
     if let Some(socket) = resolve_via_songbird(capability_domain) {
         return Some(socket);
     }
@@ -214,7 +214,8 @@ pub fn discover_by_capability(capability_domain: &str) -> Option<PathBuf> {
 /// Returns `Some(socket_path)` if Songbird is running and resolves the
 /// domain to a live primal socket. Returns `None` on any failure
 /// (Songbird absent, RPC error, domain not found) — callers fall back
-/// to the static table.
+/// to the static bootstrap table.
+#[cfg(feature = "ipc")]
 fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     use std::io::{BufRead, BufReader, Write};
     use std::os::unix::net::UnixStream;
@@ -249,7 +250,11 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     if socket_is_alive(&path) { Some(path) } else { None }
 }
 
-/// Map a capability domain prefix to the canonical primal name that serves it.
+/// Bootstrap table: map a capability domain prefix to the canonical primal name.
+///
+/// This is the compile-time fallback used when Songbird is unavailable or
+/// when the `ipc` feature is disabled. When Songbird is live,
+/// [`discover_by_capability`] prefers the dynamic `capability.resolve` RPC.
 ///
 /// Returns `None` for unrecognized domains.
 #[must_use]
@@ -590,6 +595,7 @@ mod tests {
         assert!(discover_by_capability("nonexistent").is_none());
     }
 
+    #[cfg(feature = "ipc")]
     #[test]
     fn resolve_via_songbird_returns_none_when_absent() {
         assert!(resolve_via_songbird("tensor").is_none());

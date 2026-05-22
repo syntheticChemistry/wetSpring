@@ -55,8 +55,8 @@ meaningless at scale. The dispatch architecture is validated for NUCLEUS.
 ```
 Step 1: biomeos nucleus start --mode tower --node-id eastgate
 Step 2: biomeos nucleus start --mode node --node-id eastgate
-Step 3: cargo run --release --bin wetspring_server
-Step 4: cargo run --release --bin validate_nucleus_data_pipeline
+Step 3: wetspring serve
+Step 4: wetspring validate --scenario nucleus_data_pipeline
 Step 5: (after 10G cables) biomeos nucleus start --mode full
 ```
 

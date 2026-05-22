@@ -48,7 +48,7 @@ pub use vault_ipc::{handle_vault_consent_verify, handle_vault_retrieve, handle_v
 
 use serde_json::{Value, json};
 
-const DEPLOY_GRAPH_NAME: &str = "wetspring_science_nucleus.toml";
+const DEPLOY_GRAPH_NAME: &str = crate::primal_names::NUCLEUS_GRAPH_NAME;
 
 use crate::ipc::protocol::RpcError;
 

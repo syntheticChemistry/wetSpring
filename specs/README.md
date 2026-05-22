@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: May 16, 2026
-**Status**: V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build 25min → 1m44s. Barrick SEALED, Tenaillon batch 0 COMPLETE. **guideStone Level 5** (primal proof). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 42 niche capabilities, 52 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 PG gaps open (deployment-only, 20 resolved/closed). Registry synced to 445 methods. 386 experiments (385 done + 1 in progress), 5,967+ checks.
+**Last Updated**: May 22, 2026
+**Status**: V183 — Deep debt evolution complete. 345 scenarios (318 validation + 23 benchmark + 4 composition). 6 oversize files refactored. Discovery evolution (Songbird-first). 3 new Python baselines (55 total). 8 notebooks UniBin-migrated. **guideStone Level 5** (primal proof). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 43 niche capabilities, 52 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 PG gaps open (deployment-only, 20 resolved/closed). Registry synced to 445 methods. 386 experiments (385 done + 1 in progress), 5,967+ checks.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---
@@ -27,7 +27,7 @@
 | Full 5-tier chain | 499/499 PASS — Paper math → CPU → GPU → Streaming → metalForge (Exp298) |
 | Finite-size scaling | 14 checks — W_c = 16.26, disorder-averaged L=6–12 (Exp150) |
 | Correlated disorder | 8 checks — biofilm clustering shifts W_c > 28 (Exp151) |
-| Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,962 lib + 97 integration + 18 IPC roundtrip = 2,077 tests, 1 UniBin (337 scenarios + 23 benchmarks) |
+| Rust modules | 46 CPU + 44 GPU + 1 IPC + 1 vault + 1 visualization, 1,962 lib + 97 integration + 18 IPC roundtrip = 2,077 tests, 1 UniBin (345 scenarios) |
 | Composition validation | Exp400: 136/136 proto-nucleate, Exp401: IPC parity, Exp402: niche parity, Exp403: primal parity (Tier 2), **wetspring_guidestone: Level 5 (NUCLEUS 38/38 pass, 4 skip, bare 16/16, v0.9.17 manifest)** |
 | Write phase | 0 local WGSL (fully lean) |
 | Dependencies | 2 runtime (flate2 + bytemuck), everything else sovereign |

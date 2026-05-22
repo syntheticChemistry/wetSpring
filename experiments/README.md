@@ -285,10 +285,17 @@ Each validation scenario uses the `Validator` harness with provenance tables,
 hardcoded expected values from the baseline experiments, and tolerance
 thresholds from `src/tolerances.rs`.
 
-> **V182 note:** All binaries below were consolidated into the `wetspring` UniBin.
-> Run via `wetspring validate --scenario <id>` where `<id>` strips the `validate_`
-> prefix (e.g., `validate_diversity` → `wetspring validate --scenario diversity`).
-> The table preserves historical binary names for provenance.
+> **V182+ (UniBin):** All binaries below are consolidated into the `wetspring` UniBin.
+> The **Command** column shows historical invocations (preserved for provenance).
+> The current invocation for any row is:
+>
+> ```bash
+> wetspring validate --scenario <id>
+> ```
+>
+> where `<id>` strips the `validate_` or `benchmark_` prefix from the Binary column
+> (e.g., `validate_diversity` → `diversity`, `benchmark_pipeline` → `pipeline`).
+> Use `wetspring validate --list` to see all 345 scenario IDs.
 
 | Binary | Experiment | Checks | Command |
 |--------|------------|--------|---------|
@@ -434,9 +441,10 @@ thresholds from `src/tolerances.rs`.
 | `validate_cross_spring_evolution_s87` | 304 | 61 | `cargo run --release --features gpu --bin validate_cross_spring_evolution_s87` |
 | `validate_r_industry_parity` | 335 | 53 | `cargo run --release --bin validate_r_industry_parity` |
 
-**Total validation checks**: 5,900+
+**Total validation checks**: 5,967+
 **Rust tests**: **1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures)
-**Binaries**: **367** workspace total (**345** barracuda + **22** forge)
+**UniBin scenarios**: **345** (318 validation + 23 benchmark + 4 composition)
+**Python baselines**: **55** scripts in `scripts/`
 **barraCuda primitives**: 150+ consumed (standalone v0.4.0, wgpu 28, Fp64Strategy, fused ops)
 **Papers**: 63 (reproduced across 6 tracks)
 **Local WGSL shaders**: 0 (all absorbed)

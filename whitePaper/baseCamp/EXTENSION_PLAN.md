@@ -4,7 +4,7 @@
 
 **Date:** May 17, 2026 (V174 update)
 **Author:** wetSpring V182 (ecoPrimals)
-**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (337 scenarios, 23 benchmarks), 91.20% coverage. **V182:** UniBin consolidation (349 binaries → 1, build 25min → 1m44s). Barrick 2009 SEALED. Tenaillon batch 0 COMPLETE. 52 consumed capabilities (registry 445). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 PG gaps open (deployment-only, 20 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration).
+**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (345 scenarios), 91.20% coverage. **V183:** Deep debt evolution complete (6 oversize files refactored, discovery evolution, 3 new baselines). Barrick 2009 SEALED. Tenaillon batch 0 COMPLETE. 52 consumed capabilities (registry 445). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 PG gaps open (deployment-only, 20 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration).
 
 ---
 
@@ -427,7 +427,7 @@ Phase 0 (Now — wetSpring standalone on Eastgate):
   NCBI via sovereign HTTP (no NestGate needed)
   GPU via wgpu (RTX 4070), NPU via akida-driver (AKD1000)
   IPC: local JSON-RPC 2.0 over Unix sockets, 42 niche capabilities
-  ✅ 150+ barraCuda primitives consumed, 364 binaries, 1,700 tests
+  ✅ 150+ barraCuda primitives consumed, 345 UniBin scenarios, 1,962 tests
   ✅ Exp403: Tier 2 primal proof (live UDS to 5 primals, check_skip)
 
 Phase 1 (Next — biomeOS single-node on Eastgate):

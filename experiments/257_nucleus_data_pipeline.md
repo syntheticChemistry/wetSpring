@@ -47,8 +47,8 @@ The experiment reports a live status table:
 
 ```bash
 biomeos nucleus start --mode node --node-id eastgate
-cargo run --release --bin wetspring_server
-WETSPRING_DATA_PROVIDER=nestgate cargo run --release --bin validate_nucleus_data_pipeline
+wetspring serve
+WETSPRING_DATA_PROVIDER=nestgate wetspring validate --scenario nucleus_data_pipeline
 ```
 
 ## Chain

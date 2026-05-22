@@ -34,7 +34,7 @@ Each tier proves the math, then the next tier proves the composition:
 |------|----------|--------|---------|
 | **0** | Published paper | Peer-reviewed science | Barrick 2009 Fig. 1 |
 | **1** | Python/R baseline | Reproducibility | `scripts/*.py` (58 baselines) |
-| **2** | Rust CPU | Implementation parity | `validate_*.rs` (349 binaries) |
+| **2** | Rust CPU | Implementation parity | `wetspring validate --scenario` (345 scenarios) |
 | **3** | Rust GPU (barraCuda) | Substrate independence | `validate_*_gpu_*` (44 modules) |
 | **4** | Primal composition | IPC parity | `validate_primal_parity` (18 roundtrips) |
 | **5** | NUCLEUS deployment | End-to-end composition | `wetspring_guidestone` (38 checks) |

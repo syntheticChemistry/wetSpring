@@ -252,19 +252,7 @@ pub fn render_grammar(grammar: &Value, data: &[Value], domain: &str) -> Option<V
 
     let request = grammar_request(&session_id, grammar, data, domain);
 
-    let neural_socket = {
-        let family_id = std::env::var("FAMILY_ID").ok()?;
-        let runtime = std::env::var("XDG_RUNTIME_DIR")
-            .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
-        let path = std::path::PathBuf::from(runtime)
-            .join("biomeos")
-            .join(format!("neural-api-{family_id}.sock"));
-        if path.exists() {
-            path
-        } else {
-            return None;
-        }
-    };
+    let neural_socket = crate::ipc::provenance::neural_api_socket()?;
 
     let mut stream = UnixStream::connect(&neural_socket).ok()?;
     stream

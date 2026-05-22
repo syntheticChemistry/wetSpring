@@ -141,6 +141,6 @@ echo "    Proxy 16S:                 PRJNA488170 + PRJNA382322 (Nannochloropsis 
 echo
 echo "  Next steps:"
 echo "    1. Run Galaxy/QIIME2 on proxy 16S data → Exp012 baseline"
-echo "    2. Build Rust validation: cargo run --bin validate_algae_16s"
-echo "    3. Build Rust validation: cargo run --bin validate_voc_peaks"
+echo "    2. Run Rust validation: wetspring validate --scenario algae_16s"
+echo "    3. Run Rust validation: wetspring validate --scenario voc_peaks"
 echo "═══════════════════════════════════════════════════════════"

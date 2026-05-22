@@ -45,32 +45,11 @@ pub enum PushError {
 /// Result type for push operations.
 pub type PushResult<T> = Result<T, PushError>;
 
-/// Standard discovery logic when `ipc` feature is disabled (no access to `discover` module).
-/// Mirrors `discover::discover_socket` resolution order with `family_id()`.
+/// Standalone fallback discovery when `ipc` feature is disabled.
+/// Delegates to the shared implementation in `ncbi::nestgate::discovery`.
 #[cfg(not(feature = "ipc"))]
 fn discover_petaltongue_fallback(env_var: &str, primal: &str) -> Option<PathBuf> {
-    if let Ok(path) = std::env::var(env_var) {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-    let fam = std::env::var("FAMILY_ID")
-        .or_else(|_| std::env::var("BIOMEOS_FAMILY_ID"))
-        .unwrap_or_else(|_| "default".to_string());
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg)
-            .join(crate::primal_names::BIOMEOS)
-            .join(format!("{primal}-{fam}.sock"));
-        if p.exists() {
-            return Some(p);
-        }
-    }
-    let fallback = std::env::temp_dir().join(format!("{primal}-{fam}.sock"));
-    if fallback.exists() {
-        return Some(fallback);
-    }
-    None
+    crate::ncbi::nestgate::discovery::discover_standalone(env_var, primal)
 }
 
 fn build_render_params(

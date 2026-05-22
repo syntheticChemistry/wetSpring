@@ -20,7 +20,7 @@
 #
 # For GPU-scale profiling:
 #   1. Download datasets with this script
-#   2. Run: cargo run --release --features gpu --bin validate_diversity_gpu
+#   2. Run: wetspring validate --scenario diversity_gpu
 #   3. Compare CPU vs GPU throughput on real NCBI data
 #
 # Prerequisites:
@@ -162,5 +162,5 @@ echo "  Directory: $DATA_DIR"
 echo "  Manifest: $MANIFEST"
 echo
 echo "  Next: Run BarraCUDA GPU pipeline on these datasets:"
-echo "    cargo run --release --features gpu --bin validate_diversity_gpu"
+echo "    wetspring validate --scenario diversity_gpu"
 echo "═══════════════════════════════════════════════════════════"

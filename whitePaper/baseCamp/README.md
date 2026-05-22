@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** May 17, 2026
+**Date:** May 22, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V177 — Wave 20 PM lithoSpore audit absorption. Stability tiers. Trio transaction semantics. Exp381: Barrick 2009 breseq pipeline (first real-data Nest Atomic composition — mutation accumulation confirmed, ferment braid exported). Gen4: compute-aware scheduling documented. 43 niche, 52 consumed (registry 445). 252 lib tests pass. 385 experiments (384 done + 1 in progress). **3** gaps open (deployment + cross-tier parity), 20 resolved/closed.
+**Status:** V183 — Deep debt evolution complete. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 6 oversize files refactored into directory modules. Discovery evolution (Songbird-first resolution). 3 new Python baselines (55 total). 43 niche, 52 consumed (registry 445). 1,962 lib tests pass. 386 experiments (385 done + 1 in progress). **2** gaps open (deployment-only), 20 resolved/closed.
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).
@@ -46,7 +46,7 @@ Tier 3 — Primal proof (Level 5: live NUCLEUS IPC)
         → check_skip for absent primals (CI: exit 2 = skipped)
 
 Tier 4 — guideStone (self-validating NUCLEUS node)  ← Level 4 V149
-  wetspring_guidestone (primalspring::composition API)
+  wetspring certify (primalspring::composition API)
     → Bare: local science baselines (16/16 pass, exit 2)  ← CERTIFIED
       → N0: liveness (5/5 primals alive, Squirrel over IPC)
         → N1: 15 manifest capabilities (v0.9.17), 10 pass + 0 skip + 5 services
@@ -101,7 +101,7 @@ graphs, aligns capability strings to proto-nucleate canonical form, adds
 coralReef/barraCuda as Node Atomic graph nodes, and extends Exp400 with D07
 deploy graph metadata compliance (44 new checks → 141/141 total, later refined to 136/136 in V144).
 
-**V146** adds the guideStone binary (`wetspring_guidestone`) — a self-validating NUCLEUS composition node using `primalspring::composition` API. Bare mode validates 5 certified properties (deterministic, reference-traceable, self-verifying, environment-agnostic, tolerance-documented) locally. NUCLEUS mode uses `validate_parity` and `validate_liveness` for IPC parity against all 7 manifest `validation_capabilities`. Cross-atomic pipeline: BearDog hash → NestGate store → retrieve → verify. `niche::GUIDESTONE_READINESS = 2` (properties documented). Inherits primalSpring's 6-layer base certification.
+**V146** adds the guideStone subcommand (`wetspring certify`) — a self-validating NUCLEUS composition node using `primalspring::composition` API. Bare mode validates 5 certified properties (deterministic, reference-traceable, self-verifying, environment-agnostic, tolerance-documented) locally. NUCLEUS mode uses `validate_parity` and `validate_liveness` for IPC parity against all 7 manifest `validation_capabilities`. Cross-atomic pipeline: BearDog hash → NestGate store → retrieve → verify. `niche::GUIDESTONE_READINESS = 2` (properties documented). Inherits primalSpring's 6-layer base certification.
 
 **V145** added the primal proof tier (Level 5 IPC-WIRED). Exp403 (`validate_primal_parity_v1`) calls live NUCLEUS primals over UDS sockets — barraCuda, NestGate, Squirrel, BearDog, toadStool — and compares results against local Rust baselines. `check_skip` for absent primals (CI: exit 2 = skipped). `niche::CONSUMED_CAPABILITIES` declares 22 barraCuda domain math methods consumed over IPC. PG-09 documents the library-to-IPC evaporation surface.
 
@@ -220,7 +220,7 @@ See companion handoffs under `wateringHole/handoffs/` for barraCuda/toadStool as
 | **V108 Track 6 Anaerobic** | Liao (MSU BAE) | 6 | 5+6 | Exp336-346 | 183 | Gompertz, first-order, Monod, Haldane kinetics, anaerobic diversity, Anderson W mapping, full 6-tier chain |
 | **V110 petalTongue + Anderson H3** | — | viz+science | — | Exp353-356 | 111 | petalTongue live dashboards, Anderson QS O₂-modulated W model (H3, r=0.851), stream_ecology, 6 JSON scenarios |
 | **V130 Anderson Hormesis** | Gonzales/Lisabeth/Waters/Jones/Kachkovskiy | cross | 1 | Exp377-379 | 31 | Biphasic dose-response via Anderson, colonization resistance surface, binding IPR/localization, computation as experiment preprocessor, healthSpring joint |
-| **Total** | | | **63** | | **5,707+** | |
+| **Total** | | | **63** | | **5,967+** | |
 
 ### NCBI-Scale Extensions (Phase 32)
 

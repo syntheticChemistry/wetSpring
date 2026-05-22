@@ -282,7 +282,7 @@ what makes the pangenome result auditable.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_cross_ecosystem_pangenome
+wetspring validate --scenario cross_ecosystem_pangenome
 ```
 
 ---
@@ -359,7 +359,7 @@ include quality metadata and SRA-deposited reads for reassembly.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_genome_binning
+wetspring validate --scenario npu_genome_binning
 ```
 
 ---
@@ -402,5 +402,5 @@ across environments, matching the prediction from Exp110.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_ncbi_pangenome
+wetspring validate --scenario ncbi_pangenome
 ```

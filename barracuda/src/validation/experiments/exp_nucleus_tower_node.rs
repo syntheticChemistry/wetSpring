@@ -225,7 +225,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║    biomeos nucleus start --mode node --node-id eastgate          ║");
     println!("║                                                                  ║");
     println!("║  Step 4: Start wetSpring science primal                          ║");
-    println!("║    cargo run --release --bin wetspring_server                    ║");
+    println!("║    wetspring serve                                              ║");
     println!("║                                                                  ║");
     println!("║  Step 5: Verify full pipeline                                    ║");
     println!("║    cargo run --release --bin validate_nucleus_data_pipeline      ║");

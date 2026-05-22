@@ -228,7 +228,7 @@ convenient; it is a prerequisite for defensible environmental monitoring.
 ### Reproduction
 
 ```bash
-cargo run --features gpu --release --bin validate_real_bloom_gpu
+wetspring validate --scenario real_bloom_gpu
 ```
 
 ---
@@ -316,7 +316,7 @@ reproducible.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_bloom_sentinel
+wetspring validate --scenario npu_bloom_sentinel
 ```
 
 ---
@@ -354,5 +354,5 @@ inference) confirms coin-cell feasibility for multi-year deployment.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_temporal_esn_bloom
+wetspring validate --scenario temporal_esn_bloom
 ```

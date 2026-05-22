@@ -18,7 +18,7 @@ results/
 ## Provenance
 
 Every `*_python_baseline.json` traces to a Python script in `scripts/` and a Rust
-validation binary in `barracuda/src/bin/validate_*.rs`. The mapping is documented in
+scenario in `barracuda/src/validation/experiments/`. The mapping is documented in
 `scripts/BASELINE_MANIFEST.md`.
 
 ### Reproduction
@@ -26,8 +26,11 @@ validation binary in `barracuda/src/bin/validate_*.rs`. The mapping is documente
 ```bash
 python3 scripts/<script>.py              # regenerate baseline
 diff <(python3 scripts/<script>.py) experiments/results/<exp>/baseline.json
-cargo run --bin validate_<experiment>     # Rust must match within tolerance
+wetspring validate --scenario <id>       # Rust must match within tolerance
 ```
+
+> **V182+:** All validation binaries are consolidated into the `wetspring` UniBin.
+> Use `wetspring validate --list` to see available scenario IDs.
 
 ### Freeze
 

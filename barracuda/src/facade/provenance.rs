@@ -27,7 +27,7 @@ const GUIDESTONE_CHECKS: &str = "38/38 PASS";
 const WETSPRING_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const REPRODUCTION_MANIFEST: &str = include_str!("../../data/reproduction_manifest.toml");
-const DEPLOY_GRAPH: &str = "wetspring_science_nucleus.toml";
+const DEPLOY_GRAPH: &str = crate::primal_names::NUCLEUS_GRAPH_NAME;
 const PLASMID_FETCH_TAG: &str = "v0.7.0";
 
 // ── Circuit breaker (epoch-based, pattern from primalSpring) ──────────
@@ -528,13 +528,7 @@ fn try_nest_store_signal(
 }
 
 fn neural_api_socket() -> Option<std::path::PathBuf> {
-    let family_id = std::env::var("FAMILY_ID").ok()?;
-    let runtime = std::env::var("XDG_RUNTIME_DIR")
-        .unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().into_owned());
-    let path = std::path::PathBuf::from(runtime)
-        .join("biomeos")
-        .join(format!("neural-api-{family_id}.sock"));
-    if path.exists() { Some(path) } else { None }
+    crate::ipc::provenance::neural_api_socket()
 }
 
 /// Route a call through Neural API `capability.call` with domain + operation.

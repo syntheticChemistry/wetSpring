@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V182:** UniBin eukaryotic consolidation. 349 prokaryotic binaries consolidated into single `wetspring` binary (345 scenarios: 318 validation + 23 benchmark + 4 composition). Build time: 25min → 1m44s. Cargo.toml: 2028 → 160 lines. `Validator::bridge_into` adapter, `BenchmarkRegistry`, clap subcommands (certify/validate/benchmark/serve/status/version). Wave 28 sporePrint surface validated. **2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10).**
+**Current release — V183:** Deep debt evolution. 6 oversize experiment files refactored to directory modules (<800L). Discovery evolution: Songbird-first capability resolution with static bootstrap fallback. Neural API discovery consolidated. Deploy graph constants centralized. 3 new Python baselines (55 total). 8 notebooks migrated to UniBin commands. Tenaillon 264-clone `compute.fan_out` graph ready. 345 scenarios, 1,962 lib tests, registry 445 (52 consumed). **2 gaps active (WS-9 L3, WS-11 calibration).**
 
 ---
 

@@ -283,7 +283,7 @@ reference phylogenies.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_phylo_placement_scale
+wetspring validate --scenario phylo_placement_scale
 ```
 
 ---
@@ -358,5 +358,5 @@ query sequence places to the reported clade.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_phylo_placement
+wetspring validate --scenario npu_phylo_placement
 ```

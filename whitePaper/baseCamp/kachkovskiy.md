@@ -306,7 +306,7 @@ to QS prediction independently auditable.
 ### Reproduction
 
 ```bash
-cargo run --features gpu --release --bin validate_qs_disorder_real
+wetspring validate --scenario qs_disorder_real
 ```
 
 ---
@@ -398,7 +398,7 @@ reproduce the classification for any sample.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_disorder_classifier
+wetspring validate --scenario npu_disorder_classifier
 ```
 
 ---
@@ -448,7 +448,7 @@ hospital biofilms provide natural 3D geometries for testing this prediction.
 ### Reproduction
 
 ```bash
-cargo run --release --features gpu --bin validate_anderson_2d_qs
+wetspring validate --scenario anderson_2d_qs
 ```
 
 ---
@@ -502,7 +502,7 @@ require spatial proximity, not just low diversity.**
 ### Reproduction
 
 ```bash
-cargo run --release --features gpu --bin validate_ncbi_qs_atlas
+wetspring validate --scenario ncbi_qs_atlas
 ```
 
 ---
@@ -573,10 +573,10 @@ consequences — QS-mediated biofilm formation, virulence, bioluminescence.
 ### Reproduction
 
 ```bash
-cargo run --release --features gpu --bin validate_anderson_3d_qs
-cargo run --release --features gpu --bin validate_vent_chimney_qs
-cargo run --release --features gpu --bin validate_dimensional_phase_diagram
-cargo run --release --features gpu --bin validate_biofilm_3d_qs
+wetspring validate --scenario anderson_3d_qs
+wetspring validate --scenario vent_chimney_qs
+wetspring validate --scenario dimensional_phase_diagram
+wetspring validate --scenario biofilm_3d_qs
 ```
 
 ## Why Analysis — Mapping, Scaling, Dilution, Eukaryotes: Exp135-138
@@ -663,10 +663,10 @@ aggregates.
 ### Reproduction
 
 ```bash
-cargo run --release --features gpu --bin validate_mapping_sensitivity
-cargo run --release --features gpu --bin validate_square_cubed_scaling
-cargo run --release --features gpu --bin validate_planktonic_dilution
-cargo run --release --features gpu --bin validate_eukaryote_scaling
+wetspring validate --scenario mapping_sensitivity
+wetspring validate --scenario square_cubed_scaling
+wetspring validate --scenario planktonic_dilution
+wetspring validate --scenario eukaryote_scaling
 ```
 
 ---
@@ -721,10 +721,10 @@ Jemielita et al. (SciRep 2019) findings map exactly onto Anderson regimes:
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_cold_seep_qs_catalog
-cargo run --release --bin validate_cold_seep_qs_geometry
-cargo run --release --bin validate_luxr_phylogeny_geometry
-cargo run --release --bin validate_mechanical_wave_anderson
-cargo run --release --bin validate_qs_wave_localization
-cargo run --release --bin validate_burst_statistics_anderson
+wetspring validate --scenario cold_seep_qs_catalog
+wetspring validate --scenario cold_seep_qs_geometry
+wetspring validate --scenario luxr_phylogeny_geometry
+wetspring validate --scenario mechanical_wave_anderson
+wetspring validate --scenario qs_wave_localization
+wetspring validate --scenario burst_statistics_anderson
 ```

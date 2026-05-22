@@ -238,7 +238,7 @@ to avoid this.
 Rscript scripts/r_vegan_diversity_baseline.R
 Rscript scripts/r_dada2_error_baseline.R
 Rscript scripts/r_phyloseq_unifrac_baseline.R
-cargo run --release --bin validate_r_industry_parity
+wetspring validate --scenario r_industry_parity
 ```
 
 ---

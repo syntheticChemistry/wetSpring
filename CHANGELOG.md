@@ -3,6 +3,22 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V183] — 2026-05-22
+
+### Deep Debt Evolution — Structural Refinement Complete
+
+- **Track A — Large file refactoring:** 6 experiment files >800L refactored into directory modules. `experiments/mod.rs` split into mod + `registry_table.rs`. `exp_cpu_vs_gpu_all_domains` → bio/chem/ml_ode submodules. `exp_cross_spring_s57` → s54/s56/gpu. `exp_cross_spring_evolution_s87` → core/extended. `bench_cross_spring_s65` → ode_gpu/delegation. `exp_anderson_qs_environments_v1` → visualization extraction. No production file exceeds 800L.
+- **Track B1 — Songbird-first discovery:** `discover_by_capability` now gates Songbird RPC under `#[cfg(feature = "ipc")]`, with static `capability_to_primal` as bootstrap fallback. Tests feature-gated accordingly.
+- **Track B2 — Deploy graph convergence:** `NUCLEUS_GRAPH_REL_PATH` and `NUCLEUS_GRAPH_NAME` constants centralized in `primal_names.rs`. Hardcoded strings in `ipc/handlers/mod.rs` and `facade/provenance.rs` replaced.
+- **Track B3 — Neural API consolidation:** 3 duplicate `neural_api_socket()` implementations in facade modules replaced with canonical `ipc::provenance::neural_api_socket()`.
+- **Track B5 — Discovery deduplication:** `visualization/ipc_push.rs` standalone fallback delegates to shared `ncbi::nestgate::discovery::discover_standalone()`.
+- **Track C — Python baselines:** 3 new scripts: `gonzales_ic50_baseline.py` (23 checks), `gonzales_pk_decay_baseline.py` (12 checks), `matrix_pharmacophenomics_baseline.py` (10 checks, pure NumPy NMF). Total baselines: 55.
+- **Track D — Tenaillon fan_out:** `graphs/tenaillon_2016_fan_out.toml` defines 27-shard fan_out for 264 clones. Awaits toadStool `compute.fan_out` primitive.
+- **Track E — Notebook UniBin migration:** 8 notebooks updated from `cargo run --bin` to `wetspring validate --scenario`. `NOTEBOOK_PATTERN.md` UniBin workflow section added.
+- **Doc alignment:** Root README/CONTEXT V183. CONTROL_EXPERIMENT_STATUS rewritten. baseCamp status + 7 faculty briefings (33 commands). experiments/README + results/README. specs/README, BARRACUDA_REQUIREMENTS, PAPER_REVIEW_QUEUE. Shell scripts + BASELINE_MANIFEST. GUIDESTONE_BINARY → `wetspring`. V182 handoff archived.
+- **V183 handoff:** `WETSPRING_V183_DEEP_DEBT_EVOLUTION_HANDOFF_MAY22_2026.md` — composition patterns, primal evolution summary, upstream asks for toadStool/Songbird/biomeOS/barraCuda.
+- Build gate: `cargo check --features ipc` clean. `niche::tests::guidestone_binary_follows_naming` passes.
+
 ## [V182] — 2026-05-20
 
 ### UniBin Consolidation — Eukaryotic Evolution Complete

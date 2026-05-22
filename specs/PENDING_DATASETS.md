@@ -2,7 +2,7 @@
 
 # wetSpring — Pending Datasets & Downloads
 
-**Last Updated**: May 17, 2026 (V174)
+**Last Updated**: May 22, 2026 (V183)
 **Purpose**: Consolidated tracker for datasets referenced but not yet downloaded,
 hardware not yet available, or GPU shaders not yet written.
 
@@ -15,7 +15,7 @@ hardware not yet available, or GPU shaders not yet written.
 | EPA UCMR 5 — national drinking water PFAS survey (2023-2025) | EPA | Exp041 | Download + parse | Medium |
 | EPA PFOS surface water — GPS + concentration time-series | EPA | Exp041 | Download + parse | Medium |
 | Jones Lab full PFAS library (175 compounds) | Jones Lab / Zenodo | Exp018 | Data access | Low |
-| NCBI PRJNA294072 — 264 *E. coli* LTEE genomes (Tenaillon 2016) | NCBI SRA | Exp380 (B7) | **B7 Tier 2 COMPLETE** — download for sovereign pipeline | Medium |
+| NCBI PRJNA294072 — 264 *E. coli* LTEE genomes (Tenaillon 2016) | NCBI SRA | Exp380 (B7) | **B7 Tier 2 COMPLETE** — 5/264 clones resequenced; `compute.fan_out` config ready (`graphs/tenaillon_2016_fan_out.toml`); awaits toadStool fan_out primitive (Wave 38+) | HIGH |
 
 ## LTEE Queue — Datasets Needed for Queued Papers
 

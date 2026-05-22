@@ -28,8 +28,8 @@ pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry valid
 /// Niche version (tracks the spring version, not the crate version).
 pub const NICHE_VERSION: &str = "1.0.0";
 
-/// guideStone binary name (matches `downstream_manifest.toml` entry).
-pub const GUIDESTONE_BINARY: &str = "wetspring_guidestone";
+/// guideStone binary name (UniBin subcommand; matches `downstream_manifest.toml` entry).
+pub const GUIDESTONE_BINARY: &str = "wetspring";
 
 /// guideStone readiness level (0-5 per `GUIDESTONE_COMPOSITION_STANDARD.md` v1.1.0).
 ///
@@ -499,7 +499,6 @@ mod tests {
     #[test]
     fn guidestone_binary_follows_naming() {
         assert!(GUIDESTONE_BINARY.starts_with("wetspring"));
-        assert!(GUIDESTONE_BINARY.contains("guidestone"));
     }
 
     #[test]

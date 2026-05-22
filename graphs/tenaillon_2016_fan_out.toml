@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Tenaillon 2016 Sovereign Resequencing — compute.fan_out Configuration
+#
+# Distributes 264 LTEE clone resequencing jobs across available compute nodes.
+# Each shard processes a batch of clones via the sovereign pipeline:
+#   FM-index → SmithWatermanGpu → pileup → Tensor::scan → SnpCallingF64
+#
+# Requires: toadStool compute.fan_out primitive (Wave 38+)
+# Dataset: NCBI BioProject PRJNA294072 (~590 GB staged)
+# Pipeline: wetspring validate --scenario sovereign_resequencing (with env overrides)
+
+[fan_out]
+name = "tenaillon_2016_sovereign_264"
+version = "1.0.0"
+description = "264-clone LTEE resequencing (Tenaillon et al. Nature 2016)"
+
+[fan_out.source]
+bioproject = "PRJNA294072"
+total_items = 264
+clone_manifest = "datasets/ltee/tenaillon_2016/clones.tsv"
+estimated_size_gb = 590
+
+[fan_out.sharding]
+# Each shard processes `batch_size` clones starting at offset = shard_id * batch_size
+strategy = "fixed_batch"
+batch_size = 10
+# 264 / 10 = 27 shards (last shard processes 4 clones)
+total_shards = 27
+
+[fan_out.shard_command]
+binary = "wetspring"
+args = ["validate", "--scenario", "sovereign_resequencing"]
+
+[fan_out.shard_command.env]
+WETSPRING_WORKSPACE = "{workspace}/datasets/ltee/tenaillon_2016"
+WETSPRING_DATASET_ID = "tenaillon_2016"
+WETSPRING_ACCESSION = "PRJNA294072"
+WETSPRING_MAX_CLONES = "{batch_size}"
+WETSPRING_CLONE_OFFSET = "{shard_offset}"
+
+[fan_out.resources]
+# Per-shard resource requirements
+gpu_required = true
+min_memory_gb = 16
+min_disk_gb = 25
+estimated_runtime_minutes = 45
+
+[fan_out.provenance]
+braid_prefix = "tenaillon_2016_sovereign"
+# Each shard writes its own braid: tenaillon_2016_sovereign_batch_{offset}.json
+# Parent braid aggregates after all shards complete
+
+[fan_out.completion]
+# 5/264 already complete (Barrick 2009 clones via batch_0)
+completed_shards = [0]
+# Resume from shard 1 (clones 10-19)
+next_shard = 1

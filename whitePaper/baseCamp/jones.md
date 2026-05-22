@@ -249,7 +249,7 @@ regulatory proceedings.
 ### Reproduction
 
 ```bash
-cargo run --features gpu --release --bin validate_massbank_gpu_scale
+wetspring validate --scenario massbank_gpu_scale
 ```
 
 ---
@@ -325,7 +325,7 @@ MassBank reference spectrum is fully traversable.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_spectral_screen
+wetspring validate --scenario npu_spectral_screen
 ```
 
 ---
@@ -366,5 +366,5 @@ acquisition feasible even on modest GPU hardware.
 ### Reproduction
 
 ```bash
-cargo run --release --bin validate_npu_spectral_triage
+wetspring validate --scenario npu_spectral_triage
 ```
