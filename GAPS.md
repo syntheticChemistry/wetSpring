@@ -4,11 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-20 (V182 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring`
-binary, 337 scenarios, 23 benchmarks. Build time 25min → 1m44s. Wave 28 sporePrint surface
-validated by primalSpring `s_sporeprint_surface`. Wave 29 Nest Atomic CM-2/CM-4 resolved
-upstream — unblocks WS-9 L3 path when live trio deploys. No new WS-* gaps from audit.
-WS-11 v3 calibration and Tenaillon batch 0 (5/5 clones, 974 variants) carried forward.)
+Last updated: 2026-05-22 (Wave 38 audit absorption. Registry synced 452 → 445 (recount,
+no production methods removed). WS-1 IMPLEMENTED upstream (primalSpring Wave 37:
+`IonicContractRegistry` full state machine, `bonding::ionic_runtime`). WS-11 v3 deployed,
+Tenaillon batch 0 5/5 COMPLETE — audit blurb stale at 2/5. WS-9 L3 still blocked on
+Nest deploy. V182 UniBin audit (345 scenarios) cleared by primalSpring.)
 
 ---
 
@@ -16,23 +16,23 @@ WS-11 v3 calibration and Tenaillon batch 0 (5/5 clones, 974 variants) carried fo
 
 **Owner:** primalSpring Track 4 (`BondingConstraint + BondingPolicy`)
 
-**Status:** Scaffolded — bonding metadata declared, no negotiation protocol.
+**Status:** IMPLEMENTED upstream (primalSpring Wave 37, May 21). wetSpring adoption pending.
 
-The facade declares its bonding capabilities in `bonding_metadata.json` and
-exposes them via `GET /api/v1/system/composition`. However, there is no
-automated protocol for:
+primalSpring shipped `bonding::ionic_runtime::IonicContractRegistry` — full state
+machine: `propose` → `accept`/`reject` → `record_call` → `modify_scope` →
+`terminate` → seal. Wire types: `IonicProposal`, `IonicContract`, `ContractState`,
+`ScopeModification`, `TerminationRequest`, `ProvenanceSeal`, `UsageMetrics`,
+`AttributionTerms`, `DataReturnPolicy`. Client RPC module: `bonding::ionic_rpc`
+(`crypto.ionic_bond.*` on bearDog, TCP via songbird).
 
-- Establishing a new ionic bond (capability scoping, duration, attribution)
-- Modifying an existing bond (scope expansion/reduction)
-- Terminating a bond (cleanup, final provenance seal)
-- Verifying a bond's validity during request dispatch
+**Remaining for wetSpring:**
+- Wire `IonicContractRegistry` into facade bonding path
+- bearDog needs `crypto.ionic_bond.propose`/`verify_proposal`/`seal` (Ed25519)
+- songbird needs `capability.call` remote dispatch for cross-gate ionic calls
+- E2E cross-gate wiring pending flockGate deploy
 
-primalSpring's `BondType::Ionic` and `TrustModel::Contractual` define the
-abstract model. The concrete negotiation protocol (handshake, contract
-serialization, mutual verification) is the gap.
-
-**Impact:** External researchers cannot self-service ionic bond creation.
-Manual setup required via ecosystem maintainers.
+**Impact:** Self-service ionic bond creation unblocked structurally. Live E2E
+still requires bearDog crypto + songbird cross-gate + deployed gates.
 
 ---
 
@@ -307,7 +307,7 @@ Parity evolution tracked in `provenance/braids/barrick_2009_calibration_v2.json`
 
 | # | Gap | Owner | Priority | Phase |
 |---|-----|-------|----------|-------|
-| 1 | Ionic contract negotiation | primalSpring Track 4 | High | 2 |
+| 1 | Ionic contract negotiation | primalSpring Track 4 | **IMPLEMENTED** upstream (Wave 37) | 2 |
 | 2 | Cross-spring data exchange | RootPulse | High | 2 |
 | 3 | Public chain anchor | loamSpine | Medium | 3 |
 | 4 | Client WASM renderer | petalTongue | Medium | 3 |

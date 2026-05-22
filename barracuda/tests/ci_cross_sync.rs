@@ -17,7 +17,7 @@
 //! 3. Niche DEPENDENCIES includes all infrastructure primals
 //! 4. Consumed capabilities include biomeOS lifecycle + Wave 17 signal methods
 //! 5. Consumed capabilities reference recognized ecosystem domains
-//! 6. Canonical primalSpring registry accessible and non-trivial (452+)
+//! 6. Canonical primalSpring registry accessible and non-trivial (445+)
 //! 7. `skunkBat` IPC module wired and discoverable
 
 use std::collections::BTreeSet;
@@ -193,8 +193,8 @@ fn canonical_registry_accessible_and_nontrivial() {
         .count();
 
     assert!(
-        method_count >= 453,
-        "canonical registry has only {method_count} method entries — expected 453+"
+        method_count >= 445,
+        "canonical registry has only {method_count} method entries — expected 445+"
     );
 }
 
