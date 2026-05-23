@@ -14,21 +14,25 @@ primalSpring River Delta audit (May 19, 2026) identified 4 upstream gaps
 that wetSpring reported but cannot resolve locally. This document formalizes
 the upstream asks with acceptance criteria.
 
-Barrick 2009 is SEALED. Tenaillon 2016 batch 0 validated (2/5 clones).
-WS-11 v2 calibration deployed locally (GPU min_depth, MAPQ filtering,
-±5bp window matching, duplicate removal).
+Barrick 2009 is SEALED. Tenaillon 2016 batch 0 validated (5/5 clones).
+WS-11 v3 calibration deployed (GPU min_depth, MAPQ gap-based formula,
+±5bp window matching, duplicate removal). 259 remaining clones await
+`compute.fan_out` from toadStool.
 
 ---
 
-## WS-1: Ionic Contract Negotiation
+## WS-1: Ionic Contract Negotiation — RESOLVED
 
 **Owner:** primalSpring Track 4
 **Priority:** HIGH
+**Status:** RESOLVED (Wave 37 upstream + V184 local wiring)
 
-**Current state:** `BondingConstraint` + `BondingPolicy` declared;
-`GET /api/v1/system/composition` exposes metadata. No automated protocol.
+> **Update (May 23, 2026):** primalSpring shipped `IonicContractRegistry` (Wave 37).
+> wetSpring V184 wired `ipc::bonding` module consuming the full state machine:
+> `bonding.{propose,accept,reject,status,terminate,list}`. 6 new niche capabilities.
+> E2E cross-gate wiring still pending bearDog Ed25519 + songbird remote dispatch.
 
-**Ask:** Define the negotiation protocol spec:
+**Original ask:** Define the negotiation protocol spec:
 - Handshake sequence (discovery → propose → accept/reject → active)
 - Contract serialization format (JSON-RPC or protobuf)
 - Mutual verification (bond validity check during dispatch)

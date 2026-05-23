@@ -1,14 +1,14 @@
 # Ecosystem Leverage Guide — wetSpring V128 (fossil record)
 
-> **V174 note (May 17, 2026):** This guide was written at V128. Current
-> metrics: **370** binaries, **1,962** tests, **150+** barraCuda primitives
-> (v0.4.0), **42** niche capabilities, **51** consumed capabilities (33 v0.9.17
-> canonical + 15 legacy + 3 Wave 17/20, registry 458). **guideStone Level 5**
-> (primal proof). Exp377–379 hormesis chain (57/57 PASS). Deep debt resolved:
-> UniBin `serve` live, display-name hygiene, `dense_to_csr` extracted.
-> Clippy pedantic+nursery zero warnings (both crates). Live NUCLEUS 30/31 pass.
+> **V184 note (May 23, 2026):** This guide was written at V128. Current
+> metrics: **1** UniBin (345 scenarios), **1,962** tests, **150+** barraCuda primitives
+> (v0.4.0), **49** niche capabilities, **52** consumed capabilities (33 v0.9.17
+> canonical + 15 legacy + 4 Wave 17/20, registry 458). **guideStone Level 5**
+> (primal proof). Ionic bonding wired (`ipc::bonding` → IonicContractRegistry).
+> Deep debt evolution complete (Tracks A–E). primalSpring v0.9.27.
+> Clippy pedantic+nursery zero warnings (both crates). Live NUCLEUS 38/38 pass.
 > Composition: composed, live-probing. **2** primal gaps open (deployment-only,
-> **20** resolved/closed). 384/384 experiments, 5,957+ checks.
+> **20** resolved/closed). 386 experiments (385 done + 1 in progress), 5,967+ checks.
 > See `docs/PRIMAL_GAPS.md`.
 
 **Date:** March 18, 2026
