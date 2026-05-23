@@ -49,6 +49,8 @@
 #[cfg(feature = "json")]
 pub mod stream_item;
 
+#[cfg(feature = "guidestone")]
+pub mod bonding;
 #[cfg(feature = "ipc")]
 pub mod barracuda_route;
 #[cfg(feature = "ipc")]

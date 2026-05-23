@@ -2,7 +2,7 @@
 
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: May 22, 2026 (V183 — Deep debt evolution complete. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 55 Python baselines. 52 consumed (registry 445). 1,962 lib tests, 5,967+ checks. 2 PG gaps open (deployment-only), 20 resolved/closed)
+**Last Updated**: May 22, 2026 (V183 — Deep debt evolution complete. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 55 Python baselines. 52 consumed (registry 458). 1,962 lib tests, 5,967+ checks. 2 PG gaps open (deployment-only), 20 resolved/closed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

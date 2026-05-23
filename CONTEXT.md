@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V183:** Deep debt evolution. 6 oversize files refactored to directory modules. Discovery evolution (Songbird-first). 3 new Python baselines (55 total). 8 notebooks UniBin-migrated. 345 scenarios (318 validation + 23 benchmark + 4 composition). Registry 445, 52 consumed.
+**Current release — V183:** Deep debt evolution. 6 oversize files refactored to directory modules. Discovery evolution (Songbird-first). 3 new Python baselines (55 total). 8 notebooks UniBin-migrated. 345 scenarios (318 validation + 23 benchmark + 4 composition). Registry 458, 52 consumed.
 
 ## Role in the Ecosystem
 
@@ -24,7 +24,7 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 345 scenarios)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 43 niche capabilities, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 49 niche capabilities, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch methods, 21 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
 - **Validation checks:** 5,967+ across 345 scenarios (UniBin)
@@ -47,7 +47,7 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, drug-target scoring
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.4.0, 150+ primitives consumed
-- **IPC:** 38 JSON-RPC methods, 43 niche capabilities, 21 domains, 1 live composition health handler (science_health — runtime probing), 8 MCP tools, Wire Standard L2+L3
+- **IPC:** 38 JSON-RPC methods, 49 niche capabilities, 21 domains, 1 live composition health handler (science_health — runtime probing), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 

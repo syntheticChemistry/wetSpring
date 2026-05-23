@@ -294,11 +294,55 @@ description = "Readiness probe (subsystems + substrate)"
 stability = "stable"
 gpu_accelerated = false
 
+# ── Ionic Bonding (primalSpring Wave 37+, WS-1) ──────────────────────
+
+[capabilities.bonding_propose]
+method = "bonding.propose"
+domain = "bonding"
+description = "Create a new ionic bond proposal"
+stability = "evolving"
+gpu_accelerated = false
+
+[capabilities.bonding_accept]
+method = "bonding.accept"
+domain = "bonding"
+description = "Accept a pending ionic bond proposal"
+stability = "evolving"
+gpu_accelerated = false
+
+[capabilities.bonding_reject]
+method = "bonding.reject"
+domain = "bonding"
+description = "Reject a pending ionic bond proposal"
+stability = "evolving"
+gpu_accelerated = false
+
+[capabilities.bonding_status]
+method = "bonding.status"
+domain = "bonding"
+description = "Query ionic bond contract state"
+stability = "evolving"
+gpu_accelerated = false
+
+[capabilities.bonding_terminate]
+method = "bonding.terminate"
+domain = "bonding"
+description = "Initiate graceful ionic bond termination with provenance seal"
+stability = "evolving"
+gpu_accelerated = false
+
+[capabilities.bonding_list]
+method = "bonding.list"
+domain = "bonding"
+description = "Enumerate ionic bond contracts by state"
+stability = "evolving"
+gpu_accelerated = false
+
 # ── Wave 20 Signal Adoption ────────────────────────────────────────────
 # primalSpring Wave 20: schema standardization + `primal.list` added.
-# primalSpring registry: 445 methods, 45 scenarios.
+# primalSpring registry: 458 methods, 49 scenarios.
 
 [signals]
 adopted = ["nest.store", "nest.commit", "primal.announce"]
 wave = 20
-registry_sync = 445
+registry_sync = 458

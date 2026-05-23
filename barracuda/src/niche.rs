@@ -130,7 +130,7 @@ pub const DEPENDENCIES: &[NicheDependency] = &[
 ///
 /// barraCuda surface aligned to primalSpring v0.9.17 canonical (33 methods).
 /// Wave 17: `primal.announce` + `signal.dispatch` added.
-/// Wave 20→36: registry synced to 445 (Wave 36 recount with test fixtures excluded,
+/// Wave 20→36→46: registry synced 445→458 (Wave 46 v0.9.27; Wave 36 recount with test fixtures excluded,
 /// composition health probing). `count` field in `capability.list` response.
 /// `primal.announce` fully adopted.
 /// Wave 20 PM: trio consumed names aligned to canonical registry —
@@ -299,6 +299,13 @@ pub const CAPABILITIES: &[&str] = &[
     "vault.consent.verify",
     // ── composition health (spring-specific, biomeOS owns universal methods) ──
     "composition.science_health",
+    // ── ionic bonding (primalSpring Wave 37+, WS-1) ──
+    "bonding.propose",
+    "bonding.accept",
+    "bonding.reject",
+    "bonding.status",
+    "bonding.terminate",
+    "bonding.list",
     // ── ecosystem client integrations (optional primals) ──
     "integration.sweetgrass.braid",
     "integration.toadstool.performance_surface",
@@ -468,8 +475,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            43,
-            "5 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 3 ecosystem integrations"
+            49,
+            "5 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 6 bonding + 3 ecosystem integrations"
         );
     }
 

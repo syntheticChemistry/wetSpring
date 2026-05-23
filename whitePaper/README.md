@@ -3,7 +3,7 @@
 # wetSpring White Paper
 
 **Date:** May 22, 2026
-**Status:** V182 — UniBin consolidation (345 scenarios, build 25min→1m44s). Barrick 2009 SEALED, Tenaillon batch 0 COMPLETE. Gen4: compute-aware scheduling, DAG checkpoint, living-environment patterns. **Tier 1:** Python/C++→Rust (5,967+ checks, 1,962 lib + 97 integration + 18 IPC, 1 UniBin). **Tier 2:** Composition (136/136, 7 graphs) + IPC. **Tier 3:** Live NUCLEUS IPC. 386 experiments (385 done + 1 in progress). 2 WS gaps active (WS-9 L3, WS-11 calibration), 2 PG open (deployment-only), 20 resolved/closed. `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry 445, 52 consumed.
+**Status:** V182 — UniBin consolidation (345 scenarios, build 25min→1m44s). Barrick 2009 SEALED, Tenaillon batch 0 COMPLETE. Gen4: compute-aware scheduling, DAG checkpoint, living-environment patterns. **Tier 1:** Python/C++→Rust (5,967+ checks, 1,962 lib + 97 integration + 18 IPC, 1 UniBin). **Tier 2:** Composition (136/136, 7 graphs) + IPC. **Tier 3:** Live NUCLEUS IPC. 386 experiments (385 done + 1 in progress). 2 WS gaps active (WS-9 L3, WS-11 calibration), 2 PG open (deployment-only), 20 resolved/closed. `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry 458, 52 consumed.
 **License:** AGPL-3.0-or-later
 
 ---

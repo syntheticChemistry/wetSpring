@@ -4,7 +4,7 @@
 
 **Date:** May 17, 2026 (V174 update)
 **Author:** wetSpring V182 (ecoPrimals)
-**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (345 scenarios), 91.20% coverage. **V183:** Deep debt evolution complete (6 oversize files refactored, discovery evolution, 3 new baselines). Barrick 2009 SEALED. Tenaillon batch 0 COMPLETE. 52 consumed capabilities (registry 445). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 PG gaps open (deployment-only, 20 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration).
+**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (345 scenarios), 91.20% coverage. **V183:** Deep debt evolution complete (6 oversize files refactored, discovery evolution, 3 new baselines). Barrick 2009 SEALED. Tenaillon batch 0 COMPLETE. 52 consumed capabilities (registry 458). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 PG gaps open (deployment-only, 20 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration).
 
 ---
 

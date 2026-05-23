@@ -26,7 +26,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **Validation checks** | 5,967+ across 345 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 43 niche, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch, 21 domains |
+| **IPC capabilities** | 49 niche, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch, 21 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V183:** Deep debt evolution. 6 oversize experiment files refactored to directory modules (<800L). Discovery evolution: Songbird-first capability resolution with static bootstrap fallback. Neural API discovery consolidated. Deploy graph constants centralized. 3 new Python baselines (55 total). 8 notebooks migrated to UniBin commands. Tenaillon 264-clone `compute.fan_out` graph ready. 345 scenarios, 1,962 lib tests, registry 445 (52 consumed). **2 gaps active (WS-9 L3, WS-11 calibration).**
+**Current release — V183:** Deep debt evolution. 6 oversize experiment files refactored to directory modules (<800L). Discovery evolution: Songbird-first capability resolution with static bootstrap fallback. Neural API discovery consolidated. Deploy graph constants centralized. 3 new Python baselines (55 total). 8 notebooks migrated to UniBin commands. Tenaillon 264-clone `compute.fan_out` graph ready. 345 scenarios, 1,962 lib tests, registry 458 (52 consumed). **2 gaps active (WS-9 L3, WS-11 calibration).**
 
 ---
 

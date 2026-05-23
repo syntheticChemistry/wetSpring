@@ -4,7 +4,7 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-22 (Wave 38 audit absorption. Registry synced 452 → 445 (recount,
+Last updated: 2026-05-22 (Wave 38 audit absorption. Registry synced 452 → 445 → 458 (Wave 46 additions;
 no production methods removed). WS-1 IMPLEMENTED upstream (primalSpring Wave 37:
 `IonicContractRegistry` full state machine, `bonding::ionic_runtime`). WS-11 v3 deployed,
 Tenaillon batch 0 5/5 COMPLETE — audit blurb stale at 2/5. WS-9 L3 still blocked on
@@ -26,7 +26,7 @@ machine: `propose` → `accept`/`reject` → `record_call` → `modify_scope` �
 (`crypto.ionic_bond.*` on bearDog, TCP via songbird).
 
 **Remaining for wetSpring:**
-- Wire `IonicContractRegistry` into facade bonding path
+- ~~Wire `IonicContractRegistry` into facade bonding path~~ DONE (V184: `ipc::bonding` module)
 - bearDog needs `crypto.ionic_bond.propose`/`verify_proposal`/`seal` (Ed25519)
 - songbird needs `capability.call` remote dispatch for cross-gate ionic calls
 - E2E cross-gate wiring pending flockGate deploy
