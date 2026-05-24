@@ -4,11 +4,12 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-22 (Wave 38 audit absorption. Registry synced 452 → 445 → 458 (Wave 46 additions;
-no production methods removed). WS-1 IMPLEMENTED upstream (primalSpring Wave 37:
-`IonicContractRegistry` full state machine, `bonding::ionic_runtime`). WS-11 v3 deployed,
-Tenaillon batch 0 5/5 COMPLETE — audit blurb stale at 2/5. WS-9 L3 still blocked on
-Nest deploy. V182 UniBin audit (345 scenarios) cleared by primalSpring.)
+Last updated: 2026-05-23 (Wave 46+ post-primordial covalent gate deployment. Registry
+458 (zero drift). WS-1 WIRED locally (V184: ipc::bonding → IonicContractRegistry).
+WS-11 v3 deployed, Tenaillon batch 0 5/5 COMPLETE, 259 remaining await fan_out.
+WS-9 L3 still blocked on Nest deploy. southGate assigned (5800X3D, 128GB).
+strandGate secondary (GPU). Gate deployment handoff posted. plasmidBin v5.5.0
+(13/13 primals). Awaiting fetch_primals.sh execution + live NUCLEUS validation.)
 
 ---
 

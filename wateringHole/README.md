@@ -22,7 +22,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **V184** | *(this commit)* | May 23 | **Wave 46 absorption**: registry 458, ionic bonding module, primalSpring v0.9.27 pin, 49 niche. |
+| **Gate** | `handoffs/WETSPRING_GATE_DEPLOYMENT_MAY23_2026.md` | May 23 | **Post-primordial gate deployment**: southGate status, proto-nucleate composition, deployment plan, strandGate GPU secondary. |
+| **V184** | *(V184 commit)* | May 23 | **Wave 46 absorption**: registry 458, ionic bonding module, primalSpring v0.9.27 pin, 49 niche. |
 | **V183** | `handoffs/WETSPRING_V183_DEEP_DEBT_EVOLUTION_HANDOFF_MAY22_2026.md` | May 22 | **Deep debt evolution**: Track A-E (refactoring, discovery, baselines, fan_out, notebooks). Composition patterns for NUCLEUS deployment. |
 | **V180** | `handoffs/WETSPRING_UPSTREAM_ASKS_RIVER_DELTA_MAY19_2026.md` | May 19 | **River Delta**: upstream asks for WS-2 (RootPulse), WS-3 (chain anchor), WS-4 (WASM). WS-1 ionic now RESOLVED locally (V184). |
 || | *Superseded → `handoffs/archive/`* | | V182 and earlier archived (**199** files). |
