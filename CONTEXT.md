@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V183:** Deep debt evolution. 6 oversize files refactored to directory modules. Discovery evolution (Songbird-first). 3 new Python baselines (55 total). 8 notebooks UniBin-migrated. 345 scenarios (318 validation + 23 benchmark + 4 composition). Registry 458, 52 consumed.
+**Current release — V184:** Post-primordial covalent gate deployment. Live NUCLEUS validated on southGate (9/9 primals started, exp091+exp094 PASS). Ionic bonding wired (`ipc::bonding` → `IonicContractRegistry`, 6 methods). 345 scenarios (318 validation + 23 benchmark + 4 composition). Registry 458, 49 niche, 52 consumed. plasmidBin v5.5.0 CLI alignment absorbed.
 
 ## Role in the Ecosystem
 

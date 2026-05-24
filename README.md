@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V183:** Deep debt evolution. 6 oversize experiment files refactored to directory modules (<800L). Discovery evolution: Songbird-first capability resolution with static bootstrap fallback. Neural API discovery consolidated. Deploy graph constants centralized. 3 new Python baselines (55 total). 8 notebooks migrated to UniBin commands. Tenaillon 264-clone `compute.fan_out` graph ready. 345 scenarios, 1,962 lib tests, registry 458 (52 consumed). **2 gaps active (WS-9 L3, WS-11 calibration).**
+**Current release — V184:** Post-primordial covalent gate deployment. NUCLEUS live on southGate (9/9 primals started, exp091+exp094 PASS, plasmidBin v5.5.0). Ionic bonding wired (6 methods). 66/77 scenarios PASS against live composition. Registry 458, 49 niche, 52 consumed. **2 gaps active (WS-9 L3, WS-11 calibration).**
 
 ---
 

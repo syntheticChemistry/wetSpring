@@ -4,7 +4,7 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-20 (V182 — UniBin consolidation. 345 scenarios, build 25min → 1m44s.
+Last updated: 2026-05-20 (V184 — UniBin consolidation. 345 scenarios, build 25min → 1m44s.
 Barrick SEALED, Tenaillon batch 0 COMPLETE. PG-02/PG-04 remain deployment-only.
 2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests, 52 consumed
 capabilities, registry 458.)

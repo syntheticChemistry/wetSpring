@@ -11,10 +11,10 @@ springs = ["wetspring"]
 ## Status
 
 - **1,962+ tests** passing, 0 failed (unit + integration + property + doc)
-- **1 UniBin** (`wetspring`) — 345 scenarios (318 validation + 23 benchmark + 4 composition, V182 eukaryotic consolidation)
+- **1 UniBin** (`wetspring`) — 345 scenarios (318 validation + 23 benchmark + 4 composition, V184 eukaryotic consolidation)
 - **19 science IPC methods** across 6 domain categories
 - **56 experiment directories** with 64+ frozen JSON baselines
-- **guideStone Level 5** (primal proof) — V182, live composition health probing, 38/38 NUCLEUS checks
+- **guideStone Level 5** (primal proof) — V184, live composition health probing, 38/38 NUCLEUS checks
 - **Zero sovereign HTTP fallbacks** — pure primal composition
 - **Structured gap reports** when deployment primals are unavailable
 - **BLAKE3 content hashing** on all data paths

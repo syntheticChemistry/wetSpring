@@ -1363,7 +1363,7 @@ dependencies = [
 
 [[package]]
 name = "primalspring"
-version = "0.9.27"
+version = "0.9.28"
 dependencies = [
  "base64",
  "blake3",

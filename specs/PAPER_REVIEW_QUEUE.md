@@ -10,7 +10,7 @@
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: May 22, 2026 (V183 — Deep debt evolution complete. 52 consumed (registry 458). 345 UniBin scenarios, 55 Python baselines. Clippy zero workspace. 386 experiments (385 done + 1 in progress), 5,967+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Last Updated**: May 22, 2026 (V184 — Deep debt evolution complete. 52 consumed (registry 458). 345 UniBin scenarios, 55 Python baselines. Clippy zero workspace. 386 experiments (385 done + 1 in progress), 5,967+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

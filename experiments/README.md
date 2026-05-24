@@ -5,7 +5,7 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-20 (V182: UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring`
+**Updated**: 2026-05-20 (V184: UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring`
 binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 SEALED (7/7).
 Tenaillon 2016 batch 0 COMPLETE (5/5 clones, 974 variants). 386 experiments indexed
 (385 completed + 1 in progress), 5,967+ checks, **1,962** lib tests

@@ -1,19 +1,21 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V183 (2026-05-22)
+**Last updated:** V184 (2026-05-23)
 **Lib tests:** 1,962 passed, 0 failed, 2 ignored (pre-existing upstream module visibility)
 **UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
+**Live NUCLEUS:** southGate — 9/9 primals started, exp091+exp094 PASS
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
 **Clippy:** zero warnings (`--features ipc --lib -- -W clippy::pedantic -W clippy::nursery`)
 
-## V183 Deep Debt Completion
+## V184 Post-Primordial Gate Deployment
 
-Track A through E of the Deep Debt Evolution Plan are complete:
-- **Track A:** 6 oversize experiment files refactored to <800L directory modules
-- **Track B:** Discovery evolution (Songbird-first, graph convergence, neural API consolidation, dedup)
-- **Track C:** 3 missing Python baselines written (Gonzales IC50, PK decay, MATRIX)
-- **Track D:** Tenaillon 264-clone fan_out graph ready for toadStool
-- **Track E:** 8 notebooks migrated from `cargo run --bin` to `wetspring validate --scenario`
+NUCLEUS composition deployed and validated on southGate:
+- **plasmidBin v5.5.0** — CLI alignment fix absorbed (`8c8cb44`)
+- **9/9 primals started** — bearDog, Songbird, toadStool, barraCuda, coralReef, nestGate, rhizoCrypt, loamSpine, sweetGrass
+- **exp091 primal routing matrix:** PASS
+- **exp094 composition parity:** PASS
+- **wetspring validate (rust tier):** 66/77 PASS (2 stale checksums, 3 empty benchmarks, minor tolerance drift)
+- **Ionic bonding module wired:** `ipc::bonding` (6 methods → IonicContractRegistry)
 
 ## Experiment Summary
 

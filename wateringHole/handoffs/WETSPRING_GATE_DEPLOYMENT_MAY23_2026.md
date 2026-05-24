@@ -66,28 +66,47 @@ inference.complete, crypto.hash
 | `nucleus_launcher.sh` | AVAILABLE | primalSpring/tools/ + plasmidBin/ |
 | Hardware | CONFIRMED | 5800X3D, 128GB DDR4 (southGate) |
 
-### Execution Results (2026-05-23 21:00 EDT)
+### Execution Results (2026-05-23 22:08 EDT — plasmidBin CLI fix absorbed)
 
 | Step | Status | Result |
 |------|--------|--------|
-| `fetch_primals.sh` | DONE (local) | GitHub release has `checksums.toml` only — no binary assets uploaded. Used local `plasmidBin` repo (12/13 binaries, skunkBat missing) |
-| `nucleus_launcher.sh start` | DONE | 7/12 primals socket-live: biomeOS, BearDog, Songbird, ToadStool, barraCuda, NestGate, sweetGrass |
-| `primalspring validate` | DONE | **1043/1172 passed** (89%), 146 skipped, 129 failures |
-| `wetspring validate` | DONE | **66/77 scenarios PASS**, 9 FAIL (see below), runner exited early on missing data |
+| plasmidBin pull | DONE | `8c8cb44` — CLI alignment fix for v2026.05.23 binaries |
+| `nucleus_launcher.sh --composition nucleus --validate` | **DONE** | **9/9 primals started**, exp091+exp094 PASS |
+| `primalspring validate` (primalSpring tools/) | DONE | **1043/1172 passed** (89%), 146 skipped, 129 failures (cross-gate routing) |
+| `wetspring validate --tier rust` | DONE | **66/77 scenarios PASS**, 9 FAIL (see below) |
 | Multi-domain validation with healthSpring | PENDING | healthSpring gate readiness |
 | Socket conflict assessment | NOT YET | Awaiting healthSpring co-residency |
 
-### Primals that did NOT come online
+#### plasmidBin `nucleus_launcher.sh` Results (9/9 started)
+
+| Primal | Port | Health |
+|--------|------|--------|
+| bearDog | 9100 | HEALTHY |
+| Songbird | 9200 | HEALTHY |
+| toadStool | 9400 | STARTED (health probe pending) |
+| barraCuda | 9740 | HEALTHY |
+| coralReef | 9730 | HEALTHY |
+| nestGate | 9500 | STARTED (health probe pending) |
+| rhizoCrypt | 9700 | STARTED (health probe pending) |
+| loamSpine | 9710 | STARTED (health probe pending) |
+| sweetGrass | 9720 | STARTED (health probe pending) |
+
+**Composition validation:** exp091 primal_routing_matrix PASS, exp094 composition_parity PASS.
+
+### Primals with degraded health probes (started but UNREACHABLE)
 
 | Primal | Phase | Failure Reason |
 |--------|-------|----------------|
-| Songbird | 1 | CLI arg mismatch: binary expects `--beardog-socket`, launcher sends `--security-socket` |
-| coralReef | 2 | Socket never appeared (timeout) |
-| NestGate | 2 | **FIXED** — needed `NESTGATE_JWT_SECRET` (32+ bytes) |
-| Squirrel | 2 | Socket never appeared (Ollama not running) |
-| rhizoCrypt | 3 | Socket never appeared (timeout) |
-| loamSpine | 3 | Tokio runtime nesting bug in infant_discovery.rs |
-| petalTongue | 4 | CLI arg mismatch: binary has no `--socket` flag |
+| toadStool | 2 | Health probe UNREACHABLE (process running, may need longer timeout) |
+| nestGate | 2 | Health probe UNREACHABLE (process running) |
+| rhizoCrypt | 3 | Health probe UNREACHABLE (process running) |
+| loamSpine | 3 | Tokio runtime nesting bug in infant_discovery.rs (upstream) |
+| sweetGrass | 3 | Health probe UNREACHABLE (process running) |
+
+Note: loamSpine is the only hard failure (panic). Others started successfully but
+health probes timed out — likely need extended timeout or alternate probe path.
+The previous run (primalSpring `nucleus_launcher.sh`) showed socket timeouts for
+the same primals. The plasmidBin launcher uses HTTP health endpoints instead of UDS.
 
 ### wetSpring Validation Failures (9)
 
@@ -111,11 +130,10 @@ inference.complete, crypto.hash
 | `guidestone_binary` in manifest says `wetspring_guidestone` | Stale (V184: `wetspring certify`) | Upstream fix in primalSpring manifest |
 | `guidestone_readiness = 3` in manifest | Stale (wetSpring self-reports Level 5) | Upstream fix in primalSpring manifest |
 | BTSP auth not yet wired | bearDog Ed25519 needed for live bonding | Deferred to bearDog readiness |
-| Songbird `--security-socket` → `--beardog-socket` | Tower Phase 1 partial | Upstream `nucleus_launcher.sh` flag fix |
-| loamSpine Tokio nesting panic | Provenance trio incomplete | Upstream runtime fix in loamSpine |
-| petalTongue no `--socket` CLI | Interface phase incomplete | Upstream CLI alignment |
-| plasmidBin v2026.05.23 no binary assets | Cannot use `fetch_primals.sh` from GitHub | Upstream build/upload needed |
-| Checksum hashes stale | 2 FAIL in self-integrity check | Regenerate `gen_checksums` after V184 |
+| loamSpine Tokio nesting panic | Provenance trio incomplete on southGate | Upstream runtime fix in loamSpine |
+| toadStool/nestgate/rhizoCrypt/sweetgrass health probe timing | Health sweep UNREACHABLE despite successful start | Extend timeout or fix health endpoint |
+| Checksum hashes stale | 2 FAIL in self-integrity check | **FIXED** — regenerated validation/CHECKSUMS |
+| Squirrel needs Ollama | AI narration unavailable | Not included in `nucleus` composition (meta_tier) |
 
 ---
 
@@ -159,19 +177,18 @@ cargo run --release --bin wetspring --features guidestone -- validate
 
 1. `downstream_manifest.toml` wetspring entry has stale `guidestone_binary = "wetspring_guidestone"` — should be `"wetspring"` (UniBin subcommand: `wetspring certify`)
 2. `guidestone_readiness = 3` should be `5` (Level 5 since V179)
-3. **plasmidBin v2026.05.23 release has no binary assets** — only `checksums.toml`. Upload builds or document local repo workaround.
-4. `nucleus_launcher.sh` passes `--security-socket` to Songbird but binary expects `--beardog-socket` — flag rename drift
-5. `nucleus_launcher.sh` passes `--socket` to petalTongue but binary has no such flag
-6. loamSpine `infant_discovery.rs:233` panics with Tokio runtime nesting — `block_on` inside existing runtime
-7. southGate has no GPU — confirm GPU scenarios can `check_skip` gracefully
+3. plasmidBin `nucleus_launcher.sh` CLI fix `8c8cb44` resolved Songbird/petalTongue issues — confirmed working on southGate
+4. Health sweep timeout for toadStool, nestGate, rhizoCrypt, sweetGrass — all start and register capabilities but don't respond to health probe within default timeout. Consider extending `--health-timeout` or adding alternate probe.
+5. loamSpine `infant_discovery.rs:233` panics with Tokio runtime nesting — `block_on` inside existing runtime. Only hard failure in composition.
+6. southGate has no GPU — confirm GPU scenarios can `check_skip` gracefully
 
 ---
 
 ## Next Steps
 
-1. Regenerate checksums (`gen_checksums`) to clear 2 stale hash FAILs
-2. Fix the single tolerance assertion in `barracuda_cpu_v12` (2.0 vs 1.0)
-3. Re-run once Songbird, loamSpine, petalTongue upstream fixes land
-4. Deploy on strandGate for GPU scenarios once remote access is available
-5. Report socket layout for healthSpring co-residency
-6. Document any capability collisions with healthSpring
+1. Fix the single tolerance assertion in `barracuda_cpu_v12` (2.0 vs 1.0)
+2. Re-run full 345-scenario suite once loamSpine upstream fix lands (provenance trio)
+3. Deploy on strandGate for GPU scenarios once remote access is available
+4. Report socket layout for healthSpring co-residency
+5. Document any capability collisions with healthSpring
+6. Extend health probe timeouts for slow-starting primals

@@ -4,12 +4,13 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-23 (Wave 46+ post-primordial covalent gate deployment. Registry
-458 (zero drift). WS-1 WIRED locally (V184: ipc::bonding → IonicContractRegistry).
+Last updated: 2026-05-23 (V184 — Post-primordial covalent gate deployment EXECUTED.
+NUCLEUS live on southGate: 9/9 primals started, exp091+exp094 PASS (plasmidBin v5.5.0,
+CLI alignment fix absorbed). primalspring validate 1043/1172 (89%). wetspring validate
+66/77 PASS. Registry 458. WS-1 WIRED locally (ipc::bonding → IonicContractRegistry).
 WS-11 v3 deployed, Tenaillon batch 0 5/5 COMPLETE, 259 remaining await fan_out.
-WS-9 L3 still blocked on Nest deploy. southGate assigned (5800X3D, 128GB).
-strandGate secondary (GPU). Gate deployment handoff posted. plasmidBin v5.5.0
-(13/13 primals). Awaiting fetch_primals.sh execution + live NUCLEUS validation.)
+WS-9 L3 still blocked on Nest deploy. Upstream issues: loamSpine tokio panic,
+Squirrel needs Ollama, rhizoCrypt/toadStool/nestgate/sweetgrass health probe timing.)
 
 ---
 

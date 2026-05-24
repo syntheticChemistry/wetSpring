@@ -5,7 +5,7 @@
 
 ---
 
-## Current Ecosystem State (Wave 46)
+## Current Ecosystem State (V184 — Post-Primordial Gate Deployment)
 
 | Metric | Value |
 |--------|-------|
@@ -13,6 +13,8 @@
 | wetSpring | V184 (345 scenarios, 49 niche, 52 consumed, 55 baselines) |
 | Registry sync | **458** — zero drift |
 | Niche capabilities | **49** (was 43; +6 bonding.*) |
+| NUCLEUS deployment | **southGate LIVE** — 9/9 primals started, exp091+exp094 PASS |
+| plasmidBin | v5.5.0, CLI alignment fix `8c8cb44` absorbed |
 | Active gaps | WS-9 (L3 parity), WS-11 (variant caller re-measurement) |
 | Resolved | WS-1 (ionic — IMPLEMENTED + locally wired), WS-8, WS-10 |
 
@@ -22,8 +24,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **Gate** | `handoffs/WETSPRING_GATE_DEPLOYMENT_MAY23_2026.md` | May 23 | **Post-primordial gate deployment**: southGate status, proto-nucleate composition, deployment plan, strandGate GPU secondary. |
-| **V184** | *(V184 commit)* | May 23 | **Wave 46 absorption**: registry 458, ionic bonding module, primalSpring v0.9.27 pin, 49 niche. |
+| **Gate** | `handoffs/WETSPRING_GATE_DEPLOYMENT_MAY23_2026.md` | May 23 | **Post-primordial gate deployment EXECUTED**: southGate 9/9 primals, exp091+exp094 PASS. Deployment issues documented for upstream. |
 | **V183** | `handoffs/WETSPRING_V183_DEEP_DEBT_EVOLUTION_HANDOFF_MAY22_2026.md` | May 22 | **Deep debt evolution**: Track A-E (refactoring, discovery, baselines, fan_out, notebooks). Composition patterns for NUCLEUS deployment. |
 | **V180** | `handoffs/WETSPRING_UPSTREAM_ASKS_RIVER_DELTA_MAY19_2026.md` | May 19 | **River Delta**: upstream asks for WS-2 (RootPulse), WS-3 (chain anchor), WS-4 (WASM). WS-1 ionic now RESOLVED locally (V184). |
 || | *Superseded → `handoffs/archive/`* | | V182 and earlier archived (**199** files). |
@@ -35,15 +36,18 @@
 | `ECOSYSTEM_LEVERAGE_GUIDE.md` | What wetSpring absorbs from ecosystem and contributes back |
 | `CROSS_SPRING_SHADER_EVOLUTION.md` | Cross-spring shader provenance map — 800+ barraCuda WGSL, zero local |
 
-## Upstream Blockers (Wave 46)
+## Upstream Blockers (Post-Deployment Findings)
 
-| Blocker | Owner | wetSpring Impact |
-|---------|-------|------------------|
-| `compute.fan_out` primitive | toadStool | Tenaillon 264-clone batch (590 GB) awaiting fan_out scheduler |
-| `capability.call` remote dispatch | songbird | Cross-gate ionic bond calls need TCP routing over TURN relay |
-| `crypto.ionic_bond.seal` (Ed25519) | bearDog | Provenance seal signing for bond termination |
-| Nest deploy (VPS) | nestGate / projectNUCLEUS | WS-9 L3 parity requires live trio |
-| biomeOS E2E `nest.sync` | biomeOS | WS-2 cross-spring data exchange |
+| Blocker | Owner | wetSpring Impact | Status |
+|---------|-------|------------------|--------|
+| `compute.fan_out` primitive | toadStool | Tenaillon 264-clone batch (590 GB) awaiting fan_out scheduler | WAITING |
+| `capability.call` remote dispatch | songbird | Cross-gate ionic bond calls need TCP routing over TURN relay | WAITING |
+| `crypto.ionic_bond.seal` (Ed25519) | bearDog | Provenance seal signing for bond termination | WAITING |
+| Nest deploy (VPS) | nestGate / projectNUCLEUS | WS-9 L3 parity requires live trio | WAITING |
+| biomeOS E2E `nest.sync` | biomeOS | WS-2 cross-spring data exchange | WAITING |
+| loamSpine tokio nesting panic | loamSpine | Provenance trio incomplete on southGate | **BUG** |
+| toadStool/nestgate/rhizoCrypt health probe | plasmidBin/respective | Health sweep shows UNREACHABLE despite start success | TIMING |
+| Squirrel needs Ollama endpoint | Squirrel | AI narration unavailable without local Ollama | OPTIONAL |
 
 ## Archive
 

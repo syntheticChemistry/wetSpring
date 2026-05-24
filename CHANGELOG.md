@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V184] — 2026-05-23
+
+### Post-Primordial Covalent Gate Deployment — NUCLEUS Live on southGate
+
+- **NUCLEUS deployed:** 9/9 primals started on southGate via plasmidBin `nucleus_launcher.sh --composition nucleus --validate`. Tower (BearDog + Songbird) ALIVE, Core (barraCuda + coralReef) ALIVE. exp091 primal routing matrix PASS. exp094 composition parity PASS.
+- **plasmidBin v5.5.0 CLI alignment absorbed:** Commit `8c8cb44` fixes Songbird `--beardog-socket` flag, barracuda/coralreef/rhizocrypt/loamspine/sweetgrass `serve → server`, coralreef `--port → --rpc-bind`. Validated on ironGate (12/12), confirmed on southGate (9/9 started, 4/9 healthy).
+- **Ionic bonding wired (V184):** `ipc::bonding` module implements JSON-RPC handlers for IonicContractRegistry lifecycle (propose, accept, reject, status, terminate, list). Feature-gated behind `guidestone`. 6 new `bonding.*` niche capabilities registered.
+- **primalspring validate:** 1043/1172 checks passed (89%). Failures: cross-gate capability routing (songbird mesh not yet operational), membrane graph node expectations.
+- **wetspring validate:** 66/77 scenarios PASS against live NUCLEUS. 9 FAIL: 2 stale checksums (niche.rs, Cargo.toml), 3 empty hardware benchmarks, 1 tolerance drift, 1 biomeOS binary check, 1 IPC routing, 1 data skip.
+- **Upstream deployment issues documented:** loamSpine tokio runtime nesting panic, toadStool/nestgate/rhizoCrypt health probe timing, Squirrel needs Ollama. Filed in gate deployment handoff.
+- **Gate assignment confirmed:** southGate primary (5800X3D, 128GB DDR4), strandGate secondary (Dual EPYC, RTX 3090 + RX 6950 XT). Co-resident: healthSpring (south), airSpring (strand).
+- Build gate: `cargo build --release --features guidestone` clean. `nucleus_launcher.sh --validate` PASS.
+
 ## [V183] — 2026-05-22
 
 ### Deep Debt Evolution — Structural Refinement Complete
