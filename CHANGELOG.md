@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V185] — 2026-05-25
+
+### Wave 48 Covalent Mesh — Behavioral Convergence + Cell Deployment
+
+- **`wetspring serve` behavioral convergence:** Added `--socket`, `--port`, `--family-id` CLI flags per DEPLOYMENT_BEHAVIOR_STANDARD v1.0. `server` alias added. Cell launcher compatible. Springs are not primals but now meet the same deployment surface.
+- **Cell deployment validated:** `wetspring_cell.toml` defines 13-node graph (NUCLEUS base + domain overlay + petalTongue live mode). Cell launcher `spawn=false` correctly defers to running NUCLEUS; `wetspring` node starts as order 12 domain overlay.
+- **Songbird TCP federation enabled:** Port 7700 confirmed listening, `discovery.peers` returns `{"peers":[],"total_count":0}` (single gate). Ready for cross-gate mesh when other gates come online.
+- **primalSpring Wave 47/48 absorbed:** v0.9.28, 52 scenarios (3 new: coordination-api, health-lifecycle-surface, crypto-identity-surface), 458/458 methods exercised (100% coverage), 787 tests. `downstream_manifest.toml` fixed: `guidestone_binary = "wetspring"`, `guidestone_readiness = 5`.
+- **CONTEXT.md Gate Deployment section completed:** Hardware confirmed (5800X3D, 128GB DDR4, RTX 4060), strandGate secondary documented.
+- Build gate: `wetspring serve --help` shows `--socket`/`--port`/`--family-id`. `wetspring server` alias works.
+
 ## [V184] — 2026-05-23
 
 ### Post-Primordial Covalent Gate Deployment — NUCLEUS Live on southGate

@@ -54,7 +54,18 @@ pub enum Commands {
         format: OutputFormat,
     },
     /// Start JSON-RPC IPC server (biomeOS science primal).
-    Serve,
+    #[command(alias = "server")]
+    Serve {
+        /// Bind UDS at this path (overrides WETSPRING_SOCKET / XDG discovery).
+        #[arg(long)]
+        socket: Option<std::path::PathBuf>,
+        /// Bind TCP on this port (opt-in; UDS is default transport).
+        #[arg(long)]
+        port: Option<u16>,
+        /// Family identifier for BTSP socket naming.
+        #[arg(long)]
+        family_id: Option<String>,
+    },
     /// Print composition health status.
     Status {
         /// Output format (text or json).

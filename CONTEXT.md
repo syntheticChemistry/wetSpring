@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V184:** Post-primordial covalent gate deployment. Live NUCLEUS validated on southGate (9/9 primals started, exp091+exp094 PASS). Ionic bonding wired (`ipc::bonding` → `IonicContractRegistry`, 6 methods). 345 scenarios (318 validation + 23 benchmark + 4 composition). Registry 458, 49 niche, 52 consumed. plasmidBin v5.5.0 CLI alignment absorbed.
+**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`, `--port`, `--family-id`). Cell deployment validated. Songbird TCP federation port 7700 live. primalSpring v0.9.28 (52 scenarios, 458/458 methods exercised). 345 scenarios, 49 niche, 52 consumed. southGate operational.
 
 ## Role in the Ecosystem
 
@@ -91,12 +91,14 @@ Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
 | Field | Value |
 |-------|-------|
 | **Gate** | southGate |
-| **Composition** | Node Atomic (9/9 primals validated) |
-| **NUCLEUS status** | operational |
+| **Hardware** | AMD Ryzen 7 5800X3D 8-Core, 128GB DDR4, NVIDIA RTX 4060 |
+| **Composition** | Node Atomic (9/9 primals started, exp091+exp094 PASS) |
+| **NUCLEUS status** | **operational** (plasmidBin v5.5.0, CLI fix `8c8cb44`) |
 | **Songbird federation** | port 7700 |
 | **LAN mesh** | ready — covalent linking via Songbird TCP |
 | **Cell graph** | `plasmidBin/cells/wetspring_cell.toml` |
-| **Launch** | `SONGBIRD_FEDERATION_PORT=7700 ./tools/nucleus_launcher.sh start` then `./tools/cell_launcher.sh wetspring start` |
+| **Secondary gate** | strandGate (Dual EPYC 64-core, 256GB ECC, RTX 3090 + RX 6950 XT) — GPU science |
+| **Launch** | `SONGBIRD_FEDERATION_PORT=7700 nucleus_launcher.sh --family-id nucleus01 --composition nucleus` then `cell_launcher.sh wetspring start` |
 
 ## Design Philosophy
 

@@ -5,18 +5,19 @@
 
 ---
 
-## Current Ecosystem State (V184 — Post-Primordial Gate Deployment)
+## Current Ecosystem State (V185 — Wave 48 Covalent Mesh)
 
 | Metric | Value |
 |--------|-------|
-| primalSpring | v0.9.27 (458 methods, 49 scenarios, ionic runtime live) |
-| wetSpring | V184 (345 scenarios, 49 niche, 52 consumed, 55 baselines) |
+| primalSpring | v0.9.28 (458 methods, 52 scenarios, 100% coverage, behavioral convergence) |
+| wetSpring | V185 (345 scenarios, 49 niche, 52 consumed, 55 baselines) |
 | Registry sync | **458** — zero drift |
 | Niche capabilities | **49** (was 43; +6 bonding.*) |
-| NUCLEUS deployment | **southGate LIVE** — 9/9 primals started, exp091+exp094 PASS |
-| plasmidBin | v5.5.0, CLI alignment fix `8c8cb44` absorbed |
+| NUCLEUS deployment | **southGate LIVE** — 9/9 primals, exp091+exp094 PASS, Songbird TCP :7700 |
+| Cell deployment | `wetspring_cell.toml` validated, `server` alias ready |
+| plasmidBin | v5.5.0, CLI fix `8c8cb44` + simplified `9231b24` |
 | Active gaps | WS-9 (L3 parity), WS-11 (variant caller re-measurement) |
-| Resolved | WS-1 (ionic — IMPLEMENTED + locally wired), WS-8, WS-10 |
+| Resolved | WS-1 (ionic — IMPLEMENTED + locally wired), WS-4 (WASM expanded), WS-8, WS-10 |
 
 ---
 

@@ -54,7 +54,11 @@ fn main() {
             list,
             format,
         } => cmd_benchmark(scenario.as_deref(), list, format),
-        cli::Commands::Serve => cmd_serve(),
+        cli::Commands::Serve {
+            ref socket,
+            port,
+            ref family_id,
+        } => cmd_serve(socket.as_deref(), port, family_id.as_deref()),
         cli::Commands::Status { format } => cmd_status(format),
         cli::Commands::Version => cmd_version(),
     }
@@ -175,7 +179,11 @@ fn cmd_validate(
     std::process::exit(v.exit_code());
 }
 
-fn cmd_serve() {
+fn cmd_serve(
+    socket_override: Option<&std::path::Path>,
+    _port: Option<u16>,
+    family_id_override: Option<&str>,
+) {
     tracing_subscriber::fmt::init();
 
     tracing::info!(
@@ -184,7 +192,26 @@ fn cmd_serve() {
         "starting science primal (UniBin)"
     );
 
-    let server = match wetspring_barracuda::ipc::Server::bind_default() {
+    let resolved_socket;
+    let bind_path: Option<&std::path::Path> = if let Some(sock) = socket_override {
+        Some(sock)
+    } else if let Some(fid) = family_id_override {
+        let xdg = std::env::var("XDG_RUNTIME_DIR")
+            .unwrap_or_else(|_| std::env::temp_dir().display().to_string());
+        resolved_socket = std::path::PathBuf::from(xdg)
+            .join("biomeos")
+            .join(format!("wetspring-{fid}.sock"));
+        Some(&resolved_socket)
+    } else {
+        None
+    };
+
+    let server = if let Some(sock) = bind_path {
+        wetspring_barracuda::ipc::Server::bind(sock)
+    } else {
+        wetspring_barracuda::ipc::Server::bind_default()
+    };
+    let server = match server {
         Ok(s) => s,
         Err(e) => {
             tracing::error!(error = %e, "cannot bind socket");

@@ -15,7 +15,7 @@ against Rust implementations, then promotes to GPU acceleration via
   wetspring certify      — Layered certification (L0–L6)
   wetspring validate     — Two-tier scenario validation (--scenario, --track, --tier)
   wetspring benchmark    — Performance benchmarks
-  wetspring serve        — JSON-RPC IPC server (biomeOS science primal)
+  wetspring serve        — JSON-RPC IPC server (--socket, --port, --family-id)
   wetspring status       — Composition health summary
   wetspring version      — Version info
 ```
@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V184:** Post-primordial covalent gate deployment. NUCLEUS live on southGate (9/9 primals started, exp091+exp094 PASS, plasmidBin v5.5.0). Ionic bonding wired (6 methods). 66/77 scenarios PASS against live composition. Registry 458, 49 niche, 52 consumed. **2 gaps active (WS-9 L3, WS-11 calibration).**
+**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`/`--port`/`--family-id` + `server` alias). Cell deployment validated. Songbird TCP :7700 federation live on southGate. primalSpring v0.9.28 (52 scenarios, 100% method coverage). Registry 458, 49 niche, 52 consumed. **2 gaps active (WS-9 L3, WS-11 calibration).**
 
 ---
 
