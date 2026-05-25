@@ -5,12 +5,12 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-20 (V184: UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring`
-binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 SEALED (7/7).
-Tenaillon 2016 batch 0 COMPLETE (5/5 clones, 974 variants). 386 experiments indexed
-(385 completed + 1 in progress), 5,967+ checks, **1,962** lib tests
-**+ 97 integration + 18 IPC** roundtrip (0 failures). 12 paper notebooks. 63/63 papers.
-52 consumed capabilities (registry 458). 2 gaps active (WS-9 L3, WS-11), 1 resolved (WS-10).)
+**Updated**: 2026-05-25 (V185: Wave 48 covalent mesh. 345 scenarios, 23 benchmarks.
+50 niche, 59 consumed, 45 dispatch, 22 domains. Songbird TCP :7700.
+386 experiments indexed (385 completed + 1 in progress), 5,967+ checks,
+**1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures).
+16 notebooks. 63/63 papers. primalSpring v0.9.28 (registry 458).
+2 gaps active (WS-9 L3, WS-11).)
 
 ---
 
@@ -705,7 +705,7 @@ resist pathogen colonization better than low-diversity strong-binding communitie
 Module: `bio::binding_landscape` (17 unit tests passing). Binary: `validate_colonization_resistance`.
 Joint with healthSpring exp097/exp098.
 
-**Totals (V182): 386 experiments indexed, 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition), 5,967+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). Wave 20 schema standard. 52 consumed (registry 458). Clippy zero workspace. Live NUCLEUS guideStone 38/38 pass. 2 gaps active (WS-9 L3, WS-11 calibration), 1 resolved (WS-10). 2 PG open (deployment-only), 20 resolved/closed.**
+**Totals (V185): 386 experiments indexed, 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition), 5,967+ checks, 1,962 lib tests + 97 integration + 18 IPC roundtrip (0 failures). Live composition health (runtime probing). 59 consumed, 50 niche, 45 dispatch, 22 domains (registry 458). Clippy zero workspace. Live NUCLEUS guideStone 38/38 pass. 2 gaps active (WS-9 L3, WS-11 calibration). 2 PG open (deployment-only), 20 resolved/closed.**
 
 ### Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic (V179 — DONE, 10/10)
 
@@ -716,7 +716,7 @@ braid for lithoSpore. Scenario: `breseq_barrick_2009` (`--features ipc`).
 Environment: `micromamba breseq-env` on 4TB NVMe. REL1164M: 579 mutations, REL8593M:
 1108 mutations. Mutation accumulation trend confirmed. Braid exported.
 
-**Totals (V182): 386 experiments indexed (385 completed + 1 in progress), 345 UniBin scenarios, 5,967+ checks. 52 consumed capabilities (registry 458). Barrick 2009 SEALED, Tenaillon batch 0 COMPLETE. 2 WS gaps active, 2 PG open (deployment-only), 20 resolved/closed.**
+**Totals (V185): 386 experiments indexed (385 completed + 1 in progress), 345 UniBin scenarios, 5,967+ checks. 59 consumed capabilities, 50 niche, 45 dispatch (registry 458). Barrick 2009 SEALED, Tenaillon batch 0 COMPLETE. 2 WS gaps active, 2 PG open (deployment-only), 20 resolved/closed.**
 
 ---
 

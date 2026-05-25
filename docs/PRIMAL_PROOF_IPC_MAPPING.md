@@ -2,7 +2,7 @@
 
 # wetSpring — Primal Proof IPC Mapping
 
-**Last Updated:** May 17, 2026 (V174 — Exp377–379 hormesis chain. Deep debt resolved. Live composition health. Registry 458, 51 consumed.)
+**Last Updated:** May 25, 2026 (V185 — Wave 48 covalent mesh. 59 consumed, 50 niche, 45 dispatch, 22 domains. Registry 458. southGate NUCLEUS operational.)
 
 When `--features primal-proof` is enabled, wetSpring routes cross-primal calls
 through IPC rather than linking primal libraries. This document maps each domain

@@ -2,8 +2,8 @@
 
 # wetSpring Specifications
 
-**Last Updated**: May 22, 2026
-**Status**: V184 — Deep debt evolution complete. 345 scenarios (318 validation + 23 benchmark + 4 composition). 6 oversize files refactored. Discovery evolution (Songbird-first). 3 new Python baselines (55 total). 8 notebooks UniBin-migrated. **guideStone Level 5** (primal proof). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 49 niche capabilities, 52 consumed, 21 domains, 136/136 proto-nucleate, 7 deploy graphs, 2 PG gaps open (deployment-only, 20 resolved/closed). Registry synced to 458 methods. 386 experiments (385 done + 1 in progress), 5,967+ checks.
+**Last Updated**: May 25, 2026
+**Status**: V185 — Wave 48 covalent mesh. 345 scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains. **guideStone Level 5** (primal proof). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 136/136 proto-nucleate, 7 deploy graphs, 2 PG gaps open (deployment-only, 20 resolved/closed). Registry synced to 458 methods (primalSpring v0.9.28). 386 experiments (385 done + 1 in progress), 5,967+ checks. southGate NUCLEUS operational, Songbird TCP :7700.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

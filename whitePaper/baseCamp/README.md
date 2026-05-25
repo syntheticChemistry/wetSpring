@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** May 22, 2026
+**Date:** May 25, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V184 — Deep debt evolution complete. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 6 oversize files refactored into directory modules. Discovery evolution (Songbird-first resolution). 3 new Python baselines (55 total). 49 niche, 52 consumed (registry 458). 1,962 lib tests pass. 386 experiments (385 done + 1 in progress). **2** gaps open (deployment-only), 20 resolved/closed.
+**Status:** V185 — Wave 48 covalent mesh. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). primalSpring v0.9.28. 1,962 lib tests pass. 386 experiments (385 done + 1 in progress). **2** PG gaps open (deployment-only), 20 resolved/closed. southGate NUCLEUS operational, Songbird TCP :7700.
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).

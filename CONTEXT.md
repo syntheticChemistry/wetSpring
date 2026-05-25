@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`, `--port`, `--family-id`). Cell deployment validated. Songbird TCP federation port 7700 live. primalSpring v0.9.28 (52 scenarios, 458/458 methods exercised). 345 scenarios, 49 niche, 52 consumed. southGate operational.
+**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`, `--port`, `--family-id`). Cell deployment validated. Songbird TCP federation port 7700 live. primalSpring v0.9.28 (52 scenarios, 458/458 methods exercised). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. southGate operational.
 
 ## Role in the Ecosystem
 
@@ -34,7 +34,7 @@ evolution pipeline.
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 2 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, PG-06 locally wired (V185), PG-02/PG-04 deployed (verification pending), 17 resolved/closed. Zero wetSpring-internal gaps.
+- **Primal gaps:** 2 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, PG-06 locally wired (V185), PG-02/PG-04 deployed (verification pending), 20 resolved/closed. Zero wetSpring-internal gaps.
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities
@@ -81,7 +81,7 @@ Tier 2: UniBin scenarios → NUCLEUS composition patterns
 Tier 3: Composition      → IPC parity → Niche gate
            (L2+L3)         (Exp401)     (Exp402)
 Tier 4: Primal proof     → Live NUCLEUS IPC (Exp403) → ecoBin harvest
-           (52 consumed)    (5 primals, check_skip)    (plasmidBin)
+           (59 consumed)    (5 primals, check_skip)    (plasmidBin)
 Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
            (wetspring certify) (38/38 live NUCLEUS, v0.9.17 manifest)
 ```

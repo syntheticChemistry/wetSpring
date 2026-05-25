@@ -1,6 +1,6 @@
 # wetSpring wateringHole
 
-**Date:** May 23, 2026
+**Date:** May 25, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
@@ -10,14 +10,14 @@
 | Metric | Value |
 |--------|-------|
 | primalSpring | v0.9.28 (458 methods, 52 scenarios, 100% coverage, behavioral convergence) |
-| wetSpring | V185 (345 scenarios, 49 niche, 52 consumed, 55 baselines) |
+| wetSpring | V185 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
 | Registry sync | **458** — zero drift |
-| Niche capabilities | **49** (was 43; +6 bonding.*) |
+| Niche capabilities | **50** (was 49; +lifecycle.status) |
 | NUCLEUS deployment | **southGate LIVE** — 9/9 primals, exp091+exp094 PASS, Songbird TCP :7700 |
 | Cell deployment | `wetspring_cell.toml` validated, `server` alias ready |
 | plasmidBin | v5.5.0, CLI fix `8c8cb44` + simplified `9231b24` |
 | Active gaps | WS-9 (L3 parity), WS-11 (variant caller re-measurement) |
-| Resolved | WS-1 (ionic — IMPLEMENTED + locally wired), WS-4 (WASM expanded), WS-8, WS-10 |
+| Resolved | WS-1 (ionic — WIRED), WS-4 (WASM upstream), WS-8, WS-10 |
 
 ---
 
@@ -25,10 +25,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **Gate** | `handoffs/WETSPRING_GATE_DEPLOYMENT_MAY23_2026.md` | May 23 | **Post-primordial gate deployment EXECUTED**: southGate 9/9 primals, exp091+exp094 PASS. Deployment issues documented for upstream. |
-| **V183** | `handoffs/WETSPRING_V183_DEEP_DEBT_EVOLUTION_HANDOFF_MAY22_2026.md` | May 22 | **Deep debt evolution**: Track A-E (refactoring, discovery, baselines, fan_out, notebooks). Composition patterns for NUCLEUS deployment. |
-| **V180** | `handoffs/WETSPRING_UPSTREAM_ASKS_RIVER_DELTA_MAY19_2026.md` | May 19 | **River Delta**: upstream asks for WS-2 (RootPulse), WS-3 (chain anchor), WS-4 (WASM). WS-1 ionic now RESOLVED locally (V184). |
-|| | *Superseded → `handoffs/archive/`* | | V182 and earlier archived (**199** files). |
+| **W48** | `handoffs/WETSPRING_WAVE48_COVALENT_MESH_MAY25_2026.md` | May 25 | **Covalent mesh deployment conformance**: health.liveness shape, lifecycle.status, bonding.* dispatched, Songbird TCP :7700, cell deployment. |
+| | *Superseded → `handoffs/archive/`* | | Gate deployment + V183 and earlier archived (**202** files). |
 
 ## Cross-Spring Documents
 
@@ -42,17 +40,16 @@
 | Blocker | Owner | wetSpring Impact | Status |
 |---------|-------|------------------|--------|
 | `compute.fan_out` primitive | toadStool | Tenaillon 264-clone batch (590 GB) awaiting fan_out scheduler | WAITING |
-| `capability.call` remote dispatch | songbird | Cross-gate ionic bond calls need TCP routing over TURN relay | WAITING |
+| `capability.call` remote dispatch | songbird | Cross-gate ionic bond calls need TCP routing via mesh | WAITING |
 | `crypto.ionic_bond.seal` (Ed25519) | bearDog | Provenance seal signing for bond termination | WAITING |
-| Nest deploy (VPS) | nestGate / projectNUCLEUS | WS-9 L3 parity requires live trio | WAITING |
 | biomeOS E2E `nest.sync` | biomeOS | WS-2 cross-spring data exchange | WAITING |
 | loamSpine tokio nesting panic | loamSpine | Provenance trio incomplete on southGate | **BUG** |
-| toadStool/nestgate/rhizoCrypt health probe | plasmidBin/respective | Health sweep shows UNREACHABLE despite start success | TIMING |
+| Health probe timing | plasmidBin/respective | rhizoCrypt/sweetGrass/toadStool sometimes exceed 8s timeout | TIMING |
 | Squirrel needs Ollama endpoint | Squirrel | AI narration unavailable without local Ollama | OPTIONAL |
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — V182 and earlier (**199** files).
+Superseded handoffs in `handoffs/archive/` — gate deployment + V183 and earlier (**202** files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → guideStone → ecoBin harvest.
 
 ## Convention

@@ -1,11 +1,24 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V184 (2026-05-23)
+**Last updated:** V185 (2026-05-25)
 **Lib tests:** 1,962 passed, 0 failed, 2 ignored (pre-existing upstream module visibility)
 **UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
-**Live NUCLEUS:** southGate — 9/9 primals started, exp091+exp094 PASS
+**Live NUCLEUS:** southGate — 9/9 primals, Songbird TCP :7700 federation
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
 **Clippy:** zero warnings (`--features ipc --lib -- -W clippy::pedantic -W clippy::nursery`)
+**Dispatch methods:** 45 (was 38; +lifecycle.status, +6 bonding.*)
+
+## V185 Wave 48 Covalent Mesh
+
+Deployment conformance + debt resolution:
+- **`health.liveness`:** Returns `{"status":"alive"}` per DEPLOYMENT_BEHAVIOR_STANDARD v1.0
+- **`lifecycle.status`:** New handler — primal name, version, status, uptime_s
+- **`bonding.*` dispatched:** 6 handlers wired into JSON-RPC dispatch (propose, accept, reject, status, terminate, list)
+- **`wetspring serve`:** `--socket`, `--port`, `--family-id` flags + `server` alias
+- **Songbird TCP federation:** Port 7700 confirmed, `discovery.peers` responding
+- **Cell deployment:** `wetspring_cell.toml` validated (13 nodes, domain overlay order 12)
+- **primalSpring v0.9.28 absorbed:** 52 scenarios, 458/458 methods (100% coverage), 787 tests
+- **22 domains, 50 niche capabilities, 59 consumed capabilities**
 
 ## V184 Post-Primordial Gate Deployment
 
@@ -107,9 +120,11 @@ primal_parity_v1          (Tier 2, 5 primals live)
 
 ## Hardware Matrix
 
-| Substrate | Validated | Coverage |
-|-----------|-----------|----------|
-| CPU (i9-12900K) | 1,962 lib + 28 CPU scenarios | Full |
-| GPU (RTX 4070 Ada) | 14 GPU + 9 CPU-vs-GPU scenarios | Full |
-| GPU (Titan V) | Cross-spring validators | Partial (NVK) |
-| NPU (AKD1000) | metalForge dispatch routing | Routing only |
+| Substrate | Gate | Validated | Coverage |
+|-----------|------|-----------|----------|
+| CPU (5800X3D 8c) | southGate | 1,962 lib + 28 CPU scenarios | Full |
+| GPU (RTX 4060) | southGate | 14 GPU + 9 CPU-vs-GPU scenarios | Full |
+| CPU (i9-12900K) | eastGate | Lib tests, 28 CPU scenarios | Full |
+| GPU (RTX 4070 Ada) | eastGate | 14 GPU + 9 CPU-vs-GPU | Full |
+| GPU (Titan V) | biomeGate | Cross-spring validators | Partial (NVK) |
+| NPU (AKD1000) | ironGate | metalForge dispatch routing | Routing only |

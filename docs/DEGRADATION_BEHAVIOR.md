@@ -2,7 +2,7 @@
 
 # wetSpring — Degradation Behavior
 
-**Last Updated**: May 17, 2026 (V177 — Wave 20 PM lithoSpore audit absorption)
+**Last Updated**: May 25, 2026 (V185 — Wave 48 covalent mesh, 6 bonding.* handlers wired)
 **Scope**: What happens when each consumed primal is unreachable
 **Contract**: Domain logic (science, validation) MUST NOT fail because a primal
 is unavailable. Provenance is enrichment, not a gate.

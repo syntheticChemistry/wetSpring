@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 20, 2026 (V184 — UniBin eukaryotic consolidation. 349 binaries → 1 `wetspring` binary (337 scenarios, 23 benchmarks). Build time 25min → 1m44s. Barrick 2009 SEALED (7/7). Tenaillon batch 0 COMPLETE (5/5). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 52 consumed capabilities (registry 458). 2 primal gaps open (deployment-only), 20 resolved/closed. 63/63 papers.)
+**Updated:** May 25, 2026 (V185 — Wave 48 covalent mesh. 345 scenarios, 23 benchmarks. 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458, primalSpring v0.9.28). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. southGate NUCLEUS operational.)
 
 ---
 
@@ -20,7 +20,7 @@ wetspring-barracuda
 ├── 44 GPU bio modules          (44 Lean/Compose, 0 Passthrough)
 ├── 1 provenance module         (barracuda::shaders::provenance wiring)
 ├── 3 streaming I/O parsers     (FASTQ/gzip, mzML/base64, MS2)
-├── 1 UniBin (wetspring)        (337 scenarios, 23 benchmarks via clap dispatch)
+├── 1 UniBin (wetspring)        (345 scenarios, 23 benchmarks via clap dispatch)
 └── depends on: barracuda via path dependency
 ```
 

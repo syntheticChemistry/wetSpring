@@ -26,7 +26,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **Validation checks** | 5,967+ across 345 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 49 niche, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch, 21 domains |
+| **IPC capabilities** | 50 niche, 59 consumed (33 canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 45 dispatch, 22 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -35,12 +35,12 @@ against Rust implementations, then promotes to GPU acceleration via
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 2 open in `docs/PRIMAL_GAPS.md` (PG-02, PG-04 deployment-only; 20 resolved/closed). Zero internal gaps. |
+| **Primal gaps** | 2 open in `docs/PRIMAL_GAPS.md` (PG-02/PG-04 deployed, verification pending; PG-06 locally wired; 20 resolved/closed). Zero internal gaps. |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`/`--port`/`--family-id` + `server` alias). Cell deployment validated. Songbird TCP :7700 federation live on southGate. primalSpring v0.9.28 (52 scenarios, 100% method coverage). Registry 458, 49 niche, 52 consumed. **2 gaps active (WS-9 L3, WS-11 calibration).**
+**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`/`--port`/`--family-id` + `server` alias). Cell deployment validated. Songbird TCP :7700 federation live on southGate. primalSpring v0.9.28 (52 scenarios, 100% method coverage). Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration).**
 
 ---
 
