@@ -86,6 +86,18 @@ Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
            (wetspring certify) (38/38 live NUCLEUS, v0.9.17 manifest)
 ```
 
+## Gate Deployment
+
+| Field | Value |
+|-------|-------|
+| **Gate** | southGate |
+| **Composition** | Node Atomic (9/9 primals validated) |
+| **NUCLEUS status** | operational |
+| **Songbird federation** | port 7700 |
+| **LAN mesh** | ready — covalent linking via Songbird TCP |
+| **Cell graph** | `plasmidBin/cells/wetspring_cell.toml` |
+| **Launch** | `SONGBIRD_FEDERATION_PORT=7700 ./tools/nucleus_launcher.sh start` then `./tools/cell_launcher.sh wetspring start` |
+
 ## Design Philosophy
 
 Primals are built using AI-assisted constrained evolution. Rust's
