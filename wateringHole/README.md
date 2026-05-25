@@ -5,7 +5,7 @@
 
 ---
 
-## Current Ecosystem State (V186 — Wave 49 Post-Primordial)
+## Current Ecosystem State (V187 — Wave 50 Covalent HPC)
 
 | Metric | Value |
 |--------|-------|
@@ -25,6 +25,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **W50** | `handoffs/WETSPRING_WAVE50_COVALENT_HPC_MAY25_2026.md` | May 25 | **Covalent HPC readiness**: NUCLEUS 7/13, cross-subnet confirmed, WS-2 nest.sync path, upstream blockers documented. |
 | **W49** | `handoffs/WETSPRING_WAVE49_POST_PRIMORDIAL_MAY25_2026.md` | May 25 | **Post-primordial cleanup**: plasmidBin-only discovery, shared `primal_binary` module, composition script cleaned, legacy `phase2/` paths updated. |
 | **W48** | `handoffs/WETSPRING_WAVE48_COVALENT_MESH_MAY25_2026.md` | May 25 | **Covalent mesh deployment conformance**: health.liveness shape, lifecycle.status, bonding.* dispatched, Songbird TCP :7700, cell deployment. |
 | | *Superseded → `handoffs/archive/`* | | Gate deployment + V183 and earlier archived (**202** files). |

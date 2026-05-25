@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V186:** Wave 49 post-primordial. All primal binary discovery via plasmidBin only — `target/release/` and PATH fallbacks removed (4 experiment files, composition script). Shared `primal_binary` module. Legacy `phase2/` path references updated to `primals/`. Songbird TCP :7700 federation on southGate. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration).**
+**Current release — V187:** Wave 50 covalent HPC readiness. Post-primordial (V186). Cross-subnet confirmed (southGate 192.168.4.29 → eastGate 192.168.1.144:7700, 4ms). NUCLEUS 7/13 health-responding. Songbird TCP 0.0.0.0:7700. WS-2 `nest.sync` path identified. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration).**
 
 ---
 

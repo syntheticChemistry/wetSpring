@@ -4,10 +4,10 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-25 (V185 — Wave 48 covalent mesh. NUCLEUS live on southGate
-(9/9 primals, Songbird TCP :7700 federation). PG-02/PG-04 narrowed to verification.
-PG-06 locally wired (ipc::bonding dispatched). 45 dispatch methods, 59 consumed
-capabilities, registry 458. Bonding on the wire.)
+Last updated: 2026-05-25 (V187 — Wave 50 post-primordial. NUCLEUS 7/13 health-responding
+on southGate (Songbird TCP :7700 federation 0.0.0.0, cross-subnet reachable).
+PG-02/PG-04 narrowed to verification. PG-06 locally wired (ipc::bonding dispatched).
+45 dispatch methods, 59 consumed capabilities, registry 458. Covalent HPC target.)
 
 ---
 

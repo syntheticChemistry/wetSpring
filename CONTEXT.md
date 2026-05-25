@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V186:** Wave 49 post-primordial. All primal discovery via plasmidBin — `target/release/` and PATH fallbacks removed. Shared `primal_binary` module. Legacy `phase2/` path refs updated. 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. southGate operational.
+**Current release — V187:** Wave 50 covalent HPC readiness. Post-primordial (V186). NUCLEUS 7/13 health-responding on southGate, Songbird TCP 0.0.0.0:7700. Cross-subnet reachable (4ms to eastGate). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains.
 
 ## Role in the Ecosystem
 

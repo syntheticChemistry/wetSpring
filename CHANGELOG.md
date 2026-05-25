@@ -3,6 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V187] — 2026-05-25
+
+### Wave 50 — Covalent HPC Readiness + NUCLEUS Validation
+
+- **Cross-subnet connectivity confirmed:** southGate (192.168.4.29) → eastGate (192.168.1.144:7700) routable at 4ms. No TURN relay required despite different /22 subnets.
+- **NUCLEUS health sweep:** 7/13 primals health-responding (Songbird, ToadStool, barraCuda, coralReef, NestGate, sweetGrass, petalTongue). 11/13 processes running. loamSpine Tokio panic (known upstream). BearDog/Squirrel/biomeOS sockets timing out.
+- **Songbird federation:** TCP on 0.0.0.0:7700 (LAN-reachable, not loopback). `discovery.peers` responding (0 peers — no SONGBIRD_PEERS seeded yet due to Songbird crash instability).
+- **WS-2 gap updated:** `nest.sync` identified as concrete path for cross-spring data exchange. NestGate alive on southGate. Infrastructure deployed, orchestration experiment pending.
+- **WS-11 gap status:** Tenaillon batch 0 re-measurement via covalent compute (toadStool on remote gate) is Wave 50 target.
+- **GAPS.md / PRIMAL_GAPS.md / CONTROL_EXPERIMENT_STATUS:** Updated to V187 with Wave 50 deployment state.
+- Build gate: `cargo check --features guidestone` clean. Zero `target/release/` for primals.
+
 ## [V186] — 2026-05-25
 
 ### Wave 49 Post-Primordial — plasmidBin-Only Binary Discovery

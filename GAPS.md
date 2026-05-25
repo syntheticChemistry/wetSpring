@@ -4,11 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-25 (V185 — Wave 48 covalent mesh. NUCLEUS live on southGate,
-Songbird TCP :7700 federation. health.liveness conforms to DEPLOYMENT_BEHAVIOR_STANDARD
-v1.0 (status:alive). lifecycle.status added. bonding.* dispatched (6 methods on wire).
-45 dispatch methods. WS-4 upstream IMPLEMENTED (petal-tongue-wasm). PG-02/PG-04 deployed,
-pending explicit roundtrip verification. PG-06 locally wired.)
+Last updated: 2026-05-25 (V187 — Wave 50 post-primordial. NUCLEUS 7/13 health-responding
+on southGate, Songbird TCP :7700 federation 0.0.0.0. Cross-subnet reachable
+(192.168.4.29 → 192.168.1.144:7700, 4ms). WS-2 has concrete path via `nest.sync`
+on covalent mesh. WS-11 re-measurement pending covalent compute. PG-02/PG-04 deployed,
+pending explicit roundtrip. PG-06 locally wired.)
 
 ---
 
@@ -40,19 +40,20 @@ still requires bearDog crypto + songbird cross-gate + deployed gates.
 
 **Owner:** RootPulse team
 
-**Status:** Not started — NestGate stores locally, no remote pull protocol.
+**Status:** Infrastructure deployed, orchestration pending. NestGate `nest.sync` exists
+in biomeOS but wetSpring has not wired a live orchestration call.
 
 The `data.fetch.*` handlers store fetched data in NestGate with BLAKE3 hashes
 and provenance sessions. The `vault.*` handlers provide consent-gated storage.
-However:
+Wave 50 identifies `nest.sync` as the concrete path:
 
-- No protocol for another spring's NUCLEUS to pull provenance-wrapped data
-  subsets from this spring's NestGate
-- No RootPulse sync mechanism for cross-spring provenance chain exchange
-- No differential sync (only full fetch or nothing)
+- biomeOS has `nest.sync` graph capability for cross-gate backup
+- NestGate is alive on southGate (`nestgate-southgate.sock` responding)
+- Cross-subnet connectivity confirmed (southGate 192.168.4.29 → eastGate 192.168.1.144, 4ms)
+- Remaining: wire `nest.sync` call in wetSpring experiment, test live with remote gate
 
-**Impact:** Each spring operates as a silo. Ionic bonds can declare shared
-capabilities but cannot exchange stored data with provenance continuity.
+**Impact:** Each spring operates as a silo until `nest.sync` orchestration is
+wired. Covalent mesh provides the transport; experiment validation pending.
 
 ---
 

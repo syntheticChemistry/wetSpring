@@ -1,12 +1,22 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V185 (2026-05-25)
+**Last updated:** V187 (2026-05-25)
 **Lib tests:** 1,962 passed, 0 failed, 2 ignored (pre-existing upstream module visibility)
 **UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
-**Live NUCLEUS:** southGate — 9/9 primals, Songbird TCP :7700 federation
+**Live NUCLEUS:** southGate — 7/13 health-responding, Songbird TCP 0.0.0.0:7700
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
 **Clippy:** zero warnings (`--features ipc --lib -- -W clippy::pedantic -W clippy::nursery`)
 **Dispatch methods:** 45 (was 38; +lifecycle.status, +6 bonding.*)
+**Binary discovery:** plasmidBin-only (shared `primal_binary` module, Wave 49)
+
+## V187 Wave 50 Post-Primordial + Covalent HPC
+
+Wave 49 post-primordial compliance + Wave 50 covalent readiness:
+- **Post-primordial:** Zero `target/release/` for primal binaries. Shared `primal_binary` module.
+- **NUCLEUS:** 7/13 health-responding on southGate (Songbird, ToadStool, barraCuda, coralReef, NestGate, sweetGrass, petalTongue). loamSpine Tokio panic, BearDog/Squirrel/biomeOS socket timeout.
+- **Cross-subnet:** southGate (192.168.4.29) → eastGate (192.168.1.144:7700) reachable at 4ms. No TURN relay needed.
+- **Federation:** Songbird TCP on 0.0.0.0:7700 (LAN-reachable, not loopback).
+- **Covalent targets:** breseq pipeline validation, WS-2 nest.sync, WS-11 re-measurement via remote compute.
 
 ## V185 Wave 48 Covalent Mesh
 
