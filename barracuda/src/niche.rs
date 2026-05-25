@@ -145,7 +145,7 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "crypto.blake3_hash",
     "discovery.find_primals",
     "discovery.announce",
-    // ── barraCuda v0.9.17 canonical surface (33 methods) ──
+    // ── barraCuda canonical surface (87 methods upstream, 33 canonical consumed) ──
     // TENSOR (9)
     "tensor.create",
     "tensor.matmul",
@@ -217,6 +217,15 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "signal.dispatch",
     // ── Wave 20: schema standardization ──
     "primal.list",
+    // ── Wave 47: deployment behavioral convergence ──
+    "lifecycle.status",
+    // ── Wave 37/V184: ionic bonding lifecycle ──
+    "bonding.propose",
+    "bonding.accept",
+    "bonding.reject",
+    "bonding.status",
+    "bonding.terminate",
+    "bonding.list",
 ];
 
 /// Extended surface from Exp403 (Tier 2 IPC validation, pre-v0.9.17).
@@ -249,12 +258,13 @@ pub const CONSUMED_CAPABILITIES_LEGACY: &[&str] = &[
 /// Derived from `ipc::capability_domains::DOMAINS` — kept as a flat list
 /// for biomeOS registration and Songbird advertisement.
 pub const CAPABILITIES: &[&str] = &[
-    // ── health / discovery (biomeOS infrastructure) ──
+    // ── health / discovery / lifecycle (biomeOS infrastructure) ──
     "capability.list",
     "identity.get",
     "health.check",
     "health.liveness",
     "health.readiness",
+    "lifecycle.status",
     // ── ecology (science) ──
     "science.diversity",
     "science.qs_model",

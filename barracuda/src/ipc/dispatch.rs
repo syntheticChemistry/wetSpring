@@ -33,6 +33,7 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "health.check" => handlers::handle_health(),
         "health.liveness" => handlers::handle_health_liveness(),
         "health.readiness" => handlers::handle_health_readiness(),
+        "lifecycle.status" => handlers::handle_lifecycle_status(),
         "capability.list" => handlers::handle_capability_list(),
         "identity.get" => handlers::handle_identity(),
 
@@ -93,6 +94,14 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         // Composition health (spring-specific domain health)
         // Universal methods (tower, node, nest, nucleus) are owned by biomeOS v3.04+
         "composition.science_health" => handlers::handle_composition_science_health(params),
+
+        // Ionic bonding lifecycle (V184: IonicContractRegistry wired)
+        "bonding.propose" => crate::ipc::bonding::handle_propose(params),
+        "bonding.accept" => crate::ipc::bonding::handle_accept(params),
+        "bonding.reject" => crate::ipc::bonding::handle_reject(params),
+        "bonding.status" => crate::ipc::bonding::handle_status(params),
+        "bonding.terminate" => crate::ipc::bonding::handle_terminate(params),
+        "bonding.list" => crate::ipc::bonding::handle_list(params),
 
         _ => Err(RpcError::method_not_found(method)),
     }
@@ -318,7 +327,7 @@ mod tests {
         assert_eq!(result["domain"], "ecology");
 
         let methods = result["methods"].as_array().unwrap();
-        assert_eq!(methods.len(), 38, "Wire Standard L2: flat methods array");
+        assert_eq!(methods.len(), 45, "Wire Standard L2: flat methods array");
         assert!(methods.iter().any(|m| m == "science.diversity"));
         assert!(methods.iter().any(|m| m == "health.liveness"));
 
@@ -336,7 +345,7 @@ mod tests {
         let result = dispatch("capability.list", &json!({})).unwrap();
 
         let provided = result["provided_capabilities"].as_array().unwrap();
-        assert_eq!(provided.len(), 21);
+        assert_eq!(provided.len(), 22);
         let types: Vec<&str> = provided.iter().filter_map(|d| d["type"].as_str()).collect();
         assert!(types.contains(&"ecology.diversity"));
         assert!(types.contains(&"health"));
@@ -366,7 +375,7 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 38);
+        assert_eq!(total_methods, 45);
     }
 
     #[test]
@@ -381,6 +390,7 @@ mod tests {
     #[test]
     fn dispatch_health_liveness() {
         let result = dispatch("health.liveness", &json!({})).unwrap();
+        assert_eq!(result["status"], "alive");
         assert_eq!(result["alive"], true);
         assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
     }
@@ -436,6 +446,7 @@ mod tests {
             ) {
                 let known = [
                     "health.check", "health.liveness", "health.readiness",
+                    "lifecycle.status",
                     "capability.list", "identity.get",
                     "science.diversity", "science.qs_model", "science.anderson",
                     "science.kinetics", "science.alignment", "science.taxonomy",
@@ -452,6 +463,8 @@ mod tests {
                     "data.fetch.chembl", "data.fetch.pubchem", "data.fetch.register_table",
                     "vault.store", "vault.retrieve", "vault.consent.verify",
                     "composition.science_health",
+                    "bonding.propose", "bonding.accept", "bonding.reject",
+                    "bonding.status", "bonding.terminate", "bonding.list",
                 ];
                 if !known.contains(&method.as_str()) {
                     let err = dispatch(&method, &json!({})).unwrap_err();

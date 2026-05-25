@@ -4,10 +4,10 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-20 (V184 — UniBin consolidation. 345 scenarios, build 25min → 1m44s.
-Barrick SEALED, Tenaillon batch 0 COMPLETE. PG-02/PG-04 remain deployment-only.
-2 gaps open (deployment-only), 20 resolved/closed. 1,962 tests, 52 consumed
-capabilities, registry 458.)
+Last updated: 2026-05-25 (V185 — Wave 48 covalent mesh. NUCLEUS live on southGate
+(9/9 primals, Songbird TCP :7700 federation). PG-02/PG-04 narrowed to verification.
+PG-06 locally wired (ipc::bonding dispatched). 45 dispatch methods, 59 consumed
+capabilities, registry 458. Bonding on the wire.)
 
 ---
 
@@ -62,11 +62,14 @@ V166b upstream resolution (GAP-36):
 - rhizoCrypt S66: UDS transport operational, provenance trio integration test added
 - JH-5 pipeline (skunkBat → rhizoCrypt → sweetGrass) confirmed operational
 
-**Remaining:** Deploy trio primals locally and verify live IPC roundtrip.
-wetSpring's method names (`dag.*`, `session.commit`, `braid.create`) align
-with upstream alias targets. No code changes needed — gap is deployment only.
+**V185 update:** NUCLEUS deployed on southGate with 9/9 primals including
+rhizoCrypt, loamSpine, sweetGrass. All three report liveness (health probes
+timing-sensitive — some return after 8s timeout). Live IPC roundtrip for
+`dag.*`, `ledger.commit`, `braid.*` pending explicit guideStone/composition
+parity validation. Method names align with upstream alias targets.
 
-**Blocked by:** Local deployment of trio stack (not upstream code).
+**Remaining:** Run explicit provenance trio roundtrip test with live NUCLEUS.
+**Blocked by:** Explicit verification (not deployment).
 
 ---
 
@@ -116,12 +119,14 @@ V166b upstream resolution:
 - `content.*` (CAS) vs `storage.*` (blob) confirmed intentional by biomeOS v3.53
 - Contract tests and graphs for `content.*` are live upstream
 
-**Remaining:** Deploy NestGate locally and verify `storage.*` IPC roundtrip.
-wetSpring's `storage.*` paths are wired and tested — gap is deployment only.
+**V185 update:** NestGate deployed on southGate as part of live NUCLEUS (9/9
+primals). Health probe timing-sensitive (returns after 8s timeout in some sweeps).
+`storage.*` IPC roundtrip pending explicit verification.
+
+**Remaining:** Run explicit `storage.store` → `storage.retrieve` roundtrip test.
 Consider adopting `content.*` CAS paths for immutable artifacts alongside
 existing `storage.*` blob paths.
-
-**Blocked by:** Local NestGate deployment (not upstream code).
+**Blocked by:** Explicit verification (not deployment).
 
 ---
 
@@ -153,17 +158,20 @@ dispatch. NV path is FECS-gated (hardware caveat, not a code gap).
 
 ---
 
-## PG-06: Ionic Bond Negotiation Protocol (Closed V162 — deferred)
+## PG-06: Ionic Bond Negotiation Protocol (Locally Wired V185)
 
 **Owner:** primalSpring Track 4
-**Status:** Closed (V162) — deferred pending Track 4 specification
+**Status:** Locally wired (V185) — 6 `bonding.*` methods on the JSON-RPC wire
 
-The facade declares bonding capabilities (Covalent, Ionic) in composition
-health responses and bonding metadata. No automated protocol for
-establishing, modifying, or terminating ionic bonds exists. This is an
-architectural gap requiring a primalSpring Track 4 specification before
-any spring can implement. Not blocking interstadial exit. wetSpring's
-bonding metadata is correctly declared for when the protocol ships.
+V184: `ipc::bonding` module bridges `IonicContractRegistry` into wetSpring.
+V185: All 6 handlers wired into `dispatch.rs` and `handlers::CAPABILITIES`:
+`bonding.propose`, `bonding.accept`, `bonding.reject`, `bonding.status`,
+`bonding.terminate`, `bonding.list`. In-process registry (OnceLock singleton).
+
+**Remaining for E2E cross-gate:**
+- bearDog `crypto.ionic_bond.propose`/`verify_proposal`/`seal` (Ed25519 signing)
+- songbird cross-gate `capability.call` remote dispatch for ionic calls
+- Live cross-gate bond negotiation test (southGate ↔ eastGate)
 
 ---
 
@@ -344,11 +352,11 @@ Exp403 itself continues to work against the live barraCuda primal.
 | # | Gap | Owner | Blocked By | Phase |
 |---|-----|-------|------------|-------|
 | PG-01 | Proto-nucleate not parsed | wetSpring | **Resolved V141** | -- |
-| PG-02 | Provenance trio — deploy only | rhizoCrypt/loamSpine/sweetGrass | **Narrowed V166b** — GAP-36 resolved, deploy needed | 2 |
+| PG-02 | Provenance trio — deployed, verify | rhizoCrypt/loamSpine/sweetGrass | **Deployed V185** — NUCLEUS live, roundtrip pending | 2 |
 | PG-03 | Capability discovery | Songbird/biomeOS | **Resolved V166b** — `capability.resolve` wired | -- |
-| PG-04 | NestGate — deploy only | NestGate | **Narrowed V166b** — `content.*` shipped, deploy needed | 2 |
+| PG-04 | NestGate — deployed, verify | NestGate | **Deployed V185** — NUCLEUS live, roundtrip pending | 2 |
 | PG-05 | toadStool Tier 2 | toadStool | **Resolved V166b** — S254 live, Tier 2 wired | -- |
-| PG-06 | Ionic bond protocol | primalSpring Track 4 | **Closed V162** — deferred, no spec | -- |
+| PG-06 | Ionic bond protocol | primalSpring Track 4 | **Wired V185** — 6 methods dispatched, E2E cross-gate pending | 2 |
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
 | PG-08 | Validate manifest binary name | primalSpring | **Closed V158** — informational, upstream | -- |
 | PG-09 | barraCuda IPC evaporation | wetSpring | **Resolved V160** — all 5 handlers wired, Tier 4 complete | -- |

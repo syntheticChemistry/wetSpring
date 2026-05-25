@@ -24,19 +24,21 @@ const VALID_DOMAIN_PREFIXES: &[&str] = &[
     "data",
     "vault",
     "composition",
+    "bonding",
 ];
 
 /// All capability domains this primal registers with Songbird.
 ///
-/// Covers 8 domain families (41 capabilities total):
+/// Covers 9 domain families (48 capabilities total):
 /// - `ecology.*`      — 14 science capabilities (diversity, ODE, alignment, AI, …)
-/// - `health`         — 3 health probes (check, liveness, readiness)
-/// - `provenance`     — 3 provenance-trio lifecycle methods
+/// - `health`         — 4 probes (check, liveness, readiness, lifecycle.status)
+/// - `provenance`     — 4 provenance-trio lifecycle methods
 /// - `brain`          — 3 neural sentinel methods
 /// - `metrics`        — 1 server metrics capability
 /// - `data`           — 3 data ingestion methods (`ChEMBL`, `PubChem`, table)
 /// - `vault`          — 3 consent-gated storage methods
-/// - `composition`    — 5 NUCLEUS composition health probes
+/// - `composition`    — 1 science health probe
+/// - `bonding`        — 6 ionic bond lifecycle methods
 pub const DOMAINS: &[CapabilityDomain] = &[
     // ── ecology (science) ───────────────────────────────────────────
     CapabilityDomain {
@@ -113,11 +115,16 @@ pub const DOMAINS: &[CapabilityDomain] = &[
             "science.anderson.cross_species",
         ],
     },
-    // ── health probes ──────────────────────────────────────────────
+    // ── health + lifecycle ──────────────────────────────────────────
     CapabilityDomain {
         name: "health",
-        description: "Liveness and readiness probes for biomeOS orchestration",
-        methods: &["health.check", "health.liveness", "health.readiness"],
+        description: "Liveness, readiness, and lifecycle probes for biomeOS orchestration",
+        methods: &[
+            "health.check",
+            "health.liveness",
+            "health.readiness",
+            "lifecycle.status",
+        ],
     },
     // ── provenance trio ─────────────────────────────────────────────
     CapabilityDomain {
@@ -170,6 +177,19 @@ pub const DOMAINS: &[CapabilityDomain] = &[
         name: "composition",
         description: "Spring-specific science composition health per COMPOSITION_HEALTH_STANDARD",
         methods: &["composition.science_health"],
+    },
+    // ── ionic bonding (Wave 37 / V184) ─────────────────────────────
+    CapabilityDomain {
+        name: "bonding",
+        description: "Ionic bond lifecycle: propose, accept, reject, status, terminate, list",
+        methods: &[
+            "bonding.propose",
+            "bonding.accept",
+            "bonding.reject",
+            "bonding.status",
+            "bonding.terminate",
+            "bonding.list",
+        ],
     },
 ];
 
@@ -232,7 +252,7 @@ mod tests {
     }
 
     #[test]
-    fn domains_cover_all_eight_families() {
+    fn domains_cover_all_nine_families() {
         let names: Vec<&str> = DOMAINS.iter().map(|d| d.name).collect();
         assert!(names.iter().any(|n| n.starts_with("ecology.")));
         assert!(names.contains(&"health"));
@@ -242,23 +262,24 @@ mod tests {
         assert!(names.contains(&"data"));
         assert!(names.contains(&"vault"));
         assert!(names.contains(&"composition"));
+        assert!(names.contains(&"bonding"));
     }
 
     #[test]
     fn total_capability_count_matches_registry() {
         assert_eq!(
             DOMAINS.len(),
-            21,
-            "21 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition)"
+            22,
+            "22 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition + bonding)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 38, "38 total capability methods");
+        assert_eq!(total_methods, 45, "45 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 38);
+        assert_eq!(methods.len(), 45);
         assert!(methods.contains(&"science.diversity"));
         assert!(methods.contains(&"health.liveness"));
         assert!(methods.contains(&"health.readiness"));

@@ -155,6 +155,9 @@ fn consumed_capabilities_use_recognized_domains() {
         "defense.",
         "primal.",
         "signal.",
+        "ledger.",
+        "lifecycle.",
+        "bonding.",
     ];
 
     for cap in niche::CONSUMED_CAPABILITIES {

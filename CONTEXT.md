@@ -24,7 +24,7 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 345 scenarios)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 49 niche capabilities, 52 consumed (33 v0.9.17 canonical + 15 legacy + 4 Wave 17/20), 38 dispatch methods, 21 domains, Wire Standard L2+L3
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 50 niche capabilities, 59 consumed (33 barraCuda canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 45 dispatch methods, 22 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
 - **Validation checks:** 5,967+ across 345 scenarios (UniBin)
@@ -34,7 +34,7 @@ evolution pipeline.
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
 - **Clippy:** zero errors (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
-- **Primal gaps:** 2 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, 20 resolved/closed. Zero wetSpring-internal gaps.
+- **Primal gaps:** 2 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, PG-06 locally wired (V185), PG-02/PG-04 deployed (verification pending), 17 resolved/closed. Zero wetSpring-internal gaps.
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
 
 ## Key Capabilities
@@ -47,7 +47,7 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, drug-target scoring
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.4.0, 150+ primitives consumed
-- **IPC:** 38 JSON-RPC methods, 49 niche capabilities, 21 domains, 1 live composition health handler (science_health — runtime probing), 8 MCP tools, Wire Standard L2+L3
+- **IPC:** 45 JSON-RPC methods, 50 niche capabilities, 22 domains, 1 live composition health handler (science_health — runtime probing), 6 bonding.* methods (IonicContractRegistry), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 

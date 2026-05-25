@@ -294,6 +294,13 @@ description = "Readiness probe (subsystems + substrate)"
 stability = "stable"
 gpu_accelerated = false
 
+[capabilities.lifecycle_status]
+method = "lifecycle.status"
+domain = "health"
+description = "DEPLOYMENT_BEHAVIOR_STANDARD v1.0: primal name, version, status, uptime"
+stability = "stable"
+gpu_accelerated = false
+
 # ── Ionic Bonding (primalSpring Wave 37+, WS-1) ──────────────────────
 
 [capabilities.bonding_propose]

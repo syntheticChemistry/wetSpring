@@ -47,10 +47,21 @@ pub use science::{
 pub use vault_ipc::{handle_vault_consent_verify, handle_vault_retrieve, handle_vault_store};
 
 use serde_json::{Value, json};
+use std::sync::OnceLock;
+use std::time::Instant;
 
 const DEPLOY_GRAPH_NAME: &str = crate::primal_names::NUCLEUS_GRAPH_NAME;
 
 use crate::ipc::protocol::RpcError;
+
+static BOOT_INSTANT: OnceLock<Instant> = OnceLock::new();
+
+fn uptime_secs() -> u64 {
+    BOOT_INSTANT
+        .get_or_init(Instant::now)
+        .elapsed()
+        .as_secs()
+}
 
 /// Capabilities advertised by this primal, derived from the dispatch table.
 ///
@@ -65,6 +76,7 @@ pub const CAPABILITIES: &[&str] = &[
     "health.check",
     "health.liveness",
     "health.readiness",
+    "lifecycle.status",
     "science.diversity",
     "science.anderson",
     "science.qs_model",
@@ -100,6 +112,12 @@ pub const CAPABILITIES: &[&str] = &[
     "vault.retrieve",
     "vault.consent.verify",
     "composition.science_health",
+    "bonding.propose",
+    "bonding.accept",
+    "bonding.reject",
+    "bonding.status",
+    "bonding.terminate",
+    "bonding.list",
 ];
 
 #[cfg(feature = "gpu")]
@@ -195,12 +213,25 @@ pub fn handle_health() -> Result<Value, RpcError> {
 
 /// Minimal liveness probe — confirms the process is alive and responsive.
 ///
-/// No subsystem checks — just an immediate `{"alive": true}` response.
-/// Used by biomeOS/sweetGrass orchestrators for fast keep-alive polling.
+/// DEPLOYMENT_BEHAVIOR_STANDARD v1.0: returns `{"status":"alive"}`.
+/// Also includes `alive: true` and `primal` for backward compat.
 pub fn handle_health_liveness() -> Result<Value, RpcError> {
     Ok(json!({
+        "status": "alive",
         "alive": true,
         "primal": crate::PRIMAL_NAME,
+    }))
+}
+
+/// Lifecycle status — DEPLOYMENT_BEHAVIOR_STANDARD v1.0 §2.
+///
+/// Returns primal name, version, running status, and uptime in seconds.
+pub fn handle_lifecycle_status() -> Result<Value, RpcError> {
+    Ok(json!({
+        "primal": crate::PRIMAL_NAME,
+        "version": env!("CARGO_PKG_VERSION"),
+        "status": "running",
+        "uptime_s": uptime_secs(),
     }))
 }
 

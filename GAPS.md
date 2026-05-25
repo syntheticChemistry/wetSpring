@@ -4,13 +4,11 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-23 (V184 — Post-primordial covalent gate deployment EXECUTED.
-NUCLEUS live on southGate: 9/9 primals started, exp091+exp094 PASS (plasmidBin v5.5.0,
-CLI alignment fix absorbed). primalspring validate 1043/1172 (89%). wetspring validate
-66/77 PASS. Registry 458. WS-1 WIRED locally (ipc::bonding → IonicContractRegistry).
-WS-11 v3 deployed, Tenaillon batch 0 5/5 COMPLETE, 259 remaining await fan_out.
-WS-9 L3 still blocked on Nest deploy. Upstream issues: loamSpine tokio panic,
-Squirrel needs Ollama, rhizoCrypt/toadStool/nestgate/sweetgrass health probe timing.)
+Last updated: 2026-05-25 (V185 — Wave 48 covalent mesh. NUCLEUS live on southGate,
+Songbird TCP :7700 federation. health.liveness conforms to DEPLOYMENT_BEHAVIOR_STANDARD
+v1.0 (status:alive). lifecycle.status added. bonding.* dispatched (6 methods on wire).
+45 dispatch methods. WS-4 upstream IMPLEMENTED (petal-tongue-wasm). PG-02/PG-04 deployed,
+pending explicit roundtrip verification. PG-06 locally wired.)
 
 ---
 
@@ -83,18 +81,20 @@ verification.
 
 **Owner:** petalTongue team
 
-**Status:** Server-side SVG rendering works; client WASM not yet built.
+**Status:** Upstream IMPLEMENTED (Wave 47/48); wetSpring adoption pending.
 
-The facade currently renders grammar expressions server-side via petalTongue
-RPC, returning SVG strings. The endgame (Phase 3 of web deployment) is:
+petalTongue now ships `petal-tongue-wasm` with 8+ `wasm_bindgen` exports:
+`render_grammar`, `render_binding`, `render_dashboard`, `render_scene`,
+`compile_scene`, `validate_grammar`, modality dispatch, `version`. CI checks
+`wasm32-unknown-unknown` target. Client-side rendering is structurally ready.
 
-- Compile petalTongue grammar engine to WASM
-- Ship to browser as a client-side renderer
-- Eliminate server round-trip for visualization
-- Enable offline rendering with cached data
+**Remaining for wetSpring:**
+- Integrate `petal_tongue_wasm.js` bundle into web UI (replace server-side RPC)
+- Offline sporePrint rendering with cached data
+- Plotly.js → grammar-of-graphics migration for science charts
 
-**Impact:** All grammar rendering requires live HPC connection. No offline
-interactive visualization. Plotly.js remains the primary client renderer.
+**Impact:** Server round-trip for grammar rendering can now be eliminated.
+Plotly.js remains the primary client renderer until WASM bundle is integrated.
 
 ---
 
@@ -309,10 +309,10 @@ Parity evolution tracked in `provenance/braids/barrick_2009_calibration_v2.json`
 
 | # | Gap | Owner | Priority | Phase |
 |---|-----|-------|----------|-------|
-| 1 | Ionic contract negotiation | primalSpring Track 4 | **IMPLEMENTED** upstream (Wave 37) | 2 |
+| 1 | Ionic contract negotiation | primalSpring Track 4 | **WIRED** locally (V185: 6 methods dispatched) | 2 |
 | 2 | Cross-spring data exchange | RootPulse | High | 2 |
 | 3 | Public chain anchor | loamSpine | Medium | 3 |
-| 4 | Client WASM renderer | petalTongue | Medium | 3 |
+| 4 | Client WASM renderer | petalTongue | **UPSTREAM IMPLEMENTED** (adoption pending) | 3 |
 | 5 | Interactive composition | ludoSpring + esotericWebb | Low | 4 |
 | 6 | Physics simulations | hotSpring | Low | 4 |
 | 7 | Radiating attribution | sweetGrass + sunCloud | Low | 4 |
