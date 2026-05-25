@@ -47,37 +47,11 @@ use barracuda::stats::norm_cdf;
 use crate::validation::OrExit;
 
 fn discover_biomeos_bin() -> Option<PathBuf> {
-    let candidates = [
-        "biomeOS",
-        primal_names::BIOMEOS,
-        "../../../phase2/biomeOS/target/release/biomeos",
-        "../../../phase2/biomeOS/target/debug/biomeos",
-    ];
-    for c in &candidates {
-        let p = PathBuf::from(c);
-        if p.exists() {
-            return Some(p);
-        }
-        if let Some(found) = find_on_path(c) {
-            return Some(found);
-        }
-    }
-    None
+    super::primal_binary::discover(primal_names::BIOMEOS)
 }
 
 fn discover_primal_bin(name: &str) -> Option<PathBuf> {
-    find_on_path(name)
-}
-
-fn find_on_path(binary: &str) -> Option<PathBuf> {
-    let path_var = std::env::var("PATH").ok()?;
-    for dir in std::env::split_paths(&path_var) {
-        let candidate = dir.join(binary);
-        if candidate.is_file() {
-            return Some(candidate);
-        }
-    }
-    None
+    super::primal_binary::discover(name)
 }
 
 /// Run the `validate_nucleus_v4` experiment, recording checks into `v`.

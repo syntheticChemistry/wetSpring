@@ -290,11 +290,11 @@ pub fn run(v: &mut crate::validation::Validator) {
     let graphs = [
         (
             "wetspring_deploy",
-            ecop.join("phase2/biomeOS/graphs/wetspring_deploy.toml"),
+            ecop.join("primals/biomeOS/graphs/wetspring_deploy.toml"),
         ),
         (
             "airspring_deploy",
-            ecop.join("phase2/biomeOS/graphs/airspring_deploy.toml"),
+            ecop.join("primals/biomeOS/graphs/airspring_deploy.toml"),
         ),
     ];
 
@@ -311,7 +311,7 @@ pub fn run(v: &mut crate::validation::Validator) {
         mf26 += 1;
     }
 
-    let cap_reg = ecop.join("phase2/biomeOS/config/capability_registry.toml");
+    let cap_reg = ecop.join("primals/biomeOS/config/capability_registry.toml");
     if cap_reg.exists() {
         let contents = std::fs::read_to_string(&cap_reg).or_exit("unexpected error");
         v.check_pass(
@@ -396,26 +396,7 @@ pub fn run(v: &mut crate::validation::Validator) {
 }
 
 fn discover_biomeos_bin() -> Option<PathBuf> {
-    if let Ok(path) = std::env::var("BIOMEOS_BIN") {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-    let path_var = std::env::var("PATH").ok()?;
-    for dir in path_var.split(':') {
-        let candidate = PathBuf::from(dir).join(primal_names::BIOMEOS);
-        if candidate.exists() && candidate.is_file() {
-            return Some(candidate);
-        }
-    }
-    for depth in &["..", "../..", "../../.."] {
-        let candidate = PathBuf::from(format!("{depth}/phase2/biomeOS/target/release/biomeos"));
-        if candidate.exists() {
-            return Some(candidate);
-        }
-    }
-    None
+    super::primal_binary::discover(primal_names::BIOMEOS)
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.

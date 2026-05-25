@@ -100,7 +100,7 @@ pub fn run(v: &mut crate::validation::Validator) {
         .or_exit("unexpected error")
         .parent()
         .or_exit("unexpected error")
-        .join("phase2/biomeOS/graphs/wetspring_deploy.toml");
+        .join("primals/biomeOS/graphs/wetspring_deploy.toml");
     let graph_exists = deploy_graph.exists();
     println!(
         "  Deploy graph: {} (exists: {graph_exists})",
@@ -447,37 +447,7 @@ fn check_f64_positive(json: &str, field: &str) -> bool {
 }
 
 fn discover_biomeos_bin() -> Option<PathBuf> {
-    if let Ok(path) = std::env::var("BIOMEOS_BIN") {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-    if let Ok(path) = which(crate::ipc::primal_names::BIOMEOS) {
-        return Some(path);
-    }
-    let phase_dirs = ["phase1", "phase2"];
-    for phase in &phase_dirs {
-        for depth in &["..", "../..", "../../.."] {
-            let candidate =
-                PathBuf::from(format!("{depth}/{phase}/biomeOS/target/release/biomeos"));
-            if candidate.exists() {
-                return Some(candidate);
-            }
-        }
-    }
-    None
-}
-
-fn which(name: &str) -> Result<PathBuf, ()> {
-    let path_var = std::env::var("PATH").map_err(|_| ())?;
-    for dir in path_var.split(':') {
-        let candidate = PathBuf::from(dir).join(name);
-        if candidate.exists() && candidate.is_file() {
-            return Ok(candidate);
-        }
-    }
-    Err(())
+    super::primal_binary::discover(crate::ipc::primal_names::BIOMEOS)
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.

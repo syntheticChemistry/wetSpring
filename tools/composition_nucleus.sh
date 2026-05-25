@@ -30,7 +30,12 @@ FAMILY_ID="${FAMILY_ID:-$COMPOSITION_NAME}"
 SOCKET_DIR="${XDG_RUNTIME_DIR:-/tmp}/biomeos"
 PID_DIR="/tmp/nucleus-${COMPOSITION_NAME}-pids"
 PLASMID_BIN="${ECOPRIMALS_PLASMID_BIN:-$ECO_ROOT/infra/plasmidBin}"
-BIN_DIR="$PLASMID_BIN/primals"
+HOST_TRIPLE="$(uname -m)-unknown-linux-musl"
+if [[ -d "$PLASMID_BIN/primals/$HOST_TRIPLE" ]]; then
+    BIN_DIR="$PLASMID_BIN/primals/$HOST_TRIPLE"
+else
+    BIN_DIR="$PLASMID_BIN/primals"
+fi
 
 PETALTONGUE_LIVE="${PETALTONGUE_LIVE:-true}"
 PRIMAL_LIST="${PRIMAL_LIST:-beardog songbird toadstool barracuda rhizocrypt loamspine sweetgrass petaltongue}"
@@ -89,18 +94,8 @@ find_binary() {
         echo "$BIN_DIR/$name"
         return
     fi
-    local release="$ECO_ROOT/primals/$name/target/release/$name"
-    [[ -x "$release" ]] && echo "$release" && return
-    # CamelCase variant (e.g. petalTongue/target/release/petaltongue)
-    for d in "$ECO_ROOT/primals"/*/; do
-        local lc
-        lc=$(basename "$d" | tr '[:upper:]' '[:lower:]')
-        if [[ "$lc" = "$name" ]] && [[ -x "$d/target/release/$name" ]]; then
-            echo "$d/target/release/$name"
-            return
-        fi
-    done
-    which "$name" 2>/dev/null || true
+    err "$name not found in plasmidBin ($BIN_DIR/$name)"
+    return 1
 }
 
 start_primal() {
@@ -262,8 +257,7 @@ cmd_start() {
     if wants_primal petaltongue; then
         log "── Phase 4: petalTongue ──"
         local petaltongue_bin
-        petaltongue_bin="$ECO_ROOT/primals/petalTongue/target/release/petaltongue"
-        [[ -x "$petaltongue_bin" ]] || petaltongue_bin="$(find_binary petaltongue)"
+        petaltongue_bin="$(find_binary petaltongue)"
 
         if [[ -x "$petaltongue_bin" ]]; then
             local pt_logfile="/tmp/nucleus-${COMPOSITION_NAME}-petaltongue.log"

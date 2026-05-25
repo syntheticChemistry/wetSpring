@@ -213,10 +213,9 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║  NUCLEUS Deployment Roadmap                                     ║");
     println!("╠══════════════════════════════════════════════════════════════════╣");
     println!("║                                                                  ║");
-    println!("║  Step 1: Build primals                                           ║");
-    println!("║    cd phase2/biomeOS && cargo build --release                    ║");
-    println!("║    cd phase1/toadstool && cargo build --release                  ║");
-    println!("║    cd phase2/nestgate && cargo build --release                   ║");
+    println!("║  Step 1: Ensure plasmidBin is current                            ║");
+    println!("║    cd infra/plasmidBin && git pull                              ║");
+    println!("║    ls primals/  # all 13 primal binaries                       ║");
     println!("║                                                                  ║");
     println!("║  Step 2: Start Tower Atomic                                      ║");
     println!("║    biomeos nucleus start --mode tower --node-id eastgate         ║");
@@ -239,73 +238,14 @@ pub fn run(v: &mut crate::validation::Validator) {
 
 }
 
-/// Discover biomeOS binary via environment or PATH.
-///
-/// Uses `BIOMEOS_BIN` if set and path exists, then `which("biomeos")`,
-/// then delegates to [`discover_primal_bin`] for relative-path discovery.
+/// Discover a primal binary via plasmidBin (post-primordial, Wave 49).
 fn discover_biomeos_bin() -> Option<PathBuf> {
-    if let Ok(path) = std::env::var("BIOMEOS_BIN") {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-    if let Ok(path) = which(primal_names::BIOMEOS) {
-        return Some(path);
-    }
-
-    discover_primal_bin(primal_names::BIOMEOS)
+    super::primal_binary::discover(primal_names::BIOMEOS)
 }
 
-/// Discover a primal binary via environment or PATH.
-///
-/// Uses `{NAME}_BIN` (e.g. `BEARDOG_BIN`, `TOADSTOOL_BIN`) if set and path exists,
-/// then `which(name)`, then relative candidates as last resort.
-///
-/// For `biomeos`, uses directory `biomeOS` (known casing for the phase2 crate).
+/// Discover a primal binary via plasmidBin (post-primordial, Wave 49).
 fn discover_primal_bin(name: &str) -> Option<PathBuf> {
-    let env_var = format!("{}_BIN", name.to_uppercase().replace('-', "_"));
-    if let Ok(path) = std::env::var(&env_var) {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Some(p);
-        }
-    }
-    if let Ok(path) = which(name) {
-        return Some(path);
-    }
-
-    let dir_name = match name {
-        n if n == primal_names::BIOMEOS => "biomeOS",
-        _ => name,
-    };
-
-    let phase_dirs = ["phase1", "phase2"];
-    for phase in &phase_dirs {
-        let candidates = [
-            format!("../{phase}/{dir_name}/target/release/{name}"),
-            format!("../../{phase}/{dir_name}/target/release/{name}"),
-            format!("../../../{phase}/{dir_name}/target/release/{name}"),
-        ];
-        for candidate in &candidates {
-            let p = PathBuf::from(candidate);
-            if p.exists() {
-                return Some(p);
-            }
-        }
-    }
-    None
-}
-
-fn which(name: &str) -> Result<PathBuf, ()> {
-    let path_var = std::env::var("PATH").map_err(|_| ())?;
-    for dir in path_var.split(':') {
-        let candidate = PathBuf::from(dir).join(name);
-        if candidate.exists() && candidate.is_file() {
-            return Ok(candidate);
-        }
-    }
-    Err(())
+    super::primal_binary::discover(name)
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.

@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V186] — 2026-05-25
+
+### Wave 49 Post-Primordial — plasmidBin-Only Binary Discovery
+
+- **Post-primordial binary discovery:** Created shared `primal_binary` module in `validation/experiments/`. All primal binary discovery now goes through plasmidBin only: env var override (`{NAME}_BIN`), `NUCLEUS_BIN_DIR`, then `infra/plasmidBin/primals/{triple}/` or flat layout. Zero `target/release/` or PATH fallback.
+- **4 experiment files cleaned:** `exp_nucleus_tower_node`, `exp_nucleus_v4`, `exp_metalforge_v17`, `exp_biomeos_nucleus_v98` — removed per-file `discover_biomeos_bin`/`discover_primal_bin`/`which`/`find_on_path` implementations (4 copies → 1 shared module).
+- **`composition_nucleus.sh` cleaned:** `find_binary()` now errors hard if primal not in plasmidBin. Removed `target/release/`, CamelCase dir scanning, and `which` fallbacks. Added host-triple-aware `primals/{triple}/` detection. Removed hardcoded `petalTongue/target/release/` path.
+- **Legacy `phase2/` paths updated:** `exp_biomeos_nucleus_v98` and `exp_metalforge_v17` graph/config paths changed from `phase2/biomeOS/` to `primals/biomeOS/`.
+- **Primordial print guidance updated:** `exp_nucleus_tower_node` roadmap changed from `cd phase2/biomeOS && cargo build` to `cd infra/plasmidBin && git pull`.
+- **`wetspring` symlink removed from plasmidBin:** Springs are not primals — cell launcher handles spring binaries separately.
+- **NUCLEUS restarted:** 4/13 primals socket-ready (biomeOS, barraCuda, nestGate, sweetGrass). Known upstream: Songbird rejects `--security-socket`, loamSpine Tokio panic, petalTongue startup failure.
+- Build gate: `cargo check --features guidestone` clean.
+
 ## [V185] — 2026-05-25
 
 ### Wave 48 Covalent Mesh — Behavioral Convergence + Cell Deployment

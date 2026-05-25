@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`, `--port`, `--family-id`). Cell deployment validated. Songbird TCP federation port 7700 live. primalSpring v0.9.28 (52 scenarios, 458/458 methods exercised). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. southGate operational.
+**Current release — V186:** Wave 49 post-primordial. All primal discovery via plasmidBin — `target/release/` and PATH fallbacks removed. Shared `primal_binary` module. Legacy `phase2/` path refs updated. 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. southGate operational.
 
 ## Role in the Ecosystem
 

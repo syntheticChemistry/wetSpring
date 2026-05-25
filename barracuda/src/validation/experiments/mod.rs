@@ -493,6 +493,7 @@ pub mod exp_voc_peaks;
 #[cfg(feature = "gpu")]
 pub mod exp_workload_routing_v1;
 
+pub(crate) mod primal_binary;
 mod registry_table;
 
 /// Register all migrated experiment scenarios into the registry.

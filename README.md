@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V185:** Wave 48 covalent mesh. `wetspring serve` behavioral convergence (`--socket`/`--port`/`--family-id` + `server` alias). Cell deployment validated. Songbird TCP :7700 federation live on southGate. primalSpring v0.9.28 (52 scenarios, 100% method coverage). Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration).**
+**Current release — V186:** Wave 49 post-primordial. All primal binary discovery via plasmidBin only — `target/release/` and PATH fallbacks removed (4 experiment files, composition script). Shared `primal_binary` module. Legacy `phase2/` path references updated to `primals/`. Songbird TCP :7700 federation on southGate. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration).**
 
 ---
 
