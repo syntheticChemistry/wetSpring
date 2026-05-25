@@ -2,7 +2,7 @@
 
 # wetSpring — BarraCuda Requirements
 
-**Last Updated**: May 25, 2026 (V185 — Wave 48 covalent mesh. 345 UniBin scenarios. 55 Python baselines. 59 consumed, 50 niche, 45 dispatch (registry 458). 1,962 lib tests, 5,967+ checks. 2 PG gaps open (deployment-only), 20 resolved/closed)
+**Last Updated**: May 25, 2026 (V187 — Wave 50 covalent HPC. 345 UniBin scenarios. 55 Python baselines. 59 consumed, 50 niche, 45 dispatch (registry 458). 1,962 lib tests, 5,967+ checks. 2 PG gaps open (deployment-only), 20 resolved/closed)
 **Purpose**: GPU kernel requirements, gap analysis, and evolution priorities
 
 ---

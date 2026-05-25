@@ -75,7 +75,7 @@ evolution pipeline.
           └──────────────────────────────────────────────────┘
 
 Tier 1: Python baseline → Rust CPU parity → GPU validation
-           (58 scripts)    (1,962 tests)     (44 GPU modules)
+           (55 scripts)    (1,962 tests)     (44 GPU modules)
 Tier 2: UniBin scenarios → NUCLEUS composition patterns
            (345 scenarios)  (136/136 proto-nucleate, 7 deploy graphs)
 Tier 3: Composition      → IPC parity → Niche gate
@@ -92,9 +92,9 @@ Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
 |-------|-------|
 | **Gate** | southGate |
 | **Hardware** | AMD Ryzen 7 5800X3D 8-Core, 128GB DDR4, NVIDIA RTX 4060 |
-| **Composition** | Node Atomic (9/9 primals started, exp091+exp094 PASS) |
-| **NUCLEUS status** | **operational** (plasmidBin v5.5.0, CLI fix `8c8cb44`) |
-| **Songbird federation** | port 7700 |
+| **Composition** | Full NUCLEUS (7/13 health-responding, 11/13 processes) |
+| **NUCLEUS status** | **operational** (plasmidBin, post-primordial V186) |
+| **Songbird federation** | 0.0.0.0:7700 (LAN-reachable, cross-subnet confirmed) |
 | **LAN mesh** | ready — covalent linking via Songbird TCP |
 | **Cell graph** | `plasmidBin/cells/wetspring_cell.toml` |
 | **Secondary gate** | strandGate (Dual EPYC 64-core, 256GB ECC, RTX 3090 + RX 6950 XT) — GPU science |

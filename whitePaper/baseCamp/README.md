@@ -4,12 +4,12 @@
 
 **Date:** May 25, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V185 — Wave 48 covalent mesh. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). primalSpring v0.9.28. 1,962 lib tests pass. 386 experiments (385 done + 1 in progress). **2** PG gaps open (deployment-only), 20 resolved/closed. southGate NUCLEUS operational, Songbird TCP :7700.
+**Status:** V187 — Wave 50 covalent HPC. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). 1,962 lib tests pass. 386 experiments (385 done + 1 in progress). **2** PG gaps open (deployment-only), 20 resolved/closed. southGate NUCLEUS 7/13 health-responding, Songbird TCP 0.0.0.0:7700.
 
 This is the validation narrative crystallized:
-- **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).
+- **Python was the validation target for Rust** (55 scripts → 1,962 lib tests).
 - **Rust + Python are now validation targets for NUCLEUS composition** (136/136
-  proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
+  proto-nucleate, 7 deploy graphs, 22 domains, cross-check tests).
 - **NUCLEUS composition enables the primal proof** (38/38 guideStone, IPC parity,
   capability-based discovery, check_skip for absent primals).
 - **Code quality is interstadial-compliant** (zero `dyn`, zero `async-trait`,
@@ -34,7 +34,7 @@ Tier 1 — Python validates Rust (science fidelity)
 
 Tier 2 — Rust validates NUCLEUS composition (primal patterns)
   Rust validation binaries
-    → IPC capability surface (42 niche capabilities, 21 domains)
+    → IPC capability surface (50 niche capabilities, 22 domains)
       → Proto-nucleate alignment (14 primals, 136/136 D01–D07)
         → Deploy graph validation (7 graphs, [[graph.nodes]] canonical)
           → IPC parity + niche gate (Exp401, Exp402, 18 IPC roundtrip tests)
@@ -83,7 +83,7 @@ wetSpring baseCamp science is publicly viewable on [primals.eco](https://primals
 
 **V142** completes Capability Wire Standard v1.0 compliance and composition
 self-description. `capabilities.list` now returns a canonical L2+L3 envelope:
-`methods` flat array (41 methods), `provided_capabilities` (21 structured domain
+`methods` flat array (45 methods), `provided_capabilities` (21 structured domain
 groups), `consumed_capabilities` (22 capabilities wetSpring needs from
 Tower/Node/Nest/Meta). `identity.get` returns `{primal, version, domain, license}`.
 `WireWitnessRef` struct added per Attestation Encoding Standard v2.0 — provenance
@@ -93,7 +93,7 @@ handlers emit self-describing witness events. barraCuda bumped to 0.3.11 (GPU
 aligned (manifest.lock, metadata.toml).
 
 **V141** completes the audit remediation cycle. Capability domain registry
-aligned (21 domains, 41 methods). Proto-nucleate validated at test time.
+aligned (22 domains, 45 methods). Proto-nucleate validated at test time.
 
 **V143** migrates all 7 deploy graphs to primalSpring canonical `[[graph.nodes]]`
 schema (NA-016), adds bonding policy and fragments metadata to full-NUCLEUS
@@ -138,9 +138,9 @@ lib tests pass. Interstadial-compliant: Edition 2024, `#[expect]` only,
 `forbid(unsafe_code)`, zero `#[allow()]`.
 
 This is the validation narrative crystallized:
-- **Python was the validation target for Rust** (58 scripts → 1,962 lib tests).
+- **Python was the validation target for Rust** (55 scripts → 1,962 lib tests).
 - **Rust + Python are now validation targets for NUCLEUS composition** (136/136
-  proto-nucleate, 7 deploy graphs, 21 domains, cross-check tests).
+  proto-nucleate, 7 deploy graphs, 22 domains, cross-check tests).
 - **NUCLEUS composition enables the primal proof** (guideStone 38/38, IPC
   parity, capability-based discovery, `check_skip` for absent primals).
 - **Code quality is interstadial-compliant** (zero `dyn`, zero `async-trait`,

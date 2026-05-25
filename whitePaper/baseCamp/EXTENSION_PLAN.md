@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** May 25, 2026 (V185 update)
-**Author:** wetSpring V185 (ecoPrimals)
-**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (345 scenarios), 91.20% coverage. **V185:** Wave 48 covalent mesh — behavioral convergence, cell deployment, Songbird TCP :7700. 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 PG gaps open (deployment-only, 20 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration).
+**Date:** May 25, 2026 (V187 update)
+**Author:** wetSpring V187 (ecoPrimals)
+**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (345 scenarios), 91.20% coverage. **V187:** Wave 50 covalent HPC — post-primordial, NUCLEUS 7/13 health-responding, Songbird TCP 0.0.0.0:7700. 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 2 PG gaps open (deployment-only, 20 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration).
 
 ---
 

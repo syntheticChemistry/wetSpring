@@ -2,7 +2,7 @@
 
 **Crate:** `wetspring-barracuda` v0.1.0
 **License:** AGPL-3.0-or-later
-**Updated:** May 25, 2026 (V185 — Wave 48 covalent mesh. 345 scenarios, 23 benchmarks. 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458, primalSpring v0.9.28). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. southGate NUCLEUS operational.)
+**Updated:** May 25, 2026 (V187 — Wave 50 covalent HPC. 345 scenarios, 23 benchmarks. 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). 1,962 lib + 97 integration + 18 IPC tests (0 failures), 242 named tolerances, 91.20% coverage (gated at 90%). `forbid(unsafe_code)`, zero `#[allow()]`, clippy ZERO WARNINGS pedantic+nursery. 2 primal gaps open (deployment-only), 20 resolved/closed. southGate NUCLEUS 7/13 health-responding, Songbird TCP 0.0.0.0:7700.)
 
 ---
 

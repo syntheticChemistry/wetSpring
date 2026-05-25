@@ -10,10 +10,10 @@
 | Metric | Value |
 |--------|-------|
 | primalSpring | v0.9.28 (458 methods, 52 scenarios, 100% coverage, behavioral convergence) |
-| wetSpring | V185 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
+| wetSpring | V187 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
 | Registry sync | **458** — zero drift |
-| Niche capabilities | **50** (was 49; +lifecycle.status) |
-| NUCLEUS deployment | **southGate LIVE** — 9/9 primals, exp091+exp094 PASS, Songbird TCP :7700 |
+| Niche capabilities | **50** |
+| NUCLEUS deployment | **southGate** — 7/13 health-responding, Songbird TCP 0.0.0.0:7700, cross-subnet reachable |
 | Cell deployment | `wetspring_cell.toml` validated, `server` alias ready |
 | plasmidBin | v5.5.0, CLI fix `8c8cb44` + simplified `9231b24` |
 | Active gaps | WS-9 (L3 parity), WS-11 (variant caller re-measurement) |

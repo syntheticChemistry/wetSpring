@@ -297,9 +297,9 @@ mod tests {
 
     /// Every handler-advertised capability must appear in at least one domain.
     ///
-    /// `handlers::CAPABILITIES` is the IPC dispatch surface (42 entries).
-    /// `DOMAINS` groups them into semantic families (currently 41 methods in
-    /// 21 domains plus `capability.list` which is meta-introspection, not a
+    /// `handlers::CAPABILITIES` is the IPC dispatch surface.
+    /// `DOMAINS` groups them into semantic families (currently 45 methods in
+    /// 22 domains plus `capability.list` which is meta-introspection, not a
     /// domain capability). This test catches drift between the two lists.
     #[cfg(feature = "ipc")]
     #[test]

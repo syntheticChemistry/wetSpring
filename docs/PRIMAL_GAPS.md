@@ -62,11 +62,11 @@ V166b upstream resolution (GAP-36):
 - rhizoCrypt S66: UDS transport operational, provenance trio integration test added
 - JH-5 pipeline (skunkBat → rhizoCrypt → sweetGrass) confirmed operational
 
-**V185 update:** NUCLEUS deployed on southGate with 9/9 primals including
-rhizoCrypt, loamSpine, sweetGrass. All three report liveness (health probes
-timing-sensitive — some return after 8s timeout). Live IPC roundtrip for
-`dag.*`, `ledger.commit`, `braid.*` pending explicit guideStone/composition
-parity validation. Method names align with upstream alias targets.
+**V187 update:** NUCLEUS on southGate with 7/13 health-responding. loamSpine
+hits Tokio runtime-in-runtime panic (known upstream). rhizoCrypt and sweetGrass
+processes running but sockets timing out. Live IPC roundtrip for `dag.*`,
+`ledger.commit`, `braid.*` pending explicit verification once provenance trio
+stabilizes. Method names align with upstream alias targets.
 
 **Remaining:** Run explicit provenance trio roundtrip test with live NUCLEUS.
 **Blocked by:** Explicit verification (not deployment).
@@ -119,9 +119,8 @@ V166b upstream resolution:
 - `content.*` (CAS) vs `storage.*` (blob) confirmed intentional by biomeOS v3.53
 - Contract tests and graphs for `content.*` are live upstream
 
-**V185 update:** NestGate deployed on southGate as part of live NUCLEUS (9/9
-primals). Health probe timing-sensitive (returns after 8s timeout in some sweeps).
-`storage.*` IPC roundtrip pending explicit verification.
+**V187 update:** NestGate alive on southGate (NUCLEUS 7/13 health-responding).
+Socket responding. `storage.*` IPC roundtrip pending explicit verification.
 
 **Remaining:** Run explicit `storage.store` → `storage.retrieve` roundtrip test.
 Consider adopting `content.*` CAS paths for immutable artifacts alongside
