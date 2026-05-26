@@ -27,10 +27,13 @@ echo "Scenarios written to: $SCENARIO_DIR"
 echo "Total files: $(find "$SCENARIO_DIR" -name '*.json' 2>/dev/null | wc -l)"
 
 if [[ "${1:-}" == "--open" ]]; then
-    if command -v petaltongue >/dev/null 2>&1; then
+    PLASMIDBIN="${ECOPRIMALS_PLASMID_BIN:-$HOME/Development/ecoPrimals/infra/plasmidBin}"
+    PT_BIN="$PLASMIDBIN/primals/petaltongue"
+    [ -x "$PT_BIN" ] || PT_BIN="$PLASMIDBIN/primals/x86_64-unknown-linux-musl/petaltongue"
+    if [ -x "$PT_BIN" ]; then
         echo "Opening petalTongue..."
-        petaltongue --scenario "$SCENARIO_DIR/" &
+        "$PT_BIN" --scenario "$SCENARIO_DIR/" &
     else
-        echo "petaltongue not found in PATH — install petalTongue or set PETALTONGUE_SOCKET"
+        echo "petaltongue not found in plasmidBin — set ECOPRIMALS_PLASMID_BIN"
     fi
 fi
