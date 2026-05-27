@@ -27,10 +27,7 @@
 | Version | File | Date | Scope |
 |---------|------|------|-------|
 | **W55** | `handoffs/WETSPRING_WAVE55_SOUTHGATE_REDEPLOY_MAY26_2026.md` | May 26 | **southGate redeploy**: Wave 53 hardened binaries, 8/13 NUCLEUS, PG-02/PG-04 VERIFIED, mesh seeded. |
-| **W50** | `handoffs/WETSPRING_WAVE50_COVALENT_HPC_MAY25_2026.md` | May 25 | **Covalent HPC readiness**: NUCLEUS 7/13, cross-subnet confirmed, WS-2 nest.sync path, upstream blockers documented. |
-| **W49** | `handoffs/WETSPRING_WAVE49_POST_PRIMORDIAL_MAY25_2026.md` | May 25 | **Post-primordial cleanup**: plasmidBin-only discovery, shared `primal_binary` module, composition script cleaned, legacy `phase2/` paths updated. |
-| **W48** | `handoffs/WETSPRING_WAVE48_COVALENT_MESH_MAY25_2026.md` | May 25 | **Covalent mesh deployment conformance**: health.liveness shape, lifecycle.status, bonding.* dispatched, Songbird TCP :7700, cell deployment. |
-| | *Superseded → `handoffs/archive/`* | | Gate deployment + V183 and earlier archived (**202** files). |
+| | *Superseded → `handoffs/archive/`* | | W48/W49/W50 + gate deployment + V183 and earlier archived (**205** files). |
 
 ## Cross-Spring Documents
 
@@ -47,9 +44,12 @@
 | `capability.call` remote dispatch | songbird | Cross-gate ionic bond calls need TCP routing via mesh | WAITING |
 | `crypto.ionic_bond.seal` (Ed25519) | bearDog | Provenance seal signing for bond termination | WAITING |
 | biomeOS E2E `nest.sync` | biomeOS | WS-2 cross-spring data exchange | WAITING |
-| loamSpine tokio nesting panic | loamSpine | Provenance trio incomplete on southGate | **BUG** |
-| Health probe timing | plasmidBin/respective | rhizoCrypt/sweetGrass/toadStool sometimes exceed 8s timeout | TIMING |
+| ~~loamSpine tokio nesting panic~~ | loamSpine | ~~Provenance trio incomplete on southGate~~ | **FIXED** (Wave 53) |
+| petalTongue `--socket` flag | petalTongue | Cannot join NUCLEUS composition on southGate | **BUG** |
+| barraCuda startup crash | barraCuda | No GPU tensor compute via IPC on southGate | **BUG** |
+| ToadStool health.liveness empty | toadStool | Health probes fail despite socket existing | **BUG** |
 | Squirrel needs Ollama endpoint | Squirrel | AI narration unavailable without local Ollama | OPTIONAL |
+| fetch.sh RECENT_TAGS bug | plasmidBin | 4 primals unfetchable when not in latest release | **BUG** |
 
 ## Archive
 

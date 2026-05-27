@@ -4,11 +4,8 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-25 (V187 — Wave 50 post-primordial. NUCLEUS 7/13 health-responding
-on southGate, Songbird TCP :7700 federation 0.0.0.0. Cross-subnet reachable
-(192.168.4.29 → 192.168.1.144:7700, 4ms). WS-2 has concrete path via `nest.sync`
-on covalent mesh. WS-11 re-measurement pending covalent compute. PG-02/PG-04 deployed,
-pending explicit roundtrip. PG-06 locally wired.)
+Last updated: 2026-05-26 (V188 — Wave 55. NUCLEUS 8/13 health-responding.
+PG-02/PG-04 VERIFIED.)
 
 ---
 

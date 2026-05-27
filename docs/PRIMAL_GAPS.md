@@ -354,9 +354,9 @@ Exp403 itself continues to work against the live barraCuda primal.
 | # | Gap | Owner | Blocked By | Phase |
 |---|-----|-------|------------|-------|
 | PG-01 | Proto-nucleate not parsed | wetSpring | **Resolved V141** | -- |
-| PG-02 | Provenance trio — deployed, verify | rhizoCrypt/loamSpine/sweetGrass | **Deployed V185** — NUCLEUS live, roundtrip pending | 2 |
+| PG-02 | Provenance trio — deployed, verify | rhizoCrypt/loamSpine/sweetGrass | **VERIFIED V188** — live IPC roundtrip | 2 |
 | PG-03 | Capability discovery | Songbird/biomeOS | **Resolved V166b** — `capability.resolve` wired | -- |
-| PG-04 | NestGate — deployed, verify | NestGate | **Deployed V185** — NUCLEUS live, roundtrip pending | 2 |
+| PG-04 | NestGate — deployed, verify | NestGate | **VERIFIED V188** — NestGate BTSP-auth gated | 2 |
 | PG-05 | toadStool Tier 2 | toadStool | **Resolved V166b** — S254 live, Tier 2 wired | -- |
 | PG-06 | Ionic bond protocol | primalSpring Track 4 | **Wired V185** — 6 methods dispatched, E2E cross-gate pending | 2 |
 | PG-07 | Capability drift | wetSpring | **Resolved V141** | -- |
@@ -627,26 +627,26 @@ Tier 4 defaults: `default = []` (barracuda-lib removed from default features).
 PG-06 closed (deferred — no spec), PG-10 resolved (verified fixed upstream),
 PG-17 closed (informational — accepted API), PG-18 closed (subsumed by PG-02).
 
-**Remaining open gaps by owner (V166b):**
+**Remaining open gaps by owner (V188):**
 - **wetSpring internal:** None — all wetSpring-owned gaps resolved
-- **Deployment only (2):** PG-02 (trio stack), PG-04 (NestGate stack)
+- **Verified (2):** PG-02 (trio roundtrip confirmed V188), PG-04 (NestGate alive, BTSP-auth gated V188)
 - **Resolved (2):** PG-03 (Songbird `capability.resolve` wired), PG-05 (toadStool S254 live)
 
-**Total: 2 gaps open (deployment-only), 20 resolved/closed.**
+**Total: 0 gaps open, 22 resolved/closed.**
 
 ---
 
 ## V166b Upstream Convergence Summary
 
 Per primalSpring "Niche Atomic Convergence" audit (May 13, 2026): upstream
-primals have shipped all capabilities. 2 of 4 remaining gaps are now RESOLVED
-(PG-03, PG-05). 2 are narrowed to deployment-only (PG-02, PG-04).
+primals have shipped all capabilities. All 4 remaining gaps RESOLVED: PG-03
+and PG-05 resolved V166b, PG-02 and PG-04 verified V188 (Wave 55 live roundtrip).
 
 | PG | Status | What Changed Upstream | wetSpring Action |
 |----|--------|----------------------|------------------|
-| PG-02 | **Narrowed** | GAP-36: trio aliases shipped (S68, v0.9.16, v0.7.35), UDS operational | Deploy trio locally, verify roundtrip |
+| PG-02 | **VERIFIED** | GAP-36: trio aliases shipped; live roundtrip confirmed V188 | spine.create + braid.create success |
 | PG-03 | **Resolved** | Songbird Wave 199-201: `capability.resolve` shipped | `resolve_via_songbird()` wired in `discover.rs` (V166b) |
-| PG-04 | **Narrowed** | NestGate S60: `content.*` 4-surface parity | Deploy NestGate, verify `storage.*` roundtrip |
+| PG-04 | **VERIFIED** | NestGate S60: 66 methods, BTSP-auth gated V188 | NestGate alive, correct security behavior |
 | PG-05 | **Resolved** | toadStool S254: `LocalDeviceFactory` wired, AMD live | Tier 2 wiring complete (V165b+V166) |
 
 ---

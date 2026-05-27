@@ -2,9 +2,9 @@
 
 # baseCamp: Per-Faculty Research Briefings
 
-**Date:** May 25, 2026
+**Date:** May 26, 2026
 **Project:** wetSpring (ecoPrimals)
-**Status:** V187 — Wave 50 covalent HPC. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). 1,962 lib tests pass. 386 experiments (385 done + 1 in progress). **2** PG gaps open (deployment-only), 20 resolved/closed. southGate NUCLEUS 7/13 health-responding, Songbird TCP 0.0.0.0:7700.
+**Status:** V188 — Wave 55. NUCLEUS 8/13 health-responding. 345 UniBin scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). 1,962 lib tests pass. 386 experiments (385 done + 1 in progress). **0** PG gaps open, 22 resolved/closed. PG-02/PG-04 VERIFIED, Songbird TCP 0.0.0.0:7700.
 
 This is the validation narrative crystallized:
 - **Python was the validation target for Rust** (55 scripts → 1,962 lib tests).

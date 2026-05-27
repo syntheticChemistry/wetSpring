@@ -3,13 +3,13 @@
 <!-- V141 note (Apr 11, 2026): Paper queue is ALL DONE (63/63). Current
      experiment counts (384 indexed) and test counts (1,962) are in the root
      README.md. This file preserves the V126 per-paper detail. -->
-<!-- V187 note (May 25, 2026): 386 experiments (385 done + 1 in progress).
-     59 consumed capabilities (registry 458). 38/38 guideStone. 7/13 NUCLEUS
-     health-responding on southGate. Wave 50 covalent HPC. -->
+<!-- V188 note (May 26, 2026): 386 experiments (385 done + 1 in progress).
+     59 consumed capabilities (registry 458). 38/38 guideStone. 8/13 NUCLEUS
+     health-responding on southGate. Wave 55 southGate redeploy, PG-02/PG-04 VERIFIED. -->
 
 # wetSpring — Paper Review Queue
 
-**Last Updated**: May 25, 2026 (V187 — Wave 50 covalent HPC. 59 consumed, 50 niche, 45 dispatch (registry 458). 345 UniBin scenarios, 55 Python baselines. Clippy zero workspace. 386 experiments (385 done + 1 in progress), 5,967+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 2 primal gaps open (deployment-only), 20 resolved/closed.)
+**Last Updated**: May 26, 2026 (V188 — Wave 55. NUCLEUS 8/13 health-responding. 59 consumed, 50 niche, 45 dispatch (registry 458). 345 UniBin scenarios, 55 Python baselines. Clippy zero workspace. 386 experiments (385 done + 1 in progress), 5,967+ checks, 1,962 lib tests, 63/63 papers. 10-paper LTEE GuideStone Queue (B7 TIER 2 COMPLETE). 0 primal gaps open, 22 resolved/closed; PG-02/PG-04 VERIFIED V188.)
 **Purpose**: Track papers for reproduction/review across five tracks
 
 ---

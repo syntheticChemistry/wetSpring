@@ -1,7 +1,7 @@
 +++
 title = "wetSpring Validation Summary"
 description = "Life-science and analytical-chemistry spring — 1,962+ tests, 345 scenarios, UniBin single binary, pure primal composition"
-date = 2026-05-25
+date = 2026-05-26
 
 [taxonomies]
 primals = ["biomeos", "barracuda", "toadstool", "nestgate", "beardog", "songbird", "squirrel", "rhizocrypt", "loamspine", "sweetgrass", "petaltongue", "coralreef"]
@@ -14,7 +14,7 @@ springs = ["wetspring"]
 - **1 UniBin** (`wetspring`) — 345 scenarios (318 validation + 23 benchmark + 4 composition)
 - **45 dispatch methods** across 22 domains, 50 niche capabilities, 59 consumed
 - **56 experiment directories** with 64+ frozen JSON baselines
-- **guideStone Level 5** (primal proof) — V187, live composition health probing, 38/38 NUCLEUS checks
+- **guideStone Level 5** (primal proof) — V188, live composition health probing, 38/38 NUCLEUS checks
 - **Zero sovereign HTTP fallbacks** — pure primal composition
 - **Structured gap reports** when deployment primals are unavailable
 - **BLAKE3 content hashing** on all data paths

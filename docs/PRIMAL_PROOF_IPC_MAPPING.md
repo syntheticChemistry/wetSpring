@@ -2,7 +2,7 @@
 
 # wetSpring — Primal Proof IPC Mapping
 
-**Last Updated:** May 25, 2026 (V187 — Wave 50 covalent HPC. 59 consumed, 50 niche, 45 dispatch, 22 domains. Registry 458. southGate NUCLEUS 7/13 health-responding.)
+**Last Updated:** May 26, 2026 (V188 — Wave 55. NUCLEUS 8/13 health-responding. 59 consumed, 50 niche, 45 dispatch, 22 domains. Registry 458.)
 
 When `--features primal-proof` is enabled, wetSpring routes cross-primal calls
 through IPC rather than linking primal libraries. This document maps each domain
