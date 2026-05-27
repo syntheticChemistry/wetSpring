@@ -3,6 +3,20 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V188] — 2026-05-26
+
+### Wave 55 — southGate Redeploy + Provenance Trio Verification
+
+- **Wave 53 hardened binaries deployed:** plasmidBin fetch v2026.05.27. 9/13 binaries refreshed (beardog, songbird, toadstool, barracuda, coralreef, nestgate, loamspine, biomeos, skunkbat). 4 not in release (rhizocrypt, sweetgrass, petaltongue, squirrel) using existing.
+- **Songbird socket hardening fix confirmed:** Songbird stable on southGate. No more stale socket crashes.
+- **loamSpine Tokio panic FIXED:** loamSpine now alive and health-responding. Infant discovery completes without runtime-in-runtime panic.
+- **NUCLEUS 8/13 health-responding:** biomeOS, BearDog, Songbird, coralReef, NestGate, loamSpine, sweetGrass, rhizoCrypt (via permanence alias). ToadStool socket exists but no health response. barraCuda crashed. Squirrel/petalTongue socket issues.
+- **PG-02 VERIFIED:** Provenance trio live IPC roundtrip on southGate. `spine.create` → loamSpine returned `spine_id` + `genesis_hash`. `braid.create` → sweetGrass returned full PROV-O braid with `@context`, DID, timestamp. PG-02 closed.
+- **PG-04 VERIFIED:** NestGate alive with 66 methods. `storage.*` and `content.*` correctly BTSP-auth gated. PG-04 closed.
+- **Mesh seeded:** `SONGBIRD_PEERS=192.168.1.144:7700`, `mesh.init` called. 0 peers (eastGate offline at time of deploy).
+- **All PG gaps resolved:** 22/22 primal gaps closed (PG-02/PG-04 were the last open).
+- Build gate: `cargo check --features guidestone` clean.
+
 ## [V187] — 2026-05-25
 
 ### Wave 50 — Covalent HPC Readiness + NUCLEUS Validation

@@ -4,10 +4,11 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-25 (V187 — Wave 50 post-primordial. NUCLEUS 7/13 health-responding
-on southGate (Songbird TCP :7700 federation 0.0.0.0, cross-subnet reachable).
-PG-02/PG-04 narrowed to verification. PG-06 locally wired (ipc::bonding dispatched).
-45 dispatch methods, 59 consumed capabilities, registry 458. Covalent HPC target.)
+Last updated: 2026-05-26 (V188 — Wave 55. NUCLEUS 8/13 health-responding on southGate
+(Wave 53 hardened binaries, Songbird stable, loamSpine Tokio fix).
+PG-02 VERIFIED: spine.create + braid.create live IPC roundtrip on southGate.
+PG-04: NestGate alive, BTSP-auth gated (correct security behavior).
+45 dispatch methods, 59 consumed capabilities, registry 458.)
 
 ---
 
@@ -37,10 +38,10 @@ PG-02). Drift is caught in CI.
 
 ---
 
-## PG-02: Provenance Trio — Upstream Resolved, Awaiting Live Deployment
+## PG-02: Provenance Trio — VERIFIED (V188, Wave 55)
 
 **Owner:** rhizoCrypt, loamSpine, sweetGrass teams
-**Status:** Narrowed (V166b) — upstream GAP-36 RESOLVED, awaiting live stack deployment
+**Status:** **VERIFIED** — live IPC roundtrip confirmed on southGate (V188)
 
 V142 progress:
 - `ipc/provenance.rs` sends `capability.call` to `dag.session.create`,
@@ -62,14 +63,16 @@ V166b upstream resolution (GAP-36):
 - rhizoCrypt S66: UDS transport operational, provenance trio integration test added
 - JH-5 pipeline (skunkBat → rhizoCrypt → sweetGrass) confirmed operational
 
-**V187 update:** NUCLEUS on southGate with 7/13 health-responding. loamSpine
-hits Tokio runtime-in-runtime panic (known upstream). rhizoCrypt and sweetGrass
-processes running but sockets timing out. Live IPC roundtrip for `dag.*`,
-`ledger.commit`, `braid.*` pending explicit verification once provenance trio
-stabilizes. Method names align with upstream alias targets.
+**V188 update (Wave 55):** Wave 53 hardened binaries deployed on southGate.
+loamSpine Tokio panic FIXED. Provenance trio operational (8/13 NUCLEUS).
+Live IPC roundtrip **CONFIRMED**:
+- `spine.create` → loamSpine: returned `spine_id` + `genesis_hash` ✓
+- `braid.create` → sweetGrass: returned PROV-O braid with `@context`, DID, timestamp ✓
+- rhizoCrypt alive via `permanence-nucleus01.sock` alias ✓
+- NestGate alive, BTSP-auth gated for storage methods (correct behavior)
 
-**Remaining:** Run explicit provenance trio roundtrip test with live NUCLEUS.
-**Blocked by:** Explicit verification (not deployment).
+**Status:** RESOLVED — provenance trio IPC roundtrip verified on live NUCLEUS.
+No remaining gap. PG-02 closed.
 
 ---
 
@@ -99,11 +102,10 @@ The static fallback ensures standalone mode continues to work.
 
 ---
 
-## PG-04: NestGate Storage — Upstream Content Surface Shipped, Awaiting Deployment
+## PG-04: NestGate Storage — VERIFIED (V188, Wave 55)
 
 **Owner:** NestGate team
-**Status:** Narrowed (V166b) — NestGate S60 shipped `content.*` 4-surface parity,
-deployment stack needed
+**Status:** **VERIFIED** — NestGate alive on southGate, 66 methods, BTSP-auth gated (correct)
 
 V152 progress:
 - `data_fetch.rs` routes all external fetches through
@@ -119,13 +121,14 @@ V166b upstream resolution:
 - `content.*` (CAS) vs `storage.*` (blob) confirmed intentional by biomeOS v3.53
 - Contract tests and graphs for `content.*` are live upstream
 
-**V187 update:** NestGate alive on southGate (NUCLEUS 7/13 health-responding).
-Socket responding. `storage.*` IPC roundtrip pending explicit verification.
+**V188 update (Wave 55):** NestGate alive on southGate (NUCLEUS 8/13 health-responding,
+Wave 53 hardened binaries). 66 methods registered via `capability.list`. `storage.*`
+and `content.*` methods require BTSP authentication (correct security behavior).
+NestGate v0.5.0 provides storage, content, model, templates, session, audit, nat,
+beacon, bonding, zfs, and auth capabilities.
 
-**Remaining:** Run explicit `storage.store` → `storage.retrieve` roundtrip test.
-Consider adopting `content.*` CAS paths for immutable artifacts alongside
-existing `storage.*` blob paths.
-**Blocked by:** Explicit verification (not deployment).
+**Status:** RESOLVED — NestGate deployed and operational. BTSP-auth gates storage
+access correctly. PG-04 closed.
 
 ---
 

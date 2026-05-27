@@ -35,12 +35,12 @@ against Rust implementations, then promotes to GPU acceleration via
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 2 open in `docs/PRIMAL_GAPS.md` (PG-02/PG-04 deployed, verification pending; PG-06 locally wired; 20 resolved/closed). Zero internal gaps. |
+| **Primal gaps** | 0 open in `docs/PRIMAL_GAPS.md` (PG-02/PG-04 VERIFIED V188; PG-06 locally wired; 22 resolved/closed). Zero internal gaps. |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V187:** Wave 50 covalent HPC readiness. Post-primordial (V186). Cross-subnet confirmed (southGate 192.168.4.29 → eastGate 192.168.1.144:7700, 4ms). NUCLEUS 7/13 health-responding. Songbird TCP 0.0.0.0:7700. WS-2 `nest.sync` path identified. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration).**
+**Current release — V188:** Wave 55 southGate redeploy. Wave 53 hardened binaries (Songbird socket fix, loamSpine Tokio fix). NUCLEUS 8/13 health-responding. PG-02 VERIFIED (spine.create + braid.create live roundtrip). PG-04 VERIFIED (NestGate BTSP-auth gated). Mesh seeded. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 

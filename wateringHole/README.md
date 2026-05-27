@@ -1,22 +1,23 @@
 # wetSpring wateringHole
 
-**Date:** May 25, 2026
+**Date:** May 26, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
 
-## Current Ecosystem State (V187 — Wave 50 Covalent HPC)
+## Current Ecosystem State (V188 — Wave 55 Redeploy)
 
 | Metric | Value |
 |--------|-------|
 | primalSpring | v0.9.28 (458 methods, 52 scenarios, 100% coverage, behavioral convergence) |
-| wetSpring | V187 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
+| wetSpring | V188 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
 | Registry sync | **458** — zero drift |
 | Niche capabilities | **50** |
-| NUCLEUS deployment | **southGate** — 7/13 health-responding, Songbird TCP 0.0.0.0:7700, cross-subnet reachable |
+| NUCLEUS deployment | **southGate** — 8/13 health-responding, Wave 53 hardened, Songbird stable |
 | Cell deployment | `wetspring_cell.toml` validated, `server` alias ready |
-| plasmidBin | v5.5.0, CLI fix `8c8cb44` + simplified `9231b24` |
+| plasmidBin | v5.6.0 (v2026.05.27 release) |
 | Active gaps | WS-9 (L3 parity), WS-11 (variant caller re-measurement) |
+| PG gaps | **0 open** — PG-02/PG-04 VERIFIED, 22/22 closed |
 | Resolved | WS-1 (ionic — WIRED), WS-4 (WASM upstream), WS-8, WS-10 |
 
 ---
@@ -25,6 +26,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **W55** | `handoffs/WETSPRING_WAVE55_SOUTHGATE_REDEPLOY_MAY26_2026.md` | May 26 | **southGate redeploy**: Wave 53 hardened binaries, 8/13 NUCLEUS, PG-02/PG-04 VERIFIED, mesh seeded. |
 | **W50** | `handoffs/WETSPRING_WAVE50_COVALENT_HPC_MAY25_2026.md` | May 25 | **Covalent HPC readiness**: NUCLEUS 7/13, cross-subnet confirmed, WS-2 nest.sync path, upstream blockers documented. |
 | **W49** | `handoffs/WETSPRING_WAVE49_POST_PRIMORDIAL_MAY25_2026.md` | May 25 | **Post-primordial cleanup**: plasmidBin-only discovery, shared `primal_binary` module, composition script cleaned, legacy `phase2/` paths updated. |
 | **W48** | `handoffs/WETSPRING_WAVE48_COVALENT_MESH_MAY25_2026.md` | May 25 | **Covalent mesh deployment conformance**: health.liveness shape, lifecycle.status, bonding.* dispatched, Songbird TCP :7700, cell deployment. |

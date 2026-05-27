@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V187:** Wave 50 covalent HPC readiness. Post-primordial (V186). NUCLEUS 7/13 health-responding on southGate, Songbird TCP 0.0.0.0:7700. Cross-subnet reachable (4ms to eastGate). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains.
+**Current release — V188:** Wave 55 southGate redeploy. Wave 53 hardened binaries. NUCLEUS 8/13 health-responding. PG-02/PG-04 VERIFIED (provenance trio live IPC roundtrip). Songbird stable. Mesh seeded. 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 
@@ -92,8 +92,8 @@ Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
 |-------|-------|
 | **Gate** | southGate |
 | **Hardware** | AMD Ryzen 7 5800X3D 8-Core, 128GB DDR4, NVIDIA RTX 4060 |
-| **Composition** | Full NUCLEUS (7/13 health-responding, 11/13 processes) |
-| **NUCLEUS status** | **operational** (plasmidBin, post-primordial V186) |
+| **Composition** | Full NUCLEUS (8/13 health-responding, Wave 53 hardened) |
+| **NUCLEUS status** | **operational** (plasmidBin v2026.05.27, Wave 53 fixes) |
 | **Songbird federation** | 0.0.0.0:7700 (LAN-reachable, cross-subnet confirmed) |
 | **LAN mesh** | ready — covalent linking via Songbird TCP |
 | **Cell graph** | `plasmidBin/cells/wetspring_cell.toml` |

@@ -1,13 +1,24 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V187 (2026-05-25)
+**Last updated:** V188 (2026-05-26)
 **Lib tests:** 1,962 passed, 0 failed, 2 ignored (pre-existing upstream module visibility)
 **UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
-**Live NUCLEUS:** southGate — 7/13 health-responding, Songbird TCP 0.0.0.0:7700
+**Live NUCLEUS:** southGate — 8/13 health-responding (Wave 53 hardened, Songbird stable)
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
 **Clippy:** zero warnings (`--features ipc --lib -- -W clippy::pedantic -W clippy::nursery`)
 **Dispatch methods:** 45 (was 38; +lifecycle.status, +6 bonding.*)
-**Binary discovery:** plasmidBin-only (shared `primal_binary` module, Wave 49)
+**Binary discovery:** plasmidBin-only (v2026.05.27 release, Wave 53)
+
+## V188 Wave 55 — southGate Redeploy + PG Verification
+
+Wave 53 hardened binaries redeployed on southGate:
+- **Songbird:** Stable. Socket hardening fix confirmed. No more stale socket crashes.
+- **loamSpine:** Alive. Tokio runtime-in-runtime panic FIXED.
+- **NUCLEUS:** 8/13 health-responding (biomeOS, BearDog, Songbird, coralReef, NestGate, loamSpine, sweetGrass, rhizoCrypt). ToadStool socket but no health response. barraCuda crashed. Squirrel/petalTongue/skunkBat socket issues.
+- **PG-02 VERIFIED:** spine.create + braid.create live IPC roundtrip. Provenance trio operational.
+- **PG-04 VERIFIED:** NestGate alive with 66 methods. BTSP-auth gates storage correctly.
+- **Mesh seeded:** SONGBIRD_PEERS=192.168.1.144:7700, mesh.init called. 0 peers (eastGate offline).
+- **All PG gaps closed:** 22/22 resolved.
 
 ## V187 Wave 50 Post-Primordial + Covalent HPC
 
