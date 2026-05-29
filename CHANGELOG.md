@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V189] — 2026-05-28
+
+### Wave 60 — Eukaryotic Gate Onboarding
+
+- **NUCLEUS 13/13 processes on southGate:** All 13 primals running with UDS sockets. 11/13 health-responding via unauthenticated probes. petalTongue + Squirrel alive but BTSP-enforced (correct security behavior). biomeOS auto-discovers 1725 capabilities from 21 primal surfaces.
+- **Forgejo periplasm onboarding:** SSH config added for `git.primals.eco:2222`. Forgejo remotes configured on 29 repos via `cascade-pull.sh --ensure-remotes`. SSH key registration **blocked** — needs API token from eastGate VPS operator.
+- **WaterFall sync ready:** 20-repo southGate profile validated via `cascade-pull.sh --gate auto --dry-run`. Gate auto-detection works with `GATE_NAME=southGate` env var (hostname `pop-os` doesn't match pattern).
+- **Launcher evolution:** primalSpring `nucleus_launcher.sh` retired → `desktop_nucleus.sh`. plasmidBin `nucleus_launcher.sh` deployed (TCP+UDS composition). Manual starts needed for sweetGrass, rhizoCrypt, skunkBat (launcher passes unsupported `--socket` flag).
+- **Upstream issues documented:** 3 manifest issues (cellMembrane not cloned, nestGate path, songbird case mismatch). petalTongue/Squirrel BTSP enforcement blocks unauthenticated health probes.
+- Build gate: `cargo check --features guidestone` clean.
+
 ## [V188] — 2026-05-26
 
 ### Wave 55 — southGate Redeploy + Provenance Trio Verification

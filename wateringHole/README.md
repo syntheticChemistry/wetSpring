@@ -1,21 +1,21 @@
 # wetSpring wateringHole
 
-**Date:** May 26, 2026
+**Date:** May 28, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
 
-## Current Ecosystem State (V188 — Wave 55 Redeploy)
+## Current Ecosystem State (V189 — Wave 60 Eukaryotic)
 
 | Metric | Value |
 |--------|-------|
 | primalSpring | v0.9.28 (458 methods, 52 scenarios, 100% coverage, behavioral convergence) |
-| wetSpring | V188 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
+| wetSpring | V189 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
 | Registry sync | **458** — zero drift |
 | Niche capabilities | **50** |
-| NUCLEUS deployment | **southGate** — 8/13 health-responding, Wave 53 hardened, Songbird stable |
-| Cell deployment | `wetspring_cell.toml` validated, `server` alias ready |
-| plasmidBin | v5.6.0 (v2026.05.27 release) |
+| NUCLEUS deployment | **southGate** — 13/13 processes (11/13 health, 2 BTSP-gated), biomeOS 1725 caps |
+| Forgejo sync | Remotes configured, SSH key registration **pending** |
+| plasmidBin | v5.6.0 (v2026.05.28) |
 | Active gaps | WS-9 (L3 parity), WS-11 (variant caller re-measurement) |
 | PG gaps | **0 open** — PG-02/PG-04 VERIFIED, 22/22 closed |
 | Resolved | WS-1 (ionic — WIRED), WS-4 (WASM upstream), WS-8, WS-10 |
@@ -26,7 +26,8 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **W55** | `handoffs/WETSPRING_WAVE55_SOUTHGATE_REDEPLOY_MAY26_2026.md` | May 26 | **southGate redeploy**: Wave 53 hardened binaries, 8/13 NUCLEUS, PG-02/PG-04 VERIFIED, mesh seeded. |
+| **W60** | `handoffs/WETSPRING_WAVE60_EUKARYOTIC_ONBOARDING_MAY28_2026.md` | May 28 | **Eukaryotic onboarding**: 13/13 NUCLEUS, Forgejo remotes, WaterFall profile, SSH key blocker. |
+| **W55** | `handoffs/WETSPRING_WAVE55_SOUTHGATE_REDEPLOY_MAY26_2026.md` | May 26 | **southGate redeploy**: Wave 53 hardened binaries, PG-02/PG-04 VERIFIED, mesh seeded. |
 | | *Superseded → `handoffs/archive/`* | | W48/W49/W50 + gate deployment + V183 and earlier archived (**205** files). |
 
 ## Cross-Spring Documents

@@ -1,13 +1,13 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V188 (2026-05-26)
+**Last updated:** V189 (2026-05-28)
 **Lib tests:** 1,962 passed, 0 failed, 2 ignored (pre-existing upstream module visibility)
 **UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
-**Live NUCLEUS:** southGate — 8/13 health-responding (Wave 53 hardened, Songbird stable)
+**Live NUCLEUS:** southGate — 13/13 processes (11/13 health-responding, 2 BTSP-gated)
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
 **Clippy:** zero warnings (`--features ipc --lib -- -W clippy::pedantic -W clippy::nursery`)
 **Dispatch methods:** 45 (was 38; +lifecycle.status, +6 bonding.*)
-**Binary discovery:** plasmidBin-only (v2026.05.27 release, Wave 53)
+**Binary discovery:** plasmidBin-only (v2026.05.28, Wave 60 eukaryotic)
 
 ## V188 Wave 55 — southGate Redeploy + PG Verification
 

@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V188:** Wave 55 southGate redeploy. Wave 53 hardened binaries (Songbird socket fix, loamSpine Tokio fix). NUCLEUS 8/13 health-responding. PG-02 VERIFIED (spine.create + braid.create live roundtrip). PG-04 VERIFIED (NestGate BTSP-auth gated). Mesh seeded. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V189:** Wave 60 eukaryotic gate onboarding. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities from 21 surfaces. Forgejo remotes configured (SSH key registration pending). WaterFall 20-repo southGate profile validated. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 
