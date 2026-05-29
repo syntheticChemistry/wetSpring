@@ -267,9 +267,10 @@ mod tests {
 
     #[test]
     fn discover_socket_explicit() {
+        use std::os::unix::net::UnixListener;
         let sock = crate::ipc::test_socket_path("skunkbat_discover_socket_explicit");
         crate::ipc::cleanup_test_socket(&sock);
-        std::fs::write(&sock, "").unwrap();
+        let _listener = UnixListener::bind(&sock).unwrap();
 
         temp_env::with_var("SKUNKBAT_SOCKET", Some(sock.to_str().unwrap()), || {
             let found = discover_socket();

@@ -73,7 +73,6 @@ struct MappingCandidate {
 /// * `ref_name` - Reference sequence name for SAM output
 /// * `config` - Mapping configuration
 #[must_use]
-#[expect(clippy::too_many_arguments, reason = "mapper needs all these inputs")]
 pub fn map_read(
     read_id: &str,
     read_seq: &[u8],
@@ -150,6 +149,7 @@ pub fn map_read(
 /// Map a batch of reads (CPU path).
 ///
 /// For GPU-accelerated mapping, use [`map_reads_gpu`] with `--features gpu`.
+#[must_use] 
 pub fn map_reads(
     reads: &[(String, Vec<u8>, Vec<u8>)], // (id, seq, qual)
     index: &FmIndex,
@@ -375,14 +375,14 @@ fn alignment_to_cigar(alignment: &AlignmentResult) -> Vec<CigarOp> {
 
 /// Compute mapping quality from best and second-best alignment scores.
 ///
-/// Uses score gap (best - second_best) rather than ratio, following BWA-MEM's
+/// Uses score gap (best - `second_best`) rather than ratio, following BWA-MEM's
 /// approach. The ratio-based formula `(1 - second/best) * 60` produces near-zero
 /// MAPQ for almost all reads when candidates have similar scores (common with
 /// FM-index seeding + Smith-Waterman extension on bacterial genomes).
 ///
 /// Gap-based: MAPQ = min(60, gap * 6). A gap of 10 alignment score points
 /// yields MAPQ 60 (confident unique placement). Gap of 0 yields MAPQ 0
-/// (ambiguous). Gap of 2 yields MAPQ 12 (passes typical min_mapq=10 filter).
+/// (ambiguous). Gap of 2 yields MAPQ 12 (passes typical `min_mapq=10` filter).
 fn compute_mapq(candidates: &[MappingCandidate]) -> u32 {
     if candidates.len() < 2 {
         return 60;

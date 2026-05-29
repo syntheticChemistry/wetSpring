@@ -2,7 +2,7 @@
 
 # wetSpring — Degradation Behavior
 
-**Last Updated**: May 26, 2026 (V188 — Wave 55. 8/13 NUCLEUS, 6 bonding.* handlers wired)
+**Last Updated**: May 29, 2026 (V190 — Wave 60. 13/13 NUCLEUS processes, 11/13 health-responding, 6 bonding.* handlers wired)
 **Scope**: What happens when each consumed primal is unreachable
 **Contract**: Domain logic (science, validation) MUST NOT fail because a primal
 is unavailable. Provenance is enrichment, not a gate.

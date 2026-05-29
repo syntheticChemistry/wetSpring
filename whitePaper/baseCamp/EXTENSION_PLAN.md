@@ -2,9 +2,9 @@
 
 # baseCamp Extension Plan: From Validated Math to Real-World Science
 
-**Date:** May 26, 2026 (V188 update)
-**Author:** wetSpring V188 (ecoPrimals)
-**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 1,962 lib tests, 1 UniBin (345 scenarios), 91.20% coverage. **V188:** Wave 55 — NUCLEUS 8/13 health-responding, PG-02/PG-04 VERIFIED, Songbird TCP 0.0.0.0:7700. 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). Composition: composed, live-probing. `forbid(unsafe_code)`, zero `#[allow()]`, zero production mocks, clippy pedantic+nursery **ZERO WARNINGS**. 0 PG gaps open (22 resolved/closed; PG-02/PG-04 VERIFIED V188). 2 WS gaps active (WS-9 L3, WS-11 calibration).
+**Date:** May 29, 2026 (V190 update)
+**Author:** wetSpring V190 (ecoPrimals)
+**Foundation:** 386 experiments (385 done + 1 in progress), 5,967+ checks, 63 papers reproduced, 150+ primitives (barraCuda v0.4.0), 2,085 tests, 1 UniBin (345 scenarios), 91.20% coverage. **V190:** Wave 60 — Eukaryotic unicellular. NUCLEUS 13/13 processes, 11/13 health-responding (2 BTSP-gated). PG-02/PG-04 VERIFIED. biomeOS 1725 capabilities. 50 niche, 59 consumed, 45 dispatch, 22 domains (registry 458). Composition: composed, live-probing. `forbid(unsafe_code)`, clippy pedantic+nursery 4 warnings (casts). 0 PG gaps open (22 resolved/closed). 2 WS gaps active (WS-9 L3, WS-11 calibration). Forgejo remotes configured.
 
 ---
 

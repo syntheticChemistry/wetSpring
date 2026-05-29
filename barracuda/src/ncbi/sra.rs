@@ -86,7 +86,7 @@ pub struct SraFetchResult {
 pub enum SraSource {
     /// Already present on disk (cached from a previous run).
     LocalCache,
-    /// Retrieved from NestGate storage primal.
+    /// Retrieved from `NestGate` storage primal.
     NestGate,
     /// Downloaded via SRA Toolkit (`fasterq-dump` / `fastq-dump`).
     SraToolkit,
@@ -103,12 +103,12 @@ impl std::fmt::Display for SraSource {
     }
 }
 
-/// Composed SRA fetch with NestGate routing and BLAKE3 content addressing.
+/// Composed SRA fetch with `NestGate` routing and BLAKE3 content addressing.
 ///
 /// Tiered strategy:
 /// 1. **Local cache** — if `output_dir/{accession}.fastq[.gz]` exists, return it
-/// 2. **NestGate** — if NestGate is available, check `sra:{accession}` cache key
-/// 3. **SRA Toolkit** — download via `fasterq-dump` / `fastq-dump`, register in NestGate
+/// 2. **`NestGate`** — if `NestGate` is available, check `sra:{accession}` cache key
+/// 3. **SRA Toolkit** — download via `fasterq-dump` / `fastq-dump`, register in `NestGate`
 ///
 /// Every acquisition path produces a BLAKE3 hash for provenance.
 ///
@@ -168,10 +168,10 @@ pub fn fetch_sra_composed(accession: &str, output_dir: &Path) -> crate::error::R
 /// BLAKE3 hash of a file on disk; returns "unavailable" if the file can't be read.
 #[cfg(feature = "ipc")]
 fn blake3_of_file(path: &Path) -> String {
-    match std::fs::read(path) {
-        Ok(data) => blake3::hash(&data).to_hex().to_string(),
-        Err(_) => "unavailable".to_string(),
-    }
+    std::fs::read(path).map_or_else(
+        |_| "unavailable".to_string(),
+        |data| blake3::hash(&data).to_hex().to_string(),
+    )
 }
 
 /// Discover the best available SRA download tool.

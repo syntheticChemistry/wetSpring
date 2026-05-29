@@ -5,12 +5,12 @@ published tools and open data. Each experiment establishes a baseline using
 existing tools (Galaxy, QIIME2, asari, FindPFAS, scipy), then validates the
 Rust CPU and Rust GPU implementations against that baseline.
 
-**Updated**: 2026-05-26 (V188: Wave 55. NUCLEUS 8/13 health-responding. 345 scenarios, 23 benchmarks.
-50 niche, 59 consumed, 45 dispatch, 22 domains. Songbird TCP 0.0.0.0:7700.
+**Updated**: 2026-05-29 (V190: Wave 60. Eukaryotic unicellular. NUCLEUS 13/13 processes, 11/13
+health-responding (2 BTSP-gated). 345 scenarios, 23 benchmarks. 50 niche,
+59 consumed, 45 dispatch, 22 domains. biomeOS 1725 capabilities.
 386 experiments indexed (385 completed + 1 in progress), 5,967+ checks,
-**1,962** lib tests **+ 97 integration + 18 IPC** roundtrip (0 failures).
-16 notebooks. 63/63 papers. Registry 458.
-2 gaps active (WS-9 L3, WS-11).)
+**2,085** tests (0 failures). 16 notebooks. 63/63 papers. Registry 458.
+2 gaps active (WS-9 L3, WS-11). Forgejo remotes configured.)
 
 ---
 

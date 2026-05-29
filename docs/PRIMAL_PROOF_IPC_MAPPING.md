@@ -2,7 +2,7 @@
 
 # wetSpring — Primal Proof IPC Mapping
 
-**Last Updated:** May 26, 2026 (V188 — Wave 55. NUCLEUS 8/13 health-responding. 59 consumed, 50 niche, 45 dispatch, 22 domains. Registry 458.)
+**Last Updated:** May 29, 2026 (V190 — Wave 60. NUCLEUS 13/13 processes, 11/13 health-responding (2 BTSP-gated). 59 consumed, 50 niche, 45 dispatch, 22 domains. Registry 458.)
 
 When `--features primal-proof` is enabled, wetSpring routes cross-primal calls
 through IPC rather than linking primal libraries. This document maps each domain

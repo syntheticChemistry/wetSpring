@@ -1,13 +1,21 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V189 (2026-05-28)
-**Lib tests:** 1,962 passed, 0 failed, 2 ignored (pre-existing upstream module visibility)
+**Last updated:** V190 (2026-05-29)
+**Tests:** 2,085 workspace (0 failed, 2 ignored)
 **UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
 **Live NUCLEUS:** southGate — 13/13 processes (11/13 health-responding, 2 BTSP-gated)
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
-**Clippy:** zero warnings (`--features ipc --lib -- -W clippy::pedantic -W clippy::nursery`)
+**Clippy:** 4 warnings (bounded casts; pedantic+nursery, down from 37)
 **Dispatch methods:** 45 (was 38; +lifecycle.status, +6 bonding.*)
 **Binary discovery:** plasmidBin-only (v2026.05.28, Wave 60 eukaryotic)
+
+## V190 Wave 60 — Eukaryotic Polish
+
+- **Doc debt resolved:** 17 stale V188 banners → V190. W55 handoff archived.
+- **Clippy debt:** 37 → 4 warnings. Removed stale `#[expect()]`, auto-fixed 23 suggestions.
+- **Test fixes:** 3 socket discovery tests updated for connect-probe. Capability count 49 → 50.
+- **`.gate` identity file:** cascade-pull v2.0.0 auto-detection enabled.
+- **`composition_nucleus.sh`:** 8 → 13 primals (full NUCLEUS from one script).
 
 ## V188 Wave 55 — southGate Redeploy + PG Verification
 

@@ -74,7 +74,7 @@ pub struct CalledVariant {
 }
 
 impl CalledVariant {
-    /// Format as a breseq-style GenomeDiff (`.gd`) line.
+    /// Format as a breseq-style `GenomeDiff` (`.gd`) line.
     #[must_use]
     pub fn to_gd_line(&self, seq_id: &str) -> String {
         let type_str = match self.variant_type {
@@ -136,7 +136,7 @@ impl CallerConfig {
     /// Permissive configuration matching the original defaults.
     /// Useful for exploratory calling or low-coverage data.
     #[must_use]
-    pub fn permissive() -> Self {
+    pub const fn permissive() -> Self {
         Self {
             min_depth: 5,
             min_alt_frequency: 0.1,
@@ -155,7 +155,7 @@ impl CallerConfig {
 ///
 /// * `pileup` - Pileup columns from [`generate_pileup`](crate::bio::pileup::generate_pileup)
 /// * `reference` - Reference sequence (0-indexed)
-/// * `features` - Optional GenBank features for gene annotation
+/// * `features` - Optional `GenBank` features for gene annotation
 /// * `config` - Calling parameters
 #[must_use]
 pub fn call_variants(
@@ -373,10 +373,6 @@ fn quality_weighted_freq(col: &PileupColumn, base_idx: usize) -> f64 {
     weights[base_idx] / total
 }
 
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "Precision: depth bounded by coverage"
-)]
 fn call_snp(
     col: &PileupColumn,
     reference: &[u8],
@@ -444,10 +440,6 @@ fn call_snp(
     })
 }
 
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "Precision: depth bounded by coverage"
-)]
 fn call_deletion(
     col: &PileupColumn,
     reference: &[u8],
@@ -484,10 +476,6 @@ fn call_deletion(
     })
 }
 
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "Precision: depth bounded by coverage"
-)]
 fn call_insertion(
     col: &PileupColumn,
     reference: &[u8],
@@ -527,7 +515,7 @@ fn call_insertion(
 ///
 /// Uses the actual mean quality of the alternative allele's supporting reads
 /// to compute the expected error rate, rather than assuming a flat Q30.
-/// Q = sum over alt reads of (-10 * log10(P_error_per_base)).
+/// Q = sum over alt reads of (-10 * `log10(P_error_per_base)`).
 ///
 /// For low-quality alt bases, this naturally produces low variant quality,
 /// suppressing calls driven by sequencing error.
@@ -581,7 +569,7 @@ fn variant_quality(alt_count: u32, total_depth: u32, _frequency: f64) -> f64 {
     (alt * lr * 10.0).min(999.0)
 }
 
-fn base_to_idx(b: u8) -> usize {
+const fn base_to_idx(b: u8) -> usize {
     match b {
         b'A' => 0,
         b'C' => 1,
@@ -598,7 +586,7 @@ fn find_gene(position_1based: usize, features: &[GenBankFeature]) -> Option<Stri
         .and_then(|f| f.gene.clone())
 }
 
-/// Parse a breseq-style GenomeDiff (`.gd`) output file.
+/// Parse a breseq-style `GenomeDiff` (`.gd`) output file.
 ///
 /// Returns a list of `(type, position, new_base)` tuples for comparison.
 #[must_use]

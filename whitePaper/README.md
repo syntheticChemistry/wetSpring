@@ -2,8 +2,8 @@
 
 # wetSpring White Paper
 
-**Date:** May 26, 2026
-**Status:** V188 — Wave 55. NUCLEUS 8/13 health-responding. 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. Songbird TCP 0.0.0.0:7700, PG-02/PG-04 VERIFIED. Gen4: compute-aware scheduling, DAG checkpoint, living-environment patterns. **Tier 1:** Python/C++→Rust (5,967+ checks, 1,962 lib + 97 integration + 18 IPC, 1 UniBin). **Tier 2:** Composition (136/136, 7 graphs) + IPC. **Tier 3:** Live NUCLEUS IPC. 386 experiments (385 done + 1 in progress). 2 WS gaps active (WS-9 L3, WS-11 calibration), 0 PG open, 22 resolved/closed. `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry 458.
+**Date:** May 29, 2026
+**Status:** V190 — Wave 60. Eukaryotic unicellular. NUCLEUS 13/13 processes, 11/13 health-responding (2 BTSP-gated). biomeOS 1725 capabilities. 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. PG-02/PG-04 VERIFIED. Gen4: compute-aware scheduling, DAG checkpoint, living-environment patterns. **Tier 1:** Python/C++→Rust (5,967+ checks, 2,085 tests, 1 UniBin). **Tier 2:** Composition (136/136, 7 graphs) + IPC. **Tier 3:** Live NUCLEUS IPC. 386 experiments (385 done + 1 in progress). 2 WS gaps active (WS-9 L3, WS-11 calibration), 0 PG open, 22 resolved/closed. `forbid(unsafe_code)`, cargo-deny clean. 63 papers. Registry 458. Forgejo remotes configured.
 **License:** AGPL-3.0-or-later
 
 ---

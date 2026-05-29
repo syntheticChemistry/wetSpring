@@ -38,7 +38,7 @@ else
 fi
 
 PETALTONGUE_LIVE="${PETALTONGUE_LIVE:-true}"
-PRIMAL_LIST="${PRIMAL_LIST:-beardog songbird toadstool barracuda rhizocrypt loamspine sweetgrass petaltongue}"
+PRIMAL_LIST="${PRIMAL_LIST:-beardog songbird nestgate toadstool barracuda coralreef rhizocrypt loamspine sweetgrass skunkbat squirrel petaltongue biomeos}"
 
 export FAMILY_ID
 export BEARDOG_FAMILY_SEED="${BEARDOG_FAMILY_SEED:-$(head -c 32 /dev/urandom | xxd -p | tr -d '\n')}"
@@ -160,8 +160,27 @@ cmd_start() {
         fi
     fi
 
+    # ── Phase 1b: NestGate (storage) ──
+    if wants_primal nestgate; then
+        log "── Phase 1b: NestGate (storage) ──"
+        local nestgate_bin
+        nestgate_bin="$(find_binary nestgate)" || true
+        if [[ -n "$nestgate_bin" ]]; then
+            export NESTGATE_JWT_SECRET="${NESTGATE_JWT_SECRET:-$(openssl rand -base64 48)}"
+            NESTGATE_SOCKET="$(sock nestgate)" \
+            BEARDOG_SOCKET="$(sock beardog)" \
+            BTSP_PROVIDER_SOCKET="$(sock beardog)" \
+                start_primal nestgate "$nestgate_bin" server \
+                    --socket "$(sock nestgate)" \
+                    --family-id "$FAMILY_ID" || log "WARN: nestgate failed"
+            wait_for_socket "$(sock nestgate)" 8 || log "WARN: nestgate socket not ready"
+        else
+            log "WARN: nestgate binary not found"
+        fi
+    fi
+
     # ── Phase 2: Compute ──
-    if wants_primal toadstool || wants_primal barracuda; then
+    if wants_primal toadstool || wants_primal barracuda || wants_primal coralreef; then
         log "── Phase 2: Compute Services ──"
     fi
 
@@ -196,6 +215,21 @@ cmd_start() {
             fi
         else
             log "WARN: barracuda binary not found"
+        fi
+    fi
+
+    if wants_primal coralreef; then
+        local coralreef_bin
+        coralreef_bin="$(find_binary coralreef)" || true
+        if [[ -n "$coralreef_bin" ]]; then
+            CORALREEF_SOCKET="$(sock coralreef)" \
+            BEARDOG_SOCKET="$(sock beardog)" \
+            BTSP_PROVIDER_SOCKET="$(sock beardog)" \
+                start_primal coralreef "$coralreef_bin" server \
+                    --socket "$(sock coralreef)" || log "WARN: coralreef failed"
+            wait_for_socket "$(sock coralreef)" 8 || log "WARN: coralreef socket not ready"
+        else
+            log "WARN: coralreef binary not found"
         fi
     fi
 
@@ -253,6 +287,38 @@ cmd_start() {
         fi
     fi
 
+    # ── Phase 3b: Audit + AI ──
+    if wants_primal skunkbat; then
+        log "── Phase 3b: skunkBat (audit) ──"
+        local skunkbat_bin
+        skunkbat_bin="$(find_binary skunkbat)" || true
+        if [[ -n "$skunkbat_bin" ]]; then
+            SKUNKBAT_SOCKET="$(sock skunkbat)" \
+            BEARDOG_SOCKET="$(sock beardog)" \
+            BTSP_PROVIDER_SOCKET="$(sock beardog)" \
+                start_primal skunkbat "$skunkbat_bin" server \
+                    --port 9750 || log "WARN: skunkbat failed"
+            sleep 1
+        else
+            log "WARN: skunkbat binary not found"
+        fi
+    fi
+
+    if wants_primal squirrel; then
+        local squirrel_bin
+        squirrel_bin="$(find_binary squirrel)" || true
+        if [[ -n "$squirrel_bin" ]]; then
+            SQUIRREL_SOCKET="$(sock squirrel)" \
+            BEARDOG_SOCKET="$(sock beardog)" \
+            BTSP_PROVIDER_SOCKET="$(sock beardog)" \
+                start_primal squirrel "$squirrel_bin" server \
+                    --socket "$(sock squirrel)" || log "WARN: squirrel failed"
+            wait_for_socket "$(sock squirrel)" 8 || log "WARN: squirrel socket not ready"
+        else
+            log "WARN: squirrel binary not found"
+        fi
+    fi
+
     # ── Phase 4: petalTongue ──
     if wants_primal petaltongue; then
         log "── Phase 4: petalTongue ──"
@@ -297,6 +363,27 @@ cmd_start() {
         fi
     fi
 
+    # ── Phase 5: biomeOS (orchestrator, last) ──
+    if wants_primal biomeos; then
+        log "── Phase 5: biomeOS (orchestrator) ──"
+        local biomeos_bin
+        biomeos_bin="$(find_binary biomeos)" || true
+        if [[ -n "$biomeos_bin" ]]; then
+            BIOMEOS_SOCKET="$(sock biomeos)" \
+            BIOMEOS_SOCKET_DIR="$SOCKET_DIR" \
+            BIOMEOS_FAMILY_ID="$FAMILY_ID" \
+            BEARDOG_SOCKET="$(sock beardog)" \
+            SONGBIRD_SOCKET="$(sock songbird)" \
+            BTSP_PROVIDER_SOCKET="$(sock beardog)" \
+                start_primal biomeos "$biomeos_bin" neural-api \
+                    --socket "$(sock biomeos)" \
+                    --family-id "$FAMILY_ID" || log "WARN: biomeos failed"
+            wait_for_socket "$(sock biomeos)" 10 || log "WARN: biomeos socket not ready"
+        else
+            log "WARN: biomeos binary not found"
+        fi
+    fi
+
     # ── Capability domain symlinks ──
     log "── Creating capability aliases ──"
     local -A domain_map=(
@@ -304,14 +391,19 @@ cmd_start() {
         [crypto]="beardog-${FAMILY_ID}.sock"
         [btsp]="beardog-${FAMILY_ID}.sock"
         [discovery]="songbird-${FAMILY_ID}.sock"
+        [storage]="nestgate-${FAMILY_ID}.sock"
         [compute]="toadstool-${FAMILY_ID}.sock"
         [tensor]="barracuda-${FAMILY_ID}.sock"
         [math]="barracuda-${FAMILY_ID}.sock"
+        [shader]="coralreef-${FAMILY_ID}.sock"
         [provenance]="rhizocrypt-${FAMILY_ID}.sock"
         [dag]="rhizocrypt-${FAMILY_ID}.sock"
         [ledger]="loamspine-${FAMILY_ID}.sock"
         [attribution]="sweetgrass-${FAMILY_ID}.sock"
+        [audit]="skunkbat-${FAMILY_ID}.sock"
+        [ai]="squirrel-${FAMILY_ID}.sock"
         [visualization]="petaltongue-${FAMILY_ID}.sock"
+        [orchestration]="biomeos-${FAMILY_ID}.sock"
     )
     for domain in "${!domain_map[@]}"; do
         local target="${domain_map[$domain]}"
@@ -351,7 +443,7 @@ cmd_start() {
 cmd_stop() {
     log "Stopping NUCLEUS $COMPOSITION_NAME..."
     local stop_order=""
-    for name in petaltongue sweetgrass loamspine rhizocrypt barracuda toadstool songbird beardog; do
+    for name in biomeos petaltongue squirrel skunkbat sweetgrass loamspine rhizocrypt coralreef barracuda toadstool nestgate songbird beardog; do
         wants_primal "$name" && stop_order="$stop_order $name"
     done
     for name in $stop_order; do

@@ -129,7 +129,7 @@ impl FastaRecord {
     }
 }
 
-/// A GenBank feature (CDS, gene, rRNA, etc.) parsed from a `.gbk` file.
+/// A `GenBank` feature (CDS, gene, rRNA, etc.) parsed from a `.gbk` file.
 #[derive(Debug, Clone)]
 pub struct GenBankFeature {
     /// Feature type (e.g. "CDS", "gene", "rRNA").
@@ -148,7 +148,7 @@ pub struct GenBankFeature {
     pub locus_tag: Option<String>,
 }
 
-/// Parsed GenBank file with sequence and feature table.
+/// Parsed `GenBank` file with sequence and feature table.
 #[derive(Debug, Clone)]
 pub struct GenBankRecord {
     /// Locus name from the LOCUS line.
@@ -160,7 +160,7 @@ pub struct GenBankRecord {
 }
 
 impl GenBankRecord {
-    /// Load a GenBank flat file (`.gbk` / `.gb`).
+    /// Load a `GenBank` flat file (`.gbk` / `.gb`).
     ///
     /// Parses the FEATURES table for CDS/gene annotations and the ORIGIN
     /// section for the nucleotide sequence.
@@ -250,16 +250,16 @@ impl GenBankRecord {
                         locus_tag: None,
                     });
                 }
-            } else if trimmed.starts_with('/') {
+            } else if let Some(stripped) = trimmed.strip_prefix('/') {
                 if let Some(ref mut feat) = current_feature {
                     if !current_qualifier_key.is_empty() {
                         apply_qualifier_to_feat(feat, &current_qualifier_key, &current_qualifier_value);
                     }
-                    if let Some(eq_pos) = trimmed.find('=') {
-                        current_qualifier_key = trimmed[1..eq_pos].to_string();
-                        current_qualifier_value = trimmed[eq_pos + 1..].trim_matches('"').to_string();
+                    if let Some(eq_pos) = stripped.find('=') {
+                        current_qualifier_key = stripped[..eq_pos].to_string();
+                        current_qualifier_value = stripped[eq_pos + 1..].trim_matches('"').to_string();
                     } else {
-                        current_qualifier_key = trimmed[1..].to_string();
+                        current_qualifier_key = stripped.to_string();
                         current_qualifier_value.clear();
                     }
                 }
@@ -327,11 +327,9 @@ fn apply_qualifier_to_feat(feat: &mut GenBankFeature, key: &str, value: &str) {
 }
 
 fn parse_location(loc: &str) -> (usize, usize, bool) {
-    let (inner, forward) = if let Some(stripped) = loc.strip_prefix("complement(") {
-        (stripped.trim_end_matches(')'), false)
-    } else {
-        (loc, true)
-    };
+    let (inner, forward) = loc
+        .strip_prefix("complement(")
+        .map_or((loc, true), |stripped| (stripped.trim_end_matches(')'), false));
     let inner = inner
         .strip_prefix("join(")
         .unwrap_or(inner)

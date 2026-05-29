@@ -1,13 +1,13 @@
 # Cross-Spring Shader Evolution (fossil record — V126 provenance map)
 
-> **V188 note (May 26, 2026):** This document preserves the V126 shader
+> **V190 note (May 29, 2026):** This document preserves the V126 shader
 > provenance map as a fossil record. Current state: barraCuda v0.4.0,
 > coralReef v0.1.0 in niche. **800+** WGSL shaders, **150+** primitives
 > consumed, **zero** local WGSL (fully lean). **guideStone Level 5** (primal
-> proof). Wave 50 covalent HPC — post-primordial, cross-subnet confirmed.
-> 59 consumed, 50 niche, 45 dispatch (registry 458). Clippy zero workspace.
-> NUCLEUS 7/13 health-responding. southGate, Songbird TCP 0.0.0.0:7700.
-> **0** primal gaps open (**22** resolved/closed; PG-02/PG-04 VERIFIED V188).
+> proof). Wave 60 eukaryotic unicellular. NUCLEUS 13/13 processes, 11/13
+> health-responding (2 BTSP-gated). biomeOS 1725 capabilities.
+> 59 consumed, 50 niche, 45 dispatch (registry 458).
+> **0** primal gaps open (**22** resolved/closed; PG-02/PG-04 VERIFIED).
 > 386 experiments. See `docs/PRIMAL_GAPS.md`.
 
 **Last updated**: Mar 16, 2026 — V126 (fossil record)

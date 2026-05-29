@@ -3,6 +3,21 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V190] — 2026-05-29
+
+### Wave 60 — Eukaryotic Polish + Debt Resolution
+
+- **17 stale doc banners updated:** V188/Wave 55/8/13 → V190/Wave 60/13/13 across specs, whitePaper, barracuda, experiments, docs, wateringHole, sporeprint.
+- **Clippy debt resolved:** 37 → 4 warnings (pedantic+nursery). Removed 4 unfulfilled `#[expect()]` attrs. Auto-fixed 23 suggestions. Remaining 4 are bounded casts.
+- **3 test failures fixed:** Socket discovery tests (`songbird`, `skunkbat`, `compute_dispatch`) updated from `std::fs::write` to `UnixListener::bind` to match `socket_is_alive` connect-probe behavior.
+- **Capability count corrected:** `CAPABILITIES.len()` assertion 49 → 50 (6 health/meta, not 5; `lifecycle.status` was added).
+- **2,085 tests passing** (0 failures, 2 ignored). Up from 1,704+4 failures.
+- **`.gate` identity file created:** `$ECOPRIMALS_ROOT/.gate` = `southGate`. cascade-pull v2.0.0 auto-detection works.
+- **W55 handoff archived:** Moved to `wateringHole/handoffs/archive/`. W60 is sole active handoff.
+- **`composition_nucleus.sh` expanded:** 8 → 13 primals (added biomeOS, nestGate, coralReef, squirrel, skunkBat). Full NUCLEUS from one script.
+- **Upstream blockers table updated:** petalTongue/barraCuda/ToadStool resolved, fetch.sh workaround documented, Forgejo SSH key registration added as BLOCKED.
+- Build gate: `cargo check --features guidestone` clean. Full workspace test suite passing.
+
 ## [V189] — 2026-05-28
 
 ### Wave 60 — Eukaryotic Gate Onboarding

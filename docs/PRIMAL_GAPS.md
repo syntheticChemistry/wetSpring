@@ -4,11 +4,11 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-05-26 (V188 — Wave 55. NUCLEUS 8/13 health-responding on southGate
-(Wave 53 hardened binaries, Songbird stable, loamSpine Tokio fix).
+Last updated: 2026-05-29 (V190 — Wave 60. Eukaryotic unicellular. NUCLEUS 13/13
+processes on southGate, 11/13 health-responding (petalTongue + Squirrel BTSP-gated).
 PG-02 VERIFIED: spine.create + braid.create live IPC roundtrip on southGate.
 PG-04: NestGate alive, BTSP-auth gated (correct security behavior).
-45 dispatch methods, 59 consumed capabilities, registry 458.)
+45 dispatch methods, 59 consumed capabilities, registry 458. biomeOS 1725 capabilities.)
 
 ---
 

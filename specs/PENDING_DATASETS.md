@@ -2,7 +2,7 @@
 
 # wetSpring — Pending Datasets & Downloads
 
-**Last Updated**: May 26, 2026 (V188)
+**Last Updated**: May 29, 2026 (V190 — Wave 60)
 **Purpose**: Consolidated tracker for datasets referenced but not yet downloaded,
 hardware not yet available, or GPU shaders not yet written.
 

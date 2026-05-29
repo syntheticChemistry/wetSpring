@@ -1,16 +1,16 @@
 # wetSpring wateringHole
 
-**Date:** May 28, 2026
+**Date:** May 29, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
 
-## Current Ecosystem State (V189 — Wave 60 Eukaryotic)
+## Current Ecosystem State (V190 — Wave 60 Eukaryotic)
 
 | Metric | Value |
 |--------|-------|
 | primalSpring | v0.9.28 (458 methods, 52 scenarios, 100% coverage, behavioral convergence) |
-| wetSpring | V189 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines) |
+| wetSpring | V190 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines, 2,085 tests) |
 | Registry sync | **458** — zero drift |
 | Niche capabilities | **50** |
 | NUCLEUS deployment | **southGate** — 13/13 processes (11/13 health, 2 BTSP-gated), biomeOS 1725 caps |
@@ -27,8 +27,7 @@
 | Version | File | Date | Scope |
 |---------|------|------|-------|
 | **W60** | `handoffs/WETSPRING_WAVE60_EUKARYOTIC_ONBOARDING_MAY28_2026.md` | May 28 | **Eukaryotic onboarding**: 13/13 NUCLEUS, Forgejo remotes, WaterFall profile, SSH key blocker. |
-| **W55** | `handoffs/WETSPRING_WAVE55_SOUTHGATE_REDEPLOY_MAY26_2026.md` | May 26 | **southGate redeploy**: Wave 53 hardened binaries, PG-02/PG-04 VERIFIED, mesh seeded. |
-| | *Superseded → `handoffs/archive/`* | | W48/W49/W50 + gate deployment + V183 and earlier archived (**205** files). |
+| | *Superseded → `handoffs/archive/`* | | W55/W48/W49/W50 + gate deployment + V183 and earlier archived (**206** files). |
 
 ## Cross-Spring Documents
 
@@ -46,15 +45,16 @@
 | `crypto.ionic_bond.seal` (Ed25519) | bearDog | Provenance seal signing for bond termination | WAITING |
 | biomeOS E2E `nest.sync` | biomeOS | WS-2 cross-spring data exchange | WAITING |
 | ~~loamSpine tokio nesting panic~~ | loamSpine | ~~Provenance trio incomplete on southGate~~ | **FIXED** (Wave 53) |
-| petalTongue `--socket` flag | petalTongue | Cannot join NUCLEUS composition on southGate | **BUG** |
-| barraCuda startup crash | barraCuda | No GPU tensor compute via IPC on southGate | **BUG** |
-| ToadStool health.liveness empty | toadStool | Health probes fail despite socket existing | **BUG** |
-| Squirrel needs Ollama endpoint | Squirrel | AI narration unavailable without local Ollama | OPTIONAL |
-| fetch.sh RECENT_TAGS bug | plasmidBin | 4 primals unfetchable when not in latest release | **BUG** |
+| ~~petalTongue `--socket` flag~~ | petalTongue | ~~BTSP-gated, process alive via manual `--port` start~~ | **RESOLVED** (Wave 60) |
+| ~~barraCuda startup crash~~ | barraCuda | ~~Alive on port 9741 (manual port assignment)~~ | **RESOLVED** (Wave 60) |
+| ~~ToadStool health.liveness empty~~ | toadStool | ~~Health responds via `compute-nucleus01.sock`~~ | **RESOLVED** (Wave 60) |
+| Squirrel needs Ollama endpoint | Squirrel | AI narration unavailable without local Ollama (BTSP-gated) | OPTIONAL |
+| ~~fetch.sh RECENT_TAGS bug~~ | plasmidBin | ~~`local` keyword bug; workaround: use cached binaries~~ | **WORKAROUND** (Wave 60) |
+| Forgejo SSH key registration | eastGate | Cannot push to Forgejo; key needs API registration | **BLOCKED** |
 
 ## Archive
 
-Superseded handoffs in `handoffs/archive/` — gate deployment + V183 and earlier (**202** files).
+Superseded handoffs in `handoffs/archive/` — gate deployment + W55 + V183 and earlier (**206** files).
 Preserved as fossil record of the evolution from ToadStool-embedded to standalone barraCuda → NUCLEUS composition → guideStone → ecoBin harvest.
 
 ## Convention

@@ -1,7 +1,7 @@
 +++
 title = "wetSpring Validation Summary"
 description = "Life-science and analytical-chemistry spring — 1,962+ tests, 345 scenarios, UniBin single binary, pure primal composition"
-date = 2026-05-26
+date = 2026-05-29
 
 [taxonomies]
 primals = ["biomeos", "barracuda", "toadstool", "nestgate", "beardog", "songbird", "squirrel", "rhizocrypt", "loamspine", "sweetgrass", "petaltongue", "coralreef"]
@@ -14,12 +14,12 @@ springs = ["wetspring"]
 - **1 UniBin** (`wetspring`) — 345 scenarios (318 validation + 23 benchmark + 4 composition)
 - **45 dispatch methods** across 22 domains, 50 niche capabilities, 59 consumed
 - **56 experiment directories** with 64+ frozen JSON baselines
-- **guideStone Level 5** (primal proof) — V188, live composition health probing, 38/38 NUCLEUS checks
+- **guideStone Level 5** (primal proof) — V190, live composition health probing, 38/38 NUCLEUS checks
 - **Zero sovereign HTTP fallbacks** — pure primal composition
 - **Structured gap reports** when deployment primals are unavailable
 - **BLAKE3 content hashing** on all data paths
 - **Build time: 1m44s** (down from 25 min with 349 prokaryotic binaries)
-- **Wave 50 deployment:** southGate NUCLEUS 7/13 health-responding, Songbird TCP 0.0.0.0:7700, cross-subnet confirmed
+- **Wave 60 deployment:** southGate NUCLEUS 13/13 processes, 11/13 health-responding (2 BTSP-gated), biomeOS 1725 capabilities, Forgejo remotes configured
 
 ## Key Milestones
 

@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V189:** Wave 60 eukaryotic gate onboarding. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities / 21 surfaces. Forgejo remotes configured. WaterFall sync ready. 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V190:** Wave 60 eukaryotic unicellular. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities / 21 surfaces. Forgejo remotes configured (SSH key registration pending — needs eastGate API token). `.gate` identity file created. WaterFall cascade-pull v2.0.0 validated (20-repo southGate profile). 2,085 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 
@@ -26,13 +26,13 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 345 scenarios)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 50 niche capabilities, 59 consumed (33 barraCuda canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 45 dispatch methods, 22 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed
+- **Tests:** 2,085 workspace (0 failed)
 - **Validation checks:** 5,967+ across 345 scenarios (UniBin)
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), `wetspring certify` (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
-- **Clippy:** zero errors (pedantic + nursery)
+- **Clippy:** 4 warnings (casts, pedantic + nursery), zero errors
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
 - **Primal gaps:** 0 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, PG-06 locally wired (V185), PG-02/PG-04 VERIFIED (V188), 22 resolved/closed. Zero wetSpring-internal gaps.
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)
@@ -98,7 +98,9 @@ Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
 | **LAN mesh** | ready — covalent linking via Songbird TCP |
 | **Cell graph** | `plasmidBin/cells/wetspring_cell.toml` |
 | **Secondary gate** | strandGate (Dual EPYC 64-core, 256GB ECC, RTX 3090 + RX 6950 XT) — GPU science |
-| **Launch** | `SONGBIRD_FEDERATION_PORT=7700 nucleus_launcher.sh --family-id nucleus01 --composition nucleus` then `cell_launcher.sh wetspring start` |
+| **Launch** | `plasmidBin/nucleus_launcher.sh --family-id nucleus01` (core primals) + manual `--port` starts for sweetGrass/rhizoCrypt/skunkBat (launcher `--socket` bug) |
+| **Forgejo** | Remotes configured via `cascade-pull.sh --ensure-remotes`; push **blocked** pending SSH key registration |
+| **Gate identity** | `$ECOPRIMALS_ROOT/.gate` contains `southGate` (cascade-pull auto-detection) |
 
 ## Design Philosophy
 

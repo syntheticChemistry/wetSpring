@@ -3,7 +3,7 @@
 # wetSpring Specifications
 
 **Last Updated**: May 26, 2026
-**Status**: V188 — Wave 55. NUCLEUS 8/13 health-responding. 345 scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains. **guideStone Level 5** (primal proof). 1,962 lib + 97 integration + 18 IPC tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery zero warnings, zero `#[allow()]`. 136/136 proto-nucleate, 7 deploy graphs, 0 PG gaps open (22 resolved/closed; PG-02/PG-04 VERIFIED V188). Registry synced to 458 methods. 386 experiments (385 done + 1 in progress), 5,967+ checks. PG-02/PG-04 VERIFIED, Songbird TCP 0.0.0.0:7700.
+**Status**: V190 — Wave 60. Eukaryotic unicellular. NUCLEUS 13/13 processes, 11/13 health-responding (2 BTSP-gated). 345 scenarios (318 validation + 23 benchmark + 4 composition). 50 niche, 59 consumed, 45 dispatch, 22 domains. **guideStone Level 5** (primal proof). 2,085 tests pass, zero fail. `forbid(unsafe_code)`, clippy pedantic+nursery 4 warnings (casts). 136/136 proto-nucleate, 7 deploy graphs, 0 PG gaps open (22 resolved/closed; PG-02/PG-04 VERIFIED). Registry synced to 458 methods. 386 experiments (385 done + 1 in progress), 5,967+ checks. biomeOS 1725 capabilities, Forgejo remotes configured.
 **Domain**: Life science (16S, metagenomics), analytical chemistry (LC-MS, PFAS), microbial signaling
 
 ---

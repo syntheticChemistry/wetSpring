@@ -38,6 +38,7 @@ const ALPHA_SIZE: usize = 5;
 /// Sentinel ($) = 0, A = 1, C = 2, G = 3, T = 4.
 /// Non-ACGT bases map to A (conservative).
 #[inline]
+#[allow(clippy::match_same_arms)]
 const fn base_to_idx(b: u8) -> usize {
     match b {
         0 | b'$' => 0,
@@ -45,7 +46,7 @@ const fn base_to_idx(b: u8) -> usize {
         b'C' | b'c' => 2,
         b'G' | b'g' => 3,
         b'T' | b't' => 4,
-        _ => 1,
+        _ => 1, // N/ambiguous → A (conservative default)
     }
 }
 
@@ -204,9 +205,9 @@ fn sais(text: &[usize], alpha_size: usize) -> Vec<usize> {
     // Compact the reduced string
     let mut reduced: Vec<usize> = Vec::with_capacity(num_lms);
     let mut lms_map: Vec<usize> = Vec::with_capacity(num_lms);
-    for i in 0..n {
-        if name[i] != usize::MAX {
-            reduced.push(name[i]);
+    for (i, &val) in name[..n].iter().enumerate() {
+        if val != usize::MAX {
+            reduced.push(val);
             lms_map.push(i);
         }
     }
@@ -259,12 +260,13 @@ impl FmIndex {
         // Convert DNA bytes to integer alphabet and append sentinel
         let mut text: Vec<usize> = Vec::with_capacity(reference.len() + 1);
         for &b in reference {
+            #[allow(clippy::match_same_arms)]
             text.push(match b {
                 b'A' | b'a' => 1,
                 b'C' | b'c' => 2,
                 b'G' | b'g' => 3,
                 b'T' | b't' => 4,
-                _ => 1, // N → A
+                _ => 1, // N/ambiguous → A (conservative default)
             });
         }
         text.push(0); // sentinel
@@ -345,7 +347,7 @@ impl FmIndex {
     fn locate(&self, mut idx: usize) -> usize {
         let mut steps = 0;
         loop {
-            if idx % OCC_INTERVAL == 0 {
+            if idx.is_multiple_of(OCC_INTERVAL) {
                 let sa_val = self.sa_sample[idx / OCC_INTERVAL] as usize;
                 let result = sa_val + steps;
                 // Subtract 1 because we appended a sentinel
@@ -421,7 +423,7 @@ impl FmIndex {
 
     /// Reference length (without sentinel).
     #[must_use]
-    pub fn reference_len(&self) -> usize {
+    pub const fn reference_len(&self) -> usize {
         self.len - 1
     }
 

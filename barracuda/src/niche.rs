@@ -28,7 +28,7 @@ pub const NICHE_DESCRIPTION: &str = "Life science and analytical chemistry valid
 /// Niche version (tracks the spring version, not the crate version).
 pub const NICHE_VERSION: &str = "1.0.0";
 
-/// guideStone binary name (UniBin subcommand; matches `downstream_manifest.toml` entry).
+/// guideStone binary name (`UniBin` subcommand; matches `downstream_manifest.toml` entry).
 pub const GUIDESTONE_BINARY: &str = "wetspring";
 
 /// guideStone readiness level (0-5 per `GUIDESTONE_COMPOSITION_STANDARD.md` v1.1.0).
@@ -485,8 +485,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            49,
-            "5 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 6 bonding + 3 ecosystem integrations"
+            50,
+            "6 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 6 bonding + 3 ecosystem integrations"
         );
     }
 

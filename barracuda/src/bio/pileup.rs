@@ -104,6 +104,7 @@ const fn base_to_idx(b: u8) -> usize {
 
 /// Pileup generation configuration.
 #[derive(Debug, Clone)]
+#[derive(Default)]
 pub struct PileupConfig {
     /// Minimum Phred quality score to include a base in counts.
     /// Bases below this threshold are excluded from `base_counts` and `depth`.
@@ -118,16 +119,6 @@ pub struct PileupConfig {
     pub skip_secondary: bool,
 }
 
-impl Default for PileupConfig {
-    fn default() -> Self {
-        Self {
-            min_base_quality: 0,
-            min_mapq: 0,
-            skip_duplicates: false,
-            skip_secondary: false,
-        }
-    }
-}
 
 /// Generate pileup from sorted SAM records.
 ///

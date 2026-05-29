@@ -22,25 +22,25 @@ against Rust implementations, then promotes to GPU acceleration via
 
 | | |
 |---|---|
-| **Tests** | 1,962 lib + 97 integration + 18 IPC roundtrip, 0 failed |
+| **Tests** | 2,085 workspace (0 failed) |
 | **Validation checks** | 5,967+ across 345 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 50 niche, 59 consumed (33 canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 45 dispatch, 22 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
-| **Clippy** | 0 warnings (pedantic + nursery) |
+| **Clippy** | 4 warnings (casts, pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
-| **`#[allow()]`** | 0 in production (uses `#[expect(reason)]` exclusively) |
+| **`#[allow()]`** | 2 (intentional `match_same_arms` for nucleotide encoding defaults) |
 | **Local WGSL** | 0 — fully lean on barraCuda |
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
 | **Deploy graphs** | 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata) |
-| **Primal gaps** | 0 open in `docs/PRIMAL_GAPS.md` (PG-02/PG-04 VERIFIED V188; PG-06 locally wired; 22 resolved/closed). Zero internal gaps. |
+| **Primal gaps** | 0 open in `docs/PRIMAL_GAPS.md` (PG-02/PG-04 VERIFIED; PG-06 locally wired; 22 resolved/closed). Zero internal gaps. |
 | **cargo-deny** | advisories ok, bans ok, licenses ok, sources ok |
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V189:** Wave 60 eukaryotic gate onboarding. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities from 21 surfaces. Forgejo remotes configured (SSH key registration pending). WaterFall 20-repo southGate profile validated. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V190:** Wave 60 eukaryotic unicellular. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities from 21 surfaces. Forgejo remotes configured (SSH key registration pending — needs eastGate API token). `.gate` identity file created, cascade-pull v2.0.0 validated (20-repo southGate profile). Clippy 37 → 4 warnings, 3 test failures fixed, capability count corrected. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 

@@ -1,13 +1,13 @@
 # Ecosystem Leverage Guide — wetSpring V128 (fossil record)
 
-> **V188 note (May 26, 2026):** This guide was written at V128. Current
-> metrics: **1** UniBin (345 scenarios), **1,962** tests, **150+** barraCuda primitives
+> **V190 note (May 29, 2026):** This guide was written at V128. Current
+> metrics: **1** UniBin (345 scenarios), **2,085** tests, **150+** barraCuda primitives
 > (v0.4.0), **50** niche capabilities, **59** consumed capabilities (33 canonical
 > + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20, registry 458). **guideStone Level 5**
 > (primal proof). Ionic bonding wired + 6 `bonding.*` dispatched (V185).
-> Wave 55 southGate redeploy — Wave 53 hardened. Clippy pedantic+nursery zero warnings.
-> NUCLEUS 8/13 health-responding. southGate, Songbird TCP 0.0.0.0:7700.
-> **0** primal gaps open (**22** resolved/closed; PG-02/PG-04 VERIFIED V188).
+> Wave 60 eukaryotic unicellular. NUCLEUS 13/13 processes, 11/13 health-responding
+> (2 BTSP-gated). biomeOS 1725 capabilities. Forgejo remotes configured.
+> **0** primal gaps open (**22** resolved/closed; PG-02/PG-04 VERIFIED).
 > 386 experiments (385 done + 1 in progress), 5,967+ checks.
 > See `docs/PRIMAL_GAPS.md`.
 

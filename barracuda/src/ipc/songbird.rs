@@ -196,9 +196,10 @@ mod tests {
 
     #[test]
     fn discover_socket_explicit() {
+        use std::os::unix::net::UnixListener;
         let sock = crate::ipc::test_socket_path("songbird_discover_socket_explicit");
         crate::ipc::cleanup_test_socket(&sock);
-        std::fs::write(&sock, "").unwrap();
+        let _listener = UnixListener::bind(&sock).unwrap();
 
         temp_env::with_var("SONGBIRD_SOCKET", Some(sock.to_str().unwrap()), || {
             let found = discover_socket();
