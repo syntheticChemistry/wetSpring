@@ -3,6 +3,15 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V191] — 2026-05-29
+
+### Wave 60 — Stabilization
+
+- **Clippy zero warnings:** Resolved final 4 cast warnings (u64→usize `try_from`+`let..else`, i32→u32 `try_from`, usize→u8 `try_from`, if-chain→`match`). Down from 37 at session start → 0.
+- **Stabilization handoff filed:** `WETSPRING_WAVE60_STABILIZATION_MAY29_2026.md` documenting steady-state compliance with primalSpring "stabilize while upstream evolves" directive.
+- **airSpring AAR issues addressed:** `.gate` file resolves hostname detection (AAR 2.1). All other southGate-relevant items confirmed resolved or N/A.
+- Build gate: `cargo clippy --features ipc -- -W clippy::pedantic -W clippy::nursery` **ZERO** warnings. `cargo check --features guidestone` clean. 2,085 tests passing.
+
 ## [V190] — 2026-05-29
 
 ### Wave 60 — Eukaryotic Polish + Debt Resolution

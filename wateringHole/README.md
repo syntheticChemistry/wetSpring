@@ -5,12 +5,12 @@
 
 ---
 
-## Current Ecosystem State (V190 — Wave 60 Eukaryotic)
+## Current Ecosystem State (V191 — Wave 60 Stabilization)
 
 | Metric | Value |
 |--------|-------|
 | primalSpring | v0.9.28 (458 methods, 52 scenarios, 100% coverage, behavioral convergence) |
-| wetSpring | V190 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines, 2,085 tests) |
+| wetSpring | V191 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines, 2,085 tests, clippy zero) |
 | Registry sync | **458** — zero drift |
 | Niche capabilities | **50** |
 | NUCLEUS deployment | **southGate** — 13/13 processes (11/13 health, 2 BTSP-gated), biomeOS 1725 caps |
@@ -26,6 +26,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **W60-S** | `handoffs/WETSPRING_WAVE60_STABILIZATION_MAY29_2026.md` | May 29 | **Stabilization**: Clippy zero, cast fixes, airSpring AAR response, steady-state. |
 | **W60** | `handoffs/WETSPRING_WAVE60_EUKARYOTIC_ONBOARDING_MAY28_2026.md` | May 28 | **Eukaryotic onboarding**: 13/13 NUCLEUS, Forgejo remotes, WaterFall profile, SSH key blocker. |
 | | *Superseded → `handoffs/archive/`* | | W55/W48/W49/W50 + gate deployment + V183 and earlier archived (**206** files). |
 

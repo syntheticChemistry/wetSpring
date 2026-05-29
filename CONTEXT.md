@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V190:** Wave 60 eukaryotic unicellular. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities / 21 surfaces. Forgejo remotes configured (SSH key registration pending — needs eastGate API token). `.gate` identity file created. WaterFall cascade-pull v2.0.0 validated (20-repo southGate profile). 2,085 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V191:** Wave 60 stabilization. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities / 21 surfaces. Forgejo remotes configured (SSH key registration pending — needs eastGate API token). `.gate` identity file created. WaterFall cascade-pull v2.0.0 validated (20-repo southGate profile). **Clippy zero warnings** (pedantic+nursery). 2,085 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 
@@ -32,7 +32,7 @@ evolution pipeline.
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
 - **Crate count:** 2 workspace crates (wetspring-barracuda, wetspring-forge)
-- **Clippy:** 4 warnings (casts, pedantic + nursery), zero errors
+- **Clippy:** zero warnings (pedantic + nursery)
 - **Unsafe code:** zero — `forbid(unsafe_code)` at workspace level + per-crate roots
 - **Primal gaps:** 0 open (`docs/PRIMAL_GAPS.md`) — PG-01 through PG-22, PG-06 locally wired (V185), PG-02/PG-04 VERIFIED (V188), 22 resolved/closed. Zero wetSpring-internal gaps.
 - **Coverage:** 91.20% line / 90.30% function (gated at 90%)

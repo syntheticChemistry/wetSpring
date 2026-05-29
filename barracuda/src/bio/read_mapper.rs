@@ -399,7 +399,7 @@ fn compute_mapq(candidates: &[MappingCandidate]) -> u32 {
         return 60;
     }
 
-    let gap = (best - second).max(0) as u32;
+    let gap = u32::try_from((best - second).max(0)).unwrap_or(u32::MAX);
     gap.saturating_mul(6).min(60)
 }
 

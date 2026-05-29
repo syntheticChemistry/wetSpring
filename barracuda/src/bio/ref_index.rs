@@ -78,12 +78,10 @@ fn sais(text: &[usize], alpha_size: usize) -> Vec<usize> {
     let mut stype = vec![false; n]; // true = S-type, false = L-type
     stype[n - 1] = true; // sentinel is always S-type
     for i in (0..n - 1).rev() {
-        stype[i] = if text[i] < text[i + 1] {
-            true
-        } else if text[i] > text[i + 1] {
-            false
-        } else {
-            stype[i + 1]
+        stype[i] = match text[i].cmp(&text[i + 1]) {
+            std::cmp::Ordering::Less => true,
+            std::cmp::Ordering::Greater => false,
+            std::cmp::Ordering::Equal => stype[i + 1],
         };
     }
 
@@ -278,7 +276,7 @@ impl FmIndex {
         let mut bwt = vec![0u8; n];
         for (i, &sa_val) in sa.iter().enumerate() {
             let sym = if sa_val == 0 { text[n - 1] } else { text[sa_val - 1] };
-            bwt[i] = sym as u8;
+            bwt[i] = u8::try_from(sym).unwrap_or(0);
         }
 
         // Build C table

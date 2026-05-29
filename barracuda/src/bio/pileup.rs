@@ -167,7 +167,9 @@ pub fn generate_pileup_filtered(
         }
 
         let is_reverse = record.is_reverse();
-        let ref_start = (record.pos - 1) as usize; // convert 1-based to 0-based
+        let Ok(ref_start) = usize::try_from(record.pos - 1) else {
+            continue;
+        };
         let mut ref_pos = ref_start;
         let mut query_pos = 0usize;
 
