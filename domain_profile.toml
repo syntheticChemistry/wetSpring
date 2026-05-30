@@ -1,0 +1,164 @@
+# Domain Profile: wetSpring — Life Science & Analytical Chemistry
+# Covers metagenomics (16S rRNA), analytical chemistry (LC-MS, PFAS),
+# mathematical biology (ODE models, Anderson physics), and drug repurposing.
+
+[profile]
+id = "wetspring-life-science"
+version = "1.0.0"
+domain = "life-science"
+subdomain = ["metagenomics", "analytical-chemistry", "mathematical-biology", "drug-repurposing"]
+tools = ["breseq", "DADA2", "asari", "Galaxy", "QIIME2", "scipy", "barraCuda"]
+methods = [
+    "16s-rrna-pipeline",
+    "variant-calling",
+    "diversity-indices",
+    "lc-ms-feature-extraction",
+    "pfas-screening",
+    "ode-integration",
+    "anderson-localization",
+    "nmf-decomposition",
+]
+
+[translation]
+
+[[translation.entity_groups]]
+name = "metagenomics_16s"
+domain_description = "16S rRNA amplicon sequencing: QC, denoising, taxonomy, diversity"
+computation = "FASTQ→DADA2 denoise→ASV→taxonomy assignment→diversity indices (Shannon, Simpson, Chao1, UniFrac)"
+modules = ["bio_16s_pipeline", "bio_diversity", "bio_taxonomy"]
+
+[[translation.entity_groups]]
+name = "variant_calling"
+domain_description = "Whole-genome resequencing and SNP/indel calling (LTEE)"
+computation = "FM-index mapping→pileup→variant calling→breseq parity comparison"
+modules = ["bio_read_mapper", "bio_pileup", "bio_variant_caller", "bio_ref_index"]
+
+[[translation.entity_groups]]
+name = "analytical_chemistry"
+domain_description = "LC-MS feature detection, spectral matching, PFAS screening"
+computation = "EIC extraction→peak detection→feature alignment→KMD filtering→spectral library matching"
+modules = ["lcms_pipeline", "pfas_screening", "spectral_matching"]
+
+[[translation.entity_groups]]
+name = "mathematical_biology"
+domain_description = "ODE models for microbial signaling, quorum sensing, cooperation"
+computation = "RK4/RK45 integration of biological ODE systems (QS, bistable, phage, cooperation)"
+modules = ["ode_quorum_sensing", "ode_bistable", "ode_cooperation", "ode_phage"]
+
+[[translation.entity_groups]]
+name = "anderson_physics"
+domain_description = "Anderson localization, hormesis, disorder mapping in biological contexts"
+computation = "Lanczos diagonalization, transfer matrix methods, dose-response curves"
+modules = ["anderson_localization", "anderson_hormesis", "anderson_binding"]
+
+[[translation.entity_groups]]
+name = "drug_repurposing"
+domain_description = "NMF decomposition, knowledge graph embedding, drug-target scoring"
+computation = "NMF→TransE KG embedding→SparseGEMM→drug-target prediction"
+modules = ["nmf", "knowledge_graph", "drug_scoring"]
+
+[[translation.entity_groups]]
+name = "phylogenetics"
+domain_description = "Tree construction, comparison, and evolutionary distance"
+computation = "Felsenstein pruning, Robinson-Foulds distance, NJ trees, HMM profiles"
+modules = ["bio_phylogenetics", "bio_hmm"]
+
+[derivation]
+
+[[derivation.pipeline]]
+name = "sovereign_resequencing"
+description = "Full Rust variant calling pipeline with GPU acceleration and provenance braids"
+input = "FASTQ files (SRA accessions)"
+output = "VCF-like variant calls + FermentTranscriptBraid JSON"
+tool = "wetspring sovereign pipeline (barraCuda GPU + provenance trio)"
+
+[[derivation.pipeline]]
+name = "diversity_analysis"
+description = "16S rRNA diversity from raw reads through alpha/beta diversity"
+input = "FASTQ amplicon reads"
+output = "diversity_indices.json (Shannon, Simpson, Chao1, Bray-Curtis, UniFrac)"
+tool = "wetspring bio pipeline (CPU)"
+
+[[derivation.pipeline]]
+name = "lcms_feature_table"
+description = "LC-MS data processing from raw mzML to aligned feature table"
+input = "mzML files"
+output = "feature_table.json (m/z, RT, intensity)"
+tool = "wetspring lcms pipeline (CPU)"
+
+[[derivation.pipeline]]
+name = "pfas_screen"
+description = "PFAS compound screening via Kendrick mass defect and spectral matching"
+input = "mzML files + PFAS library"
+output = "pfas_hits.json (compound, score, confidence)"
+tool = "wetspring pfas pipeline (CPU)"
+
+[audit]
+
+[[audit.checks]]
+name = "python_rust_parity"
+description = "Rust implementation matches Python baseline within named tolerance"
+applies_to = "all"
+
+[[audit.checks]]
+name = "gpu_cpu_parity"
+description = "GPU-accelerated path produces identical results to CPU reference"
+applies_to = ["bio_variant_caller", "anderson_localization", "nmf"]
+
+[[audit.checks]]
+name = "provenance_completeness"
+description = "All pipeline outputs have BLAKE3 hashes and DAG session provenance"
+applies_to = ["sovereign_resequencing", "diversity_analysis"]
+
+[[audit.checks]]
+name = "cross_tier_parity"
+description = "L1 (Python/breseq) → L2 (Rust CPU) → L3 (IPC composition) produce consistent variants"
+applies_to = ["bio_variant_caller"]
+
+[[audit.checks]]
+name = "named_tolerance_coverage"
+description = "All numerical comparisons use named tolerances (242 registered, zero inline literals)"
+applies_to = "all"
+
+[[audit.checks]]
+name = "ferment_transcript_integrity"
+description = "FermentTranscriptBraid contains valid DAG merkle root, spine ID, and PROV-O alignment"
+applies_to = ["sovereign_resequencing"]
+
+[figures]
+auto_generate = false
+
+[[figures.plot]]
+name = "diversity_rarefaction"
+module = "bio_diversity"
+type = "1d_line"
+x_axis = "Sampling depth"
+y_axis = "Species richness"
+
+[[figures.plot]]
+name = "variant_accumulation"
+module = "bio_variant_caller"
+type = "1d_scatter"
+x_axis = "Generation"
+y_axis = "Cumulative mutations"
+
+[[figures.plot]]
+name = "lcms_tic"
+module = "lcms_pipeline"
+type = "1d_line"
+x_axis = "Retention time (min)"
+y_axis = "Total ion current"
+
+[[figures.plot]]
+name = "anderson_localization_length"
+module = "anderson_localization"
+type = "1d_line"
+x_axis = "Disorder strength (W/t)"
+y_axis = "Localization length (ξ)"
+
+[[figures.plot]]
+name = "hormesis_dose_response"
+module = "anderson_hormesis"
+type = "1d_line"
+x_axis = "Dose"
+y_axis = "Response"

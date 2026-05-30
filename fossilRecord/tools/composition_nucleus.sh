@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
+# FOSSILIZED: V192 (Wave 63, 2026-05-30)
+# Superseded by: infra/plasmidBin/nucleus_launcher.sh
+# Reason: plasmidBin is the canonical launcher for all gates. This local script
+# contained workarounds (--port instead of --socket, biomeOS neural-api subcommand)
+# that should be fixed upstream in plasmidBin. Retained as fossil record of the
+# 13-primal local dev launcher pattern with domain aliases.
+#
 # composition_nucleus.sh — Launch a NUCLEUS composition for any domain
 #
 # Starts primals from plasmidBin in dependency order with correct socket

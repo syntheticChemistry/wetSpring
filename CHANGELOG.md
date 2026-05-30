@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V192] — 2026-05-30
+
+### Wave 63 — River Delta: Temporal Sync + pseudoSpore
+
+- **PG-02/PG-04 re-verified live:** Provenance trio (loamSpine, sweetGrass, rhizoCrypt) all responding with proper JSON-RPC. NestGate alive with 66 capabilities. Live IPC roundtrips confirmed on current NUCLEUS.
+- **`composition_nucleus.sh` fossilized:** Moved to `fossilRecord/tools/` with provenance header. Superseded by `plasmidBin/nucleus_launcher.sh` per Wave 63 directive.
+- **`domain_profile.toml` created:** pseudoSpore domain profile covering 7 entity groups (metagenomics, variant calling, analytical chemistry, mathematical biology, Anderson physics, drug repurposing, phylogenetics). 4 derivation pipelines, 6 audit checks, 5 figure definitions. Ready for `litho emit-pseudospore`.
+- **Temporal sync tooling confirmed:** `cascade-pull.sh --source temporal` available in wateringHole scripts.
+- **NUCLEUS 10/13:** coralReef socket renamed upstream (was `shader.sock`, now needs discovery). petalTongue + Squirrel BTSP-gated. All other primals responding.
+- Build gate: clippy zero warnings, 2,085 tests, `cargo check --features guidestone` clean.
+
 ## [V191] — 2026-05-29
 
 ### Wave 60 — Stabilization

@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V191:** Wave 60 stabilization. NUCLEUS 13/13 processes on southGate (11/13 health-responding, 2 BTSP-gated). biomeOS discovers 1725 capabilities / 21 surfaces. Forgejo remotes configured (SSH key registration pending — needs eastGate API token). `.gate` identity file created. WaterFall cascade-pull v2.0.0 validated (20-repo southGate profile). **Clippy zero warnings** (pedantic+nursery). 2,085 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V192:** Wave 63 river delta. NUCLEUS 10/13 health-responding on southGate. PG-02/PG-04 re-verified live. `composition_nucleus.sh` fossilized. `domain_profile.toml` created for pseudoSpore. Temporal sync tooling available. **Clippy zero warnings**. 2,085 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 
