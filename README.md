@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V192:** Wave 63 river delta. NUCLEUS 10/13 health-responding on southGate (coralReef socket renamed upstream; petalTongue + Squirrel BTSP-gated). PG-02/PG-04 re-verified live. `composition_nucleus.sh` fossilized (plasmidBin is canonical). `domain_profile.toml` created for pseudoSpore emission. Temporal sync tooling available (`cascade-pull.sh --source temporal`). **Clippy zero warnings** (pedantic+nursery). 2,085 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V193:** Wave 67 glacial cutover. Songbird security socket fix (P0 BLOCKER): `from_env()` honors `--security-socket`/`SECURITY_PROVIDER_ENDPOINT`. biomeOS API socket proxies `capability.call` to Neural API (P0 BLOCKER resolved). bearDog S4 auth verified (TCP :9100, ionic token roundtrip, Ed25519 DID). NUCLEUS 10/13 health on southGate. **Clippy zero warnings** (pedantic+nursery). 2,085 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 

@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V193] — 2026-06-01
+
+### Wave 67 — Glacial Cutover: southGate Mesh Primals
+
+- **Songbird security socket fix (P0 BLOCKER):** `SecurityCryptoProvider::from_env()` now checks `SECURITY_PROVIDER_ENDPOINT` (set by `--security-socket` CLI) before mode-based discovery. Added `SECURITY_PROVIDER_ENDPOINT` to `discover_neural_api_socket()` chain. Aligned `songbird-crypto-provider` discovery. Unblocks federation TLS and cross-gate `capability.call`.
+- **biomeOS `capability.call` proxy (P0 BLOCKER):** API socket now proxies `capability.call`, `graph.execute`, `topology.primals` to the Neural API socket instead of returning `-32601`. Fixed stale test. Cross-gate capability routing unblocked.
+- **bearDog S4 auth verified:** TCP :9100 bound and accessible. `auth.issue_ionic` + `auth.verify_ionic` + `auth.public_key` roundtrip confirmed. Ed25519 DID operational. `MethodGate` enforced/permissive evolution. Ready for ironGate 7-day shadow gate.
+- **Impulse acknowledged:** `wave67-southgate-glacial-mesh-primals` FRAGO from eastGate.
+- Build gate: clippy zero warnings, 2,085 tests, all primal changes pushed upstream.
+
 ## [V192] — 2026-05-30
 
 ### Wave 63 — River Delta: Temporal Sync + pseudoSpore
