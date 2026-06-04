@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V193:** Wave 67 glacial cutover. Songbird security socket fix (P0 BLOCKER): `from_env()` honors `--security-socket`/`SECURITY_PROVIDER_ENDPOINT`. biomeOS API socket proxies `capability.call` to Neural API (P0 BLOCKER resolved). bearDog S4 auth verified (TCP :9100, ionic token roundtrip, Ed25519 DID). NUCLEUS 10/13 health on southGate. **Clippy zero warnings** (pedantic+nursery). 2,085 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V195:** Wave 76 deep debt. TCP transport implemented, primal name literals centralized, cross-gate discovery evolved, Songbird capability registration fixed, macOS RSS support, ionic bonding modernized, 5 deps bumped, stale lint expects removed, registries const-ified. **Clippy zero warnings** (pedantic+nursery). 2,089 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 

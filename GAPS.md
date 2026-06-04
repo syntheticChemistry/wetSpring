@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-05-29 (V190 — Wave 60. Eukaryotic unicellular. NUCLEUS
-13/13 processes, 11/13 health-responding (petalTongue + Squirrel BTSP-gated).
-PG-02/PG-04 VERIFIED. Forgejo remotes configured.)
+Last updated: 2026-06-03 (V195 — Wave 76. NUCLEUS 10/13 health. Clippy zero
+warnings. 2,089 tests. TCP transport implemented. bearDog w135 absorbed.
+Deep debt resolved. PG-02/PG-04 VERIFIED.)
 
 ---
 

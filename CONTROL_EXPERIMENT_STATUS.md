@@ -1,13 +1,43 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V190 (2026-05-29)
-**Tests:** 2,085 workspace (0 failed, 2 ignored)
+**Last updated:** V195 (2026-06-03)
+**Tests:** 2,089 workspace (0 failed, 3 ignored)
 **UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
-**Live NUCLEUS:** southGate — 13/13 processes (11/13 health-responding, 2 BTSP-gated)
+**Live NUCLEUS:** southGate — 13/13 processes (10/13 health-responding, 2 BTSP-gated, 1 coralReef socket rename)
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
-**Clippy:** 4 warnings (bounded casts; pedantic+nursery, down from 37)
-**Dispatch methods:** 45 (was 38; +lifecycle.status, +6 bonding.*)
+**Clippy:** 0 warnings (production code; experiments suppressed at module level)
+**Dispatch methods:** 45 (incl. lifecycle.status + 6 bonding.*)
 **Binary discovery:** plasmidBin-only (v2026.05.28, Wave 60 eukaryotic)
+
+## V195 Wave 76 — Deep Debt: Architecture Evolution
+
+- **TCP transport:** `ipc::transport` now supports `Transport::Tcp(addr)` alongside Unix sockets. Cross-gate JSON-RPC with unified `jsonrpc_line()` dispatch.
+- **Primal name centralization:** Replaced scattered string literals with `primal_names::*` constants.
+- **Songbird registration fix:** Non-`barracuda-lib` builds register `niche::CAPABILITIES` instead of empty list.
+- **macOS RSS:** `bench::peak_rss_mb()` supports macOS via safe `ps` subprocess.
+- **Ionic bonding modernized:** `try_from` casts, `ok_or_else`, dead match arms removed.
+- **Dependencies bumped:** axum 0.8.9, blake3 1.8.5, proptest 1.11, tempfile 3.27, tower-http 0.6.11.
+- **Registries const-ified:** `ScenarioRegistry` and `BenchmarkRegistry` constructors/accessors.
+- **4 new tests** from TCP transport (+4 to 2,089).
+
+## V194 Wave 76 — Parity Alignment
+
+- **bearDog w135 absorbed:** wetSpring has zero direct `auth.verify_ionic` calls. Multi-issuer change is transparent.
+- **157 compiler warnings eliminated:** Consolidated lint suppression on `validation::experiments` module.
+- **Build gate:** 0 warnings, 0 clippy warnings, 2,085→2,089 tests.
+
+## V193 Wave 67 — Glacial Cutover
+
+- **Songbird security socket fix (P0):** `SecurityCryptoProvider::from_env()` now honors `--security-socket`/`SECURITY_PROVIDER_ENDPOINT`.
+- **biomeOS capability.call proxy (P0):** API socket proxies `capability.call` to Neural API.
+- **bearDog S4 auth verified:** TCP :9100, ionic token roundtrip, Ed25519 DID operational.
+
+## V192 Wave 63 — River Delta
+
+- **PG-02/PG-04 re-verified live.** Provenance trio responding, NestGate alive with 66 capabilities.
+- **`composition_nucleus.sh` fossilized** → `fossilRecord/tools/`.
+- **`domain_profile.toml` created** for pseudoSpore emission.
+- **Temporal sync tooling** confirmed.
 
 ## V190 Wave 60 — Eukaryotic Polish
 
