@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V194] — 2026-06-03
+
+### Wave 76 — Parity Alignment: bearDog w135 Absorption
+
+- **FRAGO acknowledged:** `wave76-parity-sprint-springs` — wetSpring is P1 priority.
+- **bearDog w135 multi-issuer `auth.verify_ionic` review:** wetSpring compositions do not call `auth.verify_ionic` directly. All bearDog references are binary/socket discovery and display names only. No code changes required — confirmed compatible.
+- **Deep debt — 157 compiler warnings eliminated:**
+  - Added consolidated lint suppression on `validation::experiments` module (`unused_imports`, `dead_code`, `unused_variables`, `cast_precision_loss`, `cast_possible_truncation`, `cast_sign_loss`, `similar_names`, `items_after_statements`, `doc_markdown`, `many_single_char_names`). Scientific experiment code uses single-letter math variables, `usize`-to-`f64` casts, and data structs with fields for documentation.
+  - Added `#[allow(dead_code)]` on `read_mapper/tests.rs` scaffolded helpers (`test_reference`, `make_index_and_ref`).
+- **Build gate:** clippy zero warnings (both default and `--features guidestone`), 2,085 tests (0 failures, 3 ignored), `cargo test --workspace` clean.
+
 ## [V193] — 2026-06-01
 
 ### Wave 67 — Glacial Cutover: southGate Mesh Primals

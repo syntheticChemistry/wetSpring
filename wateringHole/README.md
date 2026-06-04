@@ -1,22 +1,21 @@
 # wetSpring wateringHole
 
-**Date:** June 1, 2026
+**Date:** June 3, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
 
-## Current Ecosystem State (V193 — Wave 67 Glacial Cutover)
+## Current Ecosystem State (V194 — Wave 76 Parity Alignment)
 
 | Metric | Value |
 |--------|-------|
 | primalSpring | v0.9.28 (458 methods, 56 scenarios, 92 experiments, temporal sync spec) |
-| wetSpring | V193 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines, 2,085 tests, clippy zero) |
+| wetSpring | V194 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines, 2,085 tests, clippy zero) |
 | Registry sync | **458** — zero drift |
 | Niche capabilities | **50** |
 | NUCLEUS deployment | **southGate** — 10/13 health (coralReef rename, 2 BTSP-gated) |
-| Songbird | `ae9b42f0` — security socket fix (P0 BLOCKER resolved) |
-| biomeOS | `9ed36983` — capability.call proxy (P0 BLOCKER resolved) |
-| bearDog | `a61c37101` — S4 auth hardening, TCP :9100, ionic token roundtrip |
+| bearDog w135 | Multi-issuer `auth.verify_ionic` — wetSpring compatible (no direct auth calls) |
+| Deep debt | 157 compiler warnings eliminated (experiment lint suppression) |
 | Forgejo sync | Remotes configured, SSH key registration **pending** |
 | Active gaps | WS-9 (L3 parity — needs FASTQ), WS-11 (MAPQ calibration — needs dataset) |
 | PG gaps | **0 open** — 22/22 closed |
@@ -27,6 +26,7 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
+| **W76** | `handoffs/WETSPRING_WAVE76_PARITY_ALIGNMENT_JUN03_2026.md` | Jun 03 | **Parity alignment**: bearDog w135 absorbed (no auth calls), 157 warnings eliminated, clippy zero, 2,085 tests clean. |
 | **W67** | `handoffs/WETSPRING_WAVE67_GLACIAL_CUTOVER_JUN01_2026.md` | Jun 01 | **Glacial cutover**: Songbird socket fix, biomeOS capability.call proxy, bearDog S4 auth verified. |
 | **W63** | `handoffs/WETSPRING_WAVE63_RIVER_DELTA_MAY30_2026.md` | May 30 | **River Delta**: PG-02/PG-04 re-verified, composition_nucleus.sh fossilized, domain_profile.toml created, temporal sync tooling confirmed. |
 | **W60-S** | `handoffs/WETSPRING_WAVE60_STABILIZATION_MAY29_2026.md` | May 29 | **Stabilization**: Clippy zero, cast fixes, airSpring AAR response, steady-state. |

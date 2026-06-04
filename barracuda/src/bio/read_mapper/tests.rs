@@ -2,6 +2,7 @@
 use super::*;
 use crate::bio::ref_index::FmIndex;
 
+#[allow(dead_code)]
 fn test_reference() -> Vec<u8> {
     // 200bp reference with a unique region
     let mut seq = Vec::with_capacity(200);
@@ -11,6 +12,7 @@ fn test_reference() -> Vec<u8> {
     seq
 }
 
+#[allow(dead_code)]
 fn make_index_and_ref() -> (FmIndex, Vec<u8>) {
     let reference = test_reference();
     let index = FmIndex::build(&reference);

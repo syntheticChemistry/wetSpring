@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V193:** Wave 67 glacial cutover. Songbird socket fix, biomeOS capability.call proxy, bearDog S4 auth verified. NUCLEUS 10/13 health. **Clippy zero warnings**. 2,085 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V194:** Wave 76 parity alignment. bearDog w135 multi-issuer `auth.verify_ionic` absorbed — no wetSpring compositions touch security verification directly, confirmed clean. Deep debt: 157 compiler warnings eliminated (experiment module lint suppression, dead code cleanup). **Clippy zero warnings**. 2,085 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 

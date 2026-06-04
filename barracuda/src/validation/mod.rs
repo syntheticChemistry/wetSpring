@@ -23,6 +23,18 @@
 mod data_dir;
 mod domain;
 #[cfg(feature = "guidestone")]
+#[allow(
+    unused_imports,
+    dead_code,
+    unused_variables,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::similar_names,
+    clippy::items_after_statements,
+    clippy::doc_markdown,
+    clippy::many_single_char_names,
+)]
 pub mod experiments;
 mod harness;
 mod or_exit;
