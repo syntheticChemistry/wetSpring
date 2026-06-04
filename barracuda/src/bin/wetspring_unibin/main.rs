@@ -181,7 +181,7 @@ fn cmd_validate(
 
 fn cmd_serve(
     socket_override: Option<&std::path::Path>,
-    _port: Option<u16>,
+    port: Option<u16>,
     family_id_override: Option<&str>,
 ) {
     tracing_subscriber::fmt::init();
@@ -219,7 +219,11 @@ fn cmd_serve(
         }
     };
 
-    tracing::info!(socket = %server.socket_path().display(), "bound");
+    tracing::info!(socket = %server.socket_path().display(), "bound UDS");
+
+    if let Some(tcp_port) = port {
+        tracing::info!(port = tcp_port, "TCP listen requested (cross-gate)");
+    }
 
     let _heartbeat = wetspring_barracuda::ipc::songbird::discover_socket().map_or_else(
         || {

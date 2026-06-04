@@ -35,6 +35,7 @@ fn registry() -> &'static Mutex<IonicContractRegistry> {
     REGISTRY.get_or_init(|| Mutex::new(IonicContractRegistry::new()))
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn map_ionic_err(e: IonicProtocolError) -> RpcError {
     RpcError {
         code: -32001,
@@ -71,12 +72,14 @@ pub fn handle_propose(params: &Value) -> Result<Value, RpcError> {
     }
 
     let duration_secs = params["duration_secs"].as_u64().unwrap_or(3600);
-    let rate_limit_rps = params["rate_limit_rps"].as_u64().unwrap_or(100) as u32;
+    let rate_limit_rps = u32::try_from(
+        params["rate_limit_rps"].as_u64().unwrap_or(100),
+    )
+    .unwrap_or(u32::MAX);
 
     let trust_model = match params["trust_model"].as_str() {
         Some("nuclear") => TrustModel::NuclearLineage,
         Some("mito_beacon") => TrustModel::MitoBeaconFamily,
-        Some("contractual") => TrustModel::Contractual,
         Some("organizational") => TrustModel::Organizational,
         Some("zero_trust") => TrustModel::ZeroTrust,
         _ => TrustModel::Contractual,
@@ -173,7 +176,7 @@ pub fn handle_terminate(params: &Value) -> Result<Value, RpcError> {
     };
 
     let request = TerminationRequest {
-        contract_id: id.clone(),
+        contract_id: id,
         reason,
     };
 
@@ -234,7 +237,7 @@ fn extract_id(params: &Value) -> Result<String, RpcError> {
     params["contract_id"]
         .as_str()
         .map(String::from)
-        .ok_or(RpcError {
+        .ok_or_else(|| RpcError {
             code: -32602,
             message: "missing 'contract_id' field".into(),
         })

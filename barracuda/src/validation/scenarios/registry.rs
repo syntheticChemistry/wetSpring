@@ -114,7 +114,7 @@ pub struct ScenarioRegistry {
 impl ScenarioRegistry {
     /// Create an empty registry.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             scenarios: Vec::new(),
         }
@@ -151,13 +151,13 @@ impl ScenarioRegistry {
 
     /// Number of registered scenarios.
     #[must_use]
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         self.scenarios.len()
     }
 
     /// Whether the registry is empty.
     #[must_use]
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.scenarios.is_empty()
     }
 }

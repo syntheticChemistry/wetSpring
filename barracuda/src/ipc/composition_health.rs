@@ -58,9 +58,9 @@ impl TrioStatus {
     #[must_use]
     pub fn to_json(&self) -> Value {
         json!({
-            "rhizocrypt": self.rhizocrypt.as_str(),
-            "loamspine": self.loamspine.as_str(),
-            "sweetgrass": self.sweetgrass.as_str(),
+            RHIZOCRYPT: self.rhizocrypt.as_str(),
+            LOAMSPINE: self.loamspine.as_str(),
+            SWEETGRASS: self.sweetgrass.as_str(),
             "summary": self.summary(),
         })
     }

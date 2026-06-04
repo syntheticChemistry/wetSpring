@@ -86,7 +86,6 @@ fn generate_sequences(n_seqs: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
     seqs
 }
 
-#[expect(clippy::too_many_lines)]
 /// Run the `validate_cross_ecosystem_pangenome` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
 

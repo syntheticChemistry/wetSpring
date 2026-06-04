@@ -55,7 +55,7 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
     #[cfg(feature = "barracuda-lib")]
     let caps = super::handlers::CAPABILITIES;
     #[cfg(not(feature = "barracuda-lib"))]
-    let caps: &[&str] = &[];
+    let caps: &[&str] = crate::niche::CAPABILITIES;
     let caps_json: Vec<String> = caps.iter().map(|c| format!("\"{c}\"")).collect();
     let caps_str = caps_json.join(",");
 

@@ -173,8 +173,9 @@ pub fn parse_peak_rss_mb(status_content: &str) -> f64 {
 
 /// Read peak resident set size (`VmHWM`) in MB from the live system.
 ///
-/// Uses `/proc/self/status` on Linux. Returns `0.0` on non-Linux platforms
-/// where this procfs file is unavailable, rather than panicking.
+/// Uses `/proc/self/status` on Linux. On macOS, shells out to `ps` as a
+/// safe alternative to `getrusage` (which requires unsafe FFI blocked by
+/// `#![forbid(unsafe_code)]`). Returns `0.0` on other platforms.
 #[must_use]
 pub fn peak_rss_mb() -> f64 {
     #[cfg(target_os = "linux")]
@@ -182,7 +183,18 @@ pub fn peak_rss_mb() -> f64 {
         let status = std::fs::read_to_string("/proc/self/status").unwrap_or_default();
         parse_peak_rss_mb(&status)
     }
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(target_os = "macos")]
+    {
+        // ps -o rss= reports RSS in KB for the current process
+        std::process::Command::new("ps")
+            .args(["-o", "rss=", "-p", &std::process::id().to_string()])
+            .output()
+            .ok()
+            .and_then(|out| String::from_utf8(out.stdout).ok())
+            .and_then(|s| s.trim().parse::<f64>().ok())
+            .map_or(0.0, |kb| kb / 1024.0)
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     {
         0.0
     }

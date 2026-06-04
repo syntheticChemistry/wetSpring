@@ -97,7 +97,7 @@ impl std::fmt::Display for SraSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::LocalCache => f.write_str("local_cache"),
-            Self::NestGate => f.write_str("nestgate"),
+            Self::NestGate => f.write_str(crate::primal_names::NESTGATE),
             Self::SraToolkit => f.write_str("sra_toolkit"),
         }
     }

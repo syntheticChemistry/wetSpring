@@ -36,6 +36,6 @@ pub fn build_registry() -> ScenarioRegistry {
 
 /// Build the benchmark registry.
 #[must_use]
-pub fn build_benchmark_registry() -> BenchmarkRegistry {
+pub const fn build_benchmark_registry() -> BenchmarkRegistry {
     BenchmarkRegistry::new()
 }

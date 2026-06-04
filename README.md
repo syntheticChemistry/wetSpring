@@ -22,7 +22,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 | | |
 |---|---|
-| **Tests** | 2,085 workspace (0 failed) |
+| **Tests** | 2,089 workspace (0 failed) |
 | **Validation checks** | 5,967+ across 345 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |

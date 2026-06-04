@@ -28,7 +28,6 @@ use crate::validation::Validator;
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
 
-#[expect(clippy::too_many_lines)]
 /// Run the `validate_cooperation` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let params = CooperationParams::default();

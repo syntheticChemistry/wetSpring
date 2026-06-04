@@ -17,6 +17,7 @@ pub fn validate_manifest_ipc(ctx: &mut CompositionContext, v: &mut ValidationRes
     validate_manifest_services(ctx, v);
 }
 
+#[allow(clippy::too_many_lines)]
 fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult) {
     validate_tensor_matmul(ctx, v);
 

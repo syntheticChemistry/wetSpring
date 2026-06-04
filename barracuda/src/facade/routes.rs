@@ -383,7 +383,7 @@ fn grammar_response(
             Err((
                 StatusCode::SERVICE_UNAVAILABLE,
                 Json(json!({
-                    "error": "petaltongue_unavailable",
+                    "error": format!("{}_unavailable", crate::primal_names::PETALTONGUE),
                     "message": "petalTongue RPC not reachable — use Plotly.js renderer",
                     "fallback": "plotly",
                 })),
@@ -392,7 +392,7 @@ fn grammar_response(
         |render_result| {
             Ok(Json(json!({
                 "id": id,
-                "renderer": "petaltongue",
+                "renderer": crate::primal_names::PETALTONGUE,
                 "modality": render_result
                     .get("modality")
                     .cloned()

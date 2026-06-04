@@ -3,6 +3,21 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V195] — 2026-06-03
+
+### Wave 76 — Deep Debt: Architecture Evolution
+
+- **TCP transport implemented:** `ipc::transport` now supports `Transport::Tcp(addr)` alongside `Transport::Unix(path)`. Cross-gate JSON-RPC via TCP with `jsonrpc_line()` unified dispatch. `Transport::resolve()` checks `{ENV_VAR}_TCP` for cross-gate addresses before Unix socket fallback. 4 new tests.
+- **Primal name literals centralized:** Replaced scattered `"nestgate"`, `"petaltongue"` string literals in production code (`ncbi/sra.rs`, `ipc/handlers/mod.rs`, `ipc/composition_health.rs`, `facade/routes.rs`) with `primal_names::*` constants.
+- **Songbird capability registration fixed:** Non-`barracuda-lib` builds now register `niche::CAPABILITIES` instead of empty `&[]`, ensuring IPC-only deployments advertise real capabilities.
+- **Cross-platform RSS:** `bench::peak_rss_mb()` now supports macOS via safe `ps` subprocess (respects `#![forbid(unsafe_code)]`), returns 0.0 only on truly unsupported platforms.
+- **`--port` CLI parameter wired:** UniBin `cmd_serve` now accepts and logs the TCP port parameter instead of ignoring it with `_port`.
+- **Ionic bonding modernized:** `u64`→`u32` cast uses `try_from` instead of `as`, redundant clone eliminated, `ok_or` → `ok_or_else` (lazy allocation), dead match arm removed.
+- **Dependencies bumped:** axum 0.8.8→0.8.9, blake3 1.8.3→1.8.5, proptest 1.10→1.11, tempfile 3.26→3.27, tower-http 0.6.8→0.6.11.
+- **Registries const-ified:** `ScenarioRegistry::new/len/is_empty` and `BenchmarkRegistry::new/len/is_empty` promoted to `const fn`.
+- **Stale lint expects removed:** 2 experiment files had unfulfilled `#[expect(clippy::too_many_lines)]` from prior refactoring.
+- **Build gate:** clippy zero warnings (production), 2,089 tests (0 failures, 3 ignored).
+
 ## [V194] — 2026-06-03
 
 ### Wave 76 — Parity Alignment: bearDog w135 Absorption

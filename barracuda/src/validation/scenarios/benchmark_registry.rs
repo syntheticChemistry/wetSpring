@@ -21,7 +21,7 @@ pub struct BenchmarkRegistry {
 impl BenchmarkRegistry {
     /// Create an empty registry.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             benchmarks: Vec::new(),
         }
@@ -60,13 +60,13 @@ impl BenchmarkRegistry {
 
     /// Number of registered benchmarks.
     #[must_use]
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         self.benchmarks.len()
     }
 
     /// Whether the registry is empty.
     #[must_use]
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.benchmarks.is_empty()
     }
 }

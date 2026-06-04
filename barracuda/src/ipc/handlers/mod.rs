@@ -302,7 +302,7 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "math": true,
         "gpu": gpu_status,
         "provenance_trio": trio.to_json(),
-        "nestgate": nestgate.as_str(),
+        crate::primal_names::NESTGATE: nestgate.as_str(),
     });
 
     let science_domains = json!([
