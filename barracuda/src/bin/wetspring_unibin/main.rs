@@ -112,10 +112,11 @@ fn cmd_validate(
                 println!("{json}");
             }
         } else {
-            println!(
-                "  {:30} {:15} {:6} {}",
-                "ID", "TRACK", "TIER", "DESCRIPTION"
-            );
+            let id = "ID";
+            let track = "TRACK";
+            let tier = "TIER";
+            let desc = "DESCRIPTION";
+            println!("  {id:30} {track:15} {tier:6} {desc}");
             println!("  {}", "─".repeat(80));
             for s in registry.all() {
                 println!(
@@ -193,24 +194,23 @@ fn cmd_serve(
     );
 
     let resolved_socket;
-    let bind_path: Option<&std::path::Path> = if let Some(sock) = socket_override {
-        Some(sock)
-    } else if let Some(fid) = family_id_override {
-        let xdg = std::env::var("XDG_RUNTIME_DIR")
-            .unwrap_or_else(|_| std::env::temp_dir().display().to_string());
-        resolved_socket = std::path::PathBuf::from(xdg)
-            .join("biomeos")
-            .join(format!("wetspring-{fid}.sock"));
-        Some(&resolved_socket)
-    } else {
-        None
+    let bind_path: Option<&std::path::Path> = match (socket_override, family_id_override) {
+        (Some(sock), _) => Some(sock),
+        (None, Some(fid)) => {
+            let xdg = std::env::var("XDG_RUNTIME_DIR")
+                .unwrap_or_else(|_| std::env::temp_dir().display().to_string());
+            resolved_socket = std::path::PathBuf::from(xdg)
+                .join("biomeos")
+                .join(format!("wetspring-{fid}.sock"));
+            Some(&resolved_socket)
+        }
+        (None, None) => None,
     };
 
-    let server = if let Some(sock) = bind_path {
-        wetspring_barracuda::ipc::Server::bind(sock)
-    } else {
-        wetspring_barracuda::ipc::Server::bind_default()
-    };
+    let server = bind_path.map_or_else(
+        wetspring_barracuda::ipc::Server::bind_default,
+        wetspring_barracuda::ipc::Server::bind,
+    );
     let server = match server {
         Ok(s) => s,
         Err(e) => {
@@ -273,10 +273,11 @@ fn cmd_benchmark(
                 println!("{json}");
             }
         } else {
-            println!(
-                "  {:30} {:15} {:6} {}",
-                "ID", "TRACK", "TIER", "DESCRIPTION"
-            );
+            let id = "ID";
+            let track = "TRACK";
+            let tier = "TIER";
+            let desc = "DESCRIPTION";
+            println!("  {id:30} {track:15} {tier:6} {desc}");
             println!("  {}", "─".repeat(80));
             for b in registry.all() {
                 println!(

@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V196] — 2026-06-04
+
+### Wave 77 — Forward Evolution: Clippy Compliance & Feature Gating
+
+- **Bonding dispatch feature-gated:** `bonding.*` dispatch arms now correctly compile without `guidestone` feature. Extracted `dispatch_bonding()` with separate `#[cfg(feature = "guidestone")]` and fallback implementations.
+- **`is_none_or` modernization:** Replaced 4 instances of `is_none() || is_some_and(...)` with idiomatic `is_none_or(...)` in `ncbi/nestgate` tests.
+- **Safe casts in tests:** Replaced `count as usize` with `usize::try_from(count).unwrap()` in dispatch and roundtrip tests.
+- **Test module lint expectations:** Added `#![expect(clippy::unwrap_used)]` to 5 test modules (`sam/tests.rs`, `fasta/tests.rs`, `pileup/tests.rs`, `read_mapper/tests.rs`, `variant_caller/tests.rs`) and `#[expect(clippy::expect_used)]` to 2 inline test modules (`precision_route`, `toadstool_validate`).
+- **Experiment lint list expanded for Rust 1.95:** Added `too_many_lines`, `expect_used`, `float_cmp`, `redundant_clone`, `redundant_closure_for_method_calls`, `map_unwrap_or`, `needless_collect`, `option_if_let_else`, `if_not_else`, `match_wildcard_for_single_variants`, `explicit_iter_loop`, `suboptimal_flops`, `trivially_copy_pass_by_ref`, `missing_const_for_fn`, `too_long_first_doc_paragraph`, `cast_lossless`, `duration_suboptimal_units`, `ignored_unit_patterns`, `needless_borrow`, `needless_range_loop`, `unnecessary_trailing_comma`, `unnecessary_sort_by`, `collection_is_never_read` to consolidated experiment module suppression.
+- **CLI refactored:** Replaced literal-in-format-string with local bindings for table headers. Replaced `if let/else` server bind with `map_or_else`.
+- **Pileup test modernized:** Replaced `collect().len()` with `.count()`, `Default::default()` field reassignment with struct literal.
+- **Build gate:** clippy zero warnings (default + guidestone), 2,089 tests (0 failures, 3 ignored).
+
 ## [V195] — 2026-06-03
 
 ### Wave 76 — Deep Debt: Architecture Evolution

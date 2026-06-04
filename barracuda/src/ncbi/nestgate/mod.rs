@@ -58,7 +58,7 @@ mod tests {
     fn resolve_socket_all_none() {
         let result = discovery::resolve_socket(None, None);
         assert!(
-            result.is_none() || result.is_some_and(|p| p.exists()),
+            result.is_none_or(|p| p.exists()),
             "should be None or a path that exists"
         );
     }
@@ -88,7 +88,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let xdg = dir.path().join("nonexistent_xdg");
         let result = discovery::resolve_socket(None, Some(xdg.to_str().unwrap()));
-        assert!(result.is_none() || result.is_some_and(|p| p.exists()));
+        assert!(result.is_none_or(|p| p.exists()));
     }
 
     #[test]
@@ -114,7 +114,7 @@ mod tests {
         let sock = dir.path().join("nestgate-default.sock");
         std::fs::write(&sock, "").unwrap();
         let result = discovery::resolve_socket(None, Some("/nonexistent_xdg_path_12345"));
-        assert!(result.is_none() || result.is_some_and(|p| p.exists()));
+        assert!(result.is_none_or(|p| p.exists()));
     }
 
     #[test]
@@ -275,7 +275,7 @@ mod tests {
     #[test]
     fn resolve_biomeos_socket_none() {
         let result = discovery::resolve_biomeos_socket(None, None);
-        assert!(result.is_none() || result.is_some_and(|p| p.exists()));
+        assert!(result.is_none_or(|p| p.exists()));
     }
 
     #[test]

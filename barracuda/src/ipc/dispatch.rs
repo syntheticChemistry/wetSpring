@@ -96,15 +96,30 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         "composition.science_health" => handlers::handle_composition_science_health(params),
 
         // Ionic bonding lifecycle (V184: IonicContractRegistry wired)
+        m if cfg!(feature = "guidestone") && m.starts_with("bonding.") => {
+            dispatch_bonding(m, params)
+        }
+
+        _ => Err(RpcError::method_not_found(method)),
+    }
+}
+
+#[cfg(feature = "guidestone")]
+fn dispatch_bonding(method: &str, params: &Value) -> Result<Value, RpcError> {
+    match method {
         "bonding.propose" => crate::ipc::bonding::handle_propose(params),
         "bonding.accept" => crate::ipc::bonding::handle_accept(params),
         "bonding.reject" => crate::ipc::bonding::handle_reject(params),
         "bonding.status" => crate::ipc::bonding::handle_status(params),
         "bonding.terminate" => crate::ipc::bonding::handle_terminate(params),
         "bonding.list" => crate::ipc::bonding::handle_list(params),
-
         _ => Err(RpcError::method_not_found(method)),
     }
+}
+
+#[cfg(not(feature = "guidestone"))]
+fn dispatch_bonding(method: &str, _params: &Value) -> Result<Value, RpcError> {
+    Err(RpcError::method_not_found(method))
 }
 
 #[cfg(test)]
@@ -334,7 +349,7 @@ mod tests {
         let caps = result["capabilities"].as_array().unwrap();
         let count = result["count"].as_u64().unwrap();
         assert_eq!(
-            count as usize,
+            usize::try_from(count).unwrap(),
             caps.len(),
             "Wave 20 canonical: count MUST match capabilities array length"
         );

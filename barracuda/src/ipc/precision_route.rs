@@ -160,6 +160,7 @@ fn parse_route_response(response: &str) -> Result<PrecisionAdvice, PrecisionErro
 }
 
 #[cfg(test)]
+#[expect(clippy::expect_used, reason = "test assertions")]
 mod tests {
     use super::*;
 

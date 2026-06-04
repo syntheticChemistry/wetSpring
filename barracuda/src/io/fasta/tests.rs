@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![expect(clippy::unwrap_used, reason = "test assertions")]
 use super::*;
 use std::io::Write;
 

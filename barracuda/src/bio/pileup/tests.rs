@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![expect(clippy::unwrap_used, reason = "test assertions")]
 use super::*;
 use crate::io::sam::{CigarOp, CigarType, SamRecord, FLAG_REVERSE, FLAG_UNMAPPED};
 
@@ -131,15 +132,17 @@ fn insertion_in_cigar() {
     let pileup = generate_pileup(&records, 10);
 
     // Position 2 (0-based) should record 1 insertion
-    let ins_cols: Vec<_> = pileup.iter().filter(|c| c.insertions > 0).collect();
-    assert_eq!(ins_cols.len(), 1);
+    let ins_count = pileup.iter().filter(|c| c.insertions > 0).count();
+    assert_eq!(ins_count, 1);
 }
 
 #[test]
 fn major_allele() {
-    let mut col = PileupColumn::default();
-    col.depth = 10;
-    col.base_counts = [1, 2, 5, 2, 0]; // G is major
+    let col = PileupColumn {
+        depth: 10,
+        base_counts: [1, 2, 5, 2, 0], // G is major
+        ..PileupColumn::default()
+    };
     assert_eq!(col.major_allele(), b'G');
     assert!((col.major_allele_frequency() - 0.5).abs() < 1e-10);
 }

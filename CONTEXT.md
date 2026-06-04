@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V195:** Wave 76 deep debt. TCP transport implemented, primal name literals centralized, cross-gate discovery evolved, Songbird capability registration fixed, macOS RSS support, ionic bonding modernized, 5 deps bumped, stale lint expects removed, registries const-ified. **Clippy zero warnings** (production). 2,089 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V196:** Wave 77 forward evolution. Bonding dispatch feature-gated (fixes non-guidestone compilation), `is_none_or` idiomatic modernization, safe casts, test-module lint expectations for Rust 1.95, experiment lint list expanded, CLI refactored. **Clippy zero warnings** (all feature combinations). 2,089 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 

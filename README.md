@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V195:** Wave 76 deep debt. TCP transport implemented, primal name literals centralized, cross-gate discovery evolved, Songbird capability registration fixed, macOS RSS support, ionic bonding modernized, 5 deps bumped, stale lint expects removed, registries const-ified. **Clippy zero warnings** (pedantic+nursery). 2,089 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V196:** Wave 77 forward evolution. Bonding dispatch feature-gated (fixes default-feature compilation), `is_none_or` modernization, safe casts in tests, new test-module lint expectations for bio I/O modules, experiment lint suppression expanded for Rust 1.95 clippy, CLI literal-format refactor, `map_or_else` idiomatic server bind. **Clippy zero warnings** (all feature combinations). 2,089 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 

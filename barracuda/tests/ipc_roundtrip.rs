@@ -136,7 +136,7 @@ fn capability_list_includes_all_domains() {
             .as_u64()
             .expect("count field (Wave 20 canonical)");
         assert_eq!(
-            count as usize,
+            usize::try_from(count).expect("count fits usize"),
             caps.len(),
             "Wave 20: count must match capabilities array length"
         );
