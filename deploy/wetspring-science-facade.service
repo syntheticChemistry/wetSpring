@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# wetspring-science-facade — user-level systemd service
+#
+# Install:
+#   cp wetspring-science-facade.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now wetspring-science-facade
+#   loginctl enable-linger $USER
+#
+# Follows the biomeos-beacon.service pattern: user-level, loginctl lingered,
+# environment from the standard locations.
+
+[Unit]
+Description=wetSpring Science Facade — primals.eco live science gateway
+Documentation=https://primals.eco
+After=network.target biomeos-beacon.service
+Wants=biomeos-beacon.service
+
+[Service]
+Type=simple
+ExecStart=%h/.cargo/bin/wetspring_science_facade
+Restart=on-failure
+RestartSec=5
+
+Environment=FACADE_BIND=127.0.0.1:3100
+Environment=FACADE_CORS_ORIGIN=https://primals.eco
+Environment=FACADE_DARK_FOREST=true
+Environment=RUST_LOG=info
+
+EnvironmentFile=-%h/.config/wetspring/facade.env
+
+[Install]
+WantedBy=default.target
