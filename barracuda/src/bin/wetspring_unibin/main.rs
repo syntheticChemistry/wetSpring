@@ -193,6 +193,11 @@ fn cmd_serve(
         "starting science primal (UniBin)"
     );
 
+    // Tier 0: TRANSPORT_ENDPOINT env var (launcher-injected, highest priority)
+    if let Ok(ep) = wetspring_barracuda::ipc::transport::TransportEndpoint::from_env() {
+        tracing::info!(endpoint = %ep, tier = 0, "TRANSPORT_ENDPOINT override");
+    }
+
     let resolved_socket;
     let bind_path: Option<&std::path::Path> = match (socket_override, family_id_override) {
         (Some(sock), _) => Some(sock),

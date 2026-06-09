@@ -22,7 +22,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 | | |
 |---|---|
-| **Tests** | 2,089 workspace (0 failed) |
+| **Tests** | 2,097 workspace (0 failed) |
 | **Validation checks** | 5,967+ across 345 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V196:** Wave 77 forward evolution. Bonding dispatch feature-gated (fixes default-feature compilation), `is_none_or` modernization, safe casts in tests, new test-module lint expectations for bio I/O modules, experiment lint suppression expanded for Rust 1.95 clippy, CLI literal-format refactor, `map_or_else` idiomatic server bind. **Clippy zero warnings** (all feature combinations). 2,089 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V197:** Wave 103 transport injection. `TransportEndpoint` ecosystem-standard type added (serde-tagged `uds`/`tcp`/`mesh_relay`), `TRANSPORT_ENDPOINT` env-var parsing, Tier 0 startup acceptance in `cmd_serve`. 10 new transport tests. wetSpring is now transport-injection ready — launcher/Tower Atomic can inject transport without primal self-binding. **Clippy zero warnings** (all feature combinations). 2,097 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 

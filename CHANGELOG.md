@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V197] — 2026-06-09
+
+### Wave 103 — Transport Injection: TransportEndpoint Ecosystem Standard
+
+- **`TransportEndpoint` type added:** Ecosystem-standard serde-tagged enum (`uds`, `tcp`, `mesh_relay`) matching the bearDog/nestGate/sweetGrass wire format. Supports launcher-injected transport via `TRANSPORT_ENDPOINT` env var — primal never self-selects transport.
+- **`TransportEndpoint::from_env()`:** Parses `TRANSPORT_ENDPOINT` JSON from environment. Returns typed `TransportEndpointError` (`NotSet` / `InvalidJson`).
+- **`TransportEndpoint::to_transport()`:** Converts to internal `Transport` enum for `jsonrpc_line` dispatch. `MeshRelay` returns `None` (requires Songbird resolution).
+- **Tier 0 startup acceptance:** `cmd_serve` logs `TRANSPORT_ENDPOINT` at Tier 0 when present (mirrors bearDog/nestGate pattern).
+- **10 new tests:** Serde roundtrip for all 3 variants, env-var parsing (not set, valid, invalid JSON), `to_transport` conversion, `Display` formatting.
+- **Build gate:** clippy zero warnings (default + guidestone), 2,097 tests (0 failures, 0 ignored).
+
 ## [V196] — 2026-06-04
 
 ### Wave 77 — Forward Evolution: Clippy Compliance & Feature Gating

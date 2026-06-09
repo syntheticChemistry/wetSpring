@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Transport abstraction for IPC connections.
 //!
-//! Supports Unix domain sockets (default) and TCP for cross-gate communication.
+//! Supports Unix domain sockets (default), TCP for cross-gate communication,
+//! and mesh relay via Songbird federation. [`TransportEndpoint`] is the
+//! ecosystem-standard wire type — launcher/Tower Atomic injects it via the
+//! `TRANSPORT_ENDPOINT` env var so primals never self-select transport.
+//!
 //! [`unix_jsonrpc_line`] and [`tcp_jsonrpc_line`] implement newline-delimited
 //! JSON-RPC 2.0 client calls to peer primals.
 
@@ -10,6 +14,8 @@ use std::net::{TcpStream, ToSocketAddrs};
 use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
+
+use serde::{Deserialize, Serialize};
 
 /// Default timeout for client JSON-RPC over Unix sockets to peer primals
 /// (toadStool, sweetGrass, …) when not using workload-specific limits.
@@ -165,7 +171,108 @@ impl std::fmt::Display for Transport {
     }
 }
 
+// ── Ecosystem-standard transport injection ──────────────────────────
+
+/// Env var name for launcher-injected transport endpoint.
+pub const TRANSPORT_ENDPOINT_ENV: &str = "TRANSPORT_ENDPOINT";
+
+/// Ecosystem-standard transport endpoint for launcher injection.
+///
+/// Injected by the launcher or Tower Atomic via `TRANSPORT_ENDPOINT`.
+/// Primals accept this at startup instead of self-binding — the primal
+/// never chooses its own transport.
+///
+/// Wire format (JSON, serde internally tagged):
+/// ```json
+/// {"transport":"uds","path":"/run/membrane/wetspring.sock"}
+/// {"transport":"tcp","host":"127.0.0.1","port":9100}
+/// {"transport":"mesh_relay","peer_id":"strand-gate","capability":"science"}
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "transport", rename_all = "snake_case")]
+pub enum TransportEndpoint {
+    /// Unix domain socket (preferred on Linux — local primal on same host).
+    Uds {
+        /// Absolute path to the socket file.
+        path: PathBuf,
+    },
+    /// TCP socket (loopback or network — cross-gate).
+    Tcp {
+        /// Hostname or IP address.
+        host: String,
+        /// Port number.
+        port: u16,
+    },
+    /// Mesh relay via Songbird federation (cross-gate, cross-WAN).
+    MeshRelay {
+        /// Mesh peer identifier (e.g. `"strand-gate"`).
+        peer_id: String,
+        /// Capability domain being relayed.
+        capability: String,
+    },
+}
+
+impl TransportEndpoint {
+    /// Parse from the `TRANSPORT_ENDPOINT` env var (JSON string).
+    ///
+    /// # Errors
+    ///
+    /// Returns `NotSet` if the env var is absent, `InvalidJson` if the
+    /// value doesn't match the expected tagged format.
+    pub fn from_env() -> Result<Self, TransportEndpointError> {
+        let raw = std::env::var(TRANSPORT_ENDPOINT_ENV)
+            .map_err(|_| TransportEndpointError::NotSet)?;
+        serde_json::from_str(&raw).map_err(TransportEndpointError::InvalidJson)
+    }
+
+    /// Convert to the internal [`Transport`] used by `jsonrpc_line`.
+    ///
+    /// `MeshRelay` has no direct transport — it must be resolved through
+    /// Songbird, so this returns `None` for relay endpoints.
+    #[must_use]
+    pub fn to_transport(&self) -> Option<Transport> {
+        match self {
+            Self::Uds { path } => Some(Transport::Unix(path.clone())),
+            Self::Tcp { host, port } => Some(Transport::Tcp(format!("{host}:{port}"))),
+            Self::MeshRelay { .. } => None,
+        }
+    }
+}
+
+impl std::fmt::Display for TransportEndpoint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Uds { path } => write!(f, "uds:{}", path.display()),
+            Self::Tcp { host, port } => write!(f, "tcp:{host}:{port}"),
+            Self::MeshRelay { peer_id, capability } => {
+                write!(f, "mesh_relay:{peer_id}/{capability}")
+            }
+        }
+    }
+}
+
+/// Errors from [`TransportEndpoint`] env-var parsing.
+#[derive(Debug)]
+pub enum TransportEndpointError {
+    /// `TRANSPORT_ENDPOINT` env var is not set.
+    NotSet,
+    /// `TRANSPORT_ENDPOINT` contains invalid JSON.
+    InvalidJson(serde_json::Error),
+}
+
+impl std::fmt::Display for TransportEndpointError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NotSet => f.write_str("`TRANSPORT_ENDPOINT` environment variable is not set"),
+            Self::InvalidJson(e) => write!(f, "invalid `TRANSPORT_ENDPOINT` JSON: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for TransportEndpointError {}
+
 #[cfg(test)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
 mod tests {
     use super::*;
 
@@ -229,5 +336,121 @@ mod tests {
         let t = Transport::Tcp("127.0.0.1:1".to_string());
         let result = jsonrpc_line(&t, r#"{"jsonrpc":"2.0","method":"health.ping","id":1}"#);
         assert!(result.is_err());
+    }
+
+    // ── TransportEndpoint tests ──
+
+    #[test]
+    fn transport_endpoint_serde_uds() {
+        let ep = TransportEndpoint::Uds {
+            path: PathBuf::from("/run/membrane/wetspring.sock"),
+        };
+        let json = serde_json::to_string(&ep).unwrap();
+        assert!(json.contains(r#""transport":"uds""#));
+        assert!(json.contains(r#""path":"/run/membrane/wetspring.sock""#));
+
+        let parsed: TransportEndpoint = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed, ep);
+    }
+
+    #[test]
+    fn transport_endpoint_serde_tcp() {
+        let ep = TransportEndpoint::Tcp {
+            host: "192.168.1.173".to_string(),
+            port: 9100,
+        };
+        let json = serde_json::to_string(&ep).unwrap();
+        assert!(json.contains(r#""transport":"tcp""#));
+
+        let parsed: TransportEndpoint = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed, ep);
+    }
+
+    #[test]
+    fn transport_endpoint_serde_mesh_relay() {
+        let json = r#"{"transport":"mesh_relay","peer_id":"strand-gate","capability":"science"}"#;
+        let ep: TransportEndpoint = serde_json::from_str(json).unwrap();
+        assert!(matches!(ep, TransportEndpoint::MeshRelay { .. }));
+    }
+
+    #[test]
+    fn transport_endpoint_to_transport_uds() {
+        let ep = TransportEndpoint::Uds {
+            path: PathBuf::from("/tmp/test.sock"),
+        };
+        let t = ep.to_transport().unwrap();
+        assert!(matches!(t, Transport::Unix(_)));
+    }
+
+    #[test]
+    fn transport_endpoint_to_transport_tcp() {
+        let ep = TransportEndpoint::Tcp {
+            host: "10.0.0.1".to_string(),
+            port: 7700,
+        };
+        let t = ep.to_transport().unwrap();
+        assert_eq!(t.tcp_addr(), Some("10.0.0.1:7700"));
+    }
+
+    #[test]
+    fn transport_endpoint_to_transport_mesh_relay_is_none() {
+        let ep = TransportEndpoint::MeshRelay {
+            peer_id: "east-gate".to_string(),
+            capability: "compute".to_string(),
+        };
+        assert!(ep.to_transport().is_none());
+    }
+
+    #[test]
+    fn transport_endpoint_from_env_not_set() {
+        temp_env::with_vars([("TRANSPORT_ENDPOINT", None::<&str>)], || {
+            let result = TransportEndpoint::from_env();
+            assert!(matches!(result, Err(TransportEndpointError::NotSet)));
+        });
+    }
+
+    #[test]
+    fn transport_endpoint_from_env_valid() {
+        temp_env::with_vars(
+            [(
+                "TRANSPORT_ENDPOINT",
+                Some(r#"{"transport":"tcp","host":"127.0.0.1","port":9200}"#),
+            )],
+            || {
+                let ep = TransportEndpoint::from_env().unwrap();
+                assert!(matches!(ep, TransportEndpoint::Tcp { port: 9200, .. }));
+            },
+        );
+    }
+
+    #[test]
+    fn transport_endpoint_from_env_invalid_json() {
+        temp_env::with_vars(
+            [("TRANSPORT_ENDPOINT", Some("not-json"))],
+            || {
+                let result = TransportEndpoint::from_env();
+                assert!(matches!(result, Err(TransportEndpointError::InvalidJson(_))));
+            },
+        );
+    }
+
+    #[test]
+    fn transport_endpoint_display() {
+        let uds = TransportEndpoint::Uds {
+            path: PathBuf::from("/run/membrane/ws.sock"),
+        };
+        assert_eq!(uds.to_string(), "uds:/run/membrane/ws.sock");
+
+        let tcp = TransportEndpoint::Tcp {
+            host: "10.0.0.5".to_string(),
+            port: 9100,
+        };
+        assert_eq!(tcp.to_string(), "tcp:10.0.0.5:9100");
+
+        let relay = TransportEndpoint::MeshRelay {
+            peer_id: "sg".to_string(),
+            capability: "security".to_string(),
+        };
+        assert_eq!(relay.to_string(), "mesh_relay:sg/security");
     }
 }

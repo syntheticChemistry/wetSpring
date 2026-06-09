@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V196:** Wave 77 forward evolution. Bonding dispatch feature-gated (fixes non-guidestone compilation), `is_none_or` idiomatic modernization, safe casts, test-module lint expectations for Rust 1.95, experiment lint list expanded, CLI refactored. **Clippy zero warnings** (all feature combinations). 2,089 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V197:** Wave 103 transport injection. `TransportEndpoint` ecosystem-standard type (serde-tagged `uds`/`tcp`/`mesh_relay`) with `TRANSPORT_ENDPOINT` env-var parsing and Tier 0 startup acceptance. wetSpring is transport-injection ready. **Clippy zero warnings** (all feature combinations). 2,097 tests (0 failures). 345 scenarios, 50 niche, 59 consumed, 45 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 
@@ -26,7 +26,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 345 scenarios)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 50 niche capabilities, 59 consumed (33 barraCuda canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 45 dispatch methods, 22 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 2,089 workspace (0 failed)
+- **Tests:** 2,097 workspace (0 failed)
 - **Validation checks:** 5,967+ across 345 scenarios (UniBin)
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), `wetspring certify` (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
