@@ -287,6 +287,13 @@ description = "Minimal liveness probe (process alive)"
 stability = "stable"
 gpu_accelerated = false
 
+[capabilities.health_ping]
+method = "health.ping"
+domain = "health"
+description = "Alias for health.liveness — biomeOS/graph executor UDS probe compatibility"
+stability = "stable"
+gpu_accelerated = false
+
 [capabilities.health_readiness]
 method = "health.readiness"
 domain = "health"

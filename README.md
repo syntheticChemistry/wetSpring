@@ -22,11 +22,11 @@ against Rust implementations, then promotes to GPU acceleration via
 
 | | |
 |---|---|
-| **Tests** | 2,097 workspace (0 failed) |
+| **Tests** | 2,098 workspace (0 failed) |
 | **Validation checks** | 5,967+ across 345 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 50 niche, 59 consumed (33 canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 45 dispatch, 22 domains |
+| **IPC capabilities** | 51 niche, 59 consumed (33 canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 46 dispatch, 22 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V197:** Wave 103 transport injection. `TransportEndpoint` ecosystem-standard type added (serde-tagged `uds`/`tcp`/`mesh_relay`), `TRANSPORT_ENDPOINT` env-var parsing, Tier 0 startup acceptance in `cmd_serve`. 10 new transport tests. wetSpring is now transport-injection ready — launcher/Tower Atomic can inject transport without primal self-binding. **Clippy zero warnings** (all feature combinations). 2,097 tests, 0 failures. Registry 458, 50 niche, 59 consumed, 45 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V198:** Wave 103 NUCLEUS deployment elevation. `health.ping` alias for biomeOS probe compatibility, IPC server systemd unit, 5 graph cleanups (deprecated binary refs, health method alignment, facade marked dormant), plasmidBin launcher handler, cell manifest aligned to full NUCLEUS set. Transport-injection ready. **Clippy zero warnings** (all feature combinations). 2,098 tests, 0 failures. Registry 458, 51 niche, 59 consumed, 46 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
 
 ---
 

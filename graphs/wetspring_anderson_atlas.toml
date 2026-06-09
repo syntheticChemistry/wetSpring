@@ -133,7 +133,7 @@ capabilities = [
 
 [[graph.nodes]]
 name = "validate_atlas"
-binary = "primalspring_primal"
+binary = "primalspring"
 order = 99
 required = false
 spawn = false

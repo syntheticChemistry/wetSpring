@@ -122,6 +122,7 @@ pub const DOMAINS: &[CapabilityDomain] = &[
         methods: &[
             "health.check",
             "health.liveness",
+            "health.ping",
             "health.readiness",
             "lifecycle.status",
         ],
@@ -273,13 +274,13 @@ mod tests {
             "22 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition + bonding)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 45, "45 total capability methods");
+        assert_eq!(total_methods, 46, "46 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 45);
+        assert_eq!(methods.len(), 46);
         assert!(methods.contains(&"science.diversity"));
         assert!(methods.contains(&"health.liveness"));
         assert!(methods.contains(&"health.readiness"));

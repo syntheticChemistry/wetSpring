@@ -3,6 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V198] — 2026-06-09
+
+### Wave 103 — NUCLEUS Deployment Elevation
+
+- **`health.ping` dispatch alias:** `health.ping` → `handle_health_liveness()` for biomeOS graph executor and UDS probe compatibility. Registered in `CAPABILITIES`, `DOMAINS` (health domain), `capability_registry.toml`, and niche `CAPABILITIES`. 51 niche capabilities, 46 dispatch methods.
+- **IPC server systemd unit:** `deploy/wetspring-ipc.service` for `wetspring serve` — user-level with hardening (`NoNewPrivileges`, `ProtectSystem=strict`, `PrivateTmp`). Complements the existing facade service.
+- **Graph cleanup:** 5 deploy graphs updated from deprecated `primalspring_primal` binary to `primalspring`. Science facade node marked `required=false, spawn=false` (binary fossilized). wetspring nodes in niche and nucleus graphs aligned to `health.liveness`.
+- **`start_primal.sh` handler:** Explicit `wetspring` case added to plasmidBin launcher — `serve --socket --port --family-id` instead of generic fallthrough.
+- **Cell manifest alignment:** `cells_manifest.toml` wetspring requires updated to full NUCLEUS set (added `biomeos`, `squirrel`, `skunkbat` — matches `NICHE_WETSPRING` in `ports.env`).
+- **plasmidBin manifest refresh:** Test count → 2,098, `transport_injection = true`, note updated to V198.
+- **Build gate:** clippy zero warnings (default + guidestone), 2,098 tests (0 failures).
+
 ## [V197] — 2026-06-09
 
 ### Wave 103 — Transport Injection: TransportEndpoint Ecosystem Standard

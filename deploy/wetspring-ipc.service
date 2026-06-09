@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# wetspring-ipc — IPC science primal (JSON-RPC over UDS)
+#
+# The core NUCLEUS deployment unit for wetSpring. Runs `wetspring serve`
+# which binds a Unix domain socket, registers with Songbird for mesh
+# discovery, and serves 46 science/health/provenance JSON-RPC methods.
+#
+# Install (user-level, gate operator):
+#   cp wetspring-ipc.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now wetspring-ipc
+#   loginctl enable-linger $USER
+#
+# Install (membrane-level):
+#   cp wetspring-ipc.service /etc/systemd/system/wetspring-membrane.service
+#   # Edit ExecStart to use /opt/membrane/wetspring
+#   systemctl daemon-reload
+#   systemctl enable --now wetspring-membrane
+
+[Unit]
+Description=wetSpring Science Primal — NUCLEUS IPC server (JSON-RPC/UDS)
+Documentation=https://primals.eco
+After=network.target
+Wants=biomeos-beacon.service
+After=biomeos-beacon.service
+
+[Service]
+Type=simple
+ExecStart=%h/.cargo/bin/wetspring serve
+Restart=on-failure
+RestartSec=5
+
+Environment=RUST_LOG=info
+EnvironmentFile=-%h/.config/wetspring/ipc.env
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=%t
+
+MemoryMax=256M
+
+[Install]
+WantedBy=default.target

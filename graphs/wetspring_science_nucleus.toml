@@ -245,7 +245,7 @@ order = 10
 required = true
 spawn = true
 depends_on = ["beardog", "songbird"]
-health_method = "health.check"
+health_method = "health.liveness"
 by_capability = "life_science"
 security_model = "tower_delegated"
 args = ["server"]
@@ -279,12 +279,13 @@ capabilities = [
 # Phase 8: Science Facade — HTTP gateway (the public interface)
 # ═══════════════════════════════════════════════════════════════
 
+# NOTE: Facade binary is fossilized — activate via `wetspring facade` subcommand.
 [[graph.nodes]]
 name = "science_facade"
 binary = "wetspring_science_facade"
 order = 20
-required = true
-spawn = true
+required = false
+spawn = false
 depends_on = ["wetspring"]
 health_method = "health.check"
 by_capability = "http_gateway"

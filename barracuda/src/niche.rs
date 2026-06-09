@@ -182,8 +182,9 @@ pub const CONSUMED_CAPABILITIES: &[&str] = &[
     "linalg.eigenvalues",
     "linalg.svd",
     "linalg.cholesky",
-    // HEALTH (2) — barraCuda ecobin liveness/readiness (used by CompositionContext)
+    // HEALTH (3) — barraCuda ecobin liveness/readiness/ping (used by CompositionContext)
     "health.liveness",
+    "health.ping",
     "health.readiness",
     // Node Atomic — toadStool compute orchestration
     "compute.dispatch.submit",
@@ -263,6 +264,7 @@ pub const CAPABILITIES: &[&str] = &[
     "identity.get",
     "health.check",
     "health.liveness",
+    "health.ping",
     "health.readiness",
     "lifecycle.status",
     // ── ecology (science) ──
@@ -485,8 +487,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            50,
-            "6 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 6 bonding + 3 ecosystem integrations"
+            51,
+            "7 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 6 bonding + 3 ecosystem integrations"
         );
     }
 

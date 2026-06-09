@@ -75,6 +75,7 @@ pub const CAPABILITIES: &[&str] = &[
     "identity.get",
     "health.check",
     "health.liveness",
+    "health.ping",
     "health.readiness",
     "lifecycle.status",
     "science.diversity",

@@ -263,7 +263,7 @@ capabilities = [
 
 [[graph.nodes]]
 name = "validate_wetspring_atomic"
-binary = "primalspring_primal"
+binary = "primalspring"
 order = 99
 required = false
 spawn = false

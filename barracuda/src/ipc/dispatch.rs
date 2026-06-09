@@ -31,7 +31,7 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
     let method_norm = normalize_method(method);
     match method_norm.as_ref() {
         "health.check" => handlers::handle_health(),
-        "health.liveness" => handlers::handle_health_liveness(),
+        "health.liveness" | "health.ping" => handlers::handle_health_liveness(),
         "health.readiness" => handlers::handle_health_readiness(),
         "lifecycle.status" => handlers::handle_lifecycle_status(),
         "capability.list" => handlers::handle_capability_list(),
@@ -342,7 +342,7 @@ mod tests {
         assert_eq!(result["domain"], "ecology");
 
         let methods = result["methods"].as_array().unwrap();
-        assert_eq!(methods.len(), 45, "Wire Standard L2: flat methods array");
+        assert_eq!(methods.len(), 46, "Wire Standard L2: flat methods array");
         assert!(methods.iter().any(|m| m == "science.diversity"));
         assert!(methods.iter().any(|m| m == "health.liveness"));
 
@@ -390,7 +390,7 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 45);
+        assert_eq!(total_methods, 46);
     }
 
     #[test]
@@ -405,6 +405,14 @@ mod tests {
     #[test]
     fn dispatch_health_liveness() {
         let result = dispatch("health.liveness", &json!({})).unwrap();
+        assert_eq!(result["status"], "alive");
+        assert_eq!(result["alive"], true);
+        assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
+    }
+
+    #[test]
+    fn dispatch_health_ping_aliases_liveness() {
+        let result = dispatch("health.ping", &json!({})).unwrap();
         assert_eq!(result["status"], "alive");
         assert_eq!(result["alive"], true);
         assert_eq!(result["primal"], crate::ipc::primal_names::SELF);
@@ -460,7 +468,7 @@ mod tests {
                 method in "[a-z]{1,8}\\.[a-z]{1,8}_[a-z]{1,8}",
             ) {
                 let known = [
-                    "health.check", "health.liveness", "health.readiness",
+                    "health.check", "health.liveness", "health.ping", "health.readiness",
                     "lifecycle.status",
                     "capability.list", "identity.get",
                     "science.diversity", "science.qs_model", "science.anderson",

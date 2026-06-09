@@ -169,7 +169,7 @@ capabilities = [
 
 [[graph.nodes]]
 name = "validate_basement"
-binary = "primalspring_primal"
+binary = "primalspring"
 order = 99
 required = false
 spawn = false

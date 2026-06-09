@@ -2,6 +2,11 @@
 #
 # wetSpring Science Facade — HTTP gateway for primals.eco live science.
 #
+# STATUS: DORMANT — The `wetspring_science_facade` binary is fossilized
+# (barracuda/fossilRecord/bin/). This graph documents the intended facade
+# architecture. To activate: add `wetspring facade` UniBin subcommand or
+# restore the `[[bin]]` target.
+#
 # Deploys the science facade as a thin Axum service that translates
 # browser REST requests into wetSpring JSON-RPC calls, with progressive
 # provenance from the trio and petalTongue grammar rendering.

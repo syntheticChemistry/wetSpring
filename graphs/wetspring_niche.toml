@@ -120,7 +120,7 @@ order = 10
 required = true
 spawn = true
 depends_on = ["beardog", "songbird"]
-health_method = "health.check"
+health_method = "health.liveness"
 by_capability = "life_science"
 security_model = "tower_delegated"
 args = ["server"]
@@ -148,7 +148,7 @@ capabilities = [
 
 [[graph.nodes]]
 name = "validate_wetspring"
-binary = "primalspring_primal"
+binary = "primalspring"
 order = 99
 required = false
 spawn = false
