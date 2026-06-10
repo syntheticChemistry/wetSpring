@@ -3,8 +3,9 @@
 //!
 //! Resolves Unix domain socket paths using a cascading strategy:
 //! 1. Explicit env var override (e.g. `WETSPRING_SOCKET`)
-//! 2. `$XDG_RUNTIME_DIR/biomeos/{primal}-{family_id}.sock`
-//! 3. `<temp_dir>/{primal}-{family_id}.sock` (platform-agnostic fallback)
+//! 2. `BIOMEOS_SOCKET_DIR/{primal}-{family_id}.sock`
+//! 3. `$XDG_RUNTIME_DIR/biomeos/{primal}-{family_id}.sock`
+//! 4. `<temp_dir>/biomeos/{primal}-{family_id}.sock`
 //!
 //! `FAMILY_ID` / `BIOMEOS_FAMILY_ID` env var selects the instance (defaults
 //! to `"default"`), enabling multi-instance deployments on the same host.
@@ -232,9 +233,9 @@ pub fn discover_transport_by_capability(
 /// Attempt live capability resolution via Songbird `capability.resolve`.
 ///
 /// Returns `Some(socket_path)` if Songbird is running and resolves the
-/// domain to a live primal socket. Returns `None` on any failure
-/// (Songbird absent, RPC error, domain not found) — callers fall back
-/// to the static bootstrap table.
+/// capability to a live primal socket. Returns `None` on any failure
+/// (Songbird absent, RPC error, capability not found) — callers fall
+/// back to the static bootstrap table.
 #[cfg(feature = "ipc")]
 fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     use std::io::{BufRead, BufReader, Write};
@@ -243,7 +244,7 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     let songbird_socket = discover_primal(super::primal_names::SONGBIRD)?;
 
     let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"capability.resolve","params":{{"domain":"{capability_domain}"}},"id":1}}"#,
+        r#"{{"jsonrpc":"2.0","method":"capability.resolve","params":{{"capability":"{capability_domain}"}},"id":1}}"#,
     );
 
     let stream = UnixStream::connect(&songbird_socket).ok()?;
@@ -265,6 +266,19 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
 
     let v: serde_json::Value = serde_json::from_str(&line).ok()?;
     let result = v.get("result")?;
+
+    // Prefer structured endpoint (Wave 107 M1)
+    if let Some(ep_value) = result.get("endpoint") {
+        if let Ok(super::transport::TransportEndpoint::Uds { ref path }) =
+            serde_json::from_value::<super::transport::TransportEndpoint>(ep_value.clone())
+        {
+            if socket_is_alive(path) {
+                return Some(path.clone());
+            }
+        }
+    }
+
+    // Legacy: plain socket path
     let socket_path = result.get("socket")?.as_str()?;
     let path = PathBuf::from(socket_path);
     if socket_is_alive(&path) { Some(path) } else { None }
@@ -272,10 +286,14 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
 
 /// Transport-aware capability resolution via Songbird.
 ///
-/// Tries to parse the response as a structured `TransportEndpoint` first
-/// (Phase 2 M1 format: `{"transport":"tcp","host":"...","port":N}`).
+/// Parses the response as a structured `TransportEndpoint` (Wave 107 M1):
+/// - `{"transport":"uds","path":"..."}` → `Transport::Unix`
+/// - `{"transport":"tcp","host":"...","port":N}` → `Transport::Tcp`
+/// - `{"transport":"mesh_relay","peer_id":"...","capability":"..."}` →
+///   `Transport::MeshRelay` (routed via local Songbird `capability.call`)
+///
 /// Falls back to legacy `{"socket":"/path"}` → `Transport::Unix`.
-/// Returns `None` when Songbird is absent or the domain is unresolved.
+/// Returns `None` when Songbird is absent or the capability is unresolved.
 #[cfg(feature = "ipc")]
 fn resolve_transport_via_songbird(
     capability_domain: &str,
@@ -286,7 +304,7 @@ fn resolve_transport_via_songbird(
     let songbird_socket = discover_primal(super::primal_names::SONGBIRD)?;
 
     let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"capability.resolve","params":{{"domain":"{capability_domain}"}},"id":1}}"#,
+        r#"{{"jsonrpc":"2.0","method":"capability.resolve","params":{{"capability":"{capability_domain}"}},"id":1}}"#,
     );
 
     let stream = UnixStream::connect(&songbird_socket).ok()?;
@@ -309,21 +327,21 @@ fn resolve_transport_via_songbird(
     let v: serde_json::Value = serde_json::from_str(&line).ok()?;
     let result = v.get("result")?;
 
-    // Phase 2 M1: structured TransportEndpoint in result.endpoint
+    // Wave 107 M1: structured TransportEndpoint in result.endpoint
     if let Some(ep_value) = result.get("endpoint") {
         if let Ok(ep) =
             serde_json::from_value::<super::transport::TransportEndpoint>(ep_value.clone())
         {
-            return ep.to_transport();
+            return ep.to_transport_or_relay();
         }
     }
 
-    // Phase 2 M1: structured TransportEndpoint at result top-level
+    // Structured TransportEndpoint at result top-level
     if result.get("transport").is_some() {
         if let Ok(ep) =
             serde_json::from_value::<super::transport::TransportEndpoint>(result.clone())
         {
-            return ep.to_transport();
+            return ep.to_transport_or_relay();
         }
     }
 
@@ -368,6 +386,12 @@ pub const fn capability_to_primal(domain: &str) -> Option<&str> {
 ///
 /// Returns `Some(path)` if a socket file is found at one of the
 /// standard locations, `None` otherwise (standalone mode).
+///
+/// Resolution cascade (first alive socket wins):
+/// 1. Explicit env var (`{PRIMAL}_SOCKET`)
+/// 2. `BIOMEOS_SOCKET_DIR/{primal}-{family}.sock`
+/// 3. `$XDG_RUNTIME_DIR/biomeos/{primal}-{family}.sock`
+/// 4. `$TMPDIR/biomeos/{primal}-{family}.sock`
 #[must_use]
 pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
     if let Ok(path) = std::env::var(env_var) {
@@ -378,19 +402,29 @@ pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
     }
 
     let fam = family_id();
+    let sock_name = format!("{primal}-{fam}.sock");
+
+    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
+        let p = PathBuf::from(dir).join(&sock_name);
+        if socket_is_alive(&p) {
+            return Some(p);
+        }
+    }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
         let p = PathBuf::from(xdg).join(format!(
-            "{}/{}-{fam}.sock",
+            "{}/{}",
             super::primal_names::BIOMEOS,
-            primal
+            sock_name
         ));
         if socket_is_alive(&p) {
             return Some(p);
         }
     }
 
-    let fallback = std::env::temp_dir().join(format!("{primal}-{fam}.sock"));
+    let fallback = std::env::temp_dir()
+        .join(super::primal_names::BIOMEOS)
+        .join(&sock_name);
     if socket_is_alive(&fallback) {
         return Some(fallback);
     }
@@ -402,6 +436,12 @@ pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
 ///
 /// Unlike [`discover_socket`], this returns a path even if the file does
 /// not yet exist (the caller will create/bind it).
+///
+/// Resolution cascade (first available wins):
+/// 1. Explicit env var
+/// 2. `BIOMEOS_SOCKET_DIR/{primal}-{family}.sock`
+/// 3. `$XDG_RUNTIME_DIR/biomeos/{primal}-{family}.sock`
+/// 4. `$TMPDIR/biomeos/{primal}-{family}.sock`
 #[must_use]
 pub fn resolve_bind_path(env_var: &str, primal: &str) -> PathBuf {
     if let Ok(path) = std::env::var(env_var) {
@@ -409,16 +449,23 @@ pub fn resolve_bind_path(env_var: &str, primal: &str) -> PathBuf {
     }
 
     let fam = family_id();
+    let sock_name = format!("{primal}-{fam}.sock");
+
+    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
+        return PathBuf::from(dir).join(&sock_name);
+    }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
         return PathBuf::from(xdg).join(format!(
-            "{}/{}-{fam}.sock",
+            "{}/{}",
             super::primal_names::BIOMEOS,
-            primal
+            sock_name
         ));
     }
 
-    std::env::temp_dir().join(format!("{primal}-{fam}.sock"))
+    std::env::temp_dir()
+        .join(super::primal_names::BIOMEOS)
+        .join(&sock_name)
 }
 
 /// Pure-logic socket resolution for testing (no env reads).
@@ -525,10 +572,33 @@ mod tests {
             [
                 ("WETSPRING_BIND_FALLBACK_TEST", None::<&str>),
                 ("XDG_RUNTIME_DIR", None::<&str>),
+                ("BIOMEOS_SOCKET_DIR", None::<&str>),
             ],
             || {
                 let p = resolve_bind_path("WETSPRING_BIND_FALLBACK_TEST", "myprimal");
                 assert!(p.to_string_lossy().contains("myprimal"));
+                assert!(
+                    p.to_string_lossy().contains("biomeos"),
+                    "temp fallback should use biomeos/ subdirectory"
+                );
+            },
+        );
+    }
+
+    #[test]
+    fn resolve_bind_path_prefers_biomeos_socket_dir() {
+        temp_env::with_vars(
+            [
+                ("WETSPRING_BIND_BSDIR_TEST", None::<&str>),
+                ("BIOMEOS_SOCKET_DIR", Some("/run/custom/biomeos")),
+                ("XDG_RUNTIME_DIR", Some("/run/user/1000")),
+            ],
+            || {
+                let p = resolve_bind_path("WETSPRING_BIND_BSDIR_TEST", "testprimal");
+                assert!(
+                    p.to_string_lossy().contains("/run/custom/biomeos"),
+                    "should prefer BIOMEOS_SOCKET_DIR over XDG"
+                );
             },
         );
     }

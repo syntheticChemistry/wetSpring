@@ -108,13 +108,22 @@ pub fn tcp_jsonrpc_line(addr: &str, request_line: &str) -> Result<String, String
 
 /// Send a JSON-RPC request over the appropriate transport.
 ///
+/// `MeshRelay` endpoints are not directly connectable — the caller
+/// should route through Songbird `capability.call` instead. This
+/// function returns an error for relay endpoints to keep the type
+/// system honest.
+///
 /// # Errors
 ///
-/// Returns `Err(String)` on connection or protocol errors.
+/// Returns `Err(String)` on connection, protocol, or unsupported transport errors.
 pub fn jsonrpc_line(transport: &Transport, request_line: &str) -> Result<String, String> {
     match transport {
         Transport::Unix(path) => unix_jsonrpc_line(path, request_line),
         Transport::Tcp(addr) => tcp_jsonrpc_line(addr, request_line),
+        Transport::MeshRelay { peer_id, capability } => Err(format!(
+            "mesh_relay({peer_id}/{capability}) is not directly connectable — \
+             route via Songbird capability.call"
+        )),
     }
 }
 
@@ -125,6 +134,14 @@ pub enum Transport {
     Unix(PathBuf),
     /// TCP socket at `host:port` for cross-gate communication.
     Tcp(String),
+    /// Mesh relay — cross-gate routing via local Songbird `capability.call`.
+    /// Not directly connectable; callers must forward through Songbird.
+    MeshRelay {
+        /// Remote gate node ID (e.g. `"eastGate"`).
+        peer_id: String,
+        /// Capability being routed.
+        capability: String,
+    },
 }
 
 impl Transport {
@@ -143,22 +160,28 @@ impl Transport {
         Self::Unix(super::discover::resolve_bind_path(env_var, primal))
     }
 
-    /// The filesystem path for Unix transports, `None` for TCP.
+    /// The filesystem path for Unix transports, `None` for TCP/relay.
     #[must_use]
     pub fn path(&self) -> Option<&std::path::Path> {
         match self {
             Self::Unix(p) => Some(p),
-            Self::Tcp(_) => None,
+            Self::Tcp(_) | Self::MeshRelay { .. } => None,
         }
     }
 
-    /// The TCP address for TCP transports, `None` for Unix.
+    /// The TCP address for TCP transports, `None` for Unix/relay.
     #[must_use]
     pub fn tcp_addr(&self) -> Option<&str> {
         match self {
-            Self::Unix(_) => None,
             Self::Tcp(addr) => Some(addr),
+            Self::Unix(_) | Self::MeshRelay { .. } => None,
         }
+    }
+
+    /// Whether this transport requires Songbird relay (cross-gate mesh).
+    #[must_use]
+    pub const fn is_mesh_relay(&self) -> bool {
+        matches!(self, Self::MeshRelay { .. })
     }
 }
 
@@ -167,6 +190,9 @@ impl std::fmt::Display for Transport {
         match self {
             Self::Unix(p) => write!(f, "unix:{}", p.display()),
             Self::Tcp(addr) => write!(f, "tcp:{addr}"),
+            Self::MeshRelay { peer_id, capability } => {
+                write!(f, "mesh_relay:{peer_id}/{capability}")
+            }
         }
     }
 }
@@ -235,6 +261,27 @@ impl TransportEndpoint {
             Self::Uds { path } => Some(Transport::Unix(path.clone())),
             Self::Tcp { host, port } => Some(Transport::Tcp(format!("{host}:{port}"))),
             Self::MeshRelay { .. } => None,
+        }
+    }
+
+    /// Convert to [`Transport`], including `MeshRelay` as a first-class
+    /// transport variant for topology-aware routing (Wave 107 M1).
+    ///
+    /// Unlike [`to_transport`], this never returns `None` — mesh relay
+    /// endpoints become `Transport::MeshRelay` which callers must route
+    /// through local Songbird `capability.call`.
+    #[must_use]
+    pub fn to_transport_or_relay(&self) -> Option<Transport> {
+        match self {
+            Self::Uds { path } => Some(Transport::Unix(path.clone())),
+            Self::Tcp { host, port } => Some(Transport::Tcp(format!("{host}:{port}"))),
+            Self::MeshRelay {
+                peer_id,
+                capability,
+            } => Some(Transport::MeshRelay {
+                peer_id: peer_id.clone(),
+                capability: capability.clone(),
+            }),
         }
     }
 }
@@ -399,6 +446,71 @@ mod tests {
             capability: "compute".to_string(),
         };
         assert!(ep.to_transport().is_none());
+    }
+
+    #[test]
+    fn transport_endpoint_to_transport_or_relay_uds() {
+        let ep = TransportEndpoint::Uds {
+            path: PathBuf::from("/tmp/test.sock"),
+        };
+        let t = ep.to_transport_or_relay().unwrap();
+        assert!(matches!(t, Transport::Unix(_)));
+    }
+
+    #[test]
+    fn transport_endpoint_to_transport_or_relay_tcp() {
+        let ep = TransportEndpoint::Tcp {
+            host: "10.0.0.1".to_string(),
+            port: 7700,
+        };
+        let t = ep.to_transport_or_relay().unwrap();
+        assert_eq!(t.tcp_addr(), Some("10.0.0.1:7700"));
+    }
+
+    #[test]
+    fn transport_endpoint_to_transport_or_relay_mesh() {
+        let ep = TransportEndpoint::MeshRelay {
+            peer_id: "eastGate".to_string(),
+            capability: "science".to_string(),
+        };
+        let t = ep.to_transport_or_relay().unwrap();
+        assert!(t.is_mesh_relay());
+        assert!(t.path().is_none());
+        assert!(t.tcp_addr().is_none());
+        assert_eq!(t.to_string(), "mesh_relay:eastGate/science");
+    }
+
+    #[test]
+    fn transport_mesh_relay_display() {
+        let t = Transport::MeshRelay {
+            peer_id: "golgiBody".to_string(),
+            capability: "security".to_string(),
+        };
+        assert_eq!(t.to_string(), "mesh_relay:golgiBody/security");
+    }
+
+    #[test]
+    fn transport_mesh_relay_jsonrpc_returns_error() {
+        let t = Transport::MeshRelay {
+            peer_id: "peer".to_string(),
+            capability: "cap".to_string(),
+        };
+        let result = jsonrpc_line(&t, r#"{"jsonrpc":"2.0","method":"test","id":1}"#);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("mesh_relay"));
+    }
+
+    #[test]
+    fn transport_is_mesh_relay() {
+        let unix = Transport::Unix(PathBuf::from("/tmp/t.sock"));
+        assert!(!unix.is_mesh_relay());
+        let tcp = Transport::Tcp("127.0.0.1:9000".to_string());
+        assert!(!tcp.is_mesh_relay());
+        let relay = Transport::MeshRelay {
+            peer_id: "p".to_string(),
+            capability: "c".to_string(),
+        };
+        assert!(relay.is_mesh_relay());
     }
 
     #[test]

@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V200] — 2026-06-10
+
+### Wave 107 — Upstream Absorption: Topology-Aware Mesh Routing
+
+- **`capability.resolve` RPC fix:** Changed `"domain"` → `"capability"` in Songbird RPC params — aligns with songBird M1 wire contract (`CapabilityResolveParams`). Previous `"domain"` param silently failed deserialization, causing all live Songbird queries to fall back to the static bootstrap table.
+- **`Transport::MeshRelay` variant:** `Transport` enum now has three variants: `Unix`, `Tcp`, `MeshRelay { peer_id, capability }`. Cross-gate endpoints returned by songBird `ipc.resolve` / `capability.resolve` are now representable in the type system. `jsonrpc_line()` returns a descriptive error for relay endpoints (callers must route via Songbird `capability.call`).
+- **`TransportEndpoint::to_transport_or_relay()`:** New method that never returns `None` — mesh relay endpoints become `Transport::MeshRelay` instead of being silently dropped. `resolve_transport_via_songbird()` uses this for full topology awareness.
+- **4-tier socket discovery cascade:** `discover_socket` and `resolve_bind_path` now check `BIOMEOS_SOCKET_DIR` (tier 2) before `$XDG_RUNTIME_DIR/biomeos/` (tier 3). Temp fallback uses `$TMPDIR/biomeos/{primal}.sock` (tier 4) instead of bare `$TMPDIR/{primal}.sock` — aligns with barraCuda Wave 107 socket cleanup (`ProtectSystem=strict` compatibility).
+- **`resolve_via_songbird` structured endpoint:** Now parses `result.endpoint` as `TransportEndpoint` (UDS path extraction) before falling back to legacy `result.socket`. Handles both Wave 107 M1 format and legacy responses.
+- **`Transport::is_mesh_relay()`:** Const helper for callers to branch on relay vs direct transports.
+- **7 new tests:** `to_transport_or_relay` (UDS/TCP/mesh), mesh relay display, mesh relay jsonrpc error, `is_mesh_relay`, `BIOMEOS_SOCKET_DIR` bind path preference.
+- **Build gate:** clippy zero warnings, 2,107 tests (0 failures).
+
 ## [V199] — 2026-06-10
 
 ### Wave 107 — Cross-Subnet Mesh: Transport-Aware Discovery
