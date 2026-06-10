@@ -210,3 +210,146 @@ fn variant_type_display() {
     assert_eq!(VariantType::Deletion.to_string(), "DEL");
     assert_eq!(VariantType::Insertion.to_string(), "INS");
 }
+
+// ── WS-11: Binomial quality model tests ─────────────────────────
+
+#[test]
+fn binomial_quality_high_for_strong_variant() {
+    let col = make_snp_column(0, 5, 45, 0, 3); // 90% alt at Q30
+    let q = binomial_quality(&col, 3, 45);
+    assert!(q > 100.0, "strong variant at Q30 should have high quality: {q}");
+}
+
+#[test]
+fn binomial_quality_low_for_noise_level() {
+    let col = make_snp_column(0, 99, 1, 0, 1); // 1% alt at Q30
+    let q = binomial_quality(&col, 1, 1);
+    // Q30 error rate is 0.001, seeing 1/100 at 1% is still above error
+    // but should be much lower quality than a strong variant
+    assert!(q < 50.0, "noise-level variant should have moderate quality: {q}");
+}
+
+#[test]
+fn binomial_quality_zero_when_at_error_rate() {
+    // Construct a column with Q10 quality (10% error rate)
+    let mut col = PileupColumn {
+        position: 0,
+        depth: 100,
+        ..PileupColumn::default()
+    };
+    col.base_counts[0] = 90; // ref A
+    col.base_counts[1] = 10; // alt C
+    col.quality_sums[0] = 90 * 10; // Q10 ref
+    col.quality_sums[1] = 10 * 10; // Q10 alt = 10% error rate
+    col.forward_depth = 50;
+    col.reverse_depth = 50;
+
+    let q = binomial_quality(&col, 1, 10);
+    // At Q10, p_err = 0.1, seeing 10% is expected under null
+    assert!(q < 5.0, "variant at error rate should have near-zero quality: {q}");
+}
+
+#[test]
+fn binomial_quality_zero_for_empty_column() {
+    let col = PileupColumn::default();
+    let q = binomial_quality(&col, 0, 0);
+    assert!((q - 0.0).abs() < f64::EPSILON);
+}
+
+#[test]
+fn binomial_quality_scales_with_depth() {
+    // Same 80% alt frequency but different depths
+    let shallow = make_snp_column(0, 4, 16, 0, 3); // depth 20
+    let deep = make_snp_column(0, 20, 80, 0, 3); // depth 100
+    let q_shallow = binomial_quality(&shallow, 3, 16);
+    let q_deep = binomial_quality(&deep, 3, 80);
+    assert!(
+        q_deep > q_shallow,
+        "deeper coverage should yield higher quality: {q_deep} vs {q_shallow}"
+    );
+}
+
+#[test]
+fn binomial_model_calls_same_clear_variant() {
+    let reference = b"ACGTACGT";
+    let pileup = vec![make_snp_column(0, 2, 48, 0, 3)]; // A→T, 96% alt
+
+    // Default config uses binomial
+    let config_binom = CallerConfig::default();
+    assert!(config_binom.binomial_quality);
+    let variants = call_variants(&pileup, reference, &[], &config_binom);
+    assert_eq!(variants.len(), 1, "binomial model should call clear variant");
+
+    // Legacy model
+    let config_legacy = CallerConfig {
+        binomial_quality: false,
+        ..CallerConfig::default()
+    };
+    let variants_legacy = call_variants(&pileup, reference, &[], &config_legacy);
+    assert_eq!(variants_legacy.len(), 1, "legacy model should also call it");
+}
+
+#[test]
+fn binomial_model_suppresses_low_quality_noise() {
+    // Low quality (Q5) alt bases — error rate ~31.6%
+    let mut col = PileupColumn {
+        position: 0,
+        depth: 50,
+        ..PileupColumn::default()
+    };
+    col.base_counts[0] = 35; // ref A
+    col.base_counts[1] = 15; // alt C (30%)
+    col.quality_sums[0] = 35 * 30; // Q30 ref
+    col.quality_sums[1] = 15 * 5; // Q5 alt — very low quality
+    col.forward_depth = 25;
+    col.reverse_depth = 25;
+
+    let reference = b"A";
+
+    // With binomial model: Q5 error rate is ~0.316, so 30% alt is noise
+    let config_binom = CallerConfig {
+        min_alt_frequency: 0.1,
+        min_alt_count: 3,
+        binomial_quality: true,
+        ..CallerConfig::default()
+    };
+    let variants = call_variants(&[col], reference, &[], &config_binom);
+    // Binomial should give very low quality for this
+    if !variants.is_empty() {
+        assert!(
+            variants[0].quality < 20.0,
+            "Q5 noise should be low quality with binomial: {}",
+            variants[0].quality
+        );
+    }
+}
+
+#[test]
+fn log_gamma_basic_values() {
+    // Γ(1) = 1, ln(1) = 0
+    assert!((log_gamma(1.0) - 0.0).abs() < 0.01);
+    // Γ(2) = 1, ln(1) = 0
+    assert!((log_gamma(2.0) - 0.0).abs() < 0.01);
+    // Γ(5) = 24, ln(24) ≈ 3.178
+    assert!((log_gamma(5.0) - 24.0_f64.ln()).abs() < 0.01);
+    // Γ(10) = 362880, ln(362880) ≈ 12.80
+    assert!((log_gamma(10.0) - 362_880.0_f64.ln()).abs() < 0.01);
+}
+
+#[test]
+fn binomial_log_sf_trivial() {
+    // P(X >= 0) = 1, ln(1) = 0
+    let p = binomial_log_sf(0, 10, 0.5);
+    assert!(
+        p.exp_m1().abs() < 0.1,
+        "P(X>=0) should be ~1: {}",
+        p.exp()
+    );
+}
+
+#[test]
+fn binomial_log_sf_extreme() {
+    // P(X >= 10) where X ~ Bin(10, 0.001) should be vanishingly small
+    let p = binomial_log_sf(10, 10, 0.001);
+    assert!(p < -50.0, "P(X>=10|n=10,p=0.001) should be near-zero: {p}");
+}

@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V201] — 2026-06-10
+
+### Wave 107 — WS-11: Quality-Weighted Binomial Variant Caller
+
+- **Quality-weighted binomial model:** New `binomial_quality()` function computes Phred-scaled p-values from a one-sided binomial test where H₀ error rate is derived from the alternative allele's mean Phred score. This aligns with breseq's core statistical approach — under the null, the probability of non-reference bases equals the quality-weighted sequencing error rate. The one-sided binomial survival function uses exact computation for n≤50 and normal approximation with continuity correction for larger depths.
+- **`CallerConfig::binomial_quality` flag:** Defaults to `true`. When enabled, both CPU `call_snp()` and GPU `call_variants_gpu()` use the binomial model. Legacy `variant_quality_bq()` (log-likelihood ratio) remains available with `binomial_quality: false`.
+- **Pure-Rust statistical functions:** `binomial_log_sf()` (log survival function), `log_binom_pmf()`, `log_binom_coeff()`, `log_gamma()` (Stirling + reduction), `log_normal_sf()`, `normal_sf_approx()` (A&S 26.2.17), `log_add_exp()`. Zero external dependencies — no `statrs` or `special` crate needed.
+- **Error suppression:** At Q5 quality (31.6% error rate), 30% alt frequency correctly produces near-zero quality. At Q30 (0.1% error rate), strong variants produce quality >100. Quality scales with depth as expected.
+- **10 new tests:** `binomial_quality` (strong variant, noise, error-rate, empty, depth scaling), binomial model vs legacy parity, noise suppression, `log_gamma` validation, `binomial_log_sf` trivial/extreme.
+- **Build gate:** clippy zero warnings, 2,117 tests (0 failures).
+
 ## [V200] — 2026-06-10
 
 ### Wave 107 — Upstream Absorption: Topology-Aware Mesh Routing

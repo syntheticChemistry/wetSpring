@@ -295,7 +295,8 @@ Interrupt/restart braid cycle verified — deterministic reproduction confirmed
 **Remaining work:**
 - [ ] Re-run Barrick 2009 with v3 pipeline to measure updated parity
 - [ ] MAPQ calibration with simulated reads (known-truth training set)
-- [ ] Quality-weighted binomial model in SnpCallingF64 shader
+- [x] Quality-weighted binomial model — V201 `binomial_quality()` (CPU, default on)
+- [ ] Quality-weighted binomial model in SnpCallingF64 GPU shader (future)
 - [ ] Mapper-level deduplication of repetitive region alignments
 - [ ] Per-generation frequency threshold calibration
 - [ ] Cross-validate against breseq polymorphism mode
