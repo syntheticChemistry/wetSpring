@@ -209,6 +209,26 @@ pub fn discover_by_capability(capability_domain: &str) -> Option<PathBuf> {
     discover_primal(primal)
 }
 
+/// Discover a primal by capability domain, returning a [`Transport`] that
+/// supports both local UDS and cross-subnet TCP.
+///
+/// Resolution order:
+/// 1. Songbird `capability.resolve` (may return structured `TransportEndpoint`)
+/// 2. Static capability table + UDS discovery
+///
+/// Cross-subnet primals (e.g. eastGate primals from southGate) are
+/// reachable when Songbird returns a TCP or mesh-relay endpoint.
+#[cfg(feature = "ipc")]
+#[must_use]
+pub fn discover_transport_by_capability(
+    capability_domain: &str,
+) -> Option<super::transport::Transport> {
+    if let Some(t) = resolve_transport_via_songbird(capability_domain) {
+        return Some(t);
+    }
+    discover_by_capability(capability_domain).map(super::transport::Transport::Unix)
+}
+
 /// Attempt live capability resolution via Songbird `capability.resolve`.
 ///
 /// Returns `Some(socket_path)` if Songbird is running and resolves the
@@ -248,6 +268,73 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     let socket_path = result.get("socket")?.as_str()?;
     let path = PathBuf::from(socket_path);
     if socket_is_alive(&path) { Some(path) } else { None }
+}
+
+/// Transport-aware capability resolution via Songbird.
+///
+/// Tries to parse the response as a structured `TransportEndpoint` first
+/// (Phase 2 M1 format: `{"transport":"tcp","host":"...","port":N}`).
+/// Falls back to legacy `{"socket":"/path"}` → `Transport::Unix`.
+/// Returns `None` when Songbird is absent or the domain is unresolved.
+#[cfg(feature = "ipc")]
+fn resolve_transport_via_songbird(
+    capability_domain: &str,
+) -> Option<super::transport::Transport> {
+    use std::io::{BufRead, BufReader, Write};
+    use std::os::unix::net::UnixStream;
+
+    let songbird_socket = discover_primal(super::primal_names::SONGBIRD)?;
+
+    let request = format!(
+        r#"{{"jsonrpc":"2.0","method":"capability.resolve","params":{{"domain":"{capability_domain}"}},"id":1}}"#,
+    );
+
+    let stream = UnixStream::connect(&songbird_socket).ok()?;
+    stream
+        .set_read_timeout(Some(super::timeouts::DISCOVERY))
+        .ok()?;
+    stream
+        .set_write_timeout(Some(super::timeouts::DISCOVERY))
+        .ok()?;
+
+    let mut writer = std::io::BufWriter::new(&stream);
+    writer.write_all(request.as_bytes()).ok()?;
+    writer.write_all(b"\n").ok()?;
+    writer.flush().ok()?;
+
+    let mut reader = BufReader::new(&stream);
+    let mut line = String::new();
+    reader.read_line(&mut line).ok()?;
+
+    let v: serde_json::Value = serde_json::from_str(&line).ok()?;
+    let result = v.get("result")?;
+
+    // Phase 2 M1: structured TransportEndpoint in result.endpoint
+    if let Some(ep_value) = result.get("endpoint") {
+        if let Ok(ep) =
+            serde_json::from_value::<super::transport::TransportEndpoint>(ep_value.clone())
+        {
+            return ep.to_transport();
+        }
+    }
+
+    // Phase 2 M1: structured TransportEndpoint at result top-level
+    if result.get("transport").is_some() {
+        if let Ok(ep) =
+            serde_json::from_value::<super::transport::TransportEndpoint>(result.clone())
+        {
+            return ep.to_transport();
+        }
+    }
+
+    // Legacy: plain socket path
+    let socket_path = result.get("socket")?.as_str()?;
+    let path = PathBuf::from(socket_path);
+    if socket_is_alive(&path) {
+        Some(super::transport::Transport::Unix(path))
+    } else {
+        None
+    }
 }
 
 /// Bootstrap table: map a capability domain prefix to the canonical primal name.
@@ -600,5 +687,19 @@ mod tests {
     fn resolve_via_songbird_returns_none_when_absent() {
         assert!(resolve_via_songbird("tensor").is_none());
         assert!(resolve_via_songbird("unknown_domain").is_none());
+    }
+
+    #[cfg(feature = "ipc")]
+    #[test]
+    fn resolve_transport_via_songbird_returns_none_when_absent() {
+        assert!(resolve_transport_via_songbird("tensor").is_none());
+        assert!(resolve_transport_via_songbird("unknown_domain").is_none());
+    }
+
+    #[cfg(feature = "ipc")]
+    #[test]
+    fn discover_transport_by_capability_returns_none_for_absent() {
+        assert!(discover_transport_by_capability("tensor").is_none());
+        assert!(discover_transport_by_capability("nonexistent").is_none());
     }
 }

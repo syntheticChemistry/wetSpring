@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V199] — 2026-06-10
+
+### Wave 107 — Cross-Subnet Mesh: Transport-Aware Discovery
+
+- **`discover_transport_by_capability()`:** New transport-aware capability resolution that returns `Transport` (UDS or TCP) instead of only `PathBuf`. Cross-subnet primals on other gates are reachable when Songbird returns TCP or mesh-relay endpoints.
+- **`resolve_transport_via_songbird()`:** Parses structured `TransportEndpoint` from Songbird's `capability.resolve` response — supports Phase 2 M1 format (`{"transport":"tcp",...}`), top-level endpoint, and legacy `{"socket":"..."}` fallback. Bridges the gap between current UDS-only resolution and cross-gate TCP.
+- **Depot refreshed:** 13/13 binaries fetched from VPS WAN depot (biomeOS v4.17/v4.18, songbird mesh persistence). southGate at `192.168.4.29/22` — cross-subnet from eastGate/ironGate.
+- **2 new tests:** `resolve_transport_via_songbird` and `discover_transport_by_capability` absent-primal validation.
+- **Build gate:** clippy zero warnings (default + guidestone), 2,100 tests (0 failures).
+
 ## [V198] — 2026-06-09
 
 ### Wave 103 — NUCLEUS Deployment Elevation
