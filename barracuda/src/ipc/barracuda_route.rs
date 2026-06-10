@@ -3,11 +3,12 @@
 //!
 //! When `--features primal-proof` is active, math calls route through the
 //! barraCuda ecobin primal over JSON-RPC instead of in-process library calls.
-//! Discovery uses the standard primal IPC cascade:
+//! Discovery uses the standard 4-tier primal IPC cascade:
 //!
 //! 1. `BARRACUDA_SOCKET` env override
-//! 2. `$XDG_RUNTIME_DIR/biomeos/barracuda-{family}.sock`
-//! 3. `<temp_dir>/barracuda-{family}.sock`
+//! 2. `BIOMEOS_SOCKET_DIR/barracuda-{family}.sock`
+//! 3. `$XDG_RUNTIME_DIR/biomeos/barracuda-{family}.sock`
+//! 4. `$TMPDIR/biomeos/barracuda-{family}.sock`
 //!
 //! Falls back to `None` when the socket is not found (caller degrades to
 //! in-process). The dual-lane pattern (IPC vs library) is resolved at
@@ -15,9 +16,17 @@
 //!
 //! # Protocol
 //!
-//! Follows barraCuda's canonical v0.9.17 surface: 33 JSON-RPC methods across
-//! TENSOR (9), STATS (9), COMPUTE (4), SPECTRAL (3), LINALG (6), HEALTH (2).
+//! Follows barraCuda's v0.4.0 surface: 97 JSON-RPC methods across
+//! TENSOR, STATS, COMPUTE, SPECTRAL, LINALG, ML, ACTIVATION, RNG,
+//! NOISE, TOLERANCES, FHE, HEALTH, NAUTILUS, and PRIMAL domains.
 //! Requests use JSON-RPC 2.0, newline-delimited, over Unix domain socket.
+//!
+//! # Method introspection
+//!
+//! Use [`describe()`] to query a method's parameter schema, access level,
+//! and description at runtime via barraCuda's `method.describe` endpoint
+//! (v0.4.0+). This enables self-correcting compositions that adapt to
+//! parameter format changes without hardcoded schemas.
 //!
 //! # Graceful degradation
 //!
@@ -85,6 +94,50 @@ pub fn is_available() -> bool {
         return false;
     };
     forward(&socket, "health.liveness", &json!({})).is_ok()
+}
+
+/// Runtime method descriptor from barraCuda `method.describe` (v0.4.0+).
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct MethodDescriptor {
+    /// Method name (e.g. `"stats.mean"`).
+    pub method: String,
+    /// Human-readable description.
+    pub description: String,
+    /// Parameter schema (e.g. `{"data": "array<f64>"}`).
+    pub params: Value,
+    /// Access level (`"public"`, `"protected"`, `"unknown"`).
+    pub access: String,
+    /// Producing primal name.
+    pub primal: String,
+    /// Primal version.
+    pub version: String,
+}
+
+/// Query a barraCuda method's parameter schema and metadata at runtime.
+///
+/// Uses `method.describe` (barraCuda v0.4.0+) to introspect a method's
+/// expected parameters, access level, and description. This enables
+/// self-correcting compositions that adapt to parameter format changes.
+///
+/// # Errors
+///
+/// Returns [`IpcError`] if barraCuda is unreachable, the method is unknown,
+/// or the response cannot be parsed.
+pub fn describe(method: &str) -> Result<MethodDescriptor, IpcError> {
+    let socket = discover().ok_or_else(|| {
+        IpcError::Connect("barraCuda not available for method.describe".to_string())
+    })?;
+    let result = forward(&socket, "method.describe", &json!({ "method": method }))?;
+    serde_json::from_value(result).map_err(|e| IpcError::Codec(format!("parse descriptor: {e}")))
+}
+
+/// Try to describe a method, returning `None` on any failure.
+///
+/// Convenience wrapper for callers that degrade gracefully when
+/// barraCuda is absent or the method is unknown.
+#[must_use]
+pub fn try_describe(method: &str) -> Option<MethodDescriptor> {
+    describe(method).ok()
 }
 
 fn rpc_call(socket: &Path, request: &Value) -> Result<Value, IpcError> {
@@ -176,5 +229,32 @@ mod tests {
         let _ = try_forward("stats.dummy", &json!({}));
         let id2 = REQUEST_ID.load(Ordering::Relaxed);
         assert!(id2 >= id1);
+    }
+
+    #[test]
+    fn describe_returns_error_when_absent() {
+        let result = describe("stats.mean");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn try_describe_returns_none_when_absent() {
+        assert!(try_describe("stats.mean").is_none());
+    }
+
+    #[test]
+    fn method_descriptor_deserializes() {
+        let json = r#"{
+            "method": "stats.mean",
+            "description": "Arithmetic mean",
+            "params": {"data": "array<f64>"},
+            "access": "public",
+            "primal": "barracuda",
+            "version": "0.4.0"
+        }"#;
+        let desc: MethodDescriptor = serde_json::from_str(json).unwrap();
+        assert_eq!(desc.method, "stats.mean");
+        assert_eq!(desc.access, "public");
+        assert_eq!(desc.primal, "barracuda");
     }
 }
