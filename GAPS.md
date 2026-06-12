@@ -4,9 +4,10 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-03 (V195 — Wave 76. NUCLEUS 10/13 health. Clippy zero
-warnings. 2,089 tests. TCP transport implemented. bearDog w135 absorbed.
-Deep debt resolved. PG-02/PG-04 VERIFIED.)
+Last updated: 2026-06-11 (V202 — Wave 111. NUCLEUS 13/13 meshed. Clippy zero
+warnings. 2,124 tests. Mesh health audit + version skew detection shipped.
+Discovery RPC deduplicated. Quality-weighted binomial variant caller live.
+All upstream Wave 108-111 reviewed — no breaking changes.)
 
 ---
 

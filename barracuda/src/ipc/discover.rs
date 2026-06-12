@@ -230,14 +230,13 @@ pub fn discover_transport_by_capability(
     discover_by_capability(capability_domain).map(super::transport::Transport::Unix)
 }
 
-/// Attempt live capability resolution via Songbird `capability.resolve`.
+/// Call Songbird `capability.resolve` and return the raw JSON result.
 ///
-/// Returns `Some(socket_path)` if Songbird is running and resolves the
-/// capability to a live primal socket. Returns `None` on any failure
-/// (Songbird absent, RPC error, capability not found) — callers fall
-/// back to the static bootstrap table.
+/// Shared RPC transport for both UDS-only resolution (`resolve_via_songbird`)
+/// and transport-aware resolution (`resolve_transport_via_songbird`). The
+/// parsing strategy differs; the RPC call is identical.
 #[cfg(feature = "ipc")]
-fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
+fn songbird_capability_resolve(capability_domain: &str) -> Option<serde_json::Value> {
     use std::io::{BufRead, BufReader, Write};
     use std::os::unix::net::UnixStream;
 
@@ -265,7 +264,17 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     reader.read_line(&mut line).ok()?;
 
     let v: serde_json::Value = serde_json::from_str(&line).ok()?;
-    let result = v.get("result")?;
+    v.get("result").cloned()
+}
+
+/// UDS-only capability resolution via Songbird `capability.resolve`.
+///
+/// Returns `Some(socket_path)` if Songbird resolves the capability to a
+/// live local UDS socket. Non-UDS endpoints (TCP, mesh relay) are ignored
+/// since this path is used where callers need a Unix socket specifically.
+#[cfg(feature = "ipc")]
+fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
+    let result = songbird_capability_resolve(capability_domain)?;
 
     // Prefer structured endpoint (Wave 107 M1)
     if let Some(ep_value) = result.get("endpoint") {
@@ -298,34 +307,7 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
 fn resolve_transport_via_songbird(
     capability_domain: &str,
 ) -> Option<super::transport::Transport> {
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
-
-    let songbird_socket = discover_primal(super::primal_names::SONGBIRD)?;
-
-    let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"capability.resolve","params":{{"capability":"{capability_domain}"}},"id":1}}"#,
-    );
-
-    let stream = UnixStream::connect(&songbird_socket).ok()?;
-    stream
-        .set_read_timeout(Some(super::timeouts::DISCOVERY))
-        .ok()?;
-    stream
-        .set_write_timeout(Some(super::timeouts::DISCOVERY))
-        .ok()?;
-
-    let mut writer = std::io::BufWriter::new(&stream);
-    writer.write_all(request.as_bytes()).ok()?;
-    writer.write_all(b"\n").ok()?;
-    writer.flush().ok()?;
-
-    let mut reader = BufReader::new(&stream);
-    let mut line = String::new();
-    reader.read_line(&mut line).ok()?;
-
-    let v: serde_json::Value = serde_json::from_str(&line).ok()?;
-    let result = v.get("result")?;
+    let result = songbird_capability_resolve(capability_domain)?;
 
     // Wave 107 M1: structured TransportEndpoint in result.endpoint
     if let Some(ep_value) = result.get("endpoint") {

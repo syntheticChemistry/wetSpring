@@ -30,13 +30,15 @@
 //! | `provenance.begin`              | Start provenance-tracked session             |
 //! | `provenance.record`             | Record step in provenance DAG                |
 //! | `provenance.complete`           | Dehydrate → commit → attribute               |
+//! | `composition.mesh_health`       | NUCLEUS mesh health audit + version skew     |
 //!
 //! # Socket discovery
 //!
-//! The server binds to:
+//! The server binds to (4-tier cascade):
 //! 1. `WETSPRING_SOCKET` env var (explicit override)
-//! 2. `$XDG_RUNTIME_DIR/biomeos/wetspring-{family_id}.sock`
-//! 3. `<temp_dir>/wetspring-{family_id}.sock` (platform-agnostic fallback)
+//! 2. `$BIOMEOS_SOCKET_DIR/wetspring-{family_id}.sock`
+//! 3. `$XDG_RUNTIME_DIR/biomeos/wetspring-{family_id}.sock`
+//! 4. `<temp_dir>/biomeos/wetspring-{family_id}.sock` (platform-agnostic fallback)
 //!
 //! # Design
 //!

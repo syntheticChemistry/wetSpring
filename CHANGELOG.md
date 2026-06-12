@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V202] — 2026-06-11
+
+### Wave 111 — Mesh Health Audit + Discovery Dedup
+
+- **`composition.mesh_health` method:** New IPC endpoint that probes all 13 NUCLEUS primals for liveness, version info, and uptime. Returns `version_skew: true/false` and `distinct_versions` array for Wave 111 Stream 6 divergence detection. Designed to identify stale binaries and version skew across the local NUCLEUS deployment.
+- **`MeshHealthAudit` struct:** Full mesh audit result with per-primal `PrimalHealthInfo` (status, version, uptime), alive/discovered counts, and distinct version tracking via `BTreeSet`.
+- **Songbird RPC deduplication:** Extracted `songbird_capability_resolve()` — shared RPC transport for both `resolve_via_songbird()` (UDS-only) and `resolve_transport_via_songbird()` (transport-aware). Eliminates ~30 lines of duplicated socket connect / request / parse logic.
+- **Capability registration:** `composition.mesh_health` added to CAPABILITIES, niche manifest, capability_domains, and capability_registry.toml.
+- **7 new tests:** mesh health probes all 13 primals, JSON shape validation, absent-when-no-nucleus, dispatch integration, version_skew detection.
+- **Build gate:** clippy zero warnings, 2,124 tests (0 failures).
+
 ## [V201] — 2026-06-10
 
 ### Wave 107 — WS-11: Quality-Weighted Binomial Variant Caller

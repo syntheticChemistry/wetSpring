@@ -219,6 +219,158 @@ pub fn probe_schema_parity() -> SchemaParity {
     }
 }
 
+// ── NUCLEUS Mesh Health Audit (Stream 6: Divergence Detection) ──────
+
+/// Version and health info from a single primal's `health.liveness` response.
+#[derive(Debug, Clone)]
+pub struct PrimalHealthInfo {
+    /// Primal slug (e.g. `"songbird"`, `"beardog"`).
+    pub primal: String,
+    /// Component liveness status.
+    pub status: ComponentStatus,
+    /// Primal version string if reported in health response.
+    pub version: Option<String>,
+    /// Uptime in seconds if reported.
+    pub uptime_secs: Option<f64>,
+}
+
+/// Full NUCLEUS mesh health audit — probes all 13 primals with version info.
+///
+/// Designed for Wave 111 Stream 6 divergence detection: identifies version
+/// skew across the local NUCLEUS that may indicate stale binaries.
+#[derive(Debug)]
+pub struct MeshHealthAudit {
+    /// Per-primal health + version info.
+    pub primals: Vec<PrimalHealthInfo>,
+    /// Number of primals that responded to liveness.
+    pub alive_count: usize,
+    /// Number of primals with discoverable sockets.
+    pub discovered_count: usize,
+    /// Total primals probed.
+    pub total_probed: usize,
+    /// Distinct versions seen across live primals (divergence indicator).
+    pub distinct_versions: Vec<String>,
+}
+
+impl MeshHealthAudit {
+    /// Serialize to JSON for health endpoints and audit reports.
+    #[must_use]
+    pub fn to_json(&self) -> Value {
+        let primals: Vec<Value> = self
+            .primals
+            .iter()
+            .map(|p| {
+                json!({
+                    "primal": p.primal,
+                    "status": p.status.as_str(),
+                    "version": p.version,
+                    "uptime_secs": p.uptime_secs,
+                })
+            })
+            .collect();
+
+        json!({
+            "primals": primals,
+            "alive": self.alive_count,
+            "discovered": self.discovered_count,
+            "total_probed": self.total_probed,
+            "distinct_versions": self.distinct_versions,
+            "version_skew": self.distinct_versions.len() > 1,
+        })
+    }
+}
+
+/// Standard NUCLEUS primal set for health audit.
+const NUCLEUS_PRIMALS: &[&str] = &[
+    super::primal_names::BEARDOG,
+    super::primal_names::SONGBIRD,
+    super::primal_names::BIOMEOS,
+    super::primal_names::NESTGATE,
+    super::primal_names::RHIZOCRYPT,
+    super::primal_names::LOAMSPINE,
+    super::primal_names::SWEETGRASS,
+    super::primal_names::SQUIRREL,
+    super::primal_names::PETALTONGUE,
+    super::primal_names::CORALREEF,
+    super::primal_names::TOADSTOOL,
+    super::primal_names::SKUNKBAT,
+    super::primal_names::BARRACUDA,
+];
+
+/// Probe the full NUCLEUS mesh for health, version, and divergence.
+///
+/// Each primal is discovered via the standard 4-tier cascade, then probed
+/// with `health.liveness`. Version information is extracted from the
+/// response if the primal reports it.
+#[must_use]
+pub fn probe_mesh_health() -> MeshHealthAudit {
+    let mut primals = Vec::with_capacity(NUCLEUS_PRIMALS.len());
+    let mut alive_count = 0;
+    let mut discovered_count = 0;
+    let mut versions = std::collections::BTreeSet::new();
+
+    for &slug in NUCLEUS_PRIMALS {
+        let info = probe_primal_versioned(slug);
+        if info.status == ComponentStatus::Live {
+            alive_count += 1;
+            if let Some(ref v) = info.version {
+                versions.insert(v.clone());
+            }
+        }
+        if info.status != ComponentStatus::Absent {
+            discovered_count += 1;
+        }
+        primals.push(info);
+    }
+
+    MeshHealthAudit {
+        total_probed: primals.len(),
+        primals,
+        alive_count,
+        discovered_count,
+        distinct_versions: versions.into_iter().collect(),
+    }
+}
+
+/// Probe a single primal with version extraction from health response.
+fn probe_primal_versioned(primal: &str) -> PrimalHealthInfo {
+    let env_var = discover::socket_env_var(primal);
+    let Some(socket_path) = discover::discover_socket(&env_var, primal) else {
+        return PrimalHealthInfo {
+            primal: primal.to_string(),
+            status: ComponentStatus::Absent,
+            version: None,
+            uptime_secs: None,
+        };
+    };
+
+    let request = r#"{"jsonrpc":"2.0","method":"health.liveness","params":{},"id":1}"#;
+    let Some(response) = probe_rpc(&socket_path, request) else {
+        return PrimalHealthInfo {
+            primal: primal.to_string(),
+            status: ComponentStatus::Discovered,
+            version: None,
+            uptime_secs: None,
+        };
+    };
+
+    let result = response.get("result");
+    let version = result
+        .and_then(|r| r.get("version"))
+        .and_then(Value::as_str)
+        .map(String::from);
+    let uptime_secs = result
+        .and_then(|r| r.get("uptime_secs"))
+        .and_then(Value::as_f64);
+
+    PrimalHealthInfo {
+        primal: primal.to_string(),
+        status: ComponentStatus::Live,
+        version,
+        uptime_secs,
+    }
+}
+
 // ── Internal Helpers ────────────────────────────────────────────────
 
 /// Probe a single primal by name: discover socket, then try `health.liveness`.
@@ -356,5 +508,45 @@ mod tests {
         assert!(j.get("loamspine").is_some());
         assert!(j.get("sweetgrass").is_some());
         assert!(j.get("summary").is_some());
+    }
+
+    #[test]
+    fn mesh_health_probes_all_primals() {
+        let audit = probe_mesh_health();
+        assert_eq!(audit.total_probed, 13, "should probe all 13 NUCLEUS primals");
+        assert_eq!(audit.primals.len(), 13);
+        for info in &audit.primals {
+            assert!(!info.primal.is_empty());
+        }
+    }
+
+    #[test]
+    fn mesh_health_to_json_shape() {
+        let audit = probe_mesh_health();
+        let j = audit.to_json();
+        assert!(
+            j.get("primals").is_some_and(Value::is_array),
+            "primals must be a JSON array"
+        );
+        assert!(j.get("alive").is_some());
+        assert!(j.get("discovered").is_some());
+        assert!(j.get("total_probed").is_some());
+        assert!(
+            j.get("distinct_versions").is_some_and(Value::is_array),
+            "distinct_versions must be a JSON array"
+        );
+        assert!(j.get("version_skew").is_some());
+    }
+
+    #[test]
+    fn mesh_health_absent_when_no_nucleus() {
+        let audit = probe_mesh_health();
+        assert_eq!(audit.alive_count, 0, "no primals running in test env");
+        assert!(audit.distinct_versions.is_empty());
+        assert_eq!(
+            audit.to_json().get("version_skew").and_then(Value::as_bool),
+            Some(false),
+            "version_skew must be false when no primals are alive"
+        );
     }
 }

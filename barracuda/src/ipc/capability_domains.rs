@@ -177,7 +177,7 @@ pub const DOMAINS: &[CapabilityDomain] = &[
     CapabilityDomain {
         name: "composition",
         description: "Spring-specific science composition health per COMPOSITION_HEALTH_STANDARD",
-        methods: &["composition.science_health"],
+        methods: &["composition.science_health", "composition.mesh_health"],
     },
     // ── ionic bonding (Wave 37 / V184) ─────────────────────────────
     CapabilityDomain {
@@ -274,13 +274,13 @@ mod tests {
             "22 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition + bonding)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 46, "46 total capability methods");
+        assert_eq!(total_methods, 47, "47 total capability methods");
     }
 
     #[test]
     fn all_methods_returns_flat_list() {
         let methods = all_methods();
-        assert_eq!(methods.len(), 46);
+        assert_eq!(methods.len(), 47);
         assert!(methods.contains(&"science.diversity"));
         assert!(methods.contains(&"health.liveness"));
         assert!(methods.contains(&"health.readiness"));

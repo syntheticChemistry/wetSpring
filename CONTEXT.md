@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V201:** Wave 107 WS-11 variant caller evolution. Quality-weighted binomial model for variant calling — breseq-aligned statistical test replaces heuristic log-likelihood ratio. Upstream absorption: topology-aware mesh routing, 4-tier socket discovery. **Clippy zero warnings** (all feature combinations). 2,117 tests (0 failures). 345 scenarios, 51 niche, 59 consumed, 46 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V202:** Wave 111 mesh health audit + discovery dedup. `composition.mesh_health` endpoint probes all 13 NUCLEUS primals for version skew detection (Stream 6 divergence pressure). Songbird RPC deduplication. Upstream Wave 108-111 reviewed — no breaking changes. **Clippy zero warnings** (all feature combinations). 2,124 tests (0 failures). 345 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 
@@ -24,9 +24,9 @@ evolution pipeline.
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
 - **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 345 scenarios)
-- **Communication:** JSON-RPC 2.0 over Unix sockets, 51 niche capabilities, 59 consumed (33 barraCuda canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 46 dispatch methods, 22 domains, Wire Standard L2+L3
+- **Communication:** JSON-RPC 2.0 over Unix sockets, 52 niche capabilities, 59 consumed (33 barraCuda canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 47 dispatch methods, 22 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 2,117 workspace (0 failed)
+- **Tests:** 2,124 workspace (0 failed)
 - **Validation checks:** 5,967+ across 345 scenarios (UniBin)
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), `wetspring certify` (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
@@ -47,7 +47,7 @@ evolution pipeline.
 - **Anderson physics:** hormesis, binding landscapes, disorder mapping
 - **Drug repurposing:** NMF, TransE knowledge graph embedding, drug-target scoring
 - **GPU acceleration:** 44 GPU modules via barraCuda v0.4.0, 150+ primitives consumed
-- **IPC:** 45 JSON-RPC methods, 50 niche capabilities, 22 domains, 1 live composition health handler (science_health — runtime probing), 6 bonding.* methods (IonicContractRegistry), 8 MCP tools, Wire Standard L2+L3
+- **IPC:** 47 JSON-RPC methods, 52 niche capabilities, 22 domains, 2 live composition health handlers (science_health + mesh_health — runtime probing + version skew detection), 6 bonding.* methods (IonicContractRegistry), 8 MCP tools, Wire Standard L2+L3
 - **Ecosystem wiring:** sweetGrass braids, toadStool performance surface, StreamItem NDJSON
 - **Primal discovery:** coralReef, toadStool, petalTongue, Squirrel, sweetGrass, rhizoCrypt, loamSpine
 

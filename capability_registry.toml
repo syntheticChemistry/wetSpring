@@ -271,6 +271,13 @@ stability = "stable"
 gpu_accelerated = false
 # Universal methods (tower, node, nest, nucleus) owned by biomeOS v3.04+
 
+[capabilities.composition_mesh_health]
+method = "composition.mesh_health"
+domain = "composition"
+description = "NUCLEUS mesh health audit with version skew detection (Wave 111 Stream 6)"
+stability = "stable"
+gpu_accelerated = false
+
 # ── Health / discovery (biomeOS infrastructure) ──────────────────────
 
 [capabilities.health_check]

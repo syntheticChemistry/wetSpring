@@ -113,6 +113,7 @@ pub const CAPABILITIES: &[&str] = &[
     "vault.retrieve",
     "vault.consent.verify",
     "composition.science_health",
+    "composition.mesh_health",
     "bonding.propose",
     "bonding.accept",
     "bonding.reject",
@@ -337,6 +338,18 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "bonding_support": ["Covalent", "Ionic"],
         "biome_os": biome_os_status,
     }))
+}
+
+/// NUCLEUS mesh health audit with version skew detection.
+///
+/// Probes all 13 NUCLEUS primals for liveness and version info.
+/// Reports version skew (distinct versions across live primals)
+/// for Stream 6 divergence detection (Wave 111).
+pub fn handle_mesh_health_audit() -> Result<Value, RpcError> {
+    use crate::ipc::composition_health;
+
+    let audit = composition_health::probe_mesh_health();
+    Ok(audit.to_json())
 }
 
 // Universal composition health methods (tower, node, nest, nucleus) removed

@@ -94,6 +94,7 @@ pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
         // Composition health (spring-specific domain health)
         // Universal methods (tower, node, nest, nucleus) are owned by biomeOS v3.04+
         "composition.science_health" => handlers::handle_composition_science_health(params),
+        "composition.mesh_health" => handlers::handle_mesh_health_audit(),
 
         // Ionic bonding lifecycle (V184: IonicContractRegistry wired)
         m if cfg!(feature = "guidestone") && m.starts_with("bonding.") => {
@@ -342,7 +343,7 @@ mod tests {
         assert_eq!(result["domain"], "ecology");
 
         let methods = result["methods"].as_array().unwrap();
-        assert_eq!(methods.len(), 46, "Wire Standard L2: flat methods array");
+        assert_eq!(methods.len(), 47, "Wire Standard L2: flat methods array");
         assert!(methods.iter().any(|m| m == "science.diversity"));
         assert!(methods.iter().any(|m| m == "health.liveness"));
 
@@ -390,7 +391,7 @@ mod tests {
             .filter_map(|d| d["methods"].as_array())
             .map(Vec::len)
             .sum();
-        assert_eq!(total_methods, 46);
+        assert_eq!(total_methods, 47);
     }
 
     #[test]
@@ -458,6 +459,15 @@ mod tests {
         assert_eq!(biome_os["wave"], 20);
     }
 
+    #[test]
+    fn mesh_health_audit_dispatch() {
+        let result = dispatch("composition.mesh_health", &json!({})).unwrap();
+        assert_eq!(result["total_probed"], 13);
+        assert!(result["primals"].is_array());
+        assert!(result.get("version_skew").is_some());
+        assert!(result.get("distinct_versions").unwrap().is_array());
+    }
+
     mod proptests {
         use super::*;
         use proptest::prelude::*;
@@ -485,7 +495,7 @@ mod tests {
                     "ai.ecology_interpret",
                     "data.fetch.chembl", "data.fetch.pubchem", "data.fetch.register_table",
                     "vault.store", "vault.retrieve", "vault.consent.verify",
-                    "composition.science_health",
+                    "composition.science_health", "composition.mesh_health",
                     "bonding.propose", "bonding.accept", "bonding.reject",
                     "bonding.status", "bonding.terminate", "bonding.list",
                 ];

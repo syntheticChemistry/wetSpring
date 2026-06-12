@@ -311,6 +311,7 @@ pub const CAPABILITIES: &[&str] = &[
     "vault.consent.verify",
     // ── composition health (spring-specific, biomeOS owns universal methods) ──
     "composition.science_health",
+    "composition.mesh_health",
     // ── ionic bonding (primalSpring Wave 37+, WS-1) ──
     "bonding.propose",
     "bonding.accept",
@@ -487,8 +488,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            51,
-            "7 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 1 composition + 6 bonding + 3 ecosystem integrations"
+            52,
+            "7 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 2 composition + 6 bonding + 3 ecosystem integrations"
         );
     }
 
