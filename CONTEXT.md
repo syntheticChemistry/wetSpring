@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V202:** Wave 111 mesh health audit + discovery dedup. `composition.mesh_health` endpoint probes all 13 NUCLEUS primals for version skew detection (Stream 6 divergence pressure). Songbird RPC deduplication. Upstream Wave 108-111 reviewed — no breaking changes. **Clippy zero warnings** (all feature combinations). 2,124 tests (0 failures). 345 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V203:** Wave 111 deep debt — module splits + macro consolidation. `gonzales.rs` split into 3 domain-family submodules (pharmacology, tissue, anderson_sweeps). `discover.rs` 8 wrapper functions replaced by `primal_discover_fn!` macro. `variant_caller.rs` 873L→604L via stats submodule extraction. **Clippy zero warnings** (all feature combinations). 2,124 tests (0 failures). 345 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 

@@ -17,12 +17,21 @@
 //! - **SNP**: single nucleotide polymorphism (base substitution)
 //! - **DEL**: deletion (missing bases relative to reference)
 //! - **INS**: insertion (extra bases relative to reference)
+//!
+//! Statistical quality models (binomial, per-base Phred, legacy) live
+//! in the [`stats`] submodule.
 
+mod stats;
 #[cfg(test)]
 mod tests;
 
 use crate::bio::pileup::PileupColumn;
 use crate::io::fasta::GenBankFeature;
+use stats::{
+    binomial_quality, quality_weighted_freq, variant_quality, variant_quality_bq,
+};
+#[cfg(test)]
+use stats::{binomial_log_sf, log_gamma};
 
 #[cfg(feature = "gpu")]
 use crate::bio::snp_gpu::SnpGpu;
@@ -350,39 +359,6 @@ pub fn call_variants_gpu(
     Ok(variants)
 }
 
-/// Compute quality-weighted frequency for a base index at a pileup column.
-///
-/// Each base contributes `1 - 10^(-Q/10)` (probability of being correct)
-/// instead of a flat 1.0. This down-weights low-quality bases that are
-/// likely sequencing errors.
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "Precision: quality sums bounded by coverage"
-)]
-fn quality_weighted_freq(col: &PileupColumn, base_idx: usize) -> f64 {
-    let weights: Vec<f64> = (0..4)
-        .map(|i| {
-            let count = f64::from(col.base_counts[i]);
-            if count == 0.0 {
-                return 0.0;
-            }
-            let mean_q = if col.base_counts[i] > 0 {
-                col.quality_sums[i] as f64 / count
-            } else {
-                0.0
-            };
-            // P(correct) = 1 - 10^(-Q/10)
-            let p_correct = 1.0 - 10.0_f64.powf(-mean_q / 10.0);
-            count * p_correct
-        })
-        .collect();
-
-    let total: f64 = weights.iter().sum();
-    if total <= 0.0 {
-        return 0.0;
-    }
-    weights[base_idx] / total
-}
 
 fn call_snp(
     col: &PileupColumn,
@@ -524,250 +500,6 @@ fn call_insertion(
         quality,
         gene,
     })
-}
-
-/// Compute Phred-scaled variant quality using per-base quality information.
-///
-/// Uses the actual mean quality of the alternative allele's supporting reads
-/// to compute the expected error rate, rather than assuming a flat Q30.
-/// Q = sum over alt reads of (-10 * `log10(P_error_per_base)`).
-///
-/// For low-quality alt bases, this naturally produces low variant quality,
-/// suppressing calls driven by sequencing error.
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "Precision: quality sums bounded by coverage"
-)]
-fn variant_quality_bq(col: &PileupColumn, alt_idx: usize, alt_count: u32) -> f64 {
-    if col.depth == 0 || alt_count == 0 {
-        return 0.0;
-    }
-
-    let alt_mean_q = if col.base_counts[alt_idx] > 0 {
-        col.quality_sums[alt_idx] as f64 / f64::from(col.base_counts[alt_idx])
-    } else {
-        0.0
-    };
-
-    // P(error) for the alt base = 10^(-Q/10)
-    let p_error = 10.0_f64.powf(-alt_mean_q / 10.0);
-    if p_error >= 1.0 {
-        return 0.0;
-    }
-
-    let alt = f64::from(alt_count);
-    let total = f64::from(col.depth);
-    let observed_freq = alt / total;
-
-    if observed_freq <= p_error {
-        return 0.0;
-    }
-
-    // Log-likelihood ratio: observed frequency vs per-base error rate
-    let lr = (observed_freq / p_error).log10();
-    (alt * lr * 10.0).min(999.0)
-}
-
-/// Legacy quality function (flat error rate assumption).
-fn variant_quality(alt_count: u32, total_depth: u32, _frequency: f64) -> f64 {
-    if total_depth == 0 {
-        return 0.0;
-    }
-    let error_rate = 0.001;
-    let alt = f64::from(alt_count);
-    let total = f64::from(total_depth);
-    let observed_freq = alt / total;
-    if observed_freq <= error_rate {
-        return 0.0;
-    }
-    let lr = (observed_freq / error_rate).log10();
-    (alt * lr * 10.0).min(999.0)
-}
-
-// ── Quality-weighted binomial model (WS-11) ─────────────────────
-
-/// Quality-weighted binomial p-value for a variant call.
-///
-/// Computes the one-sided binomial probability of seeing at least `k`
-/// variant-supporting reads out of `n` total, where the null hypothesis
-/// error rate `p_err` is derived from the **quality-weighted** mean Phred
-/// score of the alternative allele.
-///
-/// This models breseq's core statistical approach: under the null (no
-/// variant), the probability of seeing a non-reference base at a position
-/// is the per-base error rate derived from quality scores. The variant
-/// quality is `-10 * log10(p_value)`, capped at 999.
-///
-/// Returns a Phred-scaled quality score.
-#[expect(clippy::cast_precision_loss, reason = "quality sums bounded by coverage")]
-fn binomial_quality(col: &PileupColumn, alt_idx: usize, alt_count: u32) -> f64 {
-    if col.depth == 0 || alt_count == 0 {
-        return 0.0;
-    }
-
-    let alt_mean_q = if col.base_counts[alt_idx] > 0 {
-        col.quality_sums[alt_idx] as f64 / f64::from(col.base_counts[alt_idx])
-    } else {
-        0.0
-    };
-
-    // Null hypothesis error rate from mean Phred of alt allele
-    let p_err = 10.0_f64.powf(-alt_mean_q / 10.0);
-    if p_err >= 1.0 || p_err <= 0.0 {
-        return 0.0;
-    }
-
-    let n = col.depth;
-    let k = alt_count;
-
-    // P(X >= k) where X ~ Binomial(n, p_err)
-    // Use log-space survival function to avoid underflow
-    let log_p = binomial_log_sf(k, n, p_err);
-
-    // Convert to Phred: Q = -10 * log10(p)
-    let quality = -10.0 * log_p / std::f64::consts::LN_10;
-    quality.clamp(0.0, 999.0)
-}
-
-/// Log survival function: ln(P(X >= k)) for X ~ Binomial(n, p).
-///
-/// Computes the upper-tail probability in log space using the
-/// regularized incomplete beta function approximation.
-///
-/// For large n, uses the normal approximation to avoid combinatorial
-/// overflow: P(X >= k) ≈ Φ_c((k - 0.5 - np) / sqrt(np(1-p))).
-fn binomial_log_sf(k: u32, n: u32, p: f64) -> f64 {
-    if k == 0 {
-        return 0.0; // P(X >= 0) = 1, ln(1) = 0
-    }
-
-    let nf = f64::from(n);
-    let kf = f64::from(k);
-
-    // If observed count is at or below the expected count under null,
-    // the upper-tail probability is large (>0.5) — not significant.
-    if kf <= nf * p {
-        return 0.0; // p-value >= 0.5, quality will be near-zero
-    }
-
-    // Normal approximation with continuity correction for n > 50
-    if n > 50 {
-        let mu = nf * p;
-        let sigma = (nf * p * (1.0 - p)).sqrt();
-        if sigma <= 0.0 {
-            return f64::NEG_INFINITY;
-        }
-        let z = (kf - 0.5 - mu) / sigma;
-        return log_normal_sf(z);
-    }
-
-    // Exact computation for small n (sum of binomial PMF terms)
-    let mut log_sum = f64::NEG_INFINITY;
-    for i in k..=n {
-        let log_pmf = log_binom_pmf(i, n, p);
-        log_sum = log_add_exp(log_sum, log_pmf);
-    }
-    log_sum
-}
-
-/// Log of the binomial PMF: ln(C(n,k) * p^k * (1-p)^(n-k)).
-fn log_binom_pmf(k: u32, n: u32, p: f64) -> f64 {
-    let kf = f64::from(k);
-    let nf = f64::from(n);
-    kf.mul_add(p.ln(), (nf - kf).mul_add((1.0 - p).ln(), log_binom_coeff(n, k)))
-}
-
-/// Log binomial coefficient: ln(C(n, k)).
-fn log_binom_coeff(n: u32, k: u32) -> f64 {
-    if k > n {
-        return f64::NEG_INFINITY;
-    }
-    log_gamma(f64::from(n) + 1.0) - log_gamma(f64::from(k) + 1.0)
-        - log_gamma(f64::from(n - k) + 1.0)
-}
-
-/// Stirling's log-gamma approximation: ln(Γ(x)).
-///
-/// Uses the Lanczos approximation for small x, Stirling for large x.
-/// Adequate precision for sequencing-depth scale (n < 10^6).
-fn log_gamma(x: f64) -> f64 {
-    if x <= 0.0 {
-        return 0.0;
-    }
-    // Use the standard Stirling series for x >= 12
-    if x >= 12.0 {
-        let x2 = x * x;
-        let half_ln_2pi = 0.5 * (2.0 * std::f64::consts::PI).ln();
-        return (x - 0.5).mul_add(x.ln(), half_ln_2pi.mul_add(1.0, -x))
-            + 1.0 / (12.0 * x)
-            - 1.0 / (360.0 * x2 * x);
-    }
-    // For smaller x, reduce to x >= 12 by using Γ(x+1) = x·Γ(x)
-    let mut log_shift = 0.0;
-    let mut z = x;
-    #[expect(clippy::while_float, reason = "reduction loop with finite termination")]
-    while z < 12.0 {
-        log_shift += z.ln();
-        z += 1.0;
-    }
-    log_gamma(z) - log_shift
-}
-
-/// Log of the normal survival function: ln(P(Z > z)) for standard normal.
-///
-/// Uses the rational approximation from Abramowitz & Stegun 26.2.17.
-fn log_normal_sf(z: f64) -> f64 {
-    if z < -8.0 {
-        return 0.0; // P(Z > z) ≈ 1
-    }
-    if z > 37.0 {
-        return f64::NEG_INFINITY; // P(Z > z) ≈ 0
-    }
-
-    // For negative z, P(Z > z) = 1 - P(Z > -z), but in log space
-    // use the identity P(Z > z) = 1 - Φ(z) for z > 0
-    if z < 0.0 {
-        let p_lower = 1.0 - normal_sf_approx(-z);
-        return (1.0 - p_lower).ln();
-    }
-
-    // Abramowitz & Stegun rational approximation for upper tail
-    let p = normal_sf_approx(z);
-    if p <= 0.0 {
-        f64::NEG_INFINITY
-    } else {
-        p.ln()
-    }
-}
-
-/// Upper-tail probability P(Z > z) for z >= 0 using A&S 26.2.17.
-fn normal_sf_approx(z: f64) -> f64 {
-    let t = 1.0 / 0.231_641_9_f64.mul_add(z, 1.0);
-    let d = (1.0 / (2.0 * std::f64::consts::PI)).sqrt() * (-z * z / 2.0).exp();
-    let p = d * t
-        * t.mul_add(
-            t.mul_add(
-                t.mul_add(
-                    t.mul_add(1.330_274_429, -1.821_255_978),
-                    1.781_477_937,
-                ),
-                -0.356_563_782,
-            ),
-            0.319_381_530,
-        );
-    p.max(0.0)
-}
-
-/// Numerically stable log(exp(a) + exp(b)).
-fn log_add_exp(a: f64, b: f64) -> f64 {
-    if a == f64::NEG_INFINITY {
-        return b;
-    }
-    if b == f64::NEG_INFINITY {
-        return a;
-    }
-    let max = a.max(b);
-    max + ((a - max).exp() + (b - max).exp()).ln()
 }
 
 const fn base_to_idx(b: u8) -> usize {

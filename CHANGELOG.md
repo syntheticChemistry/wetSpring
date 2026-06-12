@@ -3,6 +3,16 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V203] — 2026-06-12
+
+### Wave 111 — Deep Debt: Module Splits + Macro Consolidation
+
+- **`gonzales.rs` → `gonzales/` submodule:** Split 586-line monolith into 3 domain-family files: `pharmacology.rs` (dose-response + PK decay), `tissue.rs` (tissue lattice + cross-species morphometry), `anderson_sweeps.rs` (biome atlas + disorder sweep + hormesis). Shared `linspace()` utility lives in the parent `gonzales/mod.rs`. All 10 existing tests preserved. Public API unchanged — re-exports via `mod.rs`.
+- **`discover.rs` macro consolidation:** Replaced 8 identical `discover_{primal}()` one-liner wrappers (70 lines) with a `primal_discover_fn!` macro invocation (~20 lines). Each generated function retains its doc comment and delegates to `discover_primal()` with the matching `primal_names` constant. Adding a new primal discovery wrapper is now a single line.
+- **`variant_caller.rs` → `variant_caller/stats.rs` extraction:** Extracted 267 lines of pure-math statistical quality models (binomial log-SF, log-gamma, normal SF, legacy/per-base/WS-11 binomial quality) into a dedicated `stats` submodule. Main file reduced from 873L to 604L (31% reduction). All 20 variant calling tests pass unchanged.
+- **Handler module docs updated:** `handlers/mod.rs` sub-module table now documents the `gonzales/` family split.
+- **Build gate:** clippy zero warnings, 2,124 tests (0 failures).
+
 ## [V202] — 2026-06-11
 
 ### Wave 111 — Mesh Health Audit + Discovery Dedup

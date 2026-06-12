@@ -10,10 +10,13 @@
 //!
 //! # Sub-modules
 //!
-//! | Module    | Handlers                                              |
-//! |-----------|-------------------------------------------------------|
-//! | `brain`   | `brain.observe`, `brain.attention`, `brain.urgency`   |
-//! | `science` | `science.diversity`, `science.qs_model`, Anderson, …  |
+//! | Module                     | Handlers                                              |
+//! |----------------------------|-------------------------------------------------------|
+//! | `brain`                    | `brain.observe`, `brain.attention`, `brain.urgency`   |
+//! | `science`                  | `science.diversity`, `science.qs_model`, Anderson, …  |
+//! | `gonzales/pharmacology`    | `gonzales.dose_response`, `gonzales.pk_decay`         |
+//! | `gonzales/tissue`          | `gonzales.tissue_lattice`, `gonzales.cross_species`   |
+//! | `gonzales/anderson_sweeps` | `biome_atlas`, `disorder_sweep`, `hormesis`            |
 
 mod ai;
 mod alignment;

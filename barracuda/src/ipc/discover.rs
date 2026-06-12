@@ -99,76 +99,43 @@ pub fn discover_primal(primal: &str) -> Option<PathBuf> {
     discover_socket(&socket_env_var(primal), primal)
 }
 
-/// Discover Squirrel AI socket.
+/// Generate a typed `discover_{name}()` wrapper for each NUCLEUS primal.
 ///
-/// Priority: `SQUIRREL_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_squirrel() -> Option<PathBuf> {
-    discover_primal(super::primal_names::SQUIRREL)
+/// All wrappers delegate to [`discover_primal`] with the matching
+/// `primal_names` constant. The 4-tier cascade applies uniformly:
+/// `{PRIMAL}_SOCKET` env → `BIOMEOS_SOCKET_DIR` → `XDG_RUNTIME_DIR` → `$TMPDIR`.
+macro_rules! primal_discover_fn {
+    ($(
+        $(#[doc = $doc:expr])*
+        $fn_name:ident => $const_name:ident
+    ),+ $(,)?) => {
+        $(
+            $(#[doc = $doc])*
+            #[must_use]
+            pub fn $fn_name() -> Option<PathBuf> {
+                discover_primal(super::primal_names::$const_name)
+            }
+        )+
+    };
 }
 
-/// Discover coralReef sovereign shader compiler socket.
-///
-/// coralReef compiles WGSL to native ISA for sovereign GPU dispatch.
-/// Priority: `CORALREEF_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_coralreef() -> Option<PathBuf> {
-    discover_primal(super::primal_names::CORALREEF)
-}
-
-/// Discover toadStool compute orchestrator socket.
-///
-/// toadStool handles hardware discovery, GPU/NPU routing, and compute dispatch.
-/// Priority: `TOADSTOOL_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_toadstool() -> Option<PathBuf> {
-    discover_primal(super::primal_names::TOADSTOOL)
-}
-
-/// Discover petalTongue visualization socket.
-///
-/// Priority: `PETALTONGUE_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_petaltongue() -> Option<PathBuf> {
-    discover_primal(super::primal_names::PETALTONGUE)
-}
-
-/// Discover rhizoCrypt derivation DAG socket.
-///
-/// rhizoCrypt tracks content lineage and derivation chains for
-/// scyBorg provenance trio integration.
-/// Priority: `RHIZOCRYPT_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_rhizocrypt() -> Option<PathBuf> {
-    discover_primal(super::primal_names::RHIZOCRYPT)
-}
-
-/// Discover loamSpine immutable ledger socket.
-///
-/// loamSpine stores provenance certificates and license proofs for
-/// scyBorg provenance trio integration.
-/// Priority: `LOAMSPINE_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_loamspine() -> Option<PathBuf> {
-    discover_primal(super::primal_names::LOAMSPINE)
-}
-
-/// Discover sweetGrass provenance socket.
-///
-/// sweetGrass handles W3C PROV-O attribution braids.
-/// Priority: `SWEETGRASS_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_sweetgrass() -> Option<PathBuf> {
-    discover_primal(super::primal_names::SWEETGRASS)
-}
-
-/// Discover skunkBat audit socket.
-///
-/// skunkBat handles security audit logging and JH-5 forwarding.
-/// Priority: `SKUNKBAT_SOCKET` env → XDG runtime → temp dir.
-#[must_use]
-pub fn discover_skunkbat() -> Option<PathBuf> {
-    discover_primal(super::primal_names::SKUNKBAT)
+primal_discover_fn! {
+    /// Discover Squirrel AI socket.
+    discover_squirrel   => SQUIRREL,
+    /// Discover coralReef sovereign shader compiler socket.
+    discover_coralreef  => CORALREEF,
+    /// Discover toadStool compute orchestrator socket.
+    discover_toadstool  => TOADSTOOL,
+    /// Discover petalTongue visualization socket.
+    discover_petaltongue => PETALTONGUE,
+    /// Discover rhizoCrypt derivation DAG socket.
+    discover_rhizocrypt => RHIZOCRYPT,
+    /// Discover loamSpine immutable ledger socket.
+    discover_loamspine  => LOAMSPINE,
+    /// Discover sweetGrass provenance socket.
+    discover_sweetgrass => SWEETGRASS,
+    /// Discover skunkBat audit socket.
+    discover_skunkbat   => SKUNKBAT,
 }
 
 /// Discover a primal by the **capability** it provides.

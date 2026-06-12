@@ -4,10 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-11 (V202 — Wave 111. NUCLEUS 13/13 meshed. Clippy zero
-warnings. 2,124 tests. Mesh health audit + version skew detection shipped.
-Discovery RPC deduplicated. Quality-weighted binomial variant caller live.
-All upstream Wave 108-111 reviewed — no breaking changes.)
+Last updated: 2026-06-12 (V203 — Wave 111 deep debt. Module splits: gonzales→3
+submodules, variant_caller stats extraction (873→604L), discover.rs macro
+consolidation. NUCLEUS 13/13 meshed. Clippy zero warnings. 2,124 tests.)
 
 ---
 
