@@ -10,12 +10,10 @@ use serde_json::{json, Value};
 use std::io::{BufRead, BufReader, Write as _};
 use std::os::unix::net::UnixStream;
 use std::path::Path;
-use std::time::Duration;
 
 use super::discover;
 use super::primal_names::{LOAMSPINE, NESTGATE, RHIZOCRYPT, SWEETGRASS};
-
-const HEALTH_PROBE_TIMEOUT: Duration = Duration::from_millis(500);
+use super::timeouts;
 
 // ── Trio Status ─────────────────────────────────────────────────────
 
@@ -409,8 +407,8 @@ fn try_primal_list(socket_path: &Path) -> Option<u64> {
 /// read one response line, parse as JSON. Returns `None` on any failure.
 fn probe_rpc(socket_path: &Path, request: &str) -> Option<Value> {
     let stream = UnixStream::connect(socket_path).ok()?;
-    stream.set_read_timeout(Some(HEALTH_PROBE_TIMEOUT)).ok()?;
-    stream.set_write_timeout(Some(HEALTH_PROBE_TIMEOUT)).ok()?;
+    stream.set_read_timeout(Some(timeouts::HEALTH_PROBE)).ok()?;
+    stream.set_write_timeout(Some(timeouts::HEALTH_PROBE)).ok()?;
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer.write_all(request.as_bytes()).ok()?;

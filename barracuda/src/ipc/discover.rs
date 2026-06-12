@@ -38,7 +38,6 @@ fn dead_cache() -> &'static Mutex<HashSet<PathBuf>> {
 #[must_use]
 pub fn socket_is_alive(path: &Path) -> bool {
     use std::os::unix::net::UnixStream;
-    use std::time::Duration;
 
     if !path.exists() {
         return false;
@@ -52,7 +51,7 @@ pub fn socket_is_alive(path: &Path) -> bool {
 
     let alive = UnixStream::connect(path)
         .and_then(|s| {
-            s.set_read_timeout(Some(Duration::from_millis(50)))?;
+            s.set_read_timeout(Some(super::timeouts::SOCKET_PROBE))?;
             Ok(s)
         })
         .is_ok();

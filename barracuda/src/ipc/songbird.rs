@@ -12,10 +12,11 @@
 //!
 //! # Discovery
 //!
-//! Socket path resolution:
+//! Socket path resolution (4-tier cascade):
 //! 1. `SONGBIRD_SOCKET` env var
-//! 2. `$XDG_RUNTIME_DIR/biomeos/songbird-{family_id}.sock`
-//! 3. `<temp_dir>/songbird-{family_id}.sock`
+//! 2. `$BIOMEOS_SOCKET_DIR/songbird-{family_id}.sock`
+//! 3. `$XDG_RUNTIME_DIR/biomeos/songbird-{family_id}.sock`
+//! 4. `<temp_dir>/biomeos/songbird-{family_id}.sock`
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
@@ -24,7 +25,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
+const HEARTBEAT_INTERVAL: Duration = super::timeouts::HEARTBEAT;
 const RPC_TIMEOUT: Duration = super::timeouts::DISCOVERY;
 
 /// Discover the Songbird Unix socket path.

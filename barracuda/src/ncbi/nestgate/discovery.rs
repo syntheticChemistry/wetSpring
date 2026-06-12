@@ -17,10 +17,11 @@ pub fn is_enabled() -> bool {
 
 /// Discover the `NestGate` Unix socket path.
 ///
-/// Capability-based discovery (no hardcoded absolute paths):
+/// Capability-based discovery (no hardcoded absolute paths), 4-tier cascade:
 /// 1. `NESTGATE_SOCKET` env var (explicit override)
-/// 2. `$XDG_RUNTIME_DIR/biomeos/nestgate-{family_id}.sock`
-/// 3. `<temp_dir>/nestgate-{family_id}.sock` (platform-agnostic fallback)
+/// 2. `$BIOMEOS_SOCKET_DIR/nestgate-{family_id}.sock`
+/// 3. `$XDG_RUNTIME_DIR/biomeos/nestgate-{family_id}.sock`
+/// 4. `<temp_dir>/biomeos/nestgate-{family_id}.sock` (platform-agnostic fallback)
 #[must_use]
 pub fn discover_socket() -> Option<PathBuf> {
     discover_primal_socket("NESTGATE_SOCKET", NESTGATE)
@@ -28,9 +29,11 @@ pub fn discover_socket() -> Option<PathBuf> {
 
 /// Discover the biomeOS Neural API socket for capability-based routing.
 ///
+/// 4-tier cascade:
 /// 1. `BIOMEOS_SOCKET` env var (explicit override)
-/// 2. `$XDG_RUNTIME_DIR/biomeos/biomeos-{family_id}.sock`
-/// 3. `<temp_dir>/biomeos-{family_id}.sock`
+/// 2. `$BIOMEOS_SOCKET_DIR/biomeos-{family_id}.sock`
+/// 3. `$XDG_RUNTIME_DIR/biomeos/biomeos-{family_id}.sock`
+/// 4. `<temp_dir>/biomeos/biomeos-{family_id}.sock`
 #[must_use]
 pub fn discover_biomeos_socket() -> Option<PathBuf> {
     discover_primal_socket("BIOMEOS_SOCKET", BIOMEOS)
@@ -97,6 +100,12 @@ fn resolve_primal_socket(
 /// Used when the `ipc` feature is not enabled so `ipc::discover` is unavailable.
 /// Also consumed by `visualization::ipc_push` for the same fallback path.
 /// Uses `FAMILY_ID` / `BIOMEOS_FAMILY_ID` for multi-instance parity with `ipc::discover`.
+///
+/// 4-tier cascade (matches `ipc::discover::discover_socket`):
+/// 1. Explicit env var
+/// 2. `BIOMEOS_SOCKET_DIR/{primal}-{family}.sock`
+/// 3. `$XDG_RUNTIME_DIR/biomeos/{primal}-{family}.sock`
+/// 4. `$TMPDIR/biomeos/{primal}-{family}.sock`
 #[cfg(not(feature = "ipc"))]
 pub(crate) fn discover_standalone(env_var: &str, primal: &str) -> Option<PathBuf> {
     if let Ok(path) = std::env::var(env_var) {
@@ -109,15 +118,23 @@ pub(crate) fn discover_standalone(env_var: &str, primal: &str) -> Option<PathBuf
     let fam = std::env::var("FAMILY_ID")
         .or_else(|_| std::env::var("BIOMEOS_FAMILY_ID"))
         .unwrap_or_else(|_| "default".to_string());
+    let sock_name = format!("{primal}-{fam}.sock");
 
-    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join(format!("biomeos/{primal}-{fam}.sock"));
+    if let Ok(dir) = std::env::var("BIOMEOS_SOCKET_DIR") {
+        let p = PathBuf::from(dir).join(&sock_name);
         if p.exists() {
             return Some(p);
         }
     }
 
-    let fallback = std::env::temp_dir().join(format!("{primal}-{fam}.sock"));
+    if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
+        let p = PathBuf::from(xdg).join("biomeos").join(&sock_name);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+
+    let fallback = std::env::temp_dir().join("biomeos").join(&sock_name);
     if fallback.exists() {
         return Some(fallback);
     }

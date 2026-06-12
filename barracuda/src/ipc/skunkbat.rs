@@ -12,11 +12,12 @@
 //! JSON-RPC 2.0, newline-delimited, over Unix domain socket.
 //! Methods: `audit.event`, `audit.forward`.
 //!
-//! # Socket discovery
+//! # Socket discovery (4-tier cascade)
 //!
 //! 1. `SKUNKBAT_SOCKET` env var
-//! 2. `$XDG_RUNTIME_DIR/biomeos/skunkbat-{family_id}.sock`
-//! 3. `<temp_dir>/skunkbat-{family_id}.sock`
+//! 2. `$BIOMEOS_SOCKET_DIR/skunkbat-{family_id}.sock`
+//! 3. `$XDG_RUNTIME_DIR/biomeos/skunkbat-{family_id}.sock`
+//! 4. `<temp_dir>/biomeos/skunkbat-{family_id}.sock`
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;

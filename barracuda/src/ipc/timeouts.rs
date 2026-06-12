@@ -13,8 +13,17 @@
 
 use std::time::Duration;
 
+/// Socket file liveness probe (connect + immediate drop).
+pub const SOCKET_PROBE: Duration = Duration::from_millis(50);
+
+/// Composition health probes (per-primal liveness check).
+pub const HEALTH_PROBE: Duration = Duration::from_millis(500);
+
 /// Songbird discovery and registration calls.
 pub const DISCOVERY: Duration = Duration::from_secs(5);
+
+/// Songbird heartbeat interval for background registration.
+pub const HEARTBEAT: Duration = Duration::from_secs(30);
 
 /// Standard JSON-RPC calls (provenance trio, general transport).
 pub const STANDARD_RPC: Duration = Duration::from_secs(10);
