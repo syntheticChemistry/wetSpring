@@ -21,6 +21,7 @@ pub mod s_bare_science;
 pub mod s_cross_atomic_pipeline;
 pub mod s_gonzales_provenance;
 pub mod s_manifest_ipc_parity;
+pub mod s_mesh_health;
 
 /// Build the complete scenario registry.
 #[must_use]
@@ -30,6 +31,7 @@ pub fn build_registry() -> ScenarioRegistry {
     r.register(s_manifest_ipc_parity::SCENARIO);
     r.register(s_cross_atomic_pipeline::SCENARIO);
     r.register(s_gonzales_provenance::SCENARIO);
+    r.register(s_mesh_health::SCENARIO);
     super::experiments::register_all(&mut r);
     r
 }

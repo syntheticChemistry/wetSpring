@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V203:** Wave 111 deep debt — module splits + macro consolidation. `gonzales.rs` split into 3 domain-family submodules (pharmacology, tissue, anderson_sweeps). `discover.rs` 8 wrapper functions replaced by `primal_discover_fn!` macro. `variant_caller.rs` 873L→604L via stats submodule extraction. **Clippy zero warnings** (all feature combinations). 2,124 tests (0 failures). 345 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V204:** Wave 111 Stream 6 — mesh health wired into certify + scenario. `composition.mesh_health` (13-primal probe + version skew) integrated as Layer 3b of `wetspring certify`. New `mesh-health` validation scenario (Tier 2). Feature-gated (`barracuda-lib`) with skip fallback. **Clippy zero warnings** (all feature combinations). 2,124 tests (0 failures). 346 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 
@@ -23,11 +23,11 @@ evolution pipeline.
 ## Technical Facts
 
 - **Language:** 100% Rust, zero C dependencies (wgpu optional for GPU)
-- **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 345 scenarios)
+- **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 346 scenarios)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 52 niche capabilities, 59 consumed (33 barraCuda canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 47 dispatch methods, 22 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
 - **Tests:** 2,124 workspace (0 failed)
-- **Validation checks:** 5,967+ across 345 scenarios (UniBin)
+- **Validation checks:** 5,967+ across 346 scenarios (UniBin)
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), `wetspring certify` (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
 - **MSRV:** 1.87 (Rust edition 2024)
@@ -70,14 +70,14 @@ evolution pipeline.
 
 ```
           ┌──────────────────────────────────────────────────┐
-          │  wetspring UniBin (1 binary, 345 scenarios)      │
+          │  wetspring UniBin (1 binary, 346 scenarios)      │
           │  certify · validate · benchmark · serve · status │
           └──────────────────────────────────────────────────┘
 
 Tier 1: Python baseline → Rust CPU parity → GPU validation
            (55 scripts)    (1,962 tests)     (44 GPU modules)
 Tier 2: UniBin scenarios → NUCLEUS composition patterns
-           (345 scenarios)  (136/136 proto-nucleate, 7 deploy graphs)
+           (346 scenarios)  (136/136 proto-nucleate, 7 deploy graphs)
 Tier 3: Composition      → IPC parity → Niche gate
            (L2+L3)         (Exp401)     (Exp402)
 Tier 4: Primal proof     → Live NUCLEUS IPC (Exp403) → ecoBin harvest

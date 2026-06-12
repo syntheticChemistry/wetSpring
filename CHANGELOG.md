@@ -3,6 +3,14 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V204] — 2026-06-12
+
+### Wave 111 — Stream 6: Mesh Health in Certify + Scenario
+
+- **`wetspring certify` Layer 3b — NUCLEUS Mesh Health Audit:** Wired `composition_health::probe_mesh_health()` into the certification pipeline as Layer 3b, immediately after NUCLEUS liveness (Layer 3). Probes all 13 NUCLEUS primals individually, reporting per-primal liveness with version and uptime. Checks aggregate alive count >= 1 and flags version skew (distinct versions across live primals). Feature-gated behind `barracuda-lib` — skips gracefully without it.
+- **`mesh-health` validation scenario:** New Tier 2 scenario (`s_mesh_health.rs`) registered in `build_registry()`. Reuses `validate_mesh_health()` so both `wetspring certify` and `wetspring validate` exercise the same mesh audit. 346 total scenarios.
+- **Build gate:** clippy zero warnings (all feature combinations including `guidestone+barracuda-lib+ipc`), 2,124 tests (0 failures).
+
 ## [V203] — 2026-06-12
 
 ### Wave 111 — Deep Debt: Module Splits + Macro Consolidation

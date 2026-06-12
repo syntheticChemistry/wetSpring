@@ -13,6 +13,7 @@
 //! | 1 | Tolerance Provenance | Nothing |
 //! | 2 | Checksum Verification | Nothing |
 //! | 3 | NUCLEUS Liveness | Deployed primals |
+//! | 3b | NUCLEUS Mesh Health Audit | Deployed primals |
 //! | 4 | Manifest IPC Parity | Live barraCuda |
 //! | 5 | Domain Science IPC | Live barraCuda |
 //! | 6 | Cross-Atomic Pipeline | Live NUCLEUS |
@@ -79,6 +80,10 @@ pub fn certify(max_layer: u8) -> ValidationResult {
         v.finish();
         return v;
     }
+
+    // Layer 3b: Full mesh health audit + version skew detection
+    v.section("Layer 3b: NUCLEUS Mesh Health Audit (13/13 + version skew)");
+    health::validate_mesh_health(&mut v);
 
     if max_layer <= 3 {
         v.finish();

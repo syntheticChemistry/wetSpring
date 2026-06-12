@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Layers 3–6: NUCLEUS health and IPC parity certification.
 //!
+//! - **Mesh**: Full 13-primal health audit + version skew detection (Layer 3b)
 //! - **N1**: Manifest IPC parity (15 validation capabilities)
 //! - **N2**: Extended domain science IPC
 //! - **N3**: Cross-atomic pipeline (hash → store → retrieve → verify)
@@ -10,6 +11,93 @@ use primalspring::tolerances as ps_tol;
 use primalspring::validation::ValidationResult;
 
 use crate::tolerances;
+
+/// NUCLEUS mesh health audit — probes all 13 primals for liveness + version skew.
+///
+/// Uses `composition_health::probe_mesh_health()` (same engine as the
+/// `composition.mesh_health` IPC endpoint) and translates the result
+/// into certification checks:
+/// - Per-primal discovery and liveness (skip when absent)
+/// - Aggregate alive count >= threshold
+/// - Version skew detection (informational — not a hard fail, since
+///   primals are heterogeneous by design and may carry different versions)
+///
+/// Requires the `barracuda-lib` feature for `composition_health` access.
+/// Without it, all mesh checks are skipped with a clear reason.
+pub fn validate_mesh_health(v: &mut ValidationResult) {
+    #[cfg(feature = "barracuda-lib")]
+    validate_mesh_health_inner(v);
+
+    #[cfg(not(feature = "barracuda-lib"))]
+    {
+        v.check_skip(
+            "mesh.health_audit",
+            "barracuda-lib feature not enabled — mesh probing unavailable",
+        );
+    }
+}
+
+#[cfg(feature = "barracuda-lib")]
+fn validate_mesh_health_inner(v: &mut ValidationResult) {
+    use crate::ipc::composition_health;
+
+    let audit = composition_health::probe_mesh_health();
+
+    for info in &audit.primals {
+        let label = format!("mesh.{}.liveness", info.primal);
+        match info.status {
+            composition_health::ComponentStatus::Live => {
+                let detail = match (&info.version, info.uptime_secs) {
+                    (Some(ver), Some(up)) => format!("alive — v{ver}, uptime {up:.0}s"),
+                    (Some(ver), None) => format!("alive — v{ver}"),
+                    _ => "alive".to_string(),
+                };
+                v.check_bool(&label, true, &detail);
+            }
+            composition_health::ComponentStatus::Discovered => {
+                v.check_bool(
+                    &label,
+                    false,
+                    "socket discovered but health probe failed",
+                );
+            }
+            composition_health::ComponentStatus::Absent => {
+                v.check_skip(&label, "socket not found (primal not deployed)");
+            }
+        }
+    }
+
+    v.check_bool(
+        "mesh.alive_count >= 1",
+        audit.alive_count >= 1,
+        &format!(
+            "{}/{} alive, {}/{} discovered",
+            audit.alive_count, audit.total_probed, audit.discovered_count, audit.total_probed
+        ),
+    );
+
+    if audit.distinct_versions.len() > 1 {
+        v.check_bool(
+            "mesh.version_skew",
+            false,
+            &format!(
+                "version skew detected: {} distinct versions — {}",
+                audit.distinct_versions.len(),
+                audit.distinct_versions.join(", ")
+            ),
+        );
+    } else {
+        let ver_str = audit
+            .distinct_versions
+            .first()
+            .map_or("(none alive)", String::as_str);
+        v.check_bool(
+            "mesh.version_skew",
+            true,
+            &format!("no skew — uniform version: {ver_str}"),
+        );
+    }
+}
 
 /// N1 — Manifest IPC Parity: validates the 15 downstream manifest capabilities.
 pub fn validate_manifest_ipc(ctx: &mut CompositionContext, v: &mut ValidationResult) {
