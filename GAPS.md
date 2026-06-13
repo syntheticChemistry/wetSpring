@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-12 (V203 — Wave 111 deep debt. Module splits: gonzales→3
-submodules, variant_caller stats extraction (873→604L), discover.rs macro
-consolidation. NUCLEUS 13/13 meshed. Clippy zero warnings. 2,124 tests.)
+Last updated: 2026-06-13 (V206 — MAPQ calibration module: simulated read generator,
+training pipeline, MapqModel lookup table, wire into compute_mapq. WS-11 variant caller
+parity items 5/8 checked. 2,160 tests, clippy zero warnings.)
 
 ---
 
@@ -294,12 +294,13 @@ Interrupt/restart braid cycle verified — deterministic reproduction confirmed
 
 **Remaining work:**
 - [ ] Re-run Barrick 2009 with v3 pipeline to measure updated parity
-- [ ] MAPQ calibration with simulated reads (known-truth training set)
+- [x] MAPQ calibration with simulated reads (known-truth training set) — V206 `mapq_calibration` module
 - [x] Quality-weighted binomial model — V201 `binomial_quality()` (CPU, default on)
+- [x] MAPQ-aware binomial quality weighting — V205 combined error model
 - [ ] Quality-weighted binomial model in SnpCallingF64 GPU shader (future)
 - [ ] Mapper-level deduplication of repetitive region alignments
-- [ ] Per-generation frequency threshold calibration
-- [ ] Cross-validate against breseq polymorphism mode
+- [x] Per-generation frequency threshold calibration — V205 `thresholds` module
+- [x] Cross-validate against breseq polymorphism mode — V205 `cross_validation` module
 
 Parity evolution tracked in `provenance/braids/barrick_2009_calibration_v2.json`.
 

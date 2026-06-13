@@ -3,6 +3,19 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V206] — 2026-06-13
+
+### WS-11: MAPQ Calibration Module — Training Set + Model Wiring
+
+- **`mapq_calibration` module:** Complete MAPQ calibration pipeline:
+  - `simulate_reads()`: Generates reads at known reference positions with controlled error rates (xorshift64 PRNG for reproducibility).
+  - `calibrate()`: Full pipeline — simulate → map → compare → build model. Returns `MapqModel` + `CalibrationStats`.
+  - `MapqModel`: Lookup table (score_gap → MAPQ) built from empirical P(wrong) per bin. Phred-scaled: MAPQ = -10×log10(P(wrong)). Falls back to linear model for gaps without training data.
+  - `CalibrationStats`: Accuracy, mapping rate, sample counts.
+- **`compute_mapq` wired to calibrated model:** `MapperConfig` now carries an optional `MapqModel`. When present, `compute_mapq` uses the calibrated lookup table instead of the hardcoded linear formula (`gap * 6`). Backward compatible — `None` uses the old behavior.
+- **GAPS.md updated:** WS-11 variant caller parity checklist now 5/8 items completed (MAPQ calibration, MAPQ-aware binomial, per-gen thresholds, cross-validation, base binomial model).
+- **Build gate:** clippy zero warnings, 2,160 tests (0 failures, +12 from V205).
+
 ## [V205] — 2026-06-12
 
 ### Wave 111 — WS-11: Binomial Model Evolution (MAPQ + Thresholds + Cross-Validation)

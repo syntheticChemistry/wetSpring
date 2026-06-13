@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V205:** WS-11 binomial model evolution — MAPQ-aware quality weighting (combined error model), per-generation LTEE frequency thresholds (exponential saturation), breseq polymorphism cross-validation engine (concordance stats: sensitivity/precision/F1). **Clippy zero warnings** (all feature combinations). 2,148 tests (0 failures). 346 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V206:** WS-11 MAPQ calibration — simulated read generator, training pipeline (sim→map→compare→model), `MapqModel` lookup table wired into `compute_mapq`. Completes the MAPQ chain: calibrated MAPQ → pileup mapq_sums → MAPQ-aware binomial quality. **Clippy zero warnings** (all feature combinations). 2,160 tests (0 failures). 346 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 

@@ -162,7 +162,7 @@ fn mapq_unique_mapping() {
             target_start: 0,
         },
     }];
-    assert_eq!(compute_mapq(&candidates), 60);
+    assert_eq!(compute_mapq(&candidates, None), 60);
 }
 
 #[test]
@@ -191,7 +191,7 @@ fn mapq_ambiguous_mapping() {
             },
         },
     ];
-    assert_eq!(compute_mapq(&candidates), 0);
+    assert_eq!(compute_mapq(&candidates, None), 0);
 }
 
 #[test]
@@ -220,7 +220,7 @@ fn mapq_differentiated() {
             },
         },
     ];
-    let mapq = compute_mapq(&candidates);
+    let mapq = compute_mapq(&candidates, None);
     assert!(mapq > 0);
     assert!(mapq <= 60);
 }

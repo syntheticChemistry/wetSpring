@@ -12,6 +12,7 @@
 
 #[cfg(test)]
 mod tests;
+pub mod mapq_calibration;
 
 use crate::bio::alignment::{self, AlignmentResult, ScoringParams};
 use crate::bio::ref_index::FmIndex;
@@ -37,6 +38,9 @@ pub struct MapperConfig {
     pub min_score: i32,
     /// Smith-Waterman scoring parameters.
     pub scoring: ScoringParams,
+    /// Calibrated MAPQ model. When `Some`, replaces the default linear formula.
+    /// Built via [`mapq_calibration::calibrate`].
+    pub mapq_model: Option<mapq_calibration::MapqModel>,
 }
 
 impl Default for MapperConfig {
@@ -47,6 +51,7 @@ impl Default for MapperConfig {
             extension_window: 50,
             min_score: 30,
             scoring: ScoringParams::default(),
+            mapq_model: None,
         }
     }
 }
@@ -127,7 +132,7 @@ pub fn map_read(
     candidates.sort_by_key(|c| std::cmp::Reverse(c.score));
 
     let best = &candidates[0];
-    let mapq = compute_mapq(&candidates);
+    let mapq = compute_mapq(&candidates, config.mapq_model.as_ref());
     let cigar = alignment_to_cigar(&best.alignment);
 
     #[expect(clippy::cast_possible_truncation, reason = "MAPQ fits in u8")]
@@ -307,7 +312,7 @@ fn map_read_gpu(
     candidates.sort_by_key(|c| std::cmp::Reverse(c.score));
 
     let best = &candidates[0];
-    let mapq = compute_mapq(&candidates);
+    let mapq = compute_mapq(&candidates, config.mapq_model.as_ref());
     let cigar = alignment_to_cigar(&best.alignment);
 
     #[expect(clippy::cast_possible_truncation, reason = "MAPQ fits in u8")]
@@ -383,7 +388,7 @@ fn alignment_to_cigar(alignment: &AlignmentResult) -> Vec<CigarOp> {
 /// Gap-based: MAPQ = min(60, gap * 6). A gap of 10 alignment score points
 /// yields MAPQ 60 (confident unique placement). Gap of 0 yields MAPQ 0
 /// (ambiguous). Gap of 2 yields MAPQ 12 (passes typical `min_mapq=10` filter).
-fn compute_mapq(candidates: &[MappingCandidate]) -> u32 {
+fn compute_mapq(candidates: &[MappingCandidate], model: Option<&mapq_calibration::MapqModel>) -> u32 {
     if candidates.len() < 2 {
         return 60;
     }
@@ -400,7 +405,11 @@ fn compute_mapq(candidates: &[MappingCandidate]) -> u32 {
     }
 
     let gap = u32::try_from((best - second).max(0)).unwrap_or(u32::MAX);
-    gap.saturating_mul(6).min(60)
+
+    model.map_or_else(
+        || gap.saturating_mul(6).min(60),
+        |m| u32::from(m.lookup(gap)),
+    )
 }
 
 fn unmapped_record(read_id: &str, read_seq: &[u8], read_qual: &[u8]) -> SamRecord {
