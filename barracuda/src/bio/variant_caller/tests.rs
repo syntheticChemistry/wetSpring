@@ -353,3 +353,68 @@ fn binomial_log_sf_extreme() {
     let p = binomial_log_sf(10, 10, 0.001);
     assert!(p < -50.0, "P(X>=10|n=10,p=0.001) should be near-zero: {p}");
 }
+
+// ── WS-11: MAPQ-aware binomial quality tests ────────────────────
+
+#[test]
+fn binomial_quality_mapq_reduces_quality_for_low_mapq() {
+    // Same base quality (Q30) but low MAPQ (Q10 = 10% mapping error)
+    let mut col = make_snp_column(0, 5, 45, 0, 3); // 90% alt at Q30
+    // Add low MAPQ to alt bases: Q10 mapping quality
+    col.mapq_sums[3] = 45 * 10; // alt bases have MAPQ 10
+
+    let q_low_mapq = binomial_quality(&col, 3, 45);
+
+    // Compare against no MAPQ (zero mapq_sums = fallback to base-only)
+    let mut col_no_mapq = make_snp_column(0, 5, 45, 0, 3);
+    col_no_mapq.mapq_sums = [0; 5]; // explicit: no MAPQ data
+    let q_no_mapq = binomial_quality(&col_no_mapq, 3, 45);
+
+    assert!(
+        q_low_mapq < q_no_mapq,
+        "low MAPQ should reduce quality: {q_low_mapq} vs {q_no_mapq} (base-only)"
+    );
+}
+
+#[test]
+fn binomial_quality_mapq_high_mapq_negligible_effect() {
+    // Q30 base + Q60 MAPQ: mapping error is negligible (1e-6)
+    let mut col = make_snp_column(0, 5, 45, 0, 3);
+    col.mapq_sums[3] = 45 * 60; // alt bases have MAPQ 60
+
+    let q_high_mapq = binomial_quality(&col, 3, 45);
+
+    let mut col_no_mapq = make_snp_column(0, 5, 45, 0, 3);
+    col_no_mapq.mapq_sums = [0; 5];
+    let q_no_mapq = binomial_quality(&col_no_mapq, 3, 45);
+
+    // High MAPQ should barely change the quality (within ~1%)
+    let ratio = q_high_mapq / q_no_mapq;
+    assert!(
+        ratio > 0.95,
+        "high MAPQ should have negligible effect: ratio={ratio:.4} ({q_high_mapq} vs {q_no_mapq})"
+    );
+}
+
+#[test]
+fn binomial_quality_mapq_zero_suppresses_with_low_mapq() {
+    // Q30 base quality but MAPQ 0 (completely unconfident mapping)
+    // Combined error ≈ 0.001 + 1.0 - 0.001 = ~1.0
+    let mut col = make_snp_column(0, 50, 50, 0, 3);
+    // MAPQ 0 means mapq_sums = 0 which triggers the fallback to base-only.
+    // Use MAPQ 1 to test very-low-MAPQ behavior: P(map_err) = 10^(-0.1) ≈ 0.79
+    col.mapq_sums[3] = 50; // 50 reads × MAPQ 1
+
+    let q = binomial_quality(&col, 3, 50);
+    // With P(map_err) ≈ 0.79, combined P(err) is very high → quality near zero
+    assert!(q < 5.0, "MAPQ 1 should suppress variant quality: {q}");
+}
+
+#[test]
+fn pileup_column_mean_mapq() {
+    let mut col = PileupColumn::default();
+    col.base_counts[2] = 10; // 10 G bases
+    col.mapq_sums[2] = 10 * 40; // mean MAPQ 40
+    assert!((col.mean_mapq(2) - 40.0).abs() < f64::EPSILON);
+    assert!((col.mean_mapq(0) - 0.0).abs() < f64::EPSILON); // no A bases
+}

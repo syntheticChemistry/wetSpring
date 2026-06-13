@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V204:** Wave 111 Stream 6 — mesh health wired into certify + scenario. `composition.mesh_health` (13-primal probe + version skew) integrated as Layer 3b of `wetspring certify`. New `mesh-health` validation scenario (Tier 2). Feature-gated (`barracuda-lib`) with skip fallback. **Clippy zero warnings** (all feature combinations). 2,124 tests (0 failures). 346 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
+**Current release — V205:** WS-11 binomial model evolution — MAPQ-aware quality weighting (combined error model), per-generation LTEE frequency thresholds (exponential saturation), breseq polymorphism cross-validation engine (concordance stats: sensitivity/precision/F1). **Clippy zero warnings** (all feature combinations). 2,148 tests (0 failures). 346 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. 0 PG gaps open.
 
 ## Role in the Ecosystem
 

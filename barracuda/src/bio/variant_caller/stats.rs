@@ -107,8 +107,15 @@ pub(super) fn variant_quality(alt_count: u32, total_depth: u32, _frequency: f64)
 ///
 /// Computes the one-sided binomial probability of seeing at least `k`
 /// variant-supporting reads out of `n` total, where the null hypothesis
-/// error rate `p_err` is derived from the **quality-weighted** mean Phred
-/// score of the alternative allele.
+/// error rate `p_err` is a **combined error** from base quality (Phred)
+/// and mapping quality (MAPQ):
+///
+///   P(error) = P_base + P_map - P_base × P_map
+///
+/// This follows breseq's approach: a non-reference base can arise from
+/// either a sequencing error (base quality) OR a mismapped read (MAPQ).
+/// When MAPQ data is unavailable (mapq_sums == 0), falls back to base
+/// quality only (pre-V205 behavior).
 ///
 /// Returns a Phred-scaled quality score.
 #[expect(clippy::cast_precision_loss, reason = "quality sums bounded by coverage")]
@@ -123,7 +130,18 @@ pub(super) fn binomial_quality(col: &PileupColumn, alt_idx: usize, alt_count: u3
         0.0
     };
 
-    let p_err = 10.0_f64.powf(-alt_mean_q / 10.0);
+    let p_base_err = 10.0_f64.powf(-alt_mean_q / 10.0);
+
+    // Combined error: incorporate MAPQ if available
+    let p_err = if col.mapq_sums[alt_idx] > 0 {
+        let alt_mean_mapq = col.mean_mapq(alt_idx);
+        let p_map_err = 10.0_f64.powf(-alt_mean_mapq / 10.0);
+        // P(error) = 1 - (1-P_base)(1-P_map) = P_base + P_map - P_base*P_map
+        p_base_err + p_map_err - p_base_err * p_map_err
+    } else {
+        p_base_err
+    };
+
     if p_err >= 1.0 || p_err <= 0.0 {
         return 0.0;
     }

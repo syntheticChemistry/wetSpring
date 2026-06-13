@@ -3,6 +3,15 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V205] — 2026-06-12
+
+### Wave 111 — WS-11: Binomial Model Evolution (MAPQ + Thresholds + Cross-Validation)
+
+- **MAPQ-aware quality weighting:** Extended `PileupColumn` with per-base `mapq_sums` tracking. The binomial quality model now computes a combined error rate: P(error) = P(base) + P(map) - P(base)×P(map), following breseq's approach. Reads with low MAPQ contribute proportionally less evidence to variant calls. Falls back to base-only model when MAPQ data is absent (backward compatible). +6 tests.
+- **Per-generation frequency thresholds (`thresholds` module):** Implements LTEE-specific exponential saturation model for polymorphism detection: f_min(g) = floor + (ceiling - floor)×(1 - e^(-g/τ)). Default parameters: floor=5%, ceiling=20%, τ=10,000 generations. Consensus threshold = complement. Quality threshold scales similarly. `LteeThresholds::apply_to()` overrides `CallerConfig`. +9 tests.
+- **breseq cross-validation (`cross_validation` module):** Concordance engine comparing sovereign variant calls against breseq GD reference sets. Computes sensitivity, precision, F1 score with per-type breakdown (SNP/DEL/INS). Position window tolerance for coordinate differences. `config_for_generation()` helper produces generation-appropriate configs. +9 tests.
+- **Build gate:** clippy zero warnings, 2,148 tests (0 failures, +24 from V204).
+
 ## [V204] — 2026-06-12
 
 ### Wave 111 — Stream 6: Mesh Health in Certify + Scenario

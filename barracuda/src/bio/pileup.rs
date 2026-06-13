@@ -34,6 +34,9 @@ pub struct PileupColumn {
     pub base_counts: [u32; 5],
     /// Sum of quality scores per base: A, C, G, T, N.
     pub quality_sums: [u64; 5],
+    /// Sum of mapping quality scores per base: A, C, G, T, N.
+    /// Used for MAPQ-aware variant quality weighting (WS-11).
+    pub mapq_sums: [u64; 5],
     /// Forward strand depth.
     pub forward_depth: u32,
     /// Reverse strand depth.
@@ -89,6 +92,23 @@ impl PileupColumn {
             return 0.5;
         }
         f64::from(self.forward_depth) / f64::from(self.depth)
+    }
+
+    /// Mean mapping quality for a specific base index.
+    ///
+    /// Returns the average MAPQ of reads contributing base `idx` at this
+    /// position. Used by the MAPQ-aware binomial model (WS-11) to compute
+    /// combined error probability (base error + mapping error).
+    #[must_use]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "Precision: mapq sums bounded by coverage"
+    )]
+    pub fn mean_mapq(&self, base_idx: usize) -> f64 {
+        if self.base_counts[base_idx] == 0 {
+            return 0.0;
+        }
+        self.mapq_sums[base_idx] as f64 / f64::from(self.base_counts[base_idx])
     }
 }
 
@@ -193,6 +213,7 @@ pub fn generate_pileup_filtered(
                             col.depth += 1;
                             col.base_counts[idx] += 1;
                             col.quality_sums[idx] += u64::from(qual);
+                            col.mapq_sums[idx] += u64::from(record.mapq);
                             if is_reverse {
                                 col.reverse_depth += 1;
                             } else {

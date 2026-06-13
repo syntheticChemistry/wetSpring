@@ -175,3 +175,33 @@ fn coverage_stats_empty() {
     assert_eq!(stats.covered_positions, 0);
     assert!(stats.mean_depth.abs() < 1e-10);
 }
+
+#[test]
+fn mapq_sums_accumulated_during_pileup() {
+    let mut r1 = simple_record(1, b"ACGT", 4);
+    r1.mapq = 40;
+    let mut r2 = simple_record(1, b"ACGT", 4);
+    r2.mapq = 20;
+
+    let pileup = generate_pileup(&[r1, r2], 10);
+    assert_eq!(pileup.len(), 4);
+    // Position 0: A from both reads, MAPQ 40 + 20 = 60
+    assert_eq!(pileup[0].mapq_sums[0], 60);
+    assert_eq!(pileup[0].base_counts[0], 2);
+    assert!((pileup[0].mean_mapq(0) - 30.0).abs() < 1e-10);
+}
+
+#[test]
+fn mapq_sums_per_base_not_per_position() {
+    // Two reads at same position but contributing different bases
+    let r1 = simple_record(1, b"ACGT", 4); // mapq=60
+    let mut r2 = simple_record(1, b"TCGT", 4); // mapq=60, differs at pos 0
+    r2.mapq = 10;
+
+    let pileup = generate_pileup(&[r1, r2], 10);
+    // Position 0: A from r1 (mapq 60), T from r2 (mapq 10)
+    assert_eq!(pileup[0].mapq_sums[0], 60); // A: only r1
+    assert_eq!(pileup[0].mapq_sums[3], 10); // T: only r2
+    assert!((pileup[0].mean_mapq(0) - 60.0).abs() < 1e-10); // A mean
+    assert!((pileup[0].mean_mapq(3) - 10.0).abs() < 1e-10); // T mean
+}

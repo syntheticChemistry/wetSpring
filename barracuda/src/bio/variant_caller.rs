@@ -19,9 +19,12 @@
 //! - **INS**: insertion (extra bases relative to reference)
 //!
 //! Statistical quality models (binomial, per-base Phred, legacy) live
-//! in the [`stats`] submodule.
+//! in the [`stats`] submodule. Generation-aware frequency thresholds
+//! for LTEE variant calling live in [`thresholds`].
 
 mod stats;
+pub mod thresholds;
+pub mod cross_validation;
 #[cfg(test)]
 mod tests;
 
