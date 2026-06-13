@@ -4,8 +4,8 @@ Gaps discovered during primal composition validation (Exp400 and IPC
 integration). Each gap is handed back to primalSpring for ecosystem-wide
 refinement per `NUCLEUS_SPRING_ALIGNMENT.md` feedback protocol.
 
-Last updated: 2026-06-03 (V195 — Wave 76. NUCLEUS 10/13 health on southGate.
-PG-02/PG-04 VERIFIED. 2,089 tests. 45 dispatch methods, 59 consumed capabilities,
+Last updated: 2026-06-13 (V206 — Wave 111. NUCLEUS 13/13 health on southGate.
+PG-02/PG-04 VERIFIED. 2,160 tests. 47 dispatch methods, 59 consumed capabilities,
 registry 458. biomeOS 1725 capabilities. Clippy zero warnings.)
 
 ---

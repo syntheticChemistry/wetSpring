@@ -1,13 +1,39 @@
 # Control Experiment Status — wetSpring
 
-**Last updated:** V195 (2026-06-03)
-**Tests:** 2,089 workspace (0 failed, 3 ignored)
-**UniBin scenarios:** 345 (318 validation + 23 benchmark + 4 composition)
-**Live NUCLEUS:** southGate — 13/13 processes (10/13 health-responding, 2 BTSP-gated, 1 coralReef socket rename)
+**Last updated:** V206 (2026-06-13)
+**Tests:** 2,160 workspace (0 failed, 3 ignored)
+**UniBin scenarios:** 346 (319 validation + 23 benchmark + 4 composition)
+**Live NUCLEUS:** southGate — 13/13 processes (13/13 health-responding)
 **Experiment specs:** 386 indexed (385 completed, 1 in progress)
-**Clippy:** 0 warnings (production code; experiments suppressed at module level)
-**Dispatch methods:** 45 (incl. lifecycle.status + 6 bonding.*)
+**Clippy:** 0 warnings (pedantic + nursery, all feature combinations)
+**Dispatch methods:** 47 (incl. lifecycle.status + 6 bonding.* + composition.mesh_health)
 **Binary discovery:** plasmidBin-only (v2026.05.28, Wave 60 eukaryotic)
+
+## V206 Wave 111 — WS-11: MAPQ Calibration Module
+
+- **MAPQ calibration pipeline:** `mapq_calibration` module — simulated read generator (xorshift64), training pipeline (sim→map→compare→model), `MapqModel` lookup table (Phred-scaled), wired into `compute_mapq` via `MapperConfig.mapq_model`.
+- **Full MAPQ chain complete:** calibrate() → MapqModel → compute_mapq → pileup mapq_sums → binomial_quality combined error model.
+- **WS-11 variant caller parity:** 5/8 items complete (MAPQ calibration, MAPQ-aware binomial, per-gen thresholds, cross-validation, base binomial).
+- **+12 tests** from calibration module (2,148→2,160).
+
+## V205 Wave 111 — WS-11: Binomial Model Evolution
+
+- **MAPQ-aware quality weighting:** Combined error model P(err) = P_base + P_map - P_base×P_map.
+- **Per-generation LTEE thresholds:** Exponential saturation model (`LteeThresholds`).
+- **breseq cross-validation:** Concordance stats (sensitivity/precision/F1) with per-type breakdown.
+- **+24 tests** (2,124→2,148).
+
+## V204 Wave 111 — Stream 6: Mesh Health in Certify + Scenario
+
+- **`wetspring certify` Layer 3b:** NUCLEUS mesh health audit (13/13 + version skew).
+- **`mesh-health` validation scenario:** Tier 2, registered in build_registry().
+- **Feature-gated:** `barracuda-lib` with skip fallback.
+
+## V203 Wave 111 — Deep Debt: Module Splits + Macro Consolidation
+
+- **`gonzales.rs` → `gonzales/` submodule:** 586L split into 3 domain files.
+- **`discover.rs` macro:** 8 wrappers → `primal_discover_fn!` macro (70L→20L).
+- **`variant_caller/stats.rs`:** 267L pure-math extracted (873L→604L, 31% reduction).
 
 ## V195 Wave 76 — Deep Debt: Architecture Evolution
 

@@ -8,11 +8,11 @@ against Rust implementations, then promotes to GPU acceleration via
 ```
                         ┌──────────────────────────────────┐
                         │  wetspring (UniBin — 1 binary)   │
-                        │  345 scenarios (318+23+4 comp)   │
+                        │  346 scenarios (319+23+4 comp)   │
                         │  Build: 1m44s (was 25min/349 bins)│
                         └──────────────────────────────────┘
 
-  wetspring certify      — Layered certification (L0–L6)
+  wetspring certify      — Layered certification (L0–L6 + 3b mesh)
   wetspring validate     — Two-tier scenario validation (--scenario, --track, --tier)
   wetspring benchmark    — Performance benchmarks
   wetspring serve        — JSON-RPC IPC server (--socket, --port, --family-id)
@@ -22,11 +22,11 @@ against Rust implementations, then promotes to GPU acceleration via
 
 | | |
 |---|---|
-| **Tests** | 2,124 workspace (0 failed) |
-| **Validation checks** | 5,967+ across 345 UniBin scenarios |
+| **Tests** | 2,160 workspace (0 failed) |
+| **Validation checks** | 5,967+ across 346 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
-| **IPC capabilities** | 51 niche, 59 consumed (33 canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 46 dispatch, 22 domains |
+| **IPC capabilities** | 52 niche, 59 consumed (33 canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 47 dispatch, 22 domains |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V199:** Wave 107 cross-subnet mesh. Transport-aware capability discovery (`discover_transport_by_capability`) bridges UDS and TCP for cross-gate resolution. `resolve_transport_via_songbird` supports Phase 2 M1 structured endpoints + legacy fallback. southGate at `192.168.4.29/22` — cross-subnet mesh ready. **Clippy zero warnings** (all feature combinations). 2,100 tests, 0 failures. Registry 458, 51 niche, 59 consumed, 46 dispatch, 22 domains. **2 gaps active (WS-9 L3, WS-11 calibration). 0 PG gaps open (22 resolved/closed).**
+**Current release — V206:** WS-11 MAPQ calibration — simulated read generator, training pipeline, MapqModel lookup table wired into compute_mapq. Full MAPQ chain: calibrate() → MapqModel → pileup mapq_sums → binomial_quality combined error model. Per-generation LTEE thresholds + breseq cross-validation engine. **Clippy zero warnings**. 2,160 tests, 0 failures. 346 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. **WS-11 5/8 parity items complete. 0 PG gaps open.**
 
 ---
 

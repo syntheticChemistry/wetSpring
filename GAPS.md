@@ -224,8 +224,8 @@ L1 (breseq 0.40.1) vs L2 (sovereign Rust) comparison.
 
 **Remaining:**
 - L2 vs L3 (local vs IPC-composed) — requires live trio
-- Position-level matching with ±5bp window tolerance
-- Adaptive frequency threshold per generation
+- ~~Position-level matching with ±5bp window tolerance~~ DONE (`compare_calls_windowed`)
+- ~~Adaptive frequency threshold per generation~~ DONE (V205 `thresholds` module)
 - lithoSpore `expected_values.json` contract for Barrick 2009
 
 ---
