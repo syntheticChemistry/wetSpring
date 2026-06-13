@@ -105,6 +105,8 @@ pub mod timeseries;
 #[cfg(feature = "ipc")]
 pub mod transport;
 
+pub mod ribocipher;
+
 #[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub use server::Server;
 

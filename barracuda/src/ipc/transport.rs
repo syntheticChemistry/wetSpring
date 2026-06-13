@@ -38,6 +38,9 @@ pub fn unix_jsonrpc_line(socket: &Path, request_line: &str) -> Result<String, St
         .set_write_timeout(Some(UNIX_JSONRPC_TIMEOUT))
         .map_err(|e| format!("set write timeout: {e}"))?;
 
+    super::ribocipher::send_clear_signal(&stream)
+        .map_err(|e| format!("riboCipher signal: {e}"))?;
+
     let mut writer = std::io::BufWriter::new(&stream);
     writer
         .write_all(request_line.as_bytes())
@@ -83,6 +86,9 @@ pub fn tcp_jsonrpc_line(addr: &str, request_line: &str) -> Result<String, String
     stream
         .set_write_timeout(Some(UNIX_JSONRPC_TIMEOUT))
         .map_err(|e| format!("set write timeout: {e}"))?;
+
+    super::ribocipher::send_clear_signal_tcp(&stream)
+        .map_err(|e| format!("riboCipher signal: {e}"))?;
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer

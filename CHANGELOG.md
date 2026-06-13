@@ -5,12 +5,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [V207] — 2026-06-13
 
-### WS-11: Post-Alignment Candidate Deduplication for Repetitive Regions
+### Wave 112: riboCipher Transport Signal + Post-Alignment Dedup (WS-11)
 
-- **`dedup_candidates` function:** Post-alignment deduplication merges mapping candidates that land within a configurable distance (default 50bp) after Smith-Waterman extension. In repetitive regions, different seed entry points can produce multiple SW alignments to overlapping loci — this inflates the candidate count and artificially suppresses MAPQ. Only the highest-scoring candidate per cluster is retained.
-- **`MapperConfig::dedup_distance` field:** New configurable parameter (default 50bp, 0 = disabled). Applied after SW extension and sorting, before MAPQ computation. Wired into both CPU and GPU mapping paths.
-- **Pre-existing feature gate fixes:** `parity` module gated behind `#[cfg(feature = "json")]` (eliminates spurious `serde_json` errors on default features). `nestgate::discovery` made `pub(crate)` (fixes private module access from `visualization::ipc_push`).
-- **Build gate:** clippy zero warnings, 1,486 tests (0 failures, +6 from V206).
+- **riboCipher transport signal implementation (Wave 112 ALL TEAMS):**
+  - `ipc::ribocipher` module: constants (`TIER_CLEAR=0xEC`, `VERSION=0x01`, `CLEAR_SIGNAL`), `SignalResult` enum, `detect_signal()` (server-side detection), `send_clear_signal()` / `send_clear_signal_tcp()` (client-side prepend).
+  - **Server side** (`connection.rs`): Detects 2-byte riboCipher prefix on every incoming connection. Valid signals consumed silently. Unsignalled connections log **ERROR** (Wave 112 policy — was WARN in 111, rejection in 113). Legacy clients remain fully functional via byte replay through `io::Chain`.
+  - **Client side** (`transport.rs`): `unix_jsonrpc_line()` and `tcp_jsonrpc_line()` prepend `[0xEC, 0x01]` immediately after connect, before any JSON-RPC payload.
+  - +6 tests (5 ribocipher unit + 1 server integration with signal).
+- **Post-alignment candidate dedup (WS-11):**
+  - `dedup_candidates()`: Merges mapping candidates within configurable distance (default 50bp) after SW extension. Reduces MAPQ suppression from repetitive regions.
+  - `MapperConfig::dedup_distance`: New field (0 = disabled, default 50bp).
+  - +6 tests for dedup behavior.
+- **Pre-existing feature gate fixes:** `parity` module gated behind `#[cfg(feature = "json")]`. `nestgate::discovery` made `pub(crate)`.
+- **Build gate:** clippy zero warnings, 1,795 tests (0 failures). WS-11 variant caller parity 6/8.
 
 ## [V206] — 2026-06-13
 

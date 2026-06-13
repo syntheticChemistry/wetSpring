@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-13 (V207 — post-alignment candidate dedup for repetitive regions:
-dedup_candidates function, MapperConfig::dedup_distance field, pre-existing feature gate
-fixes. WS-11 variant caller parity items 6/8 checked. 1,486 tests, clippy zero warnings.)
+Last updated: 2026-06-13 (V207 — Wave 112 riboCipher transport signal: server detection +
+ERROR on unsignalled + client prepend. Post-alignment candidate dedup (WS-11). 1,795 tests,
+clippy zero warnings. WS-11 variant caller parity 6/8.)
 
 ---
 

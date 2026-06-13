@@ -6,7 +6,7 @@
 //! Separated from the server lifecycle (`Server` bind/run/drop) so that
 //! the protocol pipeline can be tested and reasoned about independently.
 
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::time::{Duration, Instant};
 
 use super::dispatch;
@@ -118,12 +118,37 @@ fn process_batch(line: &str, metrics: &Metrics, start: Instant) -> Option<String
 
 /// Handle a client connection: read newline-delimited JSON-RPC, dispatch, respond.
 pub(super) fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics) {
+    use super::ribocipher::{SignalResult, detect_signal};
+
+    let signal = detect_signal(stream);
+    let replay_buf;
+    let prefix: &[u8] = match signal {
+        SignalResult::Valid { tier, version } => {
+            tracing::debug!(tier = tier, version = version, "riboCipher signal accepted");
+            &[]
+        }
+        SignalResult::Unsignalled { peeked } => {
+            tracing::error!(
+                first_bytes = ?peeked,
+                "unsignalled connection (no riboCipher prefix) — \
+                 legacy client detected (will be rejected in Wave 113)"
+            );
+            replay_buf = peeked;
+            &replay_buf
+        }
+        SignalResult::Incomplete => {
+            tracing::debug!("connection closed before signal detection");
+            return;
+        }
+    };
+
     if let Err(e) = stream.set_read_timeout(Some(CONNECTION_READ_TIMEOUT)) {
         tracing::warn!(error = %e, "set read timeout");
         return;
     }
 
-    let reader = BufReader::new(stream);
+    let chained = std::io::Cursor::new(prefix).chain(stream);
+    let reader = BufReader::new(chained);
     let mut writer = std::io::BufWriter::new(stream);
 
     for line in reader.lines() {

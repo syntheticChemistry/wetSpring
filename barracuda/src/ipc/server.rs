@@ -532,4 +532,35 @@ mod tests {
         assert!(val["id"].is_null());
         cleanup_test_socket(&sock);
     }
+
+    #[test]
+    fn server_ribocipher_signalled_connection() {
+        use crate::ipc::ribocipher;
+
+        let sock = test_socket_path("server_ribocipher_signalled");
+        cleanup_test_socket(&sock);
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        ribocipher::send_clear_signal(&stream).unwrap();
+
+        let mut writer = std::io::BufWriter::new(&stream);
+        let request = r#"{"jsonrpc":"2.0","method":"health.check","params":{},"id":1}"#;
+        writer.write_all(request.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut reader = BufReader::new(&stream);
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        assert_eq!(val["result"]["status"], "healthy");
+        assert_eq!(val["id"], 1);
+        cleanup_test_socket(&sock);
+    }
 }

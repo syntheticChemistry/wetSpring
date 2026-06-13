@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V207:** WS-11 post-alignment candidate dedup — repetitive regions no longer inflate candidate counts to suppress MAPQ. `dedup_candidates` merges SW-aligned candidates within configurable distance (default 50bp), keeping best score per locus. Pre-existing feature gate fixes (`parity` → json, `nestgate::discovery` → pub(crate)). **Clippy zero warnings** (all feature combinations). 1,486 tests (0 failures). WS-11 variant caller parity 6/8 complete.
+**Current release — V207:** Wave 112 riboCipher transport signal standard — server-side signal detection (ERROR on unsignalled, replay for backward compat), client-side clear signal prepend on all outgoing UDS/TCP connections. Post-alignment candidate dedup for repetitive regions (WS-11). **Clippy zero warnings**. 1,795 tests (0 failures). WS-11 variant caller parity 6/8 complete.
 
 ## Role in the Ecosystem
 
