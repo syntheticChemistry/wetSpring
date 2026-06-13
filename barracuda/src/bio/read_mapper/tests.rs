@@ -224,3 +224,104 @@ fn mapq_differentiated() {
     assert!(mapq > 0);
     assert!(mapq <= 60);
 }
+
+// --- Post-alignment dedup tests ---
+
+fn make_candidate(ref_start: usize, score: i32) -> MappingCandidate {
+    MappingCandidate {
+        ref_start,
+        score,
+        alignment: AlignmentResult {
+            score,
+            aligned_query: vec![],
+            aligned_target: vec![],
+            query_start: 0,
+            target_start: 0,
+        },
+    }
+}
+
+#[test]
+fn dedup_removes_nearby_lower_scoring_candidates() {
+    let mut candidates = vec![
+        make_candidate(100, 80),
+        make_candidate(120, 70), // within 50bp of first
+        make_candidate(130, 60), // within 50bp of first
+    ];
+    dedup_candidates(&mut candidates, 50);
+    assert_eq!(candidates.len(), 1);
+    assert_eq!(candidates[0].ref_start, 100);
+    assert_eq!(candidates[0].score, 80);
+}
+
+#[test]
+fn dedup_preserves_distant_candidates() {
+    let mut candidates = vec![
+        make_candidate(100, 80),
+        make_candidate(200, 70), // 100bp away, > 50bp distance
+        make_candidate(500, 60),
+    ];
+    dedup_candidates(&mut candidates, 50);
+    assert_eq!(candidates.len(), 3);
+}
+
+#[test]
+fn dedup_no_op_with_single_candidate() {
+    let mut candidates = vec![make_candidate(100, 80)];
+    dedup_candidates(&mut candidates, 50);
+    assert_eq!(candidates.len(), 1);
+}
+
+#[test]
+fn dedup_disabled_when_distance_zero() {
+    let mut candidates = vec![
+        make_candidate(100, 80),
+        make_candidate(101, 70),
+    ];
+    dedup_candidates(&mut candidates, 0);
+    // distance=0 means abs_diff < 0 is never true, so nothing is deduped
+    assert_eq!(candidates.len(), 2);
+}
+
+#[test]
+fn dedup_repetitive_region_improves_mapq() {
+    // Simulate repetitive region: 5 candidates all near position 500
+    // with similar scores, plus one distant candidate at position 5000
+    let mut candidates_no_dedup = vec![
+        make_candidate(500, 80),
+        make_candidate(510, 79),
+        make_candidate(520, 78),
+        make_candidate(530, 77),
+        make_candidate(540, 76),
+        make_candidate(5000, 50),
+    ];
+    let mapq_no_dedup = compute_mapq(&candidates_no_dedup, None);
+
+    // After dedup, the cluster collapses to one candidate
+    dedup_candidates(&mut candidates_no_dedup, 50);
+    let mapq_after_dedup = compute_mapq(&candidates_no_dedup, None);
+
+    assert_eq!(candidates_no_dedup.len(), 2, "cluster should collapse to 1 + distant 1");
+    assert!(
+        mapq_after_dedup >= mapq_no_dedup,
+        "dedup should improve or maintain MAPQ: {mapq_after_dedup} vs {mapq_no_dedup}"
+    );
+}
+
+#[test]
+fn dedup_keeps_best_from_each_cluster() {
+    // Two clusters: [100, 120, 140] and [1000, 1020]
+    let mut candidates = vec![
+        make_candidate(100, 90),
+        make_candidate(1000, 85),
+        make_candidate(120, 80),
+        make_candidate(1020, 75),
+        make_candidate(140, 70),
+    ];
+    dedup_candidates(&mut candidates, 50);
+    assert_eq!(candidates.len(), 2);
+    assert_eq!(candidates[0].ref_start, 100);
+    assert_eq!(candidates[0].score, 90);
+    assert_eq!(candidates[1].ref_start, 1000);
+    assert_eq!(candidates[1].score, 85);
+}

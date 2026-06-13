@@ -41,6 +41,11 @@ pub struct MapperConfig {
     /// Calibrated MAPQ model. When `Some`, replaces the default linear formula.
     /// Built via [`mapq_calibration::calibrate`].
     pub mapq_model: Option<mapq_calibration::MapqModel>,
+    /// Post-alignment deduplication distance (bp). Candidates mapping within
+    /// this distance are merged, keeping the highest score. Reduces spurious
+    /// near-identical candidates from repetitive regions that inflate the
+    /// candidate count and suppress MAPQ. 0 = disabled (pre-V207 behavior).
+    pub dedup_distance: usize,
 }
 
 impl Default for MapperConfig {
@@ -52,6 +57,7 @@ impl Default for MapperConfig {
             min_score: 30,
             scoring: ScoringParams::default(),
             mapq_model: None,
+            dedup_distance: 50,
         }
     }
 }
@@ -130,6 +136,10 @@ pub fn map_read(
     }
 
     candidates.sort_by_key(|c| std::cmp::Reverse(c.score));
+
+    if config.dedup_distance > 0 {
+        dedup_candidates(&mut candidates, config.dedup_distance);
+    }
 
     let best = &candidates[0];
     let mapq = compute_mapq(&candidates, config.mapq_model.as_ref());
@@ -311,6 +321,10 @@ fn map_read_gpu(
 
     candidates.sort_by_key(|c| std::cmp::Reverse(c.score));
 
+    if config.dedup_distance > 0 {
+        dedup_candidates(&mut candidates, config.dedup_distance);
+    }
+
     let best = &candidates[0];
     let mapq = compute_mapq(&candidates, config.mapq_model.as_ref());
     let cigar = alignment_to_cigar(&best.alignment);
@@ -376,6 +390,31 @@ fn alignment_to_cigar(alignment: &AlignmentResult) -> Vec<CigarOp> {
     }
 
     ops
+}
+
+/// Deduplicate candidates that map to overlapping positions after alignment.
+///
+/// In repetitive regions, different seed entry points can lead to multiple
+/// SW alignments landing at effectively the same genomic locus. This inflates
+/// the candidate count and artificially suppresses MAPQ.
+///
+/// Operates on an already-sorted (descending by score) candidate list.
+/// For each cluster of candidates within `distance` bp, only the
+/// highest-scoring one is retained.
+fn dedup_candidates(candidates: &mut Vec<MappingCandidate>, distance: usize) {
+    if candidates.len() < 2 {
+        return;
+    }
+    let mut keep = Vec::with_capacity(candidates.len());
+    for candidate in candidates.iter() {
+        let dominated = keep.iter().any(|kept: &MappingCandidate| {
+            kept.ref_start.abs_diff(candidate.ref_start) < distance
+        });
+        if !dominated {
+            keep.push(candidate.clone());
+        }
+    }
+    *candidates = keep;
 }
 
 /// Compute mapping quality from best and second-best alignment scores.

@@ -63,6 +63,7 @@ mod domain;
 pub mod experiments;
 mod harness;
 mod or_exit;
+#[cfg(feature = "json")]
 pub mod parity;
 #[cfg(feature = "guidestone")]
 pub mod scenarios;

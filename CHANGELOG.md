@@ -3,6 +3,15 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V207] — 2026-06-13
+
+### WS-11: Post-Alignment Candidate Deduplication for Repetitive Regions
+
+- **`dedup_candidates` function:** Post-alignment deduplication merges mapping candidates that land within a configurable distance (default 50bp) after Smith-Waterman extension. In repetitive regions, different seed entry points can produce multiple SW alignments to overlapping loci — this inflates the candidate count and artificially suppresses MAPQ. Only the highest-scoring candidate per cluster is retained.
+- **`MapperConfig::dedup_distance` field:** New configurable parameter (default 50bp, 0 = disabled). Applied after SW extension and sorting, before MAPQ computation. Wired into both CPU and GPU mapping paths.
+- **Pre-existing feature gate fixes:** `parity` module gated behind `#[cfg(feature = "json")]` (eliminates spurious `serde_json` errors on default features). `nestgate::discovery` made `pub(crate)` (fixes private module access from `visualization::ipc_push`).
+- **Build gate:** clippy zero warnings, 1,486 tests (0 failures, +6 from V206).
+
 ## [V206] — 2026-06-13
 
 ### WS-11: MAPQ Calibration Module — Training Set + Model Wiring

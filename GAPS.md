@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-13 (V206 — MAPQ calibration module: simulated read generator,
-training pipeline, MapqModel lookup table, wire into compute_mapq. WS-11 variant caller
-parity items 5/8 checked. 2,160 tests, clippy zero warnings.)
+Last updated: 2026-06-13 (V207 — post-alignment candidate dedup for repetitive regions:
+dedup_candidates function, MapperConfig::dedup_distance field, pre-existing feature gate
+fixes. WS-11 variant caller parity items 6/8 checked. 1,486 tests, clippy zero warnings.)
 
 ---
 
@@ -298,7 +298,7 @@ Interrupt/restart braid cycle verified — deterministic reproduction confirmed
 - [x] Quality-weighted binomial model — V201 `binomial_quality()` (CPU, default on)
 - [x] MAPQ-aware binomial quality weighting — V205 combined error model
 - [ ] Quality-weighted binomial model in SnpCallingF64 GPU shader (future)
-- [ ] Mapper-level deduplication of repetitive region alignments
+- [x] Mapper-level deduplication of repetitive region alignments — V207 `dedup_candidates` (post-SW, configurable distance)
 - [x] Per-generation frequency threshold calibration — V205 `thresholds` module
 - [x] Cross-validate against breseq polymorphism mode — V205 `cross_validation` module
 

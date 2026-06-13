@@ -22,7 +22,7 @@
 //! | 2 | Direct `NestGate` socket | Standalone + NestGate available |
 //! | 3 | Sovereign HTTP | No ecosystem services |
 
-mod discovery;
+pub(crate) mod discovery;
 mod fetch;
 mod rpc;
 mod storage;
