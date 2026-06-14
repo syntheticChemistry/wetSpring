@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V210] — 2026-06-14
+
+### Wave 113: DEPLOY-THEN-STALE Validation + guideStone Amendment Compliance
+
+- **`health.liveness` now includes `version`:** Matches proposed guideStone amendment minimum (`{status, primal, version}`). Previously only returned `{status, alive, primal}`.
+- **DEPLOY-THEN-STALE integration tests (+2):**
+  - `server_lifecycle_status_exposes_skew_fields`: Verifies `lifecycle.status` returns non-empty `git_sha` (resolved at compile time, not "unknown"), `version`, and `uptime_s` — all fields required for mesh skew detection.
+  - `server_health_liveness_includes_version`: Verifies `health.liveness` includes `version` per guideStone amendment.
+- **Build gate:** clippy zero warnings, 1,805 tests (0 failures).
+- **Exit criterion 3 (DEPLOY-THEN-STALE) structurally proven:** Server returns skew-detectable data. Operational validation (skip N cycles, mesh detects skew) pending next Wave sync.
+
 ## [V209] — 2026-06-14
 
 ### Wave 113: Mesh Version-Skew Detection Fix (DEPLOY-THEN-STALE)

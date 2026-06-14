@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-14 (V209 — Mesh version-skew detection fix: probe_primal_versioned
-queries lifecycle.status, build-time git SHA for DEPLOY-THEN-STALE. sha_skew detection.
-1,803 tests, clippy zero warnings. WS-11 variant caller parity 6/8.)
+Last updated: 2026-06-14 (V210 — guideStone amendment: health.liveness includes version.
+DEPLOY-THEN-STALE structurally proven via integration tests. 1,805 tests, clippy zero warnings.
+WS-11 variant caller parity 6/8.)
 
 ---
 

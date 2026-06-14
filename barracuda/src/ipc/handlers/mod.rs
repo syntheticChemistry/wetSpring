@@ -218,13 +218,14 @@ pub fn handle_health() -> Result<Value, RpcError> {
 
 /// Minimal liveness probe — confirms the process is alive and responsive.
 ///
-/// DEPLOYMENT_BEHAVIOR_STANDARD v1.0: returns `{"status":"alive"}`.
-/// Also includes `alive: true` and `primal` for backward compat.
+/// guideStone amendment: minimum `{status, primal, version}`.
+/// Also includes `alive: true` for backward compat.
 pub fn handle_health_liveness() -> Result<Value, RpcError> {
     Ok(json!({
         "status": "alive",
         "alive": true,
         "primal": crate::PRIMAL_NAME,
+        "version": env!("CARGO_PKG_VERSION"),
     }))
 }
 

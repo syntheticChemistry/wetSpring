@@ -627,4 +627,92 @@ mod tests {
 
         cleanup_test_socket(&sock);
     }
+
+    /// DEPLOY-THEN-STALE validation: lifecycle.status must return version + git_sha
+    /// so mesh health audits can detect stale deploys (Wave 113 exit criterion 3).
+    #[test]
+    fn server_lifecycle_status_exposes_skew_fields() {
+        use crate::ipc::ribocipher;
+
+        let sock = test_socket_path("server_lifecycle_skew");
+        cleanup_test_socket(&sock);
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        ribocipher::send_clear_signal(&stream).unwrap();
+
+        let mut writer = std::io::BufWriter::new(&stream);
+        let request = r#"{"jsonrpc":"2.0","method":"lifecycle.status","params":{},"id":42}"#;
+        writer.write_all(request.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut reader = BufReader::new(&stream);
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        assert_eq!(val["id"], 42);
+
+        let result = &val["result"];
+        assert_eq!(result["primal"], "wetspring");
+        assert_eq!(result["status"], "running");
+
+        let version = result["version"].as_str().unwrap();
+        assert!(!version.is_empty(), "version must be non-empty");
+
+        let git_sha = result["git_sha"].as_str().unwrap();
+        assert!(!git_sha.is_empty(), "git_sha must be non-empty");
+        assert_ne!(git_sha, "unknown", "git_sha must resolve at compile time");
+        assert!(
+            git_sha.len() >= 7,
+            "git_sha should be at least 7 hex chars, got: {git_sha}"
+        );
+
+        let uptime = result["uptime_s"].as_f64().unwrap();
+        assert!(uptime >= 0.0, "uptime must be non-negative");
+
+        cleanup_test_socket(&sock);
+    }
+
+    /// DEPLOY-THEN-STALE: health.liveness must include version per guideStone amendment.
+    #[test]
+    fn server_health_liveness_includes_version() {
+        use crate::ipc::ribocipher;
+
+        let sock = test_socket_path("server_health_version");
+        cleanup_test_socket(&sock);
+        let server = Server::bind(&sock).unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        ribocipher::send_clear_signal(&stream).unwrap();
+
+        let mut writer = std::io::BufWriter::new(&stream);
+        let request = r#"{"jsonrpc":"2.0","method":"health.liveness","params":{},"id":7}"#;
+        writer.write_all(request.as_bytes()).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+
+        let mut reader = BufReader::new(&stream);
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+
+        let val: serde_json::Value = serde_json::from_str(&response).unwrap();
+        let result = &val["result"];
+        assert_eq!(result["status"], "alive");
+        assert_eq!(result["primal"], "wetspring");
+        assert!(
+            result["version"].as_str().is_some_and(|v| !v.is_empty()),
+            "health.liveness must include version per guideStone amendment"
+        );
+        cleanup_test_socket(&sock);
+    }
 }

@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V209:** Mesh version-skew detection fix — `probe_primal_versioned` now queries `lifecycle.status` (was querying `health.liveness` which never returned version info). Build-time git SHA embedded via `build.rs` for fine-grained stale-deploy detection (`sha_skew`). `MeshHealthAudit` now reports both `distinct_versions` and `distinct_git_shas`. riboCipher REJECT mode active. **Clippy zero warnings**. 1,803 tests (0 failures). WS-11 variant caller parity 6/8 complete.
+**Current release — V210:** guideStone amendment compliance (`health.liveness` now includes `version`). DEPLOY-THEN-STALE structurally validated — `lifecycle.status` returns `git_sha` (12-char, resolved at build time), mesh audit detects both version skew and SHA skew. riboCipher REJECT mode active. **Clippy zero warnings**. 1,805 tests (0 failures). WS-11 variant caller parity 6/8 complete.
 
 ## Role in the Ecosystem
 
