@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-13 (V207 — Wave 112 riboCipher transport signal: server detection +
-ERROR on unsignalled + client prepend. Post-alignment candidate dedup (WS-11). 1,795 tests,
-clippy zero warnings. WS-11 variant caller parity 6/8.)
+Last updated: 2026-06-14 (V208 — Wave 113 riboCipher REJECT mode: Policy enum, env-based
+configuration, server drops unsignalled connections. 1,801 tests, clippy zero warnings.
+WS-11 variant caller parity 6/8.)
 
 ---
 

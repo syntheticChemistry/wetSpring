@@ -11,8 +11,18 @@
 //! | 0xED   | 0x01   | Mito-tier (HKDF+HMAC authenticated) |
 //! | 0xEE   | 0x01   | Nuclear-tier (ChaCha20-Poly1305 encrypted) |
 //!
-//! Wave 112 policy: unsignalled connections produce ERROR logs (was WARN
-//! in Wave 111). Connections are still accepted — rejection starts Wave 113.
+//! ## Deprecation timeline
+//!
+//! | Wave | Policy | Behavior |
+//! |------|--------|----------|
+//! | 111  | Warn   | WARN log, accept connection |
+//! | 112  | Error  | ERROR log, accept connection |
+//! | 113  | Reject | ERROR log, drop connection immediately |
+//! | 114  | —      | Remove legacy paths entirely |
+//!
+//! The [`Policy`] enum configures which behavior this server uses.
+//! Default is [`Policy::Reject`] (Wave 113+). Set via `RIBOCIPHER_POLICY`
+//! env var or programmatically before calling `Server::run()`.
 
 use std::io::Read;
 use std::os::unix::net::UnixStream;
@@ -25,6 +35,48 @@ pub const VERSION: u8 = 0x01;
 
 /// Complete clear-tier signal frame (sent by clients on connect).
 pub const CLEAR_SIGNAL: [u8; 2] = [TIER_CLEAR, VERSION];
+
+/// Environment variable to override the default riboCipher policy.
+///
+/// Values: `"reject"` (default), `"error"`, `"warn"`, `"accept"`.
+pub const POLICY_ENV: &str = "RIBOCIPHER_POLICY";
+
+/// Server-side enforcement policy for unsignalled connections.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum Policy {
+    /// Accept unsignalled connections silently (pre-Wave 111 behavior).
+    Accept,
+    /// Log WARN, accept connection (Wave 111).
+    Warn,
+    /// Log ERROR, accept connection (Wave 112).
+    Error,
+    /// Log ERROR, reject (drop) connection immediately (Wave 113+).
+    #[default]
+    Reject,
+}
+
+impl Policy {
+    /// Resolve the active policy from environment, falling back to default.
+    ///
+    /// Reads `RIBOCIPHER_POLICY` env var. Unrecognized values fall back to
+    /// the compile-time default ([`Policy::Reject`]).
+    #[must_use]
+    pub fn from_env() -> Self {
+        match std::env::var(POLICY_ENV).as_deref() {
+            Ok("accept") => Self::Accept,
+            Ok("warn") => Self::Warn,
+            Ok("error") => Self::Error,
+            Ok("reject") => Self::Reject,
+            _ => Self::default(),
+        }
+    }
+
+    /// Whether this policy allows unsignalled connections to proceed.
+    #[must_use]
+    pub const fn allows_unsignalled(self) -> bool {
+        matches!(self, Self::Accept | Self::Warn | Self::Error)
+    }
+}
 
 /// Result of attempting to read the riboCipher signal from a stream.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -146,5 +198,48 @@ mod tests {
         assert_eq!(TIER_CLEAR, 0xEC);
         assert_eq!(VERSION, 0x01);
         assert_eq!(CLEAR_SIGNAL, [0xEC, 0x01]);
+    }
+
+    #[test]
+    fn policy_default_is_reject() {
+        assert_eq!(Policy::default(), Policy::Reject);
+    }
+
+    #[test]
+    fn policy_allows_unsignalled_accept_warn_error() {
+        assert!(Policy::Accept.allows_unsignalled());
+        assert!(Policy::Warn.allows_unsignalled());
+        assert!(Policy::Error.allows_unsignalled());
+        assert!(!Policy::Reject.allows_unsignalled());
+    }
+
+    #[test]
+    fn policy_from_env_variants() {
+        temp_env::with_vars([(POLICY_ENV, Some("accept"))], || {
+            assert_eq!(Policy::from_env(), Policy::Accept);
+        });
+        temp_env::with_vars([(POLICY_ENV, Some("warn"))], || {
+            assert_eq!(Policy::from_env(), Policy::Warn);
+        });
+        temp_env::with_vars([(POLICY_ENV, Some("error"))], || {
+            assert_eq!(Policy::from_env(), Policy::Error);
+        });
+        temp_env::with_vars([(POLICY_ENV, Some("reject"))], || {
+            assert_eq!(Policy::from_env(), Policy::Reject);
+        });
+    }
+
+    #[test]
+    fn policy_from_env_unset_defaults_to_reject() {
+        temp_env::with_vars([(POLICY_ENV, None::<&str>)], || {
+            assert_eq!(Policy::from_env(), Policy::Reject);
+        });
+    }
+
+    #[test]
+    fn policy_from_env_unknown_defaults_to_reject() {
+        temp_env::with_vars([(POLICY_ENV, Some("bogus"))], || {
+            assert_eq!(Policy::from_env(), Policy::Reject);
+        });
     }
 }

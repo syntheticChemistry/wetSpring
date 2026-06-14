@@ -3,6 +3,17 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V208] — 2026-06-14
+
+### Wave 113: riboCipher REJECT Mode + Policy Configuration
+
+- **`Policy` enum in `ipc::ribocipher`:** Configurable enforcement for unsignalled connections — `Accept` (pre-111), `Warn` (111), `Error` (112), `Reject` (113+, default). Resolved at server startup from `RIBOCIPHER_POLICY` env var via `Policy::from_env()`.
+- **Server `bind_with_policy`:** New constructor accepts explicit policy. `bind_default()` reads from env (production: Reject). `bind()` uses Error (backward-compatible for callers and tests).
+- **Reject mode:** Unsignalled connections are immediately dropped (connection handler returns before reading JSON-RPC). ERROR logged with diagnostic info.
+- **`connection::handle_connection` takes policy parameter:** No longer reads env at runtime per-connection — policy resolved once at startup, passed to handler threads.
+- **+7 new tests:** 5 policy unit tests (default, env variants, allows_unsignalled), 1 reject integration test (`server_ribocipher_reject_drops_unsignalled`), 1 signalled connection test.
+- **Build gate:** clippy zero warnings, 1,801 tests (0 failures).
+
 ## [V207] — 2026-06-13
 
 ### Wave 112: riboCipher Transport Signal + Post-Alignment Dedup (WS-11)

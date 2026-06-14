@@ -117,7 +117,11 @@ fn process_batch(line: &str, metrics: &Metrics, start: Instant) -> Option<String
 }
 
 /// Handle a client connection: read newline-delimited JSON-RPC, dispatch, respond.
-pub(super) fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics: &Metrics) {
+pub(super) fn handle_connection(
+    stream: &std::os::unix::net::UnixStream,
+    metrics: &Metrics,
+    policy: super::ribocipher::Policy,
+) {
     use super::ribocipher::{SignalResult, detect_signal};
 
     let signal = detect_signal(stream);
@@ -130,9 +134,13 @@ pub(super) fn handle_connection(stream: &std::os::unix::net::UnixStream, metrics
         SignalResult::Unsignalled { peeked } => {
             tracing::error!(
                 first_bytes = ?peeked,
-                "unsignalled connection (no riboCipher prefix) — \
-                 legacy client detected (will be rejected in Wave 113)"
+                policy = ?policy,
+                "unsignalled connection (no riboCipher prefix) — legacy client"
             );
+            if !policy.allows_unsignalled() {
+                tracing::error!("REJECTING unsignalled connection (Wave 113 policy)");
+                return;
+            }
             replay_buf = peeked;
             &replay_buf
         }

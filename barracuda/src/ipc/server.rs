@@ -25,10 +25,14 @@ pub struct Server {
     listener: UnixListener,
     socket_path: PathBuf,
     metrics: Arc<Metrics>,
+    /// riboCipher enforcement policy for incoming connections.
+    policy: super::ribocipher::Policy,
 }
 
 impl Server {
     /// Bind to the default socket path following the Primal IPC Protocol.
+    ///
+    /// Reads riboCipher policy from `RIBOCIPHER_POLICY` env var (production default: Reject).
     ///
     /// Discovery order:
     /// 1. `WETSPRING_SOCKET` env var (explicit override)
@@ -40,16 +44,33 @@ impl Server {
     /// Returns `Err` if the socket directory cannot be created or the bind fails.
     pub fn bind_default() -> crate::error::Result<Self> {
         let path = resolve_bind_path();
-        Self::bind(&path)
+        Self::bind_with_policy(&path, super::ribocipher::Policy::from_env())
     }
 
-    /// Bind to a specific socket path.
+    /// Bind to a specific socket path with `Error` policy (accept unsignalled with ERROR log).
+    ///
+    /// For production deployments that should reject unsignalled connections, use
+    /// [`bind_default`](Self::bind_default) or [`bind_with_policy`](Self::bind_with_policy)
+    /// with [`Policy::Reject`](super::ribocipher::Policy::Reject).
     ///
     /// # Errors
     ///
     /// Returns `Err` if the directory cannot be created, a stale socket cannot
     /// be removed, or the bind fails.
     pub fn bind(path: &Path) -> crate::error::Result<Self> {
+        Self::bind_with_policy(path, super::ribocipher::Policy::Error)
+    }
+
+    /// Bind to a specific socket path with an explicit riboCipher policy.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the directory cannot be created, a stale socket cannot
+    /// be removed, or the bind fails.
+    pub fn bind_with_policy(
+        path: &Path,
+        policy: super::ribocipher::Policy,
+    ) -> crate::error::Result<Self> {
         use crate::error::IpcError;
 
         if let Some(parent) = path.parent() {
@@ -71,6 +92,7 @@ impl Server {
             listener,
             socket_path: path.to_path_buf(),
             metrics: Arc::new(Metrics::new()),
+            policy,
         })
     }
 
@@ -97,8 +119,9 @@ impl Server {
             match stream {
                 Ok(stream) => {
                     let metrics = Arc::clone(&self.metrics);
+                    let policy = self.policy;
                     std::thread::spawn(move || {
-                        connection::handle_connection(&stream, &metrics);
+                        connection::handle_connection(&stream, &metrics, policy);
                     });
                 }
                 Err(e) => {
@@ -136,7 +159,7 @@ mod tests {
     fn server_bind_and_health_check() {
         let sock = test_socket_path("server_bind_and_health_check");
         cleanup_test_socket(&sock);
-        let server = Server::bind(&sock).unwrap();
+        let server = Server::bind_with_policy(&sock, crate::ipc::ribocipher::Policy::Error).unwrap();
 
         assert!(sock.exists());
 
@@ -170,7 +193,7 @@ mod tests {
     fn server_diversity_wetspring_prefixed_method_normalized() {
         let sock = test_socket_path("server_diversity_wetspring_prefixed_method_normalized");
         cleanup_test_socket(&sock);
-        let server = Server::bind(&sock).unwrap();
+        let server = Server::bind_with_policy(&sock, crate::ipc::ribocipher::Policy::Error).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
         std::thread::spawn(move || server.run());
@@ -561,6 +584,47 @@ mod tests {
         let val: serde_json::Value = serde_json::from_str(&response).unwrap();
         assert_eq!(val["result"]["status"], "healthy");
         assert_eq!(val["id"], 1);
+        cleanup_test_socket(&sock);
+    }
+
+    #[test]
+    fn server_ribocipher_reject_drops_unsignalled() {
+        use std::io::Read;
+
+        let sock = test_socket_path("server_ribocipher_reject");
+        cleanup_test_socket(&sock);
+        let server = Server::bind_with_policy(
+            &sock,
+            crate::ipc::ribocipher::Policy::Reject,
+        )
+        .unwrap();
+        let server_path = server.socket_path().to_path_buf();
+
+        std::thread::spawn(move || server.run());
+        std::thread::sleep(Duration::from_millis(50));
+
+        let stream = UnixStream::connect(&server_path).unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_millis(200)))
+            .unwrap();
+
+        // Send JSON-RPC without riboCipher signal — should be rejected
+        let mut writer = std::io::BufWriter::new(&stream);
+        writer
+            .write_all(
+                b"{\"jsonrpc\":\"2.0\",\"method\":\"health.check\",\"params\":{},\"id\":1}\n",
+            )
+            .unwrap();
+        writer.flush().unwrap();
+
+        // Read should fail (connection dropped by server)
+        let mut buf = [0u8; 1];
+        let result = (&stream).read(&mut buf);
+        assert!(
+            result.is_err() || result.unwrap() == 0,
+            "server should have dropped the connection"
+        );
+
         cleanup_test_socket(&sock);
     }
 }
