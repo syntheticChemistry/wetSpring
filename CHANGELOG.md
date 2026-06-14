@@ -3,6 +3,18 @@
 All notable changes to wetSpring are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [V209] — 2026-06-14
+
+### Wave 113: Mesh Version-Skew Detection Fix (DEPLOY-THEN-STALE)
+
+- **Bug fix: `probe_primal_versioned` now queries `lifecycle.status`** instead of `health.liveness`. The prior endpoint never returned `version`, making `distinct_versions` in `MeshHealthAudit` permanently empty and version skew undetectable.
+- **Build-time git SHA embedding (`build.rs`):** Captures `git rev-parse --short=12 HEAD` into `WETSPRING_GIT_SHA` env var at compile time. Enables detection of stale deploys (same semver, different commit).
+- **`lifecycle.status` includes `git_sha` field:** Fine-grained skew detection for the DEPLOY-THEN-STALE simulation (Wave 113 exit criterion 3).
+- **`PrimalHealthInfo` extended with `git_sha`:** Mesh audit collects per-primal git SHAs alongside versions.
+- **`MeshHealthAudit` extended:** New `distinct_git_shas` vector and `sha_skew` boolean in JSON output. Differentiates version skew (different semver) from SHA skew (same version, different build).
+- **+2 new tests:** `mesh_audit_detects_version_skew`, `mesh_audit_detects_sha_skew_same_version`.
+- **Build gate:** clippy zero warnings, 1,803 tests (0 failures).
+
 ## [V208] — 2026-06-14
 
 ### Wave 113: riboCipher REJECT Mode + Policy Configuration

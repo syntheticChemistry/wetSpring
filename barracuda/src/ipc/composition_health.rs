@@ -219,15 +219,17 @@ pub fn probe_schema_parity() -> SchemaParity {
 
 // ── NUCLEUS Mesh Health Audit (Stream 6: Divergence Detection) ──────
 
-/// Version and health info from a single primal's `health.liveness` response.
+/// Version and health info from a single primal's `lifecycle.status` response.
 #[derive(Debug, Clone)]
 pub struct PrimalHealthInfo {
     /// Primal slug (e.g. `"songbird"`, `"beardog"`).
     pub primal: String,
     /// Component liveness status.
     pub status: ComponentStatus,
-    /// Primal version string if reported in health response.
+    /// Primal version string if reported in lifecycle response.
     pub version: Option<String>,
+    /// Build git SHA (short) for fine-grained skew detection.
+    pub git_sha: Option<String>,
     /// Uptime in seconds if reported.
     pub uptime_secs: Option<f64>,
 }
@@ -248,6 +250,8 @@ pub struct MeshHealthAudit {
     pub total_probed: usize,
     /// Distinct versions seen across live primals (divergence indicator).
     pub distinct_versions: Vec<String>,
+    /// Distinct git SHAs seen across live primals (fine-grained skew).
+    pub distinct_git_shas: Vec<String>,
 }
 
 impl MeshHealthAudit {
@@ -262,6 +266,7 @@ impl MeshHealthAudit {
                     "primal": p.primal,
                     "status": p.status.as_str(),
                     "version": p.version,
+                    "git_sha": p.git_sha,
                     "uptime_secs": p.uptime_secs,
                 })
             })
@@ -273,7 +278,9 @@ impl MeshHealthAudit {
             "discovered": self.discovered_count,
             "total_probed": self.total_probed,
             "distinct_versions": self.distinct_versions,
+            "distinct_git_shas": self.distinct_git_shas,
             "version_skew": self.distinct_versions.len() > 1,
+            "sha_skew": self.distinct_git_shas.len() > 1,
         })
     }
 }
@@ -306,6 +313,7 @@ pub fn probe_mesh_health() -> MeshHealthAudit {
     let mut alive_count = 0;
     let mut discovered_count = 0;
     let mut versions = std::collections::BTreeSet::new();
+    let mut git_shas = std::collections::BTreeSet::new();
 
     for &slug in NUCLEUS_PRIMALS {
         let info = probe_primal_versioned(slug);
@@ -313,6 +321,9 @@ pub fn probe_mesh_health() -> MeshHealthAudit {
             alive_count += 1;
             if let Some(ref v) = info.version {
                 versions.insert(v.clone());
+            }
+            if let Some(ref sha) = info.git_sha {
+                git_shas.insert(sha.clone());
             }
         }
         if info.status != ComponentStatus::Absent {
@@ -327,10 +338,11 @@ pub fn probe_mesh_health() -> MeshHealthAudit {
         alive_count,
         discovered_count,
         distinct_versions: versions.into_iter().collect(),
+        distinct_git_shas: git_shas.into_iter().collect(),
     }
 }
 
-/// Probe a single primal with version extraction from health response.
+/// Probe a single primal with version extraction from lifecycle response.
 fn probe_primal_versioned(primal: &str) -> PrimalHealthInfo {
     let env_var = discover::socket_env_var(primal);
     let Some(socket_path) = discover::discover_socket(&env_var, primal) else {
@@ -338,16 +350,18 @@ fn probe_primal_versioned(primal: &str) -> PrimalHealthInfo {
             primal: primal.to_string(),
             status: ComponentStatus::Absent,
             version: None,
+            git_sha: None,
             uptime_secs: None,
         };
     };
 
-    let request = r#"{"jsonrpc":"2.0","method":"health.liveness","params":{},"id":1}"#;
+    let request = r#"{"jsonrpc":"2.0","method":"lifecycle.status","params":{},"id":1}"#;
     let Some(response) = probe_rpc(&socket_path, request) else {
         return PrimalHealthInfo {
             primal: primal.to_string(),
             status: ComponentStatus::Discovered,
             version: None,
+            git_sha: None,
             uptime_secs: None,
         };
     };
@@ -357,14 +371,19 @@ fn probe_primal_versioned(primal: &str) -> PrimalHealthInfo {
         .and_then(|r| r.get("version"))
         .and_then(Value::as_str)
         .map(String::from);
+    let git_sha = result
+        .and_then(|r| r.get("git_sha"))
+        .and_then(Value::as_str)
+        .map(String::from);
     let uptime_secs = result
-        .and_then(|r| r.get("uptime_secs"))
+        .and_then(|r| r.get("uptime_s"))
         .and_then(Value::as_f64);
 
     PrimalHealthInfo {
         primal: primal.to_string(),
         status: ComponentStatus::Live,
         version,
+        git_sha,
         uptime_secs,
     }
 }
@@ -533,7 +552,12 @@ mod tests {
             j.get("distinct_versions").is_some_and(Value::is_array),
             "distinct_versions must be a JSON array"
         );
+        assert!(
+            j.get("distinct_git_shas").is_some_and(Value::is_array),
+            "distinct_git_shas must be a JSON array"
+        );
         assert!(j.get("version_skew").is_some());
+        assert!(j.get("sha_skew").is_some());
     }
 
     #[test]
@@ -541,10 +565,109 @@ mod tests {
         let audit = probe_mesh_health();
         assert_eq!(audit.alive_count, 0, "no primals running in test env");
         assert!(audit.distinct_versions.is_empty());
+        assert!(audit.distinct_git_shas.is_empty());
         assert_eq!(
             audit.to_json().get("version_skew").and_then(Value::as_bool),
             Some(false),
             "version_skew must be false when no primals are alive"
+        );
+        assert_eq!(
+            audit.to_json().get("sha_skew").and_then(Value::as_bool),
+            Some(false),
+            "sha_skew must be false when no primals are alive"
+        );
+    }
+
+    #[test]
+    fn mesh_audit_detects_version_skew() {
+        let primals = vec![
+            PrimalHealthInfo {
+                primal: "songbird".into(),
+                status: ComponentStatus::Live,
+                version: Some("0.3.0".into()),
+                git_sha: Some("abc123def456".into()),
+                uptime_secs: Some(100.0),
+            },
+            PrimalHealthInfo {
+                primal: "beardog".into(),
+                status: ComponentStatus::Live,
+                version: Some("0.2.9".into()),
+                git_sha: Some("abc123def456".into()),
+                uptime_secs: Some(200.0),
+            },
+            PrimalHealthInfo {
+                primal: "skunkbat".into(),
+                status: ComponentStatus::Absent,
+                version: None,
+                git_sha: None,
+                uptime_secs: None,
+            },
+        ];
+
+        let mut versions = std::collections::BTreeSet::new();
+        let mut git_shas = std::collections::BTreeSet::new();
+        let mut alive_count = 0;
+        for p in &primals {
+            if p.status == ComponentStatus::Live {
+                alive_count += 1;
+                if let Some(ref v) = p.version { versions.insert(v.clone()); }
+                if let Some(ref s) = p.git_sha { git_shas.insert(s.clone()); }
+            }
+        }
+
+        let audit = MeshHealthAudit {
+            total_probed: primals.len(),
+            alive_count,
+            discovered_count: 2,
+            distinct_versions: versions.into_iter().collect(),
+            distinct_git_shas: git_shas.into_iter().collect(),
+            primals,
+        };
+
+        assert_eq!(audit.distinct_versions.len(), 2, "two distinct versions = skew");
+        assert_eq!(audit.distinct_git_shas.len(), 1, "same SHA = no sha skew");
+
+        let j = audit.to_json();
+        assert_eq!(j.get("version_skew").and_then(Value::as_bool), Some(true));
+        assert_eq!(j.get("sha_skew").and_then(Value::as_bool), Some(false));
+    }
+
+    #[test]
+    fn mesh_audit_detects_sha_skew_same_version() {
+        let primals = vec![
+            PrimalHealthInfo {
+                primal: "songbird".into(),
+                status: ComponentStatus::Live,
+                version: Some("0.3.0".into()),
+                git_sha: Some("abc123def456".into()),
+                uptime_secs: Some(100.0),
+            },
+            PrimalHealthInfo {
+                primal: "beardog".into(),
+                status: ComponentStatus::Live,
+                version: Some("0.3.0".into()),
+                git_sha: Some("deadbeef9999".into()),
+                uptime_secs: Some(300.0),
+            },
+        ];
+
+        let audit = MeshHealthAudit {
+            total_probed: primals.len(),
+            alive_count: 2,
+            discovered_count: 2,
+            distinct_versions: vec!["0.3.0".into()],
+            distinct_git_shas: vec!["abc123def456".into(), "deadbeef9999".into()],
+            primals,
+        };
+
+        let j = audit.to_json();
+        assert_eq!(
+            j.get("version_skew").and_then(Value::as_bool), Some(false),
+            "same version for both primals"
+        );
+        assert_eq!(
+            j.get("sha_skew").and_then(Value::as_bool), Some(true),
+            "different SHAs = stale deploy detected"
         );
     }
 }

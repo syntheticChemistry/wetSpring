@@ -230,11 +230,14 @@ pub fn handle_health_liveness() -> Result<Value, RpcError> {
 
 /// Lifecycle status — DEPLOYMENT_BEHAVIOR_STANDARD v1.0 §2.
 ///
-/// Returns primal name, version, running status, and uptime in seconds.
+/// Returns primal name, version, git SHA, running status, and uptime in seconds.
+/// The `git_sha` field enables fine-grained skew detection (same version, different
+/// commit = stale deploy) for the DEPLOY-THEN-STALE simulation (Wave 113).
 pub fn handle_lifecycle_status() -> Result<Value, RpcError> {
     Ok(json!({
         "primal": crate::PRIMAL_NAME,
         "version": env!("CARGO_PKG_VERSION"),
+        "git_sha": env!("WETSPRING_GIT_SHA"),
         "status": "running",
         "uptime_s": uptime_secs(),
     }))
