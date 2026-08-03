@@ -373,3 +373,88 @@ pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
     pipeline_result.insert("pipeline".into(), json!("complete"));
     Ok(Value::Object(pipeline_result))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn diversity_computes_all_metrics() {
+        let params = json!({"counts": [10.0, 20.0, 30.0, 40.0]});
+        let result = handle_diversity(&params).unwrap();
+        assert!(result["shannon"].as_f64().unwrap() > 0.0);
+        assert!(result["simpson"].as_f64().unwrap() > 0.0);
+        assert!(result["observed"].as_f64().is_some());
+        assert!(result["chao1"].as_f64().is_some());
+    }
+
+    #[test]
+    fn diversity_specific_metric() {
+        let params = json!({"counts": [5.0, 5.0, 5.0], "metrics": ["shannon"]});
+        let result = handle_diversity(&params).unwrap();
+        assert!(result["shannon"].as_f64().is_some());
+        assert!(result.get("simpson").is_none());
+    }
+
+    #[test]
+    fn diversity_rejects_empty_counts() {
+        let params = json!({"counts": []});
+        let err = handle_diversity(&params).unwrap_err();
+        assert_eq!(err.code, -32602);
+    }
+
+    #[test]
+    fn diversity_rejects_missing_counts() {
+        let params = json!({});
+        let err = handle_diversity(&params).unwrap_err();
+        assert_eq!(err.code, -32602);
+    }
+
+    #[test]
+    fn qs_model_standard_growth() {
+        let params = json!({"scenario": "standard_growth"});
+        let result = handle_qs_model(&params).unwrap();
+        assert!(result["steps"].as_u64().unwrap() > 1);
+        assert!(result["t_end"].as_f64().unwrap() > 0.0);
+        assert!(result["final_state"].is_array());
+        assert!(result["peak_biofilm"].as_f64().is_some());
+    }
+
+    #[test]
+    fn qs_model_custom_dt() {
+        let params = json!({"dt": 0.1});
+        let result = handle_qs_model(&params).unwrap();
+        assert!(result["steps"].as_u64().unwrap() > 1);
+        assert!(result["t_end"].as_f64().unwrap() > 0.0);
+    }
+
+    #[test]
+    fn anderson_requires_gpu_feature() {
+        let params = json!({"lattice_size": 4, "disorder": 10.0});
+        let result = handle_anderson(&params);
+        #[cfg(not(feature = "gpu"))]
+        assert!(result.is_err());
+        #[cfg(feature = "gpu")]
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn full_pipeline_runs_without_crash() {
+        let params = json!({
+            "counts": [10.0, 20.0, 30.0],
+            "scenario": "standard_growth",
+        });
+        let result = handle_full_pipeline(&params).unwrap();
+        assert_eq!(result["pipeline"], "complete");
+        assert!(result["diversity"].is_object());
+        assert!(result["qs_model"].is_object());
+    }
+
+    #[test]
+    fn full_pipeline_skips_anderson_gracefully() {
+        let params = json!({"counts": [1.0, 2.0, 3.0]});
+        let result = handle_full_pipeline(&params).unwrap();
+        #[cfg(not(feature = "gpu"))]
+        assert_eq!(result["anderson"]["status"], "skipped");
+    }
+}

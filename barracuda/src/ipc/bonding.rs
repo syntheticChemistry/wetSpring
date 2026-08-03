@@ -28,6 +28,7 @@ use primalspring::bonding::{BondingConstraint, TrustModel};
 use serde_json::{Value, json};
 
 use crate::ipc::protocol::RpcError;
+use crate::primal_names;
 
 static REGISTRY: OnceLock<Mutex<IonicContractRegistry>> = OnceLock::new();
 
@@ -59,7 +60,7 @@ fn lock_err() -> RpcError {
 pub fn handle_propose(params: &Value) -> Result<Value, RpcError> {
     let proposer_identity = params["proposer_identity"]
         .as_str()
-        .unwrap_or("wetspring")
+        .unwrap_or(primal_names::SELF_NAME)
         .to_owned();
 
     let requested_capabilities: Vec<String> = params["requested_capabilities"]

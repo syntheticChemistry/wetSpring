@@ -170,7 +170,12 @@ pub fn parse_single_service(json: &str) -> Option<Substrate> {
             "simd" => {
                 capabilities.push(Capability::SimdVector);
             }
-            _ => {}
+            unknown => {
+                tracing::debug!(
+                    capability = unknown,
+                    "unrecognized Songbird capability — skipping"
+                );
+            }
         }
     }
 

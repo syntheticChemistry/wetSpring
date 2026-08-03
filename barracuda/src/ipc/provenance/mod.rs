@@ -24,6 +24,7 @@ use std::time::Duration;
 use serde_json::{Value, json};
 
 use crate::ipc::protocol::RpcError;
+use crate::primal_names;
 
 pub mod braid_handoff;
 pub mod loamspine;
@@ -276,7 +277,7 @@ fn signal_dispatch(socket_path: &Path, signal: &str, payload: &Value) -> Option<
 fn try_nest_commit_signal(socket_path: &Path, session_id: &str) -> Option<Value> {
     let payload = json!({
         "session_id": session_id,
-        "spring_id": "wetspring",
+        "spring_id": primal_names::SELF_NAME,
     });
 
     let result = signal_dispatch(socket_path, "nest.commit", &payload)?;

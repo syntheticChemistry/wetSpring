@@ -22,6 +22,8 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use serde_json::{Value, json};
 
+use crate::primal_names;
+
 const GUIDESTONE_VERSION: &str = "wetspring-gonzales-guideStone v0.2.0";
 const GUIDESTONE_CHECKS: &str = "38/38 PASS";
 const WETSPRING_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -146,7 +148,7 @@ pub fn tier1(method: &str, params: &Value, result: &Value) -> Value {
             "version": GUIDESTONE_VERSION,
             "validation": GUIDESTONE_CHECKS,
         },
-        "wetspring": {
+        primal_names::SELF_NAME: {
             "version": WETSPRING_VERSION,
             "commit": option_env!("GIT_COMMIT_HASH").unwrap_or("dev"),
         },
@@ -214,8 +216,8 @@ fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Va
         "session.create",
         &json!({
             "metadata": { "type": "science", "name": method },
-            "session_type": { "Experiment": { "spring_id": "wetspring" } },
-            "description": format!("wetspring:{method}"),
+            "session_type": { "Experiment": { "spring_id": primal_names::SELF_NAME } },
+            "description": format!("{}:{method}", primal_names::SELF_NAME),
         }),
     )?;
 
@@ -519,9 +521,9 @@ fn try_nest_store_signal(
             "params_hash": params_hash,
             "result_hash": result_hash,
             "witnesses": [computation_witness, ingest_witness],
-            "session_type": { "Experiment": { "spring_id": "wetspring" } },
+            "session_type": { "Experiment": { "spring_id": primal_names::SELF_NAME } },
             "agents": [{
-                "did": "did:key:wetspring",
+                "did": format!("did:key:{}", primal_names::SELF_NAME),
                 "role": "computation",
                 "contribution": 1.0,
             }],
@@ -667,4 +669,105 @@ pub fn nestgate_exists(key: &str) -> bool {
     )
     .and_then(|r| r.get("exists").and_then(Value::as_bool))
     .unwrap_or(false)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn witness_hash_structure() {
+        let w = witness_hash("abc123", "test:context");
+        assert_eq!(w["kind"], "hash");
+        assert_eq!(w["evidence"], "abc123");
+        assert_eq!(w["encoding"], "hex");
+        assert_eq!(w["tier"], "open");
+        assert_eq!(w["context"], "test:context");
+        assert!(
+            w["agent"]
+                .as_str()
+                .unwrap()
+                .starts_with("wetspring:pipeline:")
+        );
+        assert!(w["witnessed_at"].as_u64().unwrap() > 0);
+    }
+
+    #[test]
+    fn witness_checkpoint_structure() {
+        let w = witness_checkpoint("tier1:computation:test");
+        assert_eq!(w["kind"], "checkpoint");
+        assert_eq!(w["evidence"], "");
+        assert_eq!(w["encoding"], "none");
+        assert_eq!(w["context"], "tier1:computation:test");
+    }
+
+    #[test]
+    fn witness_signature_structure() {
+        let w = witness_signature("base64data==", "beardog:verify");
+        assert_eq!(w["kind"], "signature");
+        assert_eq!(w["evidence"], "base64data==");
+        assert_eq!(w["encoding"], "base64");
+        assert_eq!(w["algorithm"], "ed25519");
+        assert_eq!(w["tier"], "local");
+    }
+
+    #[test]
+    fn tier1_has_required_fields() {
+        let params = json!({"method": "diversity.shannon", "samples": [[1,2,3]]});
+        let result = json!({"shannon": 1.0986});
+        let prov = tier1("diversity.shannon", &params, &result);
+
+        assert_eq!(prov["tier"], 1);
+        assert!(
+            prov["guidestone"]["version"]
+                .as_str()
+                .unwrap()
+                .contains("guideStone")
+        );
+        assert_eq!(prov[primal_names::SELF_NAME]["version"], WETSPRING_VERSION);
+        assert_eq!(prov["computation"]["method"], "diversity.shannon");
+        assert!(prov["computation"]["content_hash"].as_str().unwrap().len() > 10);
+        assert!(prov["witnesses"].as_array().unwrap().len() >= 2);
+        assert!(
+            prov["reproduction"]["plasmid_manifest"]
+                .as_str()
+                .unwrap()
+                .len()
+                > 0
+        );
+    }
+
+    #[test]
+    fn circuit_breaker_opens_after_threshold() {
+        TRIO_FAILURES.store(0, Ordering::Relaxed);
+        TRIO_BREAKER_OPENED.store(0, Ordering::Relaxed);
+
+        assert!(!trio_breaker_open());
+
+        for _ in 0..BREAKER_THRESHOLD {
+            trio_record_failure();
+        }
+        assert!(trio_breaker_open());
+
+        trio_record_success();
+        assert!(!trio_breaker_open());
+    }
+
+    #[test]
+    fn circuit_breaker_resets_after_cooldown() {
+        TRIO_FAILURES.store(0, Ordering::Relaxed);
+        TRIO_BREAKER_OPENED.store(0, Ordering::Relaxed);
+
+        let past = now_epoch().saturating_sub(BREAKER_COOLDOWN_SECS + 1);
+        TRIO_BREAKER_OPENED.store(past, Ordering::Relaxed);
+        TRIO_FAILURES.store(BREAKER_THRESHOLD, Ordering::Relaxed);
+
+        assert!(!trio_breaker_open());
+        assert_eq!(TRIO_FAILURES.load(Ordering::Relaxed), 0);
+    }
+
+    #[test]
+    fn now_nanos_is_nonzero() {
+        assert!(now_nanos() > 0);
+    }
 }

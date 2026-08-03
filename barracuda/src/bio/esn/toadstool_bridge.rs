@@ -421,3 +421,98 @@ where
         }),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bio_head_kind_indices() {
+        assert_eq!(BioHeadKind::Diversity.index(5), 0);
+        assert_eq!(BioHeadKind::Taxonomy.index(5), 1);
+        assert_eq!(BioHeadKind::Amr.index(5), 2);
+        assert_eq!(BioHeadKind::Bloom.index(5), 3);
+        assert_eq!(BioHeadKind::Disorder.index(5), 4);
+        assert_eq!(BioHeadKind::Custom(99).index(5), 4);
+    }
+
+    #[test]
+    fn bio_head_kind_clamps_to_output_size() {
+        assert_eq!(BioHeadKind::Disorder.index(2), 1);
+        assert_eq!(BioHeadKind::Custom(10).index(3), 2);
+    }
+
+    #[test]
+    fn bio_head_kind_default_index() {
+        assert_eq!(BioHeadKind::default_index(), 0);
+    }
+
+    #[test]
+    fn bio_esn_config_default() {
+        let cfg = BioEsnConfig::default();
+        assert_eq!(cfg.input_size, 5);
+        assert_eq!(cfg.reservoir_size, 200);
+        assert_eq!(cfg.output_size, 3);
+        assert!((cfg.spectral_radius - 0.9).abs() < 1e-10);
+        assert!((cfg.leak_rate - 0.3).abs() < 1e-10);
+    }
+
+    #[test]
+    fn bio_esn_config_multi_head() {
+        let cfg = BioEsnConfig::multi_head(10, 5);
+        assert_eq!(cfg.input_size, 10);
+        assert_eq!(cfg.output_size, 5);
+        assert_eq!(cfg.reservoir_size, 500);
+        assert!((cfg.spectral_radius - 0.95).abs() < 1e-10);
+    }
+
+    #[test]
+    fn bio_esn_config_converts_to_esn_config() {
+        let bio = BioEsnConfig::default();
+        let esn = bio.to_esn_config();
+        assert_eq!(esn.input_size, bio.input_size);
+        assert_eq!(esn.reservoir_size, bio.reservoir_size);
+        assert_eq!(esn.output_size, bio.output_size);
+        assert!((f64::from(esn.spectral_radius) - bio.spectral_radius).abs() < 0.01);
+    }
+
+    #[test]
+    fn bio_head_labels_standard() {
+        let labels = bio_head_labels(5);
+        assert_eq!(
+            labels,
+            ["diversity", "taxonomy", "amr", "bloom", "disorder"]
+        );
+    }
+
+    #[test]
+    fn bio_head_labels_overflow() {
+        let labels = bio_head_labels(7);
+        assert_eq!(labels[5], "custom_5");
+        assert_eq!(labels[6], "custom_6");
+    }
+
+    #[test]
+    fn bio_head_labels_fewer_than_names() {
+        let labels = bio_head_labels(2);
+        assert_eq!(labels, ["diversity", "taxonomy"]);
+    }
+
+    #[test]
+    fn from_esn_config() {
+        let esn_cfg = EsnConfig {
+            input_size: 8,
+            reservoir_size: 300,
+            output_size: 4,
+            spectral_radius: 0.85,
+            connectivity: 0.15,
+            leak_rate: 0.25,
+            regularization: 1e-6,
+            seed: 123,
+        };
+        let bio: BioEsnConfig = (&esn_cfg).into();
+        assert_eq!(bio.input_size, 8);
+        assert_eq!(bio.reservoir_size, 300);
+        assert_eq!(bio.seed, 123);
+    }
+}
