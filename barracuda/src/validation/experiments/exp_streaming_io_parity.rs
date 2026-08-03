@@ -425,13 +425,11 @@ fn validate_ms2_streaming_parity(v: &mut Validator) {
 
 /// Run the `validate_streaming_io_parity` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_fastq_stats_parity(v);
     validate_fastq_record_parity(v);
     validate_utf8_header_safety(v);
     validate_nanopore_bulk_parity(v);
     validate_ms2_streaming_parity(v);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -442,14 +440,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "streaming_io_parity",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_streaming_io_parity",
-        provenance_date: "2026-05-20",
-        description: "# Exp209: Streaming I/O Parity Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "streaming_io_parity",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_streaming_io_parity",
+            provenance_date: "2026-05-20",
+            description: "# Exp209: Streaming I/O Parity Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

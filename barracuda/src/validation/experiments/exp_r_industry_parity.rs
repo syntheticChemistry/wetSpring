@@ -530,14 +530,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "r_industry_parity",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_r_industry_parity",
-        provenance_date: "2026-05-20",
-        description: "R Industry Parity Validation — vegan / DADA2 / phyloseq",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "r_industry_parity",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_r_industry_parity",
+            provenance_date: "2026-05-20",
+            description: "R Industry Parity Validation — vegan / DADA2 / phyloseq",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

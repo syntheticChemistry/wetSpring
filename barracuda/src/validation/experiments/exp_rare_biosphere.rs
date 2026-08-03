@@ -43,7 +43,6 @@ use crate::validation::Validator;
 
 /// Run the `validate_rare_biosphere` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let piccard = piccard_community();
     let von_damm = von_damm_community();
     let background = background_community();
@@ -56,7 +55,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_rare_lineages(v, &piccard, &von_damm, &background);
     validate_pcoa(v, &piccard, &von_damm, &background);
     validate_python_parity(v, &piccard, &von_damm, &background);
-
 }
 
 // ── Synthetic vent communities (match Python baseline exactly) ──────
@@ -417,14 +415,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "rare_biosphere",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_rare_biosphere",
-        provenance_date: "2026-05-20",
-        description: "Exp051 — Anderson 2015: Rare biosphere at deep-sea hydrothermal vents",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "rare_biosphere",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_rare_biosphere",
+            provenance_date: "2026-05-20",
+            description: "Exp051 — Anderson 2015: Rare biosphere at deep-sea hydrothermal vents",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

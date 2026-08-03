@@ -38,7 +38,6 @@ struct BurstObservation {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_burst_statistics_anderson` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Jemielita et al. (SciRep 2019) key findings ──");
 
     let observations = [
@@ -221,7 +220,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  to Anderson regimes, quantitative predictions for diversity/3D");
     println!("  extension experiments, and the level spacing ratio reanalysis.");
     v.check_pass("paper strategy documented", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -232,14 +230,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "burst_statistics_anderson",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_burst_statistics_anderson",
-        provenance_date: "2026-05-20",
-        description: "# Exp149: Reinterpretation of QS Burst Statistics as Anderson Localization",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "burst_statistics_anderson",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_burst_statistics_anderson",
+            provenance_date: "2026-05-20",
+            description: "# Exp149: Reinterpretation of QS Burst Statistics as Anderson Localization",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

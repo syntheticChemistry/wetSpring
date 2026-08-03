@@ -22,19 +22,18 @@
 //! in the [`stats`] submodule. Generation-aware frequency thresholds
 //! for LTEE variant calling live in [`thresholds`].
 
-mod stats;
-pub mod thresholds;
 pub mod cross_validation;
+mod stats;
 #[cfg(test)]
 mod tests;
+pub mod thresholds;
 
 use crate::bio::pileup::PileupColumn;
+use crate::cast;
 use crate::io::fasta::GenBankFeature;
-use stats::{
-    binomial_quality, quality_weighted_freq, variant_quality, variant_quality_bq,
-};
 #[cfg(test)]
 use stats::{binomial_log_sf, log_gamma};
+use stats::{binomial_quality, quality_weighted_freq, variant_quality, variant_quality_bq};
 
 #[cfg(feature = "gpu")]
 use crate::bio::snp_gpu::SnpGpu;
@@ -94,15 +93,10 @@ impl CalledVariant {
             VariantType::Deletion => "DEL",
             VariantType::Insertion => "INS",
         };
-        let gene_str = self
-            .gene
-            .as_deref()
-            .unwrap_or("intergenic");
+        let gene_str = self.gene.as_deref().unwrap_or("intergenic");
         format!(
             "{type_str}\t.\t.\t{seq_id}\t{}\t{}\tgene={gene_str}\tfreq={:.4}",
-            self.position,
-            self.alt_allele as char,
-            self.frequency
+            self.position, self.alt_allele as char, self.frequency
         )
     }
 }
@@ -265,8 +259,9 @@ pub fn call_variants_gpu(
         }
         let mut seq_idx = 0;
         for (base_idx, &count) in col.base_counts[..4].iter().enumerate() {
-            #[expect(clippy::cast_possible_truncation, reason = "scaled to max_synthetic_depth")]
-            let scaled = ((u64::from(count) * max_synthetic_depth as u64) / u64::from(total)) as usize;
+            let scaled = cast::u64_usize(
+                (u64::from(count) * cast::usize_u64(max_synthetic_depth)) / u64::from(total),
+            );
             for _ in 0..scaled {
                 if seq_idx < max_synthetic_depth {
                     sequences[seq_idx][col_idx] = bases[base_idx];
@@ -293,7 +288,7 @@ pub fn call_variants_gpu(
         let ref_base = reference[col.position].to_ascii_uppercase();
 
         if gpu_result.is_variant[col_idx] == 1 {
-            let gpu_ref_idx = gpu_result.ref_alleles[col_idx] as usize;
+            let gpu_ref_idx = cast::u32_usize(gpu_result.ref_alleles[col_idx]);
             let (alt_base, alt_idx) = if gpu_ref_idx < 4 {
                 col.base_counts[..4]
                     .iter()
@@ -361,7 +356,6 @@ pub fn call_variants_gpu(
 
     Ok(variants)
 }
-
 
 fn call_snp(
     col: &PileupColumn,
@@ -538,7 +532,10 @@ pub fn parse_gd_file(contents: &str) -> Vec<(String, usize, String)> {
             continue;
         }
         let variant_type = fields[0].to_string();
-        if !matches!(variant_type.as_str(), "SNP" | "DEL" | "INS" | "SUB" | "MOB" | "AMP" | "CON" | "INV") {
+        if !matches!(
+            variant_type.as_str(),
+            "SNP" | "DEL" | "INS" | "SUB" | "MOB" | "AMP" | "CON" | "INV"
+        ) {
             continue;
         }
         if let Ok(position) = fields[4].parse::<usize>() {

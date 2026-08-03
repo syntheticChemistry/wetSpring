@@ -27,7 +27,6 @@ use crate::validation::Validator;
 
 /// Run the `validate_toadstool_s70_rewire` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══ S1: Kimura Fixation Probability ════════════════════════════════════
     v.section("S1: Kimura Fixation Probability (evolution.rs)");
 
@@ -308,7 +307,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  diversity:   chao1_classic (u64 counts, Chao 1984)");
     println!("  Pin:         S70+++ (1dd7e338)");
     println!("═══════════════════════════════════════════════════════════════");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -319,14 +317,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "toadstool_s70_rewire",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_toadstool_s70_rewire",
-        provenance_date: "2026-05-20",
-        description: "# Exp247: `ToadStool` S70+++ Rewire Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "toadstool_s70_rewire",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_toadstool_s70_rewire",
+            provenance_date: "2026-05-20",
+            description: "# Exp247: `ToadStool` S70+++ Rewire Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

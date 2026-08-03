@@ -200,8 +200,7 @@ fn nestgate_has_dataset(socket: &Path, key: &str) -> bool {
     let request = format!(
         r#"{{"jsonrpc":"2.0","method":"storage.exists","params":{{"key":"data:{escaped_key}","family_id":"default"}},"id":1}}"#,
     );
-    nestgate_rpc(socket, &request)
-        .is_ok_and(|resp| resp.contains("true"))
+    nestgate_rpc(socket, &request).is_ok_and(|resp| resp.contains("true"))
 }
 
 /// Send a JSON-RPC request to `NestGate`.

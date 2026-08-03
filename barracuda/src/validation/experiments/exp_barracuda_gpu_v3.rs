@@ -32,9 +32,7 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use crate::bio::{
-    diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu,
-};
+use crate::bio::{diversity, diversity_gpu, spectral_match, spectral_match_gpu, stats_gpu};
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
@@ -44,25 +42,23 @@ use crate::validation::{self, Validator};
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    println!();
+        println!();
 
-    validate_extended_diversity(&gpu, v);
-    validate_bray_curtis_matrix(&gpu, v);
-    validate_spectral_batch(&gpu, v);
-    validate_statistics(&gpu, v);
-    validate_gpu_determinism(&gpu, v);
-
+        validate_extended_diversity(&gpu, v);
+        validate_bray_curtis_matrix(&gpu, v);
+        validate_spectral_batch(&gpu, v);
+        validate_statistics(&gpu, v);
+        validate_gpu_determinism(&gpu, v);
     });
 }
 
@@ -340,14 +336,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_gpu_v3",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_gpu_v3",
-        provenance_date: "2026-05-20",
-        description: "Exp044: `BarraCuda` GPU parity for v3 domains — proves CPU→GPU portability",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_gpu_v3",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_gpu_v3",
+            provenance_date: "2026-05-20",
+            description: "Exp044: `BarraCuda` GPU parity for v3 domains — proves CPU→GPU portability",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

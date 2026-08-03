@@ -29,28 +29,24 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use std::collections::HashMap;
 use crate::bio::chimera::{self, ChimeraParams};
 use crate::bio::dada2::{self, Asv, Dada2Params};
 use crate::bio::derep::{self, DerepSort, UniqueSequence};
 use crate::bio::diversity;
-use crate::bio::taxonomy::{
-    ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq,
-};
+use crate::bio::taxonomy::{ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq};
 use crate::bio::unifrac::{self, PhyloTree};
 use crate::io::fastq::FastqRecord;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::collections::HashMap;
 
 /// Run the `validate_16s_pipeline` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_dada2(v);
     validate_chimera(v);
     validate_taxonomy(v);
     validate_unifrac(v);
     validate_end_to_end(v);
-
 }
 
 // ── DADA2 denoising ─────────────────────────────────────────────────────────
@@ -452,14 +448,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "16s_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_16s_pipeline",
-        provenance_date: "2026-05-20",
-        description: "Validate the complete 16S amplicon pipeline: derep → DADA2 → chimera → taxono...",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "16s_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_16s_pipeline",
+            provenance_date: "2026-05-20",
+            description: "Validate the complete 16S amplicon pipeline: derep → DADA2 → chimera → taxono...",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

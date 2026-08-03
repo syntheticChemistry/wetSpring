@@ -40,7 +40,6 @@ struct WaveLocalizationRegime {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_qs_wave_localization` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Two complementary QS models ──");
 
     println!("  MODEL A (Meyer et al. PRE 2020):");
@@ -245,7 +244,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("    W ≈ W_c: L_eff ≈ a (Anderson-limited, QS fails)");
     println!("    d ≤ 2: ξ always finite → L_eff << L_QS (always Anderson-limited)");
     v.check_pass("quantitative framework documented", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -256,14 +254,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "qs_wave_localization",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_qs_wave_localization",
-        provenance_date: "2026-05-20",
-        description: "# Exp148: QS Traveling Wave × Anderson Localization",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "qs_wave_localization",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_qs_wave_localization",
+            provenance_date: "2026-05-20",
+            description: "# Exp148: QS Traveling Wave × Anderson Localization",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

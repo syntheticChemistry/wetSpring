@@ -50,7 +50,6 @@ struct ColdSeepSample {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_cold_seep_qs_catalog` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Deep-sea cold seep QS gene systems ──");
 
     let systems = vec![
@@ -239,7 +238,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  • Deep-sea sediment = undisturbed 3D → clean geometry test");
     println!("  • If predictions hold, cold seep = \"gold standard\" 3D QS habitat");
     v.check_pass("sub-thesis extension documented", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -250,14 +248,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cold_seep_qs_catalog",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_cold_seep_qs_catalog",
-        provenance_date: "2026-05-20",
-        description: "# Exp144: Cold Seep QS Gene Catalog — Parsing 299K Genes",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cold_seep_qs_catalog",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_cold_seep_qs_catalog",
+            provenance_date: "2026-05-20",
+            description: "# Exp144: Cold Seep QS Gene Catalog — Parsing 299K Genes",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

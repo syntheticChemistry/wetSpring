@@ -28,7 +28,6 @@ use barracuda::spectral::{
 
 /// Run the `validate_qs_distance_scaling` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Physical constants ──");
 
     // Bacterial cell
@@ -326,7 +325,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  QS is the best-characterized example, but the math applies to");
     println!("  ANY signal that diffuses through the spatial matrix.");
     v.check_pass("mixed systems analysis", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -337,14 +335,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "qs_distance_scaling",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_qs_distance_scaling",
-        provenance_date: "2026-05-20",
-        description: "# Exp139: QS Distance Scaling — Bacteria Shouting vs Human Shouting",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "qs_distance_scaling",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_qs_distance_scaling",
+            provenance_date: "2026-05-20",
+            description: "# Exp139: QS Distance Scaling — Bacteria Shouting vs Human Shouting",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

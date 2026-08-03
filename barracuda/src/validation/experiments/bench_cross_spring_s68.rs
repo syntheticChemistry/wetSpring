@@ -49,9 +49,7 @@ use crate::bio::multi_signal_gpu::{MultiSignalGpu, MultiSignalOdeConfig};
 use crate::bio::phage_defense::PhageDefenseParams;
 use crate::bio::phage_defense_gpu::{PhageDefenseGpu, PhageDefenseOdeConfig};
 use crate::tolerances;
-use crate::validation::{
-    BenchRow, OrExit, Validator, bench_print, print_bench_table,
-};
+use crate::validation::{BenchRow, OrExit, Validator, bench_print, print_bench_table};
 
 /// Run the `benchmark_cross_spring_s68` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -764,7 +762,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  GEMM cached dispatch: {per_dispatch:.3} ms");
 
     v.check_pass("all timing data collected", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -775,14 +772,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_s68",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_cross_spring_s68",
-        provenance_date: "2026-05-20",
-        description: "Exp189 — Cross-Spring Evolution Benchmark (`ToadStool` S68)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_s68",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_cross_spring_s68",
+            provenance_date: "2026-05-20",
+            description: "Exp189 — Cross-Spring Evolution Benchmark (`ToadStool` S68)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

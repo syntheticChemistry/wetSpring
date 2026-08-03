@@ -17,12 +17,12 @@
 //!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
-use std::time::Instant;
 use crate::bio::ani;
 use crate::bio::diversity;
 use crate::bio::dnds;
 use crate::bio::pangenome::{self, GeneCluster};
 use crate::validation::Validator;
+use std::time::Instant;
 
 const N_GENOMES: usize = 200;
 const N_GENES: usize = 4000;
@@ -88,7 +88,6 @@ fn generate_sequences(n_seqs: usize, seq_len: usize, seed: u64) -> Vec<Vec<u8>> 
 
 /// Run the `validate_cross_ecosystem_pangenome` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── S1: Multi-ecosystem pangenome generation ──
     v.section("── S1: Synthetic pangenomes ──");
 
@@ -245,7 +244,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             1,
         );
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -256,14 +254,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_ecosystem_pangenome",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_cross_ecosystem_pangenome",
-        provenance_date: "2026-05-20",
-        description: "# Exp110: Cross-Ecosystem Pangenome GPU Analysis",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_ecosystem_pangenome",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_cross_ecosystem_pangenome",
+            provenance_date: "2026-05-20",
+            description: "# Exp110: Cross-Ecosystem Pangenome GPU Analysis",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

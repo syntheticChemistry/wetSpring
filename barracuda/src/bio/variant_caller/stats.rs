@@ -118,7 +118,10 @@ pub(super) fn variant_quality(alt_count: u32, total_depth: u32, _frequency: f64)
 /// quality only (pre-V205 behavior).
 ///
 /// Returns a Phred-scaled quality score.
-#[expect(clippy::cast_precision_loss, reason = "quality sums bounded by coverage")]
+#[expect(
+    clippy::cast_precision_loss,
+    reason = "quality sums bounded by coverage"
+)]
 pub(super) fn binomial_quality(col: &PileupColumn, alt_idx: usize, alt_count: u32) -> f64 {
     if col.depth == 0 || alt_count == 0 {
         return 0.0;
@@ -193,7 +196,10 @@ pub(super) fn binomial_log_sf(k: u32, n: u32, p: f64) -> f64 {
 pub(super) fn log_binom_pmf(k: u32, n: u32, p: f64) -> f64 {
     let kf = f64::from(k);
     let nf = f64::from(n);
-    kf.mul_add(p.ln(), (nf - kf).mul_add((1.0 - p).ln(), log_binom_coeff(n, k)))
+    kf.mul_add(
+        p.ln(),
+        (nf - kf).mul_add((1.0 - p).ln(), log_binom_coeff(n, k)),
+    )
 }
 
 /// Log binomial coefficient: ln(C(n, k)).
@@ -201,7 +207,8 @@ pub(super) fn log_binom_coeff(n: u32, k: u32) -> f64 {
     if k > n {
         return f64::NEG_INFINITY;
     }
-    log_gamma(f64::from(n) + 1.0) - log_gamma(f64::from(k) + 1.0)
+    log_gamma(f64::from(n) + 1.0)
+        - log_gamma(f64::from(k) + 1.0)
         - log_gamma(f64::from(n - k) + 1.0)
 }
 
@@ -216,8 +223,7 @@ pub(super) fn log_gamma(x: f64) -> f64 {
     if x >= 12.0 {
         let x2 = x * x;
         let half_ln_2pi = 0.5 * (2.0 * std::f64::consts::PI).ln();
-        return (x - 0.5).mul_add(x.ln(), half_ln_2pi.mul_add(1.0, -x))
-            + 1.0 / (12.0 * x)
+        return (x - 0.5).mul_add(x.ln(), half_ln_2pi.mul_add(1.0, -x)) + 1.0 / (12.0 * x)
             - 1.0 / (360.0 * x2 * x);
     }
     let mut log_shift = 0.0;
@@ -247,24 +253,18 @@ pub(super) fn log_normal_sf(z: f64) -> f64 {
     }
 
     let p = normal_sf_approx(z);
-    if p <= 0.0 {
-        f64::NEG_INFINITY
-    } else {
-        p.ln()
-    }
+    if p <= 0.0 { f64::NEG_INFINITY } else { p.ln() }
 }
 
 /// Upper-tail probability P(Z > z) for z >= 0 using A&S 26.2.17.
 pub(super) fn normal_sf_approx(z: f64) -> f64 {
     let t = 1.0 / 0.231_641_9_f64.mul_add(z, 1.0);
     let d = (1.0 / (2.0 * std::f64::consts::PI)).sqrt() * (-z * z / 2.0).exp();
-    let p = d * t
+    let p = d
+        * t
         * t.mul_add(
             t.mul_add(
-                t.mul_add(
-                    t.mul_add(1.330_274_429, -1.821_255_978),
-                    1.781_477_937,
-                ),
+                t.mul_add(t.mul_add(1.330_274_429, -1.821_255_978), 1.781_477_937),
                 -0.356_563_782,
             ),
             0.319_381_530,

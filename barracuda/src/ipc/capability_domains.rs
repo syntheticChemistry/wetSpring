@@ -326,8 +326,10 @@ mod tests {
     /// documented as aspirational (integration/protocol prefixes).
     ///
     /// Orphan niche capabilities:
-    /// - `integration.sweetgrass.braid` — aspirational: sweetGrass braid wiring
-    /// - `integration.toadstool.performance_surface` — aspirational: toadStool perf data
+    /// - `integration.braid` — aspirational: sweetGrass braid wiring
+    /// - `integration.performance_surface` — aspirational: toadStool perf data
+    /// - `integration.sweetgrass.braid`, `integration.toadstool.performance_surface`
+    ///   — legacy primal-named aliases (backward compat)
     /// - `protocol.stream_item` — aspirational: streaming protocol extension
     #[cfg(feature = "ipc")]
     #[test]

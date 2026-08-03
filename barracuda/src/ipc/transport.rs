@@ -38,8 +38,7 @@ pub fn unix_jsonrpc_line(socket: &Path, request_line: &str) -> Result<String, St
         .set_write_timeout(Some(UNIX_JSONRPC_TIMEOUT))
         .map_err(|e| format!("set write timeout: {e}"))?;
 
-    super::ribocipher::send_clear_signal(&stream)
-        .map_err(|e| format!("riboCipher signal: {e}"))?;
+    super::ribocipher::send_clear_signal(&stream).map_err(|e| format!("riboCipher signal: {e}"))?;
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer
@@ -126,7 +125,10 @@ pub fn jsonrpc_line(transport: &Transport, request_line: &str) -> Result<String,
     match transport {
         Transport::Unix(path) => unix_jsonrpc_line(path, request_line),
         Transport::Tcp(addr) => tcp_jsonrpc_line(addr, request_line),
-        Transport::MeshRelay { peer_id, capability } => Err(format!(
+        Transport::MeshRelay {
+            peer_id,
+            capability,
+        } => Err(format!(
             "mesh_relay({peer_id}/{capability}) is not directly connectable — \
              route via Songbird capability.call"
         )),
@@ -196,7 +198,10 @@ impl std::fmt::Display for Transport {
         match self {
             Self::Unix(p) => write!(f, "unix:{}", p.display()),
             Self::Tcp(addr) => write!(f, "tcp:{addr}"),
-            Self::MeshRelay { peer_id, capability } => {
+            Self::MeshRelay {
+                peer_id,
+                capability,
+            } => {
                 write!(f, "mesh_relay:{peer_id}/{capability}")
             }
         }
@@ -252,8 +257,8 @@ impl TransportEndpoint {
     /// Returns `NotSet` if the env var is absent, `InvalidJson` if the
     /// value doesn't match the expected tagged format.
     pub fn from_env() -> Result<Self, TransportEndpointError> {
-        let raw = std::env::var(TRANSPORT_ENDPOINT_ENV)
-            .map_err(|_| TransportEndpointError::NotSet)?;
+        let raw =
+            std::env::var(TRANSPORT_ENDPOINT_ENV).map_err(|_| TransportEndpointError::NotSet)?;
         serde_json::from_str(&raw).map_err(TransportEndpointError::InvalidJson)
     }
 
@@ -297,7 +302,10 @@ impl std::fmt::Display for TransportEndpoint {
         match self {
             Self::Uds { path } => write!(f, "uds:{}", path.display()),
             Self::Tcp { host, port } => write!(f, "tcp:{host}:{port}"),
-            Self::MeshRelay { peer_id, capability } => {
+            Self::MeshRelay {
+                peer_id,
+                capability,
+            } => {
                 write!(f, "mesh_relay:{peer_id}/{capability}")
             }
         }
@@ -348,15 +356,12 @@ mod tests {
 
     #[test]
     fn resolve_prefers_tcp_when_set() {
-        temp_env::with_vars(
-            [("WETSPRING_TCP_TEST_TCP", Some("127.0.0.1:9200"))],
-            || {
-                let t = Transport::resolve("WETSPRING_TCP_TEST", "test_primal");
-                assert!(matches!(t, Transport::Tcp(_)));
-                assert_eq!(t.tcp_addr(), Some("127.0.0.1:9200"));
-                assert!(t.path().is_none());
-            },
-        );
+        temp_env::with_vars([("WETSPRING_TCP_TEST_TCP", Some("127.0.0.1:9200"))], || {
+            let t = Transport::resolve("WETSPRING_TCP_TEST", "test_primal");
+            assert!(matches!(t, Transport::Tcp(_)));
+            assert_eq!(t.tcp_addr(), Some("127.0.0.1:9200"));
+            assert!(t.path().is_none());
+        });
     }
 
     #[test]
@@ -543,13 +548,13 @@ mod tests {
 
     #[test]
     fn transport_endpoint_from_env_invalid_json() {
-        temp_env::with_vars(
-            [("TRANSPORT_ENDPOINT", Some("not-json"))],
-            || {
-                let result = TransportEndpoint::from_env();
-                assert!(matches!(result, Err(TransportEndpointError::InvalidJson(_))));
-            },
-        );
+        temp_env::with_vars([("TRANSPORT_ENDPOINT", Some("not-json"))], || {
+            let result = TransportEndpoint::from_env();
+            assert!(matches!(
+                result,
+                Err(TransportEndpointError::InvalidJson(_))
+            ));
+        });
     }
 
     #[test]

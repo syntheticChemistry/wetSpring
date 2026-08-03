@@ -54,7 +54,6 @@ use crate::validation::{self, Validator};
 
 /// Run the `validate_cross_spring_s93` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── D00: CPU Math Primitives (always available, no GPU) ──
     v.section("D00: CPU Math Primitives — barraCuda v0.3.1");
 
@@ -75,8 +74,7 @@ pub fn run(v: &mut crate::validation::Validator) {
         tolerances::NORM_PPF_KNOWN,
     );
 
-    let cdf_then_ppf =
-        crate::special::norm_ppf(crate::special::normal_cdf(1.645));
+    let cdf_then_ppf = crate::special::norm_ppf(crate::special::normal_cdf(1.645));
     v.check(
         "norm_ppf(Φ(1.645)) round-trip",
         cdf_then_ppf,
@@ -391,8 +389,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     v.section("D08: Bio Tolerance Search — CPU fallback validation");
 
     let sorted_mz = vec![100.001, 200.002, 300.003];
-    let hits =
-        crate::bio::tolerance_search::find_within_ppm(&sorted_mz, 100.001, 10.0);
+    let hits = crate::bio::tolerance_search::find_within_ppm(&sorted_mz, 100.001, 10.0);
     v.check_pass("ppm search finds exact match", !hits.is_empty());
 
     // ── D09: Bio KMD (CPU path) ──
@@ -509,7 +506,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "All springs → barraCuda → all springs (shared evolution)",
         true,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -520,14 +516,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_s93",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_cross_spring_s93",
-        provenance_date: "2026-05-20",
-        description: "# Exp305: Cross-Spring S93 Evolution Validation + Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_s93",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_cross_spring_s93",
+            provenance_date: "2026-05-20",
+            description: "# Exp305: Cross-Spring S93 Evolution Validation + Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

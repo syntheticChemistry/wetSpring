@@ -103,11 +103,8 @@ pub(super) fn dehydrate(
 /// Pass empty `vertex_ids` to dehydrate all current vertices.
 ///
 /// This is the "aglet" pattern — seal the finished nodes, leave open branches.
-#[must_use] 
-pub fn partial_dehydrate(
-    session_id: &str,
-    vertex_ids: &[String],
-) -> Option<Value> {
+#[must_use]
+pub fn partial_dehydrate(session_id: &str, vertex_ids: &[String]) -> Option<Value> {
     let socket = neural_api_socket()?;
     capability_call(
         &socket,

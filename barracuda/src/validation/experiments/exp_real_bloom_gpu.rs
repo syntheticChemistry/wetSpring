@@ -19,7 +19,6 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::time::Instant;
 use crate::bio::diversity;
 #[cfg(feature = "gpu")]
 use crate::bio::diversity_gpu;
@@ -28,6 +27,7 @@ use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::time::Instant;
 
 fn generate_ecosystem(
     name: &str,
@@ -73,7 +73,6 @@ fn dominance_index(counts: &[f64]) -> f64 {
 
 /// Run the `validate_real_bloom_gpu` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── S1: Multi-ecosystem bloom generation ──
     v.section("── S1: Multi-ecosystem synthetic data ──");
 
@@ -298,7 +297,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     }
 
     v.check_count("scale benchmark ran", 1, 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -309,14 +307,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "real_bloom_gpu",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_real_bloom_gpu",
-        provenance_date: "2026-05-20",
-        description: "# Exp112: Real-Bloom GPU Surveillance at Scale",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "real_bloom_gpu",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_real_bloom_gpu",
+            provenance_date: "2026-05-20",
+            description: "# Exp112: Real-Bloom GPU Surveillance at Scale",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

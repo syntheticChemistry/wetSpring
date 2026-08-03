@@ -1,23 +1,20 @@
 # wetSpring wateringHole
 
-**Date:** June 3, 2026
+**Date:** August 3, 2026
 **Purpose:** Spring-local handoff documents to `barraCuda`/`toadStool` and cross-spring provenance records. Pattern library for primalSpring and primal teams.
 
 ---
 
-## Current Ecosystem State (V195 — Wave 76 Deep Debt)
+## Current Ecosystem State (V210+ — Wave 156 Deep Debt Evolution)
 
 | Metric | Value |
 |--------|-------|
-| primalSpring | v0.9.28 (458 methods, 56 scenarios, 92 experiments, temporal sync spec) |
-| wetSpring | V195 (345 scenarios, 50 niche, 59 consumed, 45 dispatch, 55 baselines, 2,089 tests, clippy zero) |
-| Registry sync | **458** — zero drift |
-| Niche capabilities | **50** |
-| NUCLEUS deployment | **southGate** — 10/13 health (coralReef rename, 2 BTSP-gated) |
-| Architecture | TCP transport, primal name constants, Songbird registration fixed, macOS RSS |
-| Dependencies | axum 0.8.9, blake3 1.8.5, proptest 1.11, tempfile 3.27, tower-http 0.6.11 |
-| Forgejo sync | Remotes configured, SSH key registration **pending** |
-| Active gaps | WS-9 (L3 parity — needs FASTQ), WS-11 (MAPQ calibration — needs dataset) |
+| wetSpring | V210+ (346 scenarios, 54 niche, 59 consumed, 47 dispatch, 22 domains, 2,201 tests, clippy zero) |
+| Gate | **westGate** (primary dev + Data NAS); southGate (NUCLEUS); strandGate (GPU science) |
+| NUCLEUS deployment | **southGate** — 13/13 processes, 11/13 health-responding, 2 BTSP-gated |
+| Architecture | Capability-based discovery, SSOT primal constants, `cast::*` safety, `tracing` observability |
+| Deep debt | 7-stream evolution: capability discovery, cast safety (186 casts), idiom modernization, mock isolation, dep evolution, coverage expansion, variant completion |
+| Active gaps | WS-9 (L3 parity), WS-11 (MAPQ 6/8 — MOB/AMP/CON/INV cross-validation logged, Gap #11) |
 | PG gaps | **0 open** — 22/22 closed |
 
 ---
@@ -26,13 +23,11 @@
 
 | Version | File | Date | Scope |
 |---------|------|------|-------|
-| **W76-DD** | `handoffs/WETSPRING_WAVE76_DEEP_DEBT_JUN03_2026.md` | Jun 03 | **Deep debt**: TCP transport, primal name centralization, Songbird registration fix, ionic bonding modernized, 5 deps bumped, 2,089 tests. |
-| **W76** | `handoffs/WETSPRING_WAVE76_PARITY_ALIGNMENT_JUN03_2026.md` | Jun 03 | **Parity alignment**: bearDog w135 absorbed (no auth calls), 157 warnings eliminated, clippy zero, 2,085 tests clean. |
-| **W67** | `handoffs/WETSPRING_WAVE67_GLACIAL_CUTOVER_JUN01_2026.md` | Jun 01 | **Glacial cutover**: Songbird socket fix, biomeOS capability.call proxy, bearDog S4 auth verified. |
-| **W63** | `handoffs/WETSPRING_WAVE63_RIVER_DELTA_MAY30_2026.md` | May 30 | **River Delta**: PG-02/PG-04 re-verified, composition_nucleus.sh fossilized, domain_profile.toml created, temporal sync tooling confirmed. |
-| **W60-S** | `handoffs/WETSPRING_WAVE60_STABILIZATION_MAY29_2026.md` | May 29 | **Stabilization**: Clippy zero, cast fixes, airSpring AAR response, steady-state. |
-| **W60** | `handoffs/WETSPRING_WAVE60_EUKARYOTIC_ONBOARDING_MAY28_2026.md` | May 28 | **Eukaryotic onboarding**: 13/13 NUCLEUS, Forgejo remotes, WaterFall profile, SSH key blocker. |
-| | *Superseded → `handoffs/archive/`* | | W55/W48/W49/W50 + gate deployment + V183 and earlier archived (**206** files). |
+| **W156** | `handoffs/WETSPRING_WAVE156_DEEP_DEBT_AUG03_2026.md` | Aug 03 | **Deep debt evolution**: 7-stream systematic cleanup — capability discovery, cast safety (186 casts), idiom modernization, mock isolation, dep evolution, coverage, variant completion. 2,201 tests. |
+| **W111** | `handoffs/WETSPRING_WAVE111_WS11_DEPTH_JUN13_2026.md` | Jun 13 | **WS-11 depth**: MAPQ calibration pipeline, cross-validation engine, variant caller parity 6/8. |
+| **W76-DD** | `handoffs/WETSPRING_WAVE76_DEEP_DEBT_JUN03_2026.md` | Jun 03 | **Deep debt**: TCP transport, primal name centralization, Songbird registration fix, ionic bonding modernized. |
+| **W76** | `handoffs/WETSPRING_WAVE76_PARITY_ALIGNMENT_JUN03_2026.md` | Jun 03 | **Parity alignment**: 157 warnings eliminated, clippy zero, 2,085 tests. |
+| | *Superseded → `handoffs/archive/`* | | W67/W63/W60/W55 + gate deployment + V183 and earlier archived (**206** files). |
 
 ## Cross-Spring Documents
 

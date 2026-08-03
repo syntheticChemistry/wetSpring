@@ -30,7 +30,6 @@
 
 use std::path::PathBuf;
 
-use barracuda::stats::norm_cdf;
 use crate::bio::diversity;
 use crate::cast::usize_f64;
 use crate::validation::OrExit;
@@ -40,10 +39,10 @@ use crate::visualization::stream::StreamSession;
 use crate::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
+use barracuda::stats::norm_cdf;
 
 /// Run the `validate_petaltongue_anderson_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Biome data: synthetic communities representing different environments ──
     let biomes: Vec<(&str, Vec<f64>)> = vec![
         (
@@ -498,7 +497,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         );
     }
     v.check_pass("science summary printed", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -509,14 +507,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "petaltongue_anderson_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_petaltongue_anderson_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp354: Anderson QS Landscape — Flagship Visualization",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "petaltongue_anderson_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_petaltongue_anderson_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp354: Anderson QS Landscape — Flagship Visualization",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

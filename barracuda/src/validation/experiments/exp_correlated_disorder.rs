@@ -50,7 +50,6 @@ fn sweep_w(i: usize) -> f64 {
 
 /// Run the `validate_correlated_disorder` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
         use std::time::Instant;
@@ -215,7 +214,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         println!("  [skipped — no GPU feature]");
         v.check_count("correlation lengths defined", CORR_LENGTHS.len(), 4);
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -226,14 +224,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "correlated_disorder",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_correlated_disorder",
-        provenance_date: "2026-05-20",
-        description: "# Exp151: Disorder-Correlated Lattices for Biofilm Disorder",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "correlated_disorder",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_correlated_disorder",
+            provenance_date: "2026-05-20",
+            description: "# Exp151: Disorder-Correlated Lattices for Biofilm Disorder",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

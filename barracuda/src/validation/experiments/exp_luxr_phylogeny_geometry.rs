@@ -39,7 +39,6 @@ struct LuxrLineage {
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 /// Run the `validate_luxr_phylogeny_geometry` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: luxR family evolutionary lineages ──");
 
     let lineages = vec![
@@ -305,7 +304,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  • Rhizobial luxR + plant flavonoid = cross-kingdom QS bridge");
     println!("  • Test: are solo luxR receptors enriched in mixed-species habitats?");
     v.check_pass("sub-thesis 05 connection", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -316,14 +314,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "luxr_phylogeny_geometry",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_luxr_phylogeny_geometry",
-        provenance_date: "2026-05-20",
-        description: "# Exp146: luxR Phylogeny × Habitat Geometry Overlay",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "luxr_phylogeny_geometry",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_luxr_phylogeny_geometry",
+            provenance_date: "2026-05-20",
+            description: "# Exp146: luxR Phylogeny × Habitat Geometry Overlay",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

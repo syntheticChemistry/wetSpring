@@ -367,7 +367,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Fp64Strategy: {:?}", gpu.fp64_strategy());
     println!("  Total GPU time: {total_ms:.1} ms");
     println!("  CPU → GPU math proven portable for fused ops.");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -378,14 +377,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_gpu_v12",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_gpu_v12",
-        provenance_date: "2026-05-20",
-        description: "# Exp308: `BarraCuda` GPU v12 — V97d Fused Ops GPU Portability",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_gpu_v12",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_gpu_v12",
+            provenance_date: "2026-05-20",
+            description: "# Exp308: `BarraCuda` GPU v12 — V97d Fused Ops GPU Portability",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

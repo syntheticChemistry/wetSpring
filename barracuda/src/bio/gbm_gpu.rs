@@ -37,6 +37,7 @@ pub fn predict_batch_gpu(
     samples: &[Vec<f64>],
 ) -> Result<Vec<GbmPrediction>> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for GBM batch inference");
     Ok(model.predict_batch_proba(samples))
 }
 
@@ -47,6 +48,7 @@ pub fn predict_batch_gpu(
 /// Returns an error if the device lacks `SHADER_F64` support.
 pub fn predict_gpu(gpu: &GpuF64, model: &GbmClassifier, features: &[f64]) -> Result<GbmPrediction> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for GBM inference");
     Ok(model.predict_proba(features))
 }
 
@@ -61,6 +63,9 @@ pub fn predict_multi_batch_gpu(
     samples: &[Vec<f64>],
 ) -> Result<Vec<GbmMultiPrediction>> {
     require_f64(gpu)?;
+    tracing::debug!(
+        "GPU pipeline sentinel: using CPU fallback for multi-class GBM batch inference"
+    );
     Ok(predict_multi_batch(model, samples))
 }
 

@@ -270,7 +270,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Stage 4: Anderson W→P(QS)");
     println!("  Stage 5: Bootstrap + jackknife + correlation");
     println!("  Total: {total_ms:.1} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -281,14 +280,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_streaming_v9",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_pure_gpu_streaming_v9",
-        provenance_date: "2026-05-20",
-        description: "# Exp294: Pure GPU Streaming v9 — Full Workload Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_streaming_v9",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_pure_gpu_streaming_v9",
+            provenance_date: "2026-05-20",
+            description: "# Exp294: Pure GPU Streaming v9 — Full Workload Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

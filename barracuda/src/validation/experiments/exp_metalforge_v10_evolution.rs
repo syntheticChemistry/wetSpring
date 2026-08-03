@@ -25,7 +25,6 @@
 
 use std::time::Instant;
 
-use serde_json::json;
 use crate::bio::{
     ani, diversity, diversity_gpu, dnds, fst_variance, kmer, pangenome, pcoa, qs_biofilm, snp,
     spectral_match,
@@ -36,6 +35,7 @@ use crate::ipc::dispatch;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use serde_json::json;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Hardware {
@@ -336,7 +336,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Graceful fallback: all error paths tested");
     println!("  Total time: {total_ms:.2} ms");
     println!("  Evolution chain: Paper → CPU → GPU → Streaming → metalForge (this)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -347,14 +346,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v10_evolution",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_metalforge_v10_evolution",
-        provenance_date: "2026-05-20",
-        description: "# Exp237: `metalForge` v10 — Cross-System Evolution",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v10_evolution",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_metalforge_v10_evolution",
+            provenance_date: "2026-05-20",
+            description: "# Exp237: `metalForge` v10 — Cross-System Evolution",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -29,10 +29,10 @@
 //!
 //! Provenance: Pure GPU streaming pipeline (V11)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::{self, DomainResult, Validator};
+use std::time::Instant;
 
 #[cfg(feature = "gpu")]
 use crate::bio::diversity_gpu;
@@ -251,7 +251,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         println!("  Unidirectional pipeline: diversity → BC → Anderson → stats");
         println!("  Zero CPU round-trips in hot path. ToadStool streaming dispatch.");
         println!("  Chain: Paper → CPU → GPU → Streaming (this) → metalForge");
-
     }
 }
 
@@ -263,14 +262,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_streaming_v11",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_pure_gpu_streaming_v11",
-        provenance_date: "2026-05-20",
-        description: "# Exp317: Pure GPU Streaming v11 — V98 End-to-End Pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_streaming_v11",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_pure_gpu_streaming_v11",
+            provenance_date: "2026-05-20",
+            description: "# Exp317: Pure GPU Streaming v11 — V98 End-to-End Pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

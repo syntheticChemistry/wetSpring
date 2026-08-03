@@ -21,10 +21,10 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::spectral_match;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 const LIB_SIZE: usize = 5_000;
 const N_QUERIES: usize = 100;
@@ -86,7 +86,6 @@ fn cosine_spectrum(a: &[(f64, f64)], b: &[(f64, f64)]) -> f64 {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_npu_spectral_triage` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Library generation ──");
     let library: Vec<Vec<(f64, f64)>> = (0..LIB_SIZE)
         .map(|i| generate_spectrum(i as u64, 20 + (i % 181)))
@@ -242,7 +241,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let energy_per_query_j = int8_macs * energy_per_mac_nj * 1e-9;
     println!("  NPU triage energy per query: {energy_per_query_j:.6} J");
     v.check_pass("energy estimate computed", energy_per_query_j > 0.0);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -253,14 +251,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "npu_spectral_triage",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_npu_spectral_triage",
-        provenance_date: "2026-05-20",
-        description: "Exp124 — `MassBank` Full-Scale NPU Spectral Triage",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "npu_spectral_triage",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_npu_spectral_triage",
+            provenance_date: "2026-05-20",
+            description: "Exp124 — `MassBank` Full-Scale NPU Spectral Triage",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

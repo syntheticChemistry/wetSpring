@@ -95,7 +95,6 @@ fn find_crossing(sweep_a: &[(f64, f64, f64)], sweep_b: &[(f64, f64, f64)]) -> Op
 #[expect(clippy::cast_precision_loss)]
 /// Run the `validate_finite_size_scaling_v2` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
         use std::time::Instant;
@@ -303,7 +302,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         v.check_count("lattice sizes defined", LATTICE_SIZES.len(), 4);
         v.check_pass("W range defined", W_MAX > W_MIN);
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -314,14 +312,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "finite_size_scaling_v2",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_finite_size_scaling_v2",
-        provenance_date: "2026-05-20",
-        description: "# Exp150: Finite-Size Scaling with Disorder Averaging",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "finite_size_scaling_v2",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_finite_size_scaling_v2",
+            provenance_date: "2026-05-20",
+            description: "# Exp150: Finite-Size Scaling with Disorder Averaging",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -32,13 +32,13 @@
 
 use std::time::Instant;
 
+use crate::bio::diversity;
+use crate::tolerances;
+use crate::validation::Validator;
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 use barracuda::stats::{hill, mean, r_squared};
-use crate::bio::diversity;
-use crate::tolerances;
-use crate::validation::Validator;
 
 struct Timing {
     domain: &'static str,
@@ -375,7 +375,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
     println!("╚═════════════════════════╩════════════╩═══════════════════════╝");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -386,14 +385,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gonzales_il31_s79",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_gonzales_il31_s79",
-        provenance_date: "2026-05-20",
-        description: "# Exp282: Gonzales 2013 — IL-31 Serum Elevation & Anderson Disorder (Paper 53)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gonzales_il31_s79",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_gonzales_il31_s79",
+            provenance_date: "2026-05-20",
+            description: "# Exp282: Gonzales 2013 — IL-31 Serum Elevation & Anderson Disorder (Paper 53)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

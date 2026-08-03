@@ -41,15 +41,15 @@
 
 use std::time::Instant;
 
-use barracuda::spectral::{
-    GOE_R, POISSON_R, SpectralAnalysis, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues,
-    level_spacing_ratio,
-};
 use crate::bio::diversity;
 use crate::cast::usize_f64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::spectral::{
+    GOE_R, POISSON_R, SpectralAnalysis, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues,
+    level_spacing_ratio,
+};
 
 struct DomainResult {
     name: &'static str,
@@ -506,7 +506,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  ├─ Fajgenbaum MATRIX ────────── geometry-augmented drug repurposing");
     println!("  └─ hotSpring spectral ────────── Anderson 2D/3D via ToadStool S79");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -517,14 +516,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "skin_anderson_s79",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_skin_anderson_s79",
-        provenance_date: "2026-05-20",
-        description: "# Exp273: Immunological Anderson Lattice — Skin-Layer Geometry",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "skin_anderson_s79",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_skin_anderson_s79",
+            provenance_date: "2026-05-20",
+            description: "# Exp273: Immunological Anderson Lattice — Skin-Layer Geometry",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

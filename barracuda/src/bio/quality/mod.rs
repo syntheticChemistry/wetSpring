@@ -22,7 +22,7 @@
 
 mod trim;
 
-use crate::cast::usize_u32;
+use crate::cast;
 use crate::io::fastq::FastqRecord;
 
 pub use super::adapter::{find_adapter_3prime, trim_adapter_3prime};
@@ -88,11 +88,11 @@ pub struct QualityGpuParams {
 impl From<&QualityParams> for QualityGpuParams {
     fn from(p: &QualityParams) -> Self {
         Self {
-            window_size: usize_u32(p.window_size),
+            window_size: cast::usize_u32(p.window_size),
             window_min_quality: u32::from(p.window_min_quality),
             leading_min_quality: u32::from(p.leading_min_quality),
             trailing_min_quality: u32::from(p.trailing_min_quality),
-            min_length: usize_u32(p.min_length),
+            min_length: cast::usize_u32(p.min_length),
             phred_offset: u32::from(p.phred_offset),
         }
     }
@@ -206,8 +206,8 @@ pub fn filter_reads(
         let orig_len = record.sequence.len();
 
         if let Some((start, end)) = trim_read(record, params) {
-            stats.leading_bases_trimmed += start as u64;
-            stats.trailing_bases_trimmed += (orig_len - end) as u64;
+            stats.leading_bases_trimmed += cast::usize_u64(start);
+            stats.trailing_bases_trimmed += cast::usize_u64(orig_len - end);
             output.push(apply_trim(record, start, end));
             stats.output_reads += 1;
         } else {
@@ -244,10 +244,6 @@ pub struct QualityFlatResult {
 /// * `lengths` — Length of each read.
 /// * `params` — Quality filtering parameters.
 #[must_use]
-#[expect(
-    clippy::cast_possible_truncation,
-    reason = "Truncation: read lengths fit u32"
-)]
 pub fn filter_reads_flat(
     qualities: &[u8],
     offsets: &[usize],
@@ -297,8 +293,8 @@ pub fn filter_reads_flat(
         let final_end = start + window_end;
 
         // Min length check
-        starts.push(start as u32);
-        ends.push(final_end as u32);
+        starts.push(cast::usize_u32(start));
+        ends.push(cast::usize_u32(final_end));
         let passed = final_end > start && (final_end - start) >= params.min_length;
         pass.push(u8::from(passed));
     }

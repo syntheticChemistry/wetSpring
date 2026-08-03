@@ -32,13 +32,13 @@
 //!
 //! Provenance: Pure GPU streaming pipeline (V12)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::{DomainResult, Validator};
+use std::time::Instant;
 
-use barracuda::stats::norm_cdf;
 use crate::validation::OrExit;
+use barracuda::stats::norm_cdf;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     p * (-(rm * std::f64::consts::E / p)
@@ -223,7 +223,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Unidirectional pipeline PROVEN: diversity → BC → kinetics → W → stats");
     println!("  ToadStool streaming eliminates dispatch overhead and round-trips");
     println!("  Chain: GPU (Exp344) → Streaming (this) → metalForge (Exp346)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -234,14 +233,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_streaming_v12",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_pure_gpu_streaming_v12",
-        provenance_date: "2026-05-20",
-        description: "# Exp345: Pure GPU Streaming v12 — Track 6 Unidirectional Pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_streaming_v12",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_pure_gpu_streaming_v12",
+            provenance_date: "2026-05-20",
+            description: "# Exp345: Pure GPU Streaming v12 — Track 6 Unidirectional Pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

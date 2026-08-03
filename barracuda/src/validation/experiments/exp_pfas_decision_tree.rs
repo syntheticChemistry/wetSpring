@@ -25,12 +25,12 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::fs;
 use crate::bio::decision_tree::DecisionTree;
 use crate::cast;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::fs;
 
 #[expect(
     clippy::cast_possible_truncation,
@@ -121,7 +121,6 @@ fn load_test_data() -> TestData {
 
 /// Run the `validate_pfas_decision_tree` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── Loading Exported Tree ──");
     let tree = load_tree();
     v.check_count("Tree loaded: node count", tree.n_nodes(), 65);
@@ -215,7 +214,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         1.0,
         tolerances::EXACT,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -226,14 +224,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pfas_decision_tree",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_pfas_decision_tree",
-        provenance_date: "2026-05-20",
-        description: "Validation: PFAS decision tree inference — Exp008 Phase 3",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pfas_decision_tree",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_pfas_decision_tree",
+            provenance_date: "2026-05-20",
+            description: "Validation: PFAS decision tree inference — Exp008 Phase 3",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -27,11 +27,11 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::{ani, dnds, molecular_clock, pangenome, snp};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 #[expect(
     clippy::too_many_lines,
@@ -487,7 +487,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  {}", "-".repeat(60));
     println!("  {:<45} {:>12.0}", "TOTAL", total_us);
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -498,14 +497,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v4",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v4",
-        provenance_date: "2026-05-20",
-        description: "`BarraCuda` CPU Parity v4 — Track 1c domains (deep-sea metagenomics)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v4",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v4",
+            provenance_date: "2026-05-20",
+            description: "`BarraCuda` CPU Parity v4 — Track 1c domains (deep-sea metagenomics)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

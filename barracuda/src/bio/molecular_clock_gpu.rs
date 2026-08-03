@@ -40,6 +40,7 @@ pub fn strict_clock_gpu(
     calibrations: &[CalibrationPoint],
 ) -> Result<Option<StrictClockResult>> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for strict molecular clock");
     let parent_opt: Vec<Option<usize>> = parent_indices
         .iter()
         .map(|&p| if p < 0 { None } else { usize::try_from(p).ok() })
@@ -67,6 +68,7 @@ pub fn relaxed_clock_rates_gpu(
     parent_indices: &[i64],
 ) -> Result<Vec<f64>> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for relaxed clock rates");
 
     let parent_opt: Vec<Option<usize>> = parent_indices
         .iter()
@@ -90,6 +92,7 @@ pub fn relaxed_clock_rates_gpu(
 /// Returns an error if the device lacks `SHADER_F64` support.
 pub fn rate_variation_cv_gpu(gpu: &GpuF64, rates: &[f64]) -> Result<f64> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for rate variation CV");
     Ok(molecular_clock::rate_variation_cv(rates))
 }
 

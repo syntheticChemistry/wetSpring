@@ -31,13 +31,13 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use barracuda::shaders::Precision;
 use crate::bio::diversity_fusion_gpu::{DiversityFusionGpu, diversity_fusion_cpu};
 use crate::bio::gemm_cached::GemmCached;
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::shaders::Precision;
 
 struct Timing {
     label: &'static str,
@@ -690,7 +690,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║    groundSpring → Bootstrap, Wright-Fisher, InterconnectTopo   ║");
     println!("║    wateringHole → Boltzmann, Sobol, LHS, chi-squared batch     ║");
     println!("╚═══════════════════════════════════════════════════════════════════╝");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -701,14 +700,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_modern_s86",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cross_spring_modern_s86",
-        provenance_date: "2026-05-20",
-        description: "# Exp297: Cross-Spring Modern S86 Validation + Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_modern_s86",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cross_spring_modern_s86",
+            provenance_date: "2026-05-20",
+            description: "# Exp297: Cross-Spring Modern S86 Validation + Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

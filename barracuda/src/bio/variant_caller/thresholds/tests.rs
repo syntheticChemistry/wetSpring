@@ -28,7 +28,10 @@ fn threshold_bounded_by_ceiling() {
     let t = LteeThresholds::at_generation(1_000_000);
     let f = t.polymorphism_threshold();
     // After many generations, should approach ceiling (0.20) but never exceed it
-    assert!(f <= 0.20 + 1e-10, "threshold should not exceed ceiling: {f}");
+    assert!(
+        f <= 0.20 + 1e-10,
+        "threshold should not exceed ceiling: {f}"
+    );
     assert!(f > 0.19, "should be near ceiling at 1M generations: {f}");
 }
 

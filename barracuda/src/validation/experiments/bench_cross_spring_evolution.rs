@@ -11,12 +11,12 @@
 //!
 //! Provenance: Cross-spring evolution benchmark
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::esn::{Esn, EsnConfig};
 use crate::bio::qs_biofilm::QsBiofilmParams;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 const N_SAMPLES: usize = 500;
 
@@ -31,7 +31,6 @@ fn bench<F: FnOnce() -> R, R>(label: &str, f: F) -> (R, f64) {
 #[expect(clippy::too_many_lines)]
 /// Run the `benchmark_cross_spring_evolution` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ─── Section 1: wetSpring bio primitives (CPU) ───────────────────
 
     v.section("§1 wetSpring → ToadStool: Diversity Metrics (CPU)");
@@ -292,7 +291,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Feb 23: wetSpring v17 handoff → 119 experiments, 2,664+ checks");
 
     v.check_pass("evolution timeline logged", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -303,14 +301,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_evolution",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_cross_spring_evolution",
-        provenance_date: "2026-05-20",
-        description: "Exp120 — Cross-Spring Evolution Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_evolution",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_cross_spring_evolution",
+            provenance_date: "2026-05-20",
+            description: "Exp120 — Cross-Spring Evolution Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

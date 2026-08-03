@@ -18,7 +18,6 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use std::time::Instant;
 #[cfg(feature = "gpu")]
 use crate::bio::spectral_match_gpu;
 #[cfg(feature = "gpu")]
@@ -27,6 +26,7 @@ use crate::special;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::time::Instant;
 
 fn generate_spectra(n_spectra: usize, n_bins: usize, seed: u64) -> Vec<Vec<f64>> {
     let mut spectra = Vec::with_capacity(n_spectra);
@@ -79,7 +79,6 @@ fn cpu_pairwise_cosine(spectra: &[Vec<f64>]) -> Vec<f64> {
 
 /// Run the `validate_massbank_gpu_scale` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── S1: Library generation ──
     v.section("── S1: Synthetic spectral library ──");
 
@@ -217,7 +216,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     }
 
     v.check_count("scaling curve ran", 1, 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -228,14 +226,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "massbank_gpu_scale",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_massbank_gpu_scale",
-        provenance_date: "2026-05-20",
-        description: "# Exp111: Full `MassBank` GPU Spectral Screening at Scale",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "massbank_gpu_scale",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_massbank_gpu_scale",
+            provenance_date: "2026-05-20",
+            description: "# Exp111: Full `MassBank` GPU Spectral Screening at Scale",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

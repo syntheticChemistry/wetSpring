@@ -47,7 +47,6 @@ use crate::validation::Validator;
 
 /// Run the `validate_nucleus_tower_node` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Phase 1: biomeOS Binary Discovery");
 
     let biomeos_bin = discover_biomeos_bin();
@@ -191,9 +190,8 @@ pub fn run(v: &mut crate::validation::Validator) {
         "metrics": ["all"],
         "scenario": "standard_growth",
     });
-    let pipeline_result =
-        crate::ipc::dispatch::dispatch("science.full_pipeline", &pipeline_params)
-            .or_exit("unexpected error");
+    let pipeline_result = crate::ipc::dispatch::dispatch("science.full_pipeline", &pipeline_params)
+        .or_exit("unexpected error");
     let pipeline_ms = t_pipeline.elapsed().as_secs_f64() * 1000.0;
 
     let has_diversity = pipeline_result.get("diversity").is_some();
@@ -235,7 +233,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║    biomeos nucleus start --mode nest --node-id westgate          ║");
     println!("║                                                                  ║");
     println!("╚══════════════════════════════════════════════════════════════════╝");
-
 }
 
 /// Discover a primal binary via plasmidBin (post-primordial, Wave 49).
@@ -256,14 +253,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nucleus_tower_node",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_nucleus_tower_node",
-        provenance_date: "2026-05-20",
-        description: "# Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nucleus_tower_node",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_nucleus_tower_node",
+            provenance_date: "2026-05-20",
+            description: "# Exp258: NUCLEUS Tower-Node Deployment — Live Primal Orchestration",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

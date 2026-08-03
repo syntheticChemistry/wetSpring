@@ -42,14 +42,12 @@ use crate::validation::Validator;
 
 /// Run the `validate_diversity` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_analytical(v);
     validate_simulated_community(v);
     validate_bray_curtis_matrix(v);
     validate_kmer(v);
     validate_evenness_and_rarefaction(v);
     validate_exp002_galaxy_baseline(v);
-
 }
 
 fn validate_analytical(v: &mut Validator) {
@@ -405,14 +403,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "diversity",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_diversity",
-        provenance_date: "2026-05-20",
-        description: "Validated against: skbio 0.6.0; Galaxy Exp002 `diversity_report.json`",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "diversity",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_diversity",
+            provenance_date: "2026-05-20",
+            description: "Validated against: skbio 0.6.0; Galaxy Exp002 `diversity_report.json`",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

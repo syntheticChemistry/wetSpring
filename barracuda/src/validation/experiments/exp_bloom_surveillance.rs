@@ -39,7 +39,6 @@ fn dominance_index(counts: &[f64]) -> f64 {
 
 /// Run the `validate_bloom_surveillance` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Section 1: Pre-bloom baseline (even community) ──────────
     v.section("── Pre-bloom: even community ──");
     let even = vec![
@@ -154,7 +153,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         bray_curtis(&even, &bloom),
         0.0,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -165,14 +163,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "bloom_surveillance",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_bloom_surveillance",
-        provenance_date: "2026-05-20",
-        description: "Exp040 — Bloom event detection and surveillance pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "bloom_surveillance",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_bloom_surveillance",
+            provenance_date: "2026-05-20",
+            description: "Exp040 — Bloom event detection and surveillance pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

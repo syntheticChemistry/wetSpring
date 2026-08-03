@@ -38,9 +38,9 @@
 //!
 //! Provenance: KBS LTER soil Anderson disorder analysis
 
-use std::time::Instant;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 struct TillageTreatment {
     name: &'static str,
@@ -136,8 +136,7 @@ pub fn run(v: &mut crate::validation::Validator) {
         let mut prev_h = t.base_shannon + t.perturbation_delta;
 
         for i in 0..n_points {
-            let year = crate::cast::usize_f64(i)
-                / crate::cast::usize_f64(points_per_year);
+            let year = crate::cast::usize_f64(i) / crate::cast::usize_f64(points_per_year);
 
             let h = if t.recovery_tau_years.is_infinite() {
                 t.base_shannon
@@ -183,8 +182,8 @@ pub fn run(v: &mut crate::validation::Validator) {
             .collect();
         let initial_w = points.first().map_or(0.0, |p| p.w_h3);
         let final_w = points.last().map_or(0.0, |p| p.w_h3);
-        let mean_p_qs = points.iter().map(|p| p.p_qs).sum::<f64>()
-            / crate::cast::usize_f64(points.len());
+        let mean_p_qs =
+            points.iter().map(|p| p.p_qs).sum::<f64>() / crate::cast::usize_f64(points.len());
 
         println!(
             "  {}: W_initial={initial_w:.2} → W_final={final_w:.2}, mean P(QS)={mean_p_qs:.4}",
@@ -336,14 +335,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "kbs_lter_anderson_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_kbs_lter_anderson_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp366: KBS LTER Soil Anderson Temporal Model",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "kbs_lter_anderson_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_kbs_lter_anderson_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp366: KBS LTER Soil Anderson Temporal Model",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -34,7 +34,6 @@ const SS_FRAC: f64 = 0.1;
 
 /// Run the `validate_bistable` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Scenario 1: Zero feedback (recover low-B monostable) ─────────
     v.section("── Scenario 1: Zero feedback (alpha_fb = 0) ──");
     let p = BistableParams {
@@ -156,14 +155,9 @@ pub fn run(v: &mut crate::validation::Validator) {
         0.0,
         tolerances::EXACT,
     );
-
 }
 
-fn check_non_negative(
-    v: &mut Validator,
-    result: &crate::bio::ode::OdeResult,
-    prefix: &str,
-) {
+fn check_non_negative(v: &mut Validator, result: &crate::bio::ode::OdeResult, prefix: &str) {
     let min_val: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
     v.check(
         &format!("{prefix}: all variables non-negative (min={min_val:.2e})"),
@@ -189,14 +183,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "bistable",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_bistable",
-        provenance_date: "2026-05-20",
-        description: "Validation: Fernandez 2020 bistable phenotypic switching (Exp023)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "bistable",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_bistable",
+            provenance_date: "2026-05-20",
+            description: "Validation: Fernandez 2020 bistable phenotypic switching (Exp023)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

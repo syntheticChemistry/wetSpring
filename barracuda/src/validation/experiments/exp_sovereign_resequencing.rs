@@ -35,9 +35,7 @@ use crate::ncbi::fetch_sra_composed;
 use crate::validation::Validator;
 
 use crate::ipc::provenance;
-use crate::ipc::provenance::braid_handoff::{
-    ComputationMetadata, FermentTranscriptBraid,
-};
+use crate::ipc::provenance::braid_handoff::{ComputationMetadata, FermentTranscriptBraid};
 
 #[cfg(feature = "gpu")]
 use crate::gpu::GpuF64;
@@ -112,7 +110,9 @@ fn load_clones(workspace: &std::path::Path) -> Vec<(String, String)> {
                 .map(|line| {
                     let mut parts = line.split('\t');
                     let acc = parts.next().unwrap_or("").trim().to_string();
-                    let name = parts.next().map_or_else(|| acc.clone(), |n| n.trim().to_string());
+                    let name = parts
+                        .next()
+                        .map_or_else(|| acc.clone(), |n| n.trim().to_string());
                     (acc, name)
                 })
                 .collect();
@@ -162,10 +162,16 @@ pub fn run(v: &mut crate::validation::Validator) {
     let offset = clone_offset();
     println!("  Dataset: {ds_id}");
     println!("  Accession: {accession}");
-    println!("  Clones: {} (offset {offset}, source: {})", clones.len(),
-        if workspace.join("clones.tsv").exists() { "clones.tsv" }
-        else if workspace.join("accession_list.txt").exists() { "accession_list.txt" }
-        else { "built-in default" }
+    println!(
+        "  Clones: {} (offset {offset}, source: {})",
+        clones.len(),
+        if workspace.join("clones.tsv").exists() {
+            "clones.tsv"
+        } else if workspace.join("accession_list.txt").exists() {
+            "accession_list.txt"
+        } else {
+            "built-in default"
+        }
     );
 
     // ── GPU init (if --features gpu) ─────────────────────────────
@@ -220,7 +226,8 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let reference = if ref_fasta_path.exists() {
         println!("  Loading FASTA: {}", ref_fasta_path.display());
-        let records = FastaRecord::load_all(&ref_fasta_path).expect("Failed to load reference FASTA");
+        let records =
+            FastaRecord::load_all(&ref_fasta_path).expect("Failed to load reference FASTA");
         v.check_pass(
             "reference FASTA loaded",
             !records.is_empty() && records[0].len() > 4_000_000,
@@ -229,13 +236,13 @@ pub fn run(v: &mut crate::validation::Validator) {
     } else if ref_gbk_path.exists() {
         println!("  Loading GenBank: {}", ref_gbk_path.display());
         let gbk = GenBankRecord::load(&ref_gbk_path).expect("Failed to load reference GenBank");
-        v.check_pass(
-            "reference GenBank loaded",
-            gbk.sequence.len() > 4_000_000,
-        );
+        v.check_pass("reference GenBank loaded", gbk.sequence.len() > 4_000_000);
         gbk.sequence
     } else {
-        println!("  WARNING: No reference genome found at {}", workspace.display());
+        println!(
+            "  WARNING: No reference genome found at {}",
+            workspace.display()
+        );
         println!("  Expected: reference/REL606.fasta or reference/REL606.gbk");
         println!("  Run Exp381 first to download the reference.");
         v.check_pass("reference genome exists", false);
@@ -262,15 +269,24 @@ pub fn run(v: &mut crate::validation::Validator) {
     } else {
         Vec::new()
     };
-    println!("  Features: {} CDS annotations", features.iter().filter(|f| f.feature_type == "CDS").count());
+    println!(
+        "  Features: {} CDS annotations",
+        features.iter().filter(|f| f.feature_type == "CDS").count()
+    );
 
     // ── Phase 2: Build FM-index ──────────────────────────────────
     println!("\n── Phase 2: Building FM-index ──");
     let idx_t0 = Instant::now();
     let fm_index = FmIndex::build(&reference);
     let idx_secs = idx_t0.elapsed().as_secs_f64();
-    println!("  FM-index built in {idx_secs:.1}s ({} bp indexed)", fm_index.reference_len());
-    v.check_pass("FM-index reference length matches", fm_index.reference_len() == reference.len());
+    println!(
+        "  FM-index built in {idx_secs:.1}s ({} bp indexed)",
+        fm_index.reference_len()
+    );
+    v.check_pass(
+        "FM-index reference length matches",
+        fm_index.reference_len() == reference.len(),
+    );
 
     let _ = provenance::record_step(
         &prov.id,
@@ -296,11 +312,17 @@ pub fn run(v: &mut crate::validation::Validator) {
         skip_duplicates: true,
         skip_secondary: true,
     };
-    println!("  Caller: min_depth={}, min_alt_freq={:.2}, quality_weighted={}, strand_balance={:.2}, min_bq={}, min_mapq={}, skip_dup={}, skip_sec={}",
-        caller_config.min_depth, caller_config.min_alt_frequency,
-        caller_config.quality_weighted, caller_config.min_strand_balance,
-        pileup_config.min_base_quality, pileup_config.min_mapq,
-        pileup_config.skip_duplicates, pileup_config.skip_secondary);
+    println!(
+        "  Caller: min_depth={}, min_alt_freq={:.2}, quality_weighted={}, strand_balance={:.2}, min_bq={}, min_mapq={}, skip_dup={}, skip_sec={}",
+        caller_config.min_depth,
+        caller_config.min_alt_frequency,
+        caller_config.quality_weighted,
+        caller_config.min_strand_balance,
+        pileup_config.min_base_quality,
+        pileup_config.min_mapq,
+        pileup_config.skip_duplicates,
+        pileup_config.skip_secondary
+    );
 
     // ── Phase 3: Process each clone ──────────────────────────────
     println!("\n── Phase 3: Per-clone sovereign pipeline ──");
@@ -360,7 +382,11 @@ pub fn run(v: &mut crate::validation::Validator) {
                 }
             }
         }
-        println!("    Reads loaded: {} (subsampled from {})", reads.len(), fq_path.display());
+        println!(
+            "    Reads loaded: {} (subsampled from {})",
+            reads.len(),
+            fq_path.display()
+        );
 
         if reads.is_empty() {
             println!("    SKIP: no reads loaded");
@@ -375,42 +401,58 @@ pub fn run(v: &mut crate::validation::Validator) {
         // Empirical: 7.5M×36bp → 344min GPU vs 26min CPU (13x);
         //            500K×101bp → >17min GPU vs ~5min CPU (est 3-4x).
         let map_t0 = Instant::now();
-        let median_read_len = reads.get(reads.len() / 2).map_or(0, |(_, seq, _)| seq.len());
+        let median_read_len = reads
+            .get(reads.len() / 2)
+            .map_or(0, |(_, seq, _)| seq.len());
         const GPU_MAPPING_MIN_READ_LEN: usize = 250;
 
         #[cfg(feature = "gpu")]
         let (sam_records, map_substrate) = if let Some(ref dev) = gpu_device {
             if median_read_len >= GPU_MAPPING_MIN_READ_LEN {
                 let recs = read_mapper::map_reads_gpu(
-                    &reads, &fm_index, &reference, "REL606", &mapper_config, dev,
+                    &reads,
+                    &fm_index,
+                    &reference,
+                    "REL606",
+                    &mapper_config,
+                    dev,
                 );
                 (recs, "GPU SmithWatermanGpu")
             } else {
-                println!("    Reads {}bp < {}bp threshold — CPU mapping (GPU reserved for pileup+calling)",
-                    median_read_len, GPU_MAPPING_MIN_READ_LEN);
-                let recs = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
+                println!(
+                    "    Reads {}bp < {}bp threshold — CPU mapping (GPU reserved for pileup+calling)",
+                    median_read_len, GPU_MAPPING_MIN_READ_LEN
+                );
+                let recs =
+                    read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
                 (recs, "CPU seed-extend (short reads)")
             }
         } else {
-            let recs = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
+            let recs =
+                read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
             (recs, "CPU seed-extend")
         };
         #[cfg(not(feature = "gpu"))]
         let (sam_records, map_substrate) = {
-            let recs = read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
+            let recs =
+                read_mapper::map_reads(&reads, &fm_index, &reference, "REL606", &mapper_config);
             (recs, "CPU seed-extend")
         };
         let map_secs = map_t0.elapsed().as_secs_f64();
 
         let mapped_count = sam_records.iter().filter(|r| r.is_mapped()).count();
-        println!("    Mapped: {mapped_count}/{} reads ({map_secs:.1}s, {map_substrate})", sam_records.len());
+        println!(
+            "    Mapped: {mapped_count}/{} reads ({map_secs:.1}s, {map_substrate})",
+            sam_records.len()
+        );
 
         // Sort by position for pileup
         let mut sorted_records = sam_records;
         sam::sort_by_position(&mut sorted_records);
 
         // Generate pileup with base quality filtering
-        let pileup_columns = pileup::generate_pileup_filtered(&sorted_records, reference.len(), &pileup_config);
+        let pileup_columns =
+            pileup::generate_pileup_filtered(&sorted_records, reference.len(), &pileup_config);
         let cov_stats = pileup::coverage_stats(&pileup_columns, reference.len());
         println!(
             "    Pileup: {} positions covered, mean depth {:.1}, coverage {:.1}%",
@@ -425,7 +467,9 @@ pub fn run(v: &mut crate::validation::Validator) {
             match pileup::cumulative_coverage_gpu(&pileup_columns, dev) {
                 Ok(cumsum) => {
                     let total_bases: f64 = cumsum.last().copied().unwrap_or(0.0);
-                    println!("    GPU coverage scan: {total_bases:.0} cumulative base-depth (Tensor::scan)");
+                    println!(
+                        "    GPU coverage scan: {total_bases:.0} cumulative base-depth (Tensor::scan)"
+                    );
                 }
                 Err(e) => println!("    GPU coverage scan skipped: {e}"),
             }
@@ -436,18 +480,27 @@ pub fn run(v: &mut crate::validation::Validator) {
         let sovereign_variants = if let Some(ref dev) = gpu_device {
             println!("    Calling via SnpCallingF64 (GPU)...");
             variant_caller::call_variants_gpu(
-                &pileup_columns, &reference, &features, &caller_config, dev,
-            ).unwrap_or_else(|e| {
+                &pileup_columns,
+                &reference,
+                &features,
+                &caller_config,
+                dev,
+            )
+            .unwrap_or_else(|e| {
                 println!("    GPU SNP failed ({e}), falling back to CPU");
-                variant_caller::call_variants(&pileup_columns, &reference, &features, &caller_config)
+                variant_caller::call_variants(
+                    &pileup_columns,
+                    &reference,
+                    &features,
+                    &caller_config,
+                )
             })
         } else {
             variant_caller::call_variants(&pileup_columns, &reference, &features, &caller_config)
         };
         #[cfg(not(feature = "gpu"))]
-        let sovereign_variants = variant_caller::call_variants(
-            &pileup_columns, &reference, &features, &caller_config,
-        );
+        let sovereign_variants =
+            variant_caller::call_variants(&pileup_columns, &reference, &features, &caller_config);
         println!("    Sovereign variants: {}", sovereign_variants.len());
         total_sovereign_variants += sovereign_variants.len();
 
@@ -473,7 +526,9 @@ pub fn run(v: &mut crate::validation::Validator) {
             let (matches, only_sov, only_breseq) =
                 variant_caller::compare_calls(&sovereign_variants, &breseq_snps);
 
-            println!("    Parity: {matches} match, {only_sov} sovereign-only, {only_breseq} breseq-only");
+            println!(
+                "    Parity: {matches} match, {only_sov} sovereign-only, {only_breseq} breseq-only"
+            );
             total_matches += matches;
 
             v.check_pass(
@@ -490,8 +545,14 @@ pub fn run(v: &mut crate::validation::Validator) {
 
         // DAG event: clone node sealed
         let clone_hash = blake3::hash(
-            format!("{clone_name}:{clone_accession}:variants={}", sovereign_variants.len()).as_bytes(),
-        ).to_hex().to_string();
+            format!(
+                "{clone_name}:{clone_accession}:variants={}",
+                sovereign_variants.len()
+            )
+            .as_bytes(),
+        )
+        .to_hex()
+        .to_string();
 
         let _ = provenance::record_step(
             &prov.id,
@@ -516,10 +577,14 @@ pub fn run(v: &mut crate::validation::Validator) {
         // rhizoCrypt S69 dag.partial_dehydrate computes Merkle root over
         // sealed vertices without closing the session.
         if let Some(partial) = provenance::rhizocrypt::partial_dehydrate(&prov.id, &[]) {
-            let partial_root = partial.get("merkle_root")
+            let partial_root = partial
+                .get("merkle_root")
                 .and_then(|v| v.as_str())
                 .unwrap_or("pending");
-            println!("    DAG partial root ({clones_processed}/{} sealed): {partial_root}", clones.len());
+            println!(
+                "    DAG partial root ({clones_processed}/{} sealed): {partial_root}",
+                clones.len()
+            );
         }
     }
 
@@ -622,7 +687,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             println!("  Global braid: {}", global_path.display());
         }
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -633,14 +697,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "sovereign_resequencing",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_sovereign_resequencing",
-        provenance_date: "2026-05-20",
-        description: "# Sovereign Rust Resequencing — Primal Composition",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "sovereign_resequencing",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_sovereign_resequencing",
+            provenance_date: "2026-05-20",
+            description: "# Sovereign Rust Resequencing — Primal Composition",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

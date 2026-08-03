@@ -40,7 +40,7 @@ pub(super) fn validate_spectral_cosine(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let gpu_cos =
-        spectral_match_gpu::batch_cosine_gpu(gpu, &spectra).or_exit("GPU/CPU validation");
+        spectral_match_gpu::pairwise_cosine_gpu(gpu, &spectra).or_exit("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     for (i, (c, g)) in cpu_cos.iter().zip(gpu_cos.iter()).enumerate() {
         v.check(
@@ -61,28 +61,35 @@ pub(super) fn validate_spectral_cosine(
 pub(super) fn validate_eic(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D13: EIC Extraction");
     let spectra = super::synthetic_spectra();
-    let target_mz = 200.0;
+    let target_mzs = [200.0];
     let ppm = 10.0;
     let tc = Instant::now();
-    let cpu_eic = eic::extract_eic(&spectra, target_mz, ppm);
+    let cpu_eics = eic::extract_eics(&spectra, &target_mzs, ppm);
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_eic = eic_gpu::extract_eic_gpu(gpu, &spectra, target_mz, ppm)
-        .or_exit("GPU/CPU validation");
+    let gpu_eics =
+        eic_gpu::extract_eics_gpu(gpu, &spectra, &target_mzs, ppm).or_exit("GPU/CPU validation");
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
-        "EIC length",
-        gpu_eic.len() as f64,
-        cpu_eic.len() as f64,
+        "EIC count",
+        gpu_eics.len() as f64,
+        cpu_eics.len() as f64,
         tolerances::EXACT,
     );
-    for (i, (c, g)) in cpu_eic.iter().zip(gpu_eic.iter()).enumerate() {
-        v.check(
-            &format!("EIC[{i}] intensity"),
-            g.intensity,
-            c.intensity,
-            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-        );
+    for (cpu_eic, gpu_eic) in cpu_eics.iter().zip(gpu_eics.iter()) {
+        for (i, (c, g)) in cpu_eic
+            .intensity
+            .iter()
+            .zip(gpu_eic.intensity.iter())
+            .enumerate()
+        {
+            v.check(
+                &format!("EIC[{i}] intensity"),
+                *g,
+                *c,
+                tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+            );
+        }
     }
     timings.push(CpuGpuRow {
         name: "EIC Extraction",
@@ -98,7 +105,7 @@ pub(super) fn validate_pcoa(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<C
         0.0, 0.5, 0.8, 0.3, 0.5, 0.0, 0.6, 0.7, 0.8, 0.6, 0.0, 0.4, 0.3, 0.7, 0.4, 0.0,
     ];
     let tc = Instant::now();
-    let cpu_pcoa = pcoa::pcoa(&dist, 4, 2);
+    let cpu_pcoa = pcoa::pcoa(&dist, 4, 2).or_exit("CPU PCoA");
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
     let gpu_pcoa = pcoa_gpu::pcoa_gpu(gpu, &dist, 4, 2).or_exit("GPU/CPU validation");
@@ -120,53 +127,50 @@ pub(super) fn validate_pcoa(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<C
 
 pub(super) fn validate_kriging(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D15: Ordinary Kriging");
-    let points: Vec<kriging::KrigingPoint> = vec![
-        kriging::KrigingPoint {
+    let sites = vec![
+        kriging::SpatialSample {
             x: 0.0,
             y: 0.0,
             value: 10.0,
         },
-        kriging::KrigingPoint {
+        kriging::SpatialSample {
             x: 1.0,
             y: 0.0,
             value: 12.0,
         },
-        kriging::KrigingPoint {
+        kriging::SpatialSample {
             x: 0.0,
             y: 1.0,
             value: 11.0,
         },
-        kriging::KrigingPoint {
+        kriging::SpatialSample {
             x: 1.0,
             y: 1.0,
             value: 13.0,
         },
-        kriging::KrigingPoint {
+        kriging::SpatialSample {
             x: 0.5,
             y: 0.5,
             value: 11.5,
         },
     ];
     let targets: Vec<(f64, f64)> = vec![(0.25, 0.25), (0.75, 0.75), (0.5, 0.0)];
-    let variogram = kriging::Variogram {
-        nugget: 0.0,
-        sill: 1.0,
-        range: 2.0,
-    };
+    let config = kriging::VariogramConfig::spherical(0.0, 1.0, 2.0);
     let tc = Instant::now();
-    let cpu_est = kriging::ordinary_kriging(&points, &targets, &variogram);
+    let cpu_result =
+        kriging::interpolate_diversity(gpu, &sites, &targets, &config).or_exit("CPU kriging");
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let gpu_est = kriging::ordinary_kriging_gpu(gpu, &points, &targets, &variogram)
-        .or_exit("GPU/CPU validation");
+    let gpu_result =
+        kriging::interpolate_diversity(gpu, &sites, &targets, &config).or_exit("GPU kriging");
     let gpu_us = tg.elapsed().as_micros() as f64;
-    for (i, (c, g)) in cpu_est.iter().zip(gpu_est.iter()).enumerate() {
-        v.check(
-            &format!("kriging[{i}]"),
-            *g,
-            *c,
-            tolerances::GPU_VS_CPU_F64,
-        );
+    for (i, (c, g)) in cpu_result
+        .values
+        .iter()
+        .zip(gpu_result.values.iter())
+        .enumerate()
+    {
+        v.check(&format!("kriging[{i}]"), *g, *c, tolerances::GPU_VS_CPU_F64);
     }
     timings.push(CpuGpuRow {
         name: "Kriging (5→3)",

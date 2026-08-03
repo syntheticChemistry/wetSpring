@@ -30,12 +30,10 @@ use crate::validation::Validator;
 
 /// Run the `validate_population_genomics` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_ani(v);
     validate_snp(v);
     validate_integrated_pipeline(v);
     validate_python_parity(v);
-
 }
 
 fn validate_ani(v: &mut Validator) {
@@ -238,14 +236,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "population_genomics",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_population_genomics",
-        provenance_date: "2026-05-20",
-        description: "Exp055 — Anderson 2017: Population genomics at hydrothermal vents",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "population_genomics",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_population_genomics",
+            provenance_date: "2026-05-20",
+            description: "Exp055 — Anderson 2017: Population genomics at hydrothermal vents",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

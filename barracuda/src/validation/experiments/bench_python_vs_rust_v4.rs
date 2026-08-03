@@ -43,11 +43,11 @@
 //!
 //! Provenance: Python vs Rust parity benchmark (V4)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 struct ParityBench {
     domain: &'static str,
@@ -420,7 +420,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  produce bit-identical results to Python/NumPy/SciPy.");
     println!("  Next step: GPU portability (Exp308) proves same math on GPU.");
     println!("  ═════════════════════════════════════════════════════════════════");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -431,14 +430,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "python_vs_rust_v4",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_python_vs_rust_v4",
-        provenance_date: "2026-05-20",
-        description: "# Exp307: Python vs Rust Benchmark v4 — V97 Fused Ops Parity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "python_vs_rust_v4",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_python_vs_rust_v4",
+            provenance_date: "2026-05-20",
+            description: "# Exp307: Python vs Rust Benchmark v4 — V97 Fused Ops Parity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

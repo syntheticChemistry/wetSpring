@@ -39,10 +39,10 @@
 
 use std::time::Instant;
 
-use barracuda::stats;
 use crate::bio::diversity;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::stats;
 
 const EMP_BIOMES: &[(&str, f64, f64)] = &[
     ("Animal corpus", 0.55, 0.15),
@@ -334,7 +334,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "║ Global QS-active: {global_qs_active}/{total_samples} ({pct_global_active:.1}%)  │  Compute: {total_ms:.1}ms  │  Substrate: {substrate:10} ║"
     );
     println!("╚══════════════════════════════════════════════════════════════════════════════╝");
-
 }
 
 fn check_nucleus_available() -> bool {
@@ -351,14 +350,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "emp_anderson_atlas",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_emp_anderson_atlas",
-        provenance_date: "2026-05-20",
-        description: "# Exp256: EMP-Scale Anderson Atlas — 30K Biome QS Classification",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "emp_anderson_atlas",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_emp_anderson_atlas",
+            provenance_date: "2026-05-20",
+            description: "# Exp256: EMP-Scale Anderson Atlas — 30K Biome QS Classification",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

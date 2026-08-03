@@ -43,10 +43,6 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use barracuda::device::WgpuDevice;
-use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
-use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
-use barracuda::ops::transe_score_f64::TranseScoreF64;
 use crate::bio::bistable::BistableParams;
 use crate::bio::bistable_gpu::BistableGpu;
 use crate::bio::diversity;
@@ -59,6 +55,10 @@ use crate::special;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::device::WgpuDevice;
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
+use barracuda::ops::transe_score_f64::TranseScoreF64;
 
 struct LcgRng(u64);
 
@@ -242,7 +242,7 @@ fn validate_neuralspring_crossspring(v: &mut Validator, gpu: &GpuF64) {
 
     let (cpu_hamming, _) = bench("CPU Hamming (binary 64-bit)", || {
         let binary: Vec<u64> = (0..n)
-            .map(|i| (i as u64).wrapping_mul(0x5DEECE66D))
+            .map(|i| (i as u64).wrapping_mul(0x5_DEEC_E66D))
             .collect();
         let mut dists = Vec::with_capacity(n * (n - 1) / 2);
         for i in 0..n {
@@ -429,7 +429,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let total_ms = t_total.elapsed().as_millis();
     println!("\n  Total wall-clock: {total_ms} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -440,14 +439,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_s62",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cross_spring_s62",
-        provenance_date: "2026-05-20",
-        description: "Exp168: Cross-Spring Evolution Validation (S62+DF64 era)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_s62",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cross_spring_s62",
+            provenance_date: "2026-05-20",
+            description: "Exp168: Cross-Spring Evolution Validation (S62+DF64 era)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

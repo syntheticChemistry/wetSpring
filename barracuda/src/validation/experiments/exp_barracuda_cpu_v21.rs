@@ -271,7 +271,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  V92D domains: error handling, harness, tolerances,");
     println!("    delegation identity, special complements, cross-domain");
     println!("  Total: {total_ms:.1} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -282,14 +281,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v21",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v21",
-        provenance_date: "2026-05-20",
-        description: "# Exp287: `BarraCuda` CPU v21 — V92D Evolution",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v21",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v21",
+            provenance_date: "2026-05-20",
+            description: "# Exp287: `BarraCuda` CPU v21 — V92D Evolution",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

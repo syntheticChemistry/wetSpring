@@ -5,10 +5,6 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use barracuda::ops::bio::gillespie::GillespieModel;
-use barracuda::{
-    FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig, TreeInferenceGpu,
-};
 use crate::bio::decision_tree::DecisionTree;
 use crate::bio::{
     alignment, gillespie, hmm, hmm_gpu::HmmGpuForward, random_forest::RandomForest,
@@ -16,6 +12,10 @@ use crate::bio::{
 };
 use crate::tolerances;
 use crate::validation::{CpuGpuRow, OrExit, Validator};
+use barracuda::ops::bio::gillespie::GillespieModel;
+use barracuda::{
+    FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig, TreeInferenceGpu,
+};
 
 pub(super) fn validate_random_forest(
     v: &mut Validator,
@@ -33,24 +33,30 @@ pub(super) fn validate_random_forest(
     ];
     let labels = vec![0, 0, 1, 1, 2, 2];
     let tc = Instant::now();
-    let rf = RandomForest::train(&features, &labels, 10, 42);
+    let tree = crate::bio::decision_tree::DecisionTree::from_arrays(
+        &[0, -1, -1],
+        &[5.0, 0.0, 0.0],
+        &[1, -1, -1],
+        &[2, -1, -1],
+        &[None, Some(0), Some(1)],
+        features[0].len(),
+    )
+    .or_exit("build tree");
+    let rf = RandomForest::from_trees(vec![tree; 10], 3).or_exit("build forest");
     let cpu_preds: Vec<usize> = features.iter().map(|f| rf.predict(f)).collect();
     let cpu_us = tc.elapsed().as_micros() as f64;
 
-    let flat_features: Vec<f64> = features.iter().flat_map(|f| f.iter().copied()).collect();
-    let n_samples = features.len();
-    let n_features = features[0].len();
     let tg = Instant::now();
-    let rf_gpu = RandomForestGpu::new(device).or_exit("RF GPU");
+    let rf_gpu = RandomForestGpu::new(device);
     let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        rf_gpu.predict_batch(&rf.to_flat(), &flat_features, n_samples, n_features)
+        rf_gpu.predict_batch(&rf, &features)
     }));
     let gpu_us = tg.elapsed().as_micros() as f64;
     if let Ok(Ok(gpu_preds)) = gpu_result {
         for (i, (c, g)) in cpu_preds.iter().zip(gpu_preds.iter()).enumerate() {
             v.check(
                 &format!("RF pred {i}"),
-                *g as f64,
+                g.class as f64,
                 *c as f64,
                 tolerances::EXACT,
             );
@@ -78,18 +84,32 @@ pub(super) fn validate_hmm(
     timings: &mut Vec<CpuGpuRow>,
 ) {
     v.section("D08: HMM Forward");
-    let init = vec![0.6, 0.4];
-    let trans = vec![0.7, 0.3, 0.4, 0.6];
-    let emit = vec![0.5, 0.4, 0.1, 0.1, 0.3, 0.6];
-    let obs = vec![0_u32, 1, 2, 0, 1];
+    let model = hmm::HmmModel {
+        n_states: 2,
+        log_pi: vec![0.6_f64.ln(), 0.4_f64.ln()],
+        log_trans: vec![0.7_f64.ln(), 0.3_f64.ln(), 0.4_f64.ln(), 0.6_f64.ln()],
+        n_symbols: 3,
+        log_emit: vec![
+            0.5_f64.ln(),
+            0.4_f64.ln(),
+            0.1_f64.ln(),
+            0.1_f64.ln(),
+            0.3_f64.ln(),
+            0.6_f64.ln(),
+        ],
+    };
+    let obs = vec![0_usize, 1, 2, 0, 1];
     let tc = Instant::now();
-    let cpu_ll = hmm::forward_log_likelihood(&init, &trans, &emit, &obs, 2, 3);
+    let cpu_result = hmm::forward(&model, &obs);
+    let cpu_ll = cpu_result.log_likelihood;
     let cpu_us = tc.elapsed().as_micros() as f64;
     let tg = Instant::now();
-    let hmm_dev = HmmGpuForward::new(device);
-    let gpu_ll = hmm_dev
-        .forward_log_likelihood(&init, &trans, &emit, &obs, 2, 3)
+    let hmm_dev = HmmGpuForward::new(device).or_exit("HMM GPU init");
+    let obs_u32: Vec<u32> = obs.iter().map(|&o| o as u32).collect();
+    let gpu_result = hmm_dev
+        .forward_batch(&model, &obs_u32, 1, obs.len())
         .or_exit("GPU/CPU validation");
+    let gpu_ll = gpu_result.log_likelihoods[0];
     let gpu_us = tg.elapsed().as_micros() as f64;
     v.check(
         "HMM log-lik",
@@ -127,8 +147,7 @@ pub(super) fn validate_smith_waterman(
     let cpu_us = tc.elapsed().as_micros() as f64;
     let sw = SmithWatermanGpu::new(device);
     let subst = vec![
-        2.0, -1.0, -1.0, -1.0, -1.0, 2.0, -1.0, -1.0, -1.0, -1.0, 2.0, -1.0, -1.0, -1.0,
-        -1.0, 2.0,
+        2.0, -1.0, -1.0, -1.0, -1.0, 2.0, -1.0, -1.0, -1.0, -1.0, 2.0, -1.0, -1.0, -1.0, -1.0, 2.0,
     ];
     let cfg = SwConfig::default();
     let q_enc: Vec<u32> = q.iter().map(|&b| dna_encode(b)).collect();

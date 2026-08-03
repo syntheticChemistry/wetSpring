@@ -53,8 +53,8 @@ impl DarkForestConfig {
 
         let family_id = std::env::var("FAMILY_ID").unwrap_or_else(|_| "default".into());
 
-        let neural_api_socket = crate::ipc::provenance::neural_api_socket()
-            .map(|p| p.to_string_lossy().into_owned());
+        let neural_api_socket =
+            crate::ipc::provenance::neural_api_socket().map(|p| p.to_string_lossy().into_owned());
 
         Self {
             enabled,

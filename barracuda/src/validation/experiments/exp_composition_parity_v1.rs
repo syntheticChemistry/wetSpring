@@ -29,14 +29,13 @@
 //! | Date | 2026-04-17 |
 //! | Command | `cargo run --features json,ipc --bin validate_composition_parity_v1` |
 
-use serde_json::json;
 use crate::ipc::dispatch::dispatch;
 use crate::tolerances;
 use crate::validation::Validator;
+use serde_json::json;
 
 /// Run the `validate_composition_parity_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // D01: Science method parity — dispatch results vs local math
     // ═══════════════════════════════════════════════════════════════
@@ -354,7 +353,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "composition: all science IPC methods return valid results",
         true,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -365,14 +363,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "composition_parity_v1",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_composition_parity_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp401: Composition Parity — IPC Science Results vs Local Rust Baselines",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "composition_parity_v1",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_composition_parity_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp401: Composition Parity — IPC Science Results vs Local Rust Baselines",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

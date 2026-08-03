@@ -50,35 +50,34 @@ use crate::validation::{self, OrExit, Validator};
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-    println!("════════════════════════════════════════════════════════════════════");
-    println!("  Exp094: Cross-Spring Evolution Validation + Benchmark");
-    println!("  Proving: Write → Absorb → Lean across all three Springs");
-    println!("════════════════════════════════════════════════════════════════════\n");
+        println!("════════════════════════════════════════════════════════════════════");
+        println!("  Exp094: Cross-Spring Evolution Validation + Benchmark");
+        println!("  Proving: Write → Absorb → Lean across all three Springs");
+        println!("════════════════════════════════════════════════════════════════════\n");
 
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
-        }
-    };
-    gpu.print_info();
+        let device = gpu.to_wgpu_device();
+        let d = device.device();
 
-    let device = gpu.to_wgpu_device();
-    let d = device.device();
+        let mut results: Vec<(&str, &str, f64, f64, &str)> = Vec::new();
 
-    let mut results: Vec<(&str, &str, f64, f64, &str)> = Vec::new();
+        // ═══ neuralSpring-evolved primitives (new to wetSpring) ══════════════
+        println!("\n── neuralSpring Primitives (evolved → absorbed → NEW lean) ──\n");
 
-    // ═══ neuralSpring-evolved primitives (new to wetSpring) ══════════════
-    println!("\n── neuralSpring Primitives (evolved → absorbed → NEW lean) ──\n");
-
-    // PairwiseHamming (neuralSpring → ToadStool session 31f)
-    v.section("PairwiseHamming (neuralSpring → ToadStool)");
-    {
-        let n_seqs: u32 = 5;
-        let seq_len: u32 = 8;
-        #[rustfmt::skip]
+        // PairwiseHamming (neuralSpring → ToadStool session 31f)
+        v.section("PairwiseHamming (neuralSpring → ToadStool)");
+        {
+            let n_seqs: u32 = 5;
+            let seq_len: u32 = 8;
+            #[rustfmt::skip]
         let sequences: Vec<u32> = vec![
             0, 1, 2, 3, 0, 1, 2, 3,
             0, 1, 2, 3, 0, 1, 2, 0,
@@ -87,52 +86,52 @@ pub fn run(v: &mut crate::validation::Validator) {
             0, 1, 2, 3, 3, 2, 1, 0,
         ];
 
-        let tc = Instant::now();
-        let cpu_dists = cpu_pairwise_hamming(&sequences, n_seqs as usize, seq_len as usize);
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tc = Instant::now();
+            let cpu_dists = cpu_pairwise_hamming(&sequences, n_seqs as usize, seq_len as usize);
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-        let seq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Hamming Seqs"),
-            contents: bytemuck::cast_slice(&sequences),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let n_pairs = n_seqs * (n_seqs - 1) / 2;
-        let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("Hamming Dists"),
-            size: (n_pairs as usize * 4) as u64,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
+            let seq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Hamming Seqs"),
+                contents: bytemuck::cast_slice(&sequences),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let n_pairs = n_seqs * (n_seqs - 1) / 2;
+            let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("Hamming Dists"),
+                size: (n_pairs as usize * 4) as u64,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
 
-        let hamming = PairwiseHammingGpu::new(device.clone());
-        let tg = Instant::now();
-        hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
-        let gpu_dists = readback_f32(&device, &dist_buf, n_pairs as usize);
-        let gpu_us = tg.elapsed().as_micros() as f64;
+            let hamming = PairwiseHammingGpu::new(device.clone());
+            let tg = Instant::now();
+            hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
+            let gpu_dists = readback_f32(&device, &dist_buf, n_pairs as usize);
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        for (i, (cpu_d, gpu_d)) in cpu_dists.iter().zip(gpu_dists.iter()).enumerate() {
-            v.check(
-                &format!("Hamming pair {i}"),
-                f64::from(*gpu_d),
-                f64::from(*cpu_d),
-                tolerances::GPU_F32_PARITY,
-            );
+            for (i, (cpu_d, gpu_d)) in cpu_dists.iter().zip(gpu_dists.iter()).enumerate() {
+                v.check(
+                    &format!("Hamming pair {i}"),
+                    f64::from(*gpu_d),
+                    f64::from(*cpu_d),
+                    tolerances::GPU_F32_PARITY,
+                );
+            }
+            results.push((
+                "PairwiseHamming",
+                "neuralSpring",
+                cpu_us,
+                gpu_us,
+                "session 31f",
+            ));
         }
-        results.push((
-            "PairwiseHamming",
-            "neuralSpring",
-            cpu_us,
-            gpu_us,
-            "session 31f",
-        ));
-    }
 
-    // PairwiseJaccard (neuralSpring → ToadStool session 31f)
-    v.section("PairwiseJaccard (neuralSpring → ToadStool)");
-    {
-        let n_genomes: u32 = 4;
-        let n_genes: u32 = 6;
-        #[rustfmt::skip]
+        // PairwiseJaccard (neuralSpring → ToadStool session 31f)
+        v.section("PairwiseJaccard (neuralSpring → ToadStool)");
+        {
+            let n_genomes: u32 = 4;
+            let n_genes: u32 = 6;
+            #[rustfmt::skip]
         let pa: Vec<f32> = vec![
             1.0, 1.0, 0.0, 0.0,
             1.0, 0.0, 1.0, 0.0,
@@ -142,167 +141,169 @@ pub fn run(v: &mut crate::validation::Validator) {
             1.0, 1.0, 0.0, 1.0,
         ];
 
-        let tc = Instant::now();
-        let cpu_dists = cpu_pairwise_jaccard(&pa, n_genomes as usize, n_genes as usize);
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tc = Instant::now();
+            let cpu_dists = cpu_pairwise_jaccard(&pa, n_genomes as usize, n_genes as usize);
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-        let pa_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Jaccard PA"),
-            contents: bytemuck::cast_slice(&pa),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let n_pairs = n_genomes * (n_genomes - 1) / 2;
-        let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("Jaccard Dists"),
-            size: (n_pairs as usize * 4) as u64,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
+            let pa_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Jaccard PA"),
+                contents: bytemuck::cast_slice(&pa),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let n_pairs = n_genomes * (n_genomes - 1) / 2;
+            let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("Jaccard Dists"),
+                size: (n_pairs as usize * 4) as u64,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
 
-        let jaccard = PairwiseJaccardGpu::new(device.clone());
-        let tg = Instant::now();
-        jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
-        let gpu_dists = readback_f32(&device, &dist_buf, n_pairs as usize);
-        let gpu_us = tg.elapsed().as_micros() as f64;
+            let jaccard = PairwiseJaccardGpu::new(device.clone());
+            let tg = Instant::now();
+            jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
+            let gpu_dists = readback_f32(&device, &dist_buf, n_pairs as usize);
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        for (i, (cpu_d, gpu_d)) in cpu_dists.iter().zip(gpu_dists.iter()).enumerate() {
-            v.check(
-                &format!("Jaccard pair {i}"),
-                f64::from(*gpu_d),
-                f64::from(*cpu_d),
-                tolerances::GPU_F32_PARITY,
-            );
-        }
-        results.push((
-            "PairwiseJaccard",
-            "neuralSpring",
-            cpu_us,
-            gpu_us,
-            "session 31f",
-        ));
-    }
-
-    // SpatialPayoff (neuralSpring → ToadStool session 31f)
-    v.section("SpatialPayoff (neuralSpring → ToadStool)");
-    {
-        let grid_size: u32 = 8;
-        let benefit: f32 = 3.0;
-        let cost: f32 = 1.0;
-        let grid: Vec<u32> = (0..(grid_size * grid_size))
-            .map(|i| u32::from(i % 3 == 0))
-            .collect();
-
-        let tc = Instant::now();
-        let cpu_fitness = cpu_spatial_payoff(&grid, grid_size as usize, benefit, cost);
-        let cpu_us = tc.elapsed().as_micros() as f64;
-
-        let grid_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Spatial Grid"),
-            contents: bytemuck::cast_slice(&grid),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("Spatial Fitness"),
-            size: u64::from(grid_size * grid_size * 4),
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
-
-        let spatial = SpatialPayoffGpu::new(device.clone());
-        let tg = Instant::now();
-        spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
-        let gpu_fitness = readback_f32(&device, &fit_buf, (grid_size * grid_size) as usize);
-        let gpu_us = tg.elapsed().as_micros() as f64;
-
-        let mut matching = 0usize;
-        for (cf, gf) in cpu_fitness.iter().zip(gpu_fitness.iter()) {
-            if (f64::from(*gf) - f64::from(*cf)).abs() < tolerances::GPU_F32_SPATIAL {
-                matching += 1;
+            for (i, (cpu_d, gpu_d)) in cpu_dists.iter().zip(gpu_dists.iter()).enumerate() {
+                v.check(
+                    &format!("Jaccard pair {i}"),
+                    f64::from(*gpu_d),
+                    f64::from(*cpu_d),
+                    tolerances::GPU_F32_PARITY,
+                );
             }
+            results.push((
+                "PairwiseJaccard",
+                "neuralSpring",
+                cpu_us,
+                gpu_us,
+                "session 31f",
+            ));
         }
-        v.check(
-            "SpatialPayoff cells matching",
-            matching as f64,
-            f64::from(grid_size * grid_size),
-            tolerances::EXACT,
-        );
-        results.push((
-            "SpatialPayoff",
-            "neuralSpring",
-            cpu_us,
-            gpu_us,
-            "session 31f",
-        ));
-    }
 
-    // BatchFitness (neuralSpring → ToadStool session 31f) — f64 pipeline
-    v.section("BatchFitness (neuralSpring → ToadStool)");
-    {
-        let pop_size: u32 = 16;
-        let genome_len: u32 = 8;
-        let weights: Vec<f64> = (0..genome_len)
-            .map(|i| (f64::from(i) + 1.0) / f64::from(genome_len))
-            .collect();
-        let population: Vec<f64> = (0..pop_size)
-            .flat_map(|i| (0..genome_len).map(move |g| if (i + g) % 2 == 0 { 1.0 } else { 0.0 }))
-            .collect();
+        // SpatialPayoff (neuralSpring → ToadStool session 31f)
+        v.section("SpatialPayoff (neuralSpring → ToadStool)");
+        {
+            let grid_size: u32 = 8;
+            let benefit: f32 = 3.0;
+            let cost: f32 = 1.0;
+            let grid: Vec<u32> = (0..(grid_size * grid_size))
+                .map(|i| u32::from(i % 3 == 0))
+                .collect();
 
-        let tc = Instant::now();
-        let cpu_fit = cpu_batch_fitness_f64(
-            &population,
-            &weights,
-            pop_size as usize,
-            genome_len as usize,
-        );
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tc = Instant::now();
+            let cpu_fitness = cpu_spatial_payoff(&grid, grid_size as usize, benefit, cost);
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-        let pop_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Fitness Pop"),
-            contents: bytemuck::cast_slice(&population),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let w_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Fitness Weights"),
-            contents: bytemuck::cast_slice(&weights),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("Fitness Output"),
-            size: u64::from(pop_size) * 8,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
+            let grid_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Spatial Grid"),
+                contents: bytemuck::cast_slice(&grid),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("Spatial Fitness"),
+                size: u64::from(grid_size * grid_size * 4),
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
 
-        let bf = BatchFitnessGpu::new(device.clone());
-        let tg = Instant::now();
-        bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
-        let gpu_fit = readback_f64(&device, &fit_buf, pop_size as usize);
-        let gpu_us = tg.elapsed().as_micros() as f64;
+            let spatial = SpatialPayoffGpu::new(device.clone());
+            let tg = Instant::now();
+            spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
+            let gpu_fitness = readback_f32(&device, &fit_buf, (grid_size * grid_size) as usize);
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        for (i, (cf, gf)) in cpu_fit.iter().zip(gpu_fit.iter()).enumerate() {
+            let mut matching = 0usize;
+            for (cf, gf) in cpu_fitness.iter().zip(gpu_fitness.iter()) {
+                if (f64::from(*gf) - f64::from(*cf)).abs() < tolerances::GPU_F32_SPATIAL {
+                    matching += 1;
+                }
+            }
             v.check(
-                &format!("Fitness individual {i}"),
-                *gf,
-                *cf,
-                tolerances::GPU_VS_CPU_F64,
+                "SpatialPayoff cells matching",
+                matching as f64,
+                f64::from(grid_size * grid_size),
+                tolerances::EXACT,
             );
+            results.push((
+                "SpatialPayoff",
+                "neuralSpring",
+                cpu_us,
+                gpu_us,
+                "session 31f",
+            ));
         }
-        results.push((
-            "BatchFitness",
-            "neuralSpring",
-            cpu_us,
-            gpu_us,
-            "session 31f",
-        ));
-    }
 
-    // LocusVariance (neuralSpring → ToadStool session 31f) — f64 pipeline
-    // Layout: allele_freqs[pop * n_loci + locus] — row-major [pop × loci]
-    v.section("LocusVariance (neuralSpring → ToadStool)");
-    {
-        let n_pops: u32 = 4;
-        let n_loci: u32 = 6;
-        #[rustfmt::skip]
+        // BatchFitness (neuralSpring → ToadStool session 31f) — f64 pipeline
+        v.section("BatchFitness (neuralSpring → ToadStool)");
+        {
+            let pop_size: u32 = 16;
+            let genome_len: u32 = 8;
+            let weights: Vec<f64> = (0..genome_len)
+                .map(|i| (f64::from(i) + 1.0) / f64::from(genome_len))
+                .collect();
+            let population: Vec<f64> = (0..pop_size)
+                .flat_map(|i| {
+                    (0..genome_len).map(move |g| if (i + g) % 2 == 0 { 1.0 } else { 0.0 })
+                })
+                .collect();
+
+            let tc = Instant::now();
+            let cpu_fit = cpu_batch_fitness_f64(
+                &population,
+                &weights,
+                pop_size as usize,
+                genome_len as usize,
+            );
+            let cpu_us = tc.elapsed().as_micros() as f64;
+
+            let pop_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Fitness Pop"),
+                contents: bytemuck::cast_slice(&population),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let w_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Fitness Weights"),
+                contents: bytemuck::cast_slice(&weights),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("Fitness Output"),
+                size: u64::from(pop_size) * 8,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
+
+            let bf = BatchFitnessGpu::new(device.clone());
+            let tg = Instant::now();
+            bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
+            let gpu_fit = readback_f64(&device, &fit_buf, pop_size as usize);
+            let gpu_us = tg.elapsed().as_micros() as f64;
+
+            for (i, (cf, gf)) in cpu_fit.iter().zip(gpu_fit.iter()).enumerate() {
+                v.check(
+                    &format!("Fitness individual {i}"),
+                    *gf,
+                    *cf,
+                    tolerances::GPU_VS_CPU_F64,
+                );
+            }
+            results.push((
+                "BatchFitness",
+                "neuralSpring",
+                cpu_us,
+                gpu_us,
+                "session 31f",
+            ));
+        }
+
+        // LocusVariance (neuralSpring → ToadStool session 31f) — f64 pipeline
+        // Layout: allele_freqs[pop * n_loci + locus] — row-major [pop × loci]
+        v.section("LocusVariance (neuralSpring → ToadStool)");
+        {
+            let n_pops: u32 = 4;
+            let n_loci: u32 = 6;
+            #[rustfmt::skip]
         let freqs: Vec<f64> = vec![
             // pop0: loci 0..5
             0.1, 0.2, 0.9, 0.0, 1.0, 0.4,
@@ -314,73 +315,72 @@ pub fn run(v: &mut crate::validation::Validator) {
             0.7, 0.2, 0.3, 0.0, 1.0, 0.7,
         ];
 
-        let tc = Instant::now();
-        let cpu_var = cpu_locus_variance_rowmajor_f64(&freqs, n_pops as usize, n_loci as usize);
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tc = Instant::now();
+            let cpu_var = cpu_locus_variance_rowmajor_f64(&freqs, n_pops as usize, n_loci as usize);
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-        let freq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("LocusVar Freqs"),
-            contents: bytemuck::cast_slice(&freqs),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("LocusVar Output"),
-            size: u64::from(n_loci) * 8,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
+            let freq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("LocusVar Freqs"),
+                contents: bytemuck::cast_slice(&freqs),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("LocusVar Output"),
+                size: u64::from(n_loci) * 8,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
 
-        let lv = LocusVarianceGpu::new(device.clone());
-        let tg = Instant::now();
-        lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
-        let gpu_var = readback_f64(&device, &var_buf, n_loci as usize);
-        let gpu_us = tg.elapsed().as_micros() as f64;
+            let lv = LocusVarianceGpu::new(device.clone());
+            let tg = Instant::now();
+            lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
+            let gpu_var = readback_f64(&device, &var_buf, n_loci as usize);
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        for (i, (cv, gv)) in cpu_var.iter().zip(gpu_var.iter()).enumerate() {
-            v.check(
-                &format!("LocusVar locus {i}"),
-                *gv,
-                *cv,
-                tolerances::GPU_VS_CPU_F64,
-            );
+            for (i, (cv, gv)) in cpu_var.iter().zip(gpu_var.iter()).enumerate() {
+                v.check(
+                    &format!("LocusVar locus {i}"),
+                    *gv,
+                    *cv,
+                    tolerances::GPU_VS_CPU_F64,
+                );
+            }
+            results.push((
+                "LocusVariance",
+                "neuralSpring",
+                cpu_us,
+                gpu_us,
+                "session 31f",
+            ));
         }
-        results.push((
-            "LocusVariance",
-            "neuralSpring",
-            cpu_us,
-            gpu_us,
-            "session 31f",
-        ));
-    }
 
-    // ═══ Summary ═════════════════════════════════════════════════════════
-    println!("\n═══ Cross-Spring Evolution Provenance ═══════════════════════════\n");
-    let hdr_abs = "Absorbed";
-    let sep_abs = "─".repeat(12);
-    println!(
-        "  {prim:25} {evol:15} {cpu:>10} {gpu:>10} {hdr_abs}",
-        prim = "Primitive",
-        evol = "Evolved By",
-        cpu = "CPU (µs)",
-        gpu = "GPU (µs)",
-    );
-    println!(
-        "  {prim:25} {evol:15} {cpu:>10} {gpu:>10} {sep_abs}",
-        prim = "─".repeat(25),
-        evol = "─".repeat(15),
-        cpu = "─".repeat(10),
-        gpu = "─".repeat(10),
-    );
-    for (name, spring, cpu_us, gpu_us, session) in &results {
-        println!("  {name:25} {spring:15} {cpu_us:>10.0} {gpu_us:>10.0} {session}",);
-    }
+        // ═══ Summary ═════════════════════════════════════════════════════════
+        println!("\n═══ Cross-Spring Evolution Provenance ═══════════════════════════\n");
+        let hdr_abs = "Absorbed";
+        let sep_abs = "─".repeat(12);
+        println!(
+            "  {prim:25} {evol:15} {cpu:>10} {gpu:>10} {hdr_abs}",
+            prim = "Primitive",
+            evol = "Evolved By",
+            cpu = "CPU (µs)",
+            gpu = "GPU (µs)",
+        );
+        println!(
+            "  {prim:25} {evol:15} {cpu:>10} {gpu:>10} {sep_abs}",
+            prim = "─".repeat(25),
+            evol = "─".repeat(15),
+            cpu = "─".repeat(10),
+            gpu = "─".repeat(10),
+        );
+        for (name, spring, cpu_us, gpu_us, session) in &results {
+            println!("  {name:25} {spring:15} {cpu_us:>10.0} {gpu_us:>10.0} {session}",);
+        }
 
-    println!("\n═══ The Biome Model Works ═══════════════════════════════════════");
-    println!("  hotSpring  → precision shaders, driver workarounds, lattice QCD");
-    println!("  wetSpring  → 12 bio shaders, GEMM 60× speedup, f64 precision");
-    println!("  neuralSpring → distance metrics, fitness eval, locus variance");
-    println!("  ToadStool  → absorbs all, every Spring benefits\n");
-
+        println!("\n═══ The Biome Model Works ═══════════════════════════════════════");
+        println!("  hotSpring  → precision shaders, driver workarounds, lattice QCD");
+        println!("  wetSpring  → 12 bio shaders, GEMM 60× speedup, f64 precision");
+        println!("  neuralSpring → distance metrics, fitness eval, locus variance");
+        println!("  ToadStool  → absorbs all, every Spring benefits\n");
     });
 }
 
@@ -547,14 +547,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_evolution",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cross_spring_evolution",
-        provenance_date: "2026-05-20",
-        description: "Exp094: Cross-Spring Evolution Validation + Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_evolution",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cross_spring_evolution",
+            provenance_date: "2026-05-20",
+            description: "Exp094: Cross-Spring Evolution Validation + Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

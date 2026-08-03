@@ -524,7 +524,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("       shader expects 16B minimum — pad struct to [u32; 4].");
     println!("    3. All CPU fallback paths validated (85+ primitives, 12+ experiments).");
     println!("  ═════════════════════════════════════════════════════════════════");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -535,14 +534,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_gpu_v10",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_gpu_v10",
-        provenance_date: "2026-05-20",
-        description: "# Exp250: `BarraCuda` GPU v10 — Cross-Spring Bio+Linalg GPU Ops",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_gpu_v10",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_gpu_v10",
+            provenance_date: "2026-05-20",
+            description: "# Exp250: `BarraCuda` GPU v10 — Cross-Spring Bio+Linalg GPU Ops",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

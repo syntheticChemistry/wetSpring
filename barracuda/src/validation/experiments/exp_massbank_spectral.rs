@@ -27,7 +27,6 @@ use crate::validation::Validator;
 
 /// Run the `validate_massbank_spectral` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // PFOS-like spectrum: characteristic CF₂ fragments
     let pfos_mz = vec![
         80.0, 99.0, 119.0, 169.0, 219.0, 269.0, 319.0, 369.0, 419.0, 499.0,
@@ -126,7 +125,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let cs1 = cosine_similarity(&pfos_mz, &pfos_int, &pfoa_mz, &pfoa_int, tol).score;
     let cs2 = cosine_similarity(&pfos_mz, &pfos_int, &pfoa_mz, &pfoa_int, tol).score;
     v.check("cosine deterministic", cs1, cs2, tolerances::EXACT);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -137,14 +135,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "massbank_spectral",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_massbank_spectral",
-        provenance_date: "2026-05-20",
-        description: "Exp042 — `MassBank` PFAS spectral matching validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "massbank_spectral",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_massbank_spectral",
+            provenance_date: "2026-05-20",
+            description: "Exp042 — `MassBank` PFAS spectral matching validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

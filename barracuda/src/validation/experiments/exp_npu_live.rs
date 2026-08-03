@@ -21,12 +21,12 @@
 //!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
-use std::time::Instant;
 use crate::bio::esn::{Esn, EsnConfig};
 use crate::npu;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 // ═══════════════════════════════════════════════════════════════════
 // Shared helpers
@@ -270,7 +270,6 @@ fn run_classifier(
 
 /// Run the `validate_npu_live` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     if !npu::npu_available() {
         println!("  SKIP: No AKD1000 hardware detected.");
         v.check_pass("NPU not available — skip", true);
@@ -590,7 +589,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
     println!("│  Driver: ToadStool akida-driver (pure Rust)  │  Status: LIVE          │");
     println!("└────────────────────────────────────────────────────────────────────────┘");
-
 }
 
 fn print_classifier_result(c: &ClassifierResult, v: &mut Validator) {
@@ -652,14 +650,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "npu_live",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_npu_live",
-        provenance_date: "2026-05-20",
-        description: "Exp194: NPU Live — ESN Reservoir on Real `AKD1000`",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "npu_live",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_npu_live",
+            provenance_date: "2026-05-20",
+            description: "Exp194: NPU Live — ESN Reservoir on Real `AKD1000`",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

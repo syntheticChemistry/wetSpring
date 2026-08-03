@@ -20,7 +20,6 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::{
     alignment, ani, bistable, bootstrap, capacitor, cooperation,
     decision_tree::DecisionTree,
@@ -35,6 +34,7 @@ use crate::bio::{
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 /// Run the `validate_barracuda_cpu_full` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -747,7 +747,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Every domain validated against paper baselines.");
     println!("  Ready for GPU promotion via BarraCuda GPU.");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -758,14 +757,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_full",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_full",
-        provenance_date: "2026-05-20",
-        description: "Exp070: `BarraCuda` CPU — 25-Domain Pure Rust Math Proof",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_full",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_full",
+            provenance_date: "2026-05-20",
+            description: "Exp070: `BarraCuda` CPU — 25-Domain Pure Rust Math Proof",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

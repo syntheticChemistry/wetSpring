@@ -292,3 +292,136 @@ pub fn extract_capabilities(response: &str) -> Option<CapabilityInfo> {
         version,
     })
 }
+
+#[cfg(test)]
+#[expect(clippy::unwrap_used, reason = "test assertions")]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rpc_error_method_not_found() {
+        let e = RpcError::method_not_found("foo.bar");
+        assert_eq!(e.code, -32601);
+        assert!(e.message.contains("foo.bar"));
+        assert!(e.to_string().contains("-32601"));
+    }
+
+    #[test]
+    fn rpc_error_invalid_params() {
+        let e = RpcError::invalid_params("missing field");
+        assert_eq!(e.code, -32602);
+        assert!(e.message.contains("missing field"));
+    }
+
+    #[test]
+    fn rpc_error_server_error() {
+        let e = RpcError::server_error(-32001, "internal");
+        assert_eq!(e.code, -32001);
+        assert_eq!(e.message, "internal");
+    }
+
+    #[test]
+    fn is_notification_true_for_no_id() {
+        assert!(is_notification(r#"{"jsonrpc":"2.0","method":"ping"}"#));
+    }
+
+    #[test]
+    fn is_notification_false_when_id_present() {
+        assert!(!is_notification(
+            r#"{"jsonrpc":"2.0","method":"ping","id":1}"#
+        ));
+    }
+
+    #[test]
+    fn is_notification_false_for_null_id() {
+        assert!(!is_notification(
+            r#"{"jsonrpc":"2.0","method":"ping","id":null}"#
+        ));
+    }
+
+    #[test]
+    fn is_notification_false_for_invalid_json() {
+        assert!(!is_notification("not json"));
+    }
+
+    #[test]
+    fn is_batch_true_for_array() {
+        assert!(is_batch(r#"[{"jsonrpc":"2.0","method":"a","id":1}]"#));
+    }
+
+    #[test]
+    fn is_batch_false_for_object() {
+        assert!(!is_batch(r#"{"jsonrpc":"2.0","method":"a","id":1}"#));
+    }
+
+    #[test]
+    fn parse_batch_splits_array() {
+        let batch = r#"[{"method":"a","id":1},{"method":"b","id":2}]"#;
+        let items = parse_batch(batch);
+        assert_eq!(items.len(), 2);
+    }
+
+    #[test]
+    fn parse_batch_empty_for_non_array() {
+        assert!(parse_batch(r#"{"method":"a"}"#).is_empty());
+    }
+
+    #[test]
+    fn parse_batch_empty_for_invalid_json() {
+        assert!(parse_batch("not json").is_empty());
+    }
+
+    #[test]
+    fn extract_rpc_error_success_response_returns_none() {
+        let resp = r#"{"jsonrpc":"2.0","result":"ok","id":1}"#;
+        assert!(extract_rpc_error(resp).is_none());
+    }
+
+    #[test]
+    fn extract_rpc_error_error_response_returns_code_and_message() {
+        let resp =
+            r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"method not found"},"id":1}"#;
+        let (code, msg) = extract_rpc_error(resp).unwrap();
+        assert_eq!(code, -32601);
+        assert_eq!(msg, "method not found");
+    }
+
+    #[test]
+    fn extract_rpc_result_success() {
+        let resp = r#"{"jsonrpc":"2.0","result":{"data":42},"id":1}"#;
+        let result = extract_rpc_result(resp).unwrap();
+        assert_eq!(result["data"], 42);
+    }
+
+    #[test]
+    fn extract_rpc_result_error_returns_none() {
+        let resp = r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"nope"},"id":1}"#;
+        assert!(extract_rpc_result(resp).is_none());
+    }
+
+    #[test]
+    fn extract_capabilities_all_formats() {
+        let resp = r#"{"jsonrpc":"2.0","result":{
+            "primal":"wetspring","version":"0.1.0",
+            "capabilities":["science.diversity","science.kmer"],
+            "domains":[{"name":"ecology","description":"Ecology domain","methods":["diversity","kmer"]}],
+            "method_info":{"diversity":{"description":"Shannon diversity","cost":"low"}},
+            "semantic_mappings":{"ecology.diversity":"science.diversity"}
+        },"id":1}"#;
+        let info = extract_capabilities(resp).unwrap();
+        assert_eq!(info.primal.as_deref(), Some("wetspring"));
+        assert_eq!(info.version.as_deref(), Some("0.1.0"));
+        assert_eq!(info.capabilities.len(), 2);
+        assert_eq!(info.domains.len(), 1);
+        assert_eq!(info.domains[0].name, "ecology");
+        assert_eq!(info.method_info.len(), 1);
+        assert_eq!(info.method_info[0].method, "diversity");
+        assert_eq!(info.semantic_mappings.len(), 1);
+    }
+
+    #[test]
+    fn extract_capabilities_returns_none_for_error_response() {
+        let resp = r#"{"jsonrpc":"2.0","error":{"code":-1,"message":"fail"},"id":1}"#;
+        assert!(extract_capabilities(resp).is_none());
+    }
+}

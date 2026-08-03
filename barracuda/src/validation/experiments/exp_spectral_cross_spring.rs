@@ -33,13 +33,13 @@
 //!
 //! Provenance: Validates across multiple primals/springs (hotSpring, wetSpring, neuralSpring, etc.)
 
+use crate::tolerances;
+use crate::validation::Validator;
 use barracuda::spectral::{
     GOE_R, POISSON_R, almost_mathieu_hamiltonian, anderson_2d, anderson_3d, anderson_hamiltonian,
     find_all_eigenvalues, lanczos, lanczos_eigenvalues, level_spacing_ratio, lyapunov_exponent,
 };
 use std::time::Instant;
-use crate::tolerances;
-use crate::validation::Validator;
 
 /// Run the `validate_spectral_cross_spring` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -357,14 +357,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "spectral_cross_spring",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_spectral_cross_spring",
-        provenance_date: "2026-05-20",
-        description: "Exp107: Cross-Spring Spectral Theory — Anderson Localization for Quorum Sensing",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "spectral_cross_spring",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_spectral_cross_spring",
+            provenance_date: "2026-05-20",
+            description: "Exp107: Cross-Spring Spectral Theory — Anderson Localization for Quorum Sensing",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

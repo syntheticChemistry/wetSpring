@@ -43,7 +43,6 @@ fn rolling_zscore(values: &[f64], window: usize) -> Vec<f64> {
 
 /// Run the `validate_algae_timeseries` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Section 1: Diversity module on synthetic community ──────
     v.section("── Shannon diversity on known distributions ──");
     let uniform_4 = vec![25.0, 25.0, 25.0, 25.0];
@@ -127,7 +126,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let bc1 = bray_curtis(&s1, &s3);
     let bc2 = bray_curtis(&s1, &s3);
     v.check("BC deterministic", bc1, bc2, tolerances::EXACT);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -138,14 +136,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "algae_timeseries",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_algae_timeseries",
-        provenance_date: "2026-05-20",
-        description: "Exp039 — Algal pond time-series diversity surveillance",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "algae_timeseries",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_algae_timeseries",
+            provenance_date: "2026-05-20",
+            description: "Exp039 — Algal pond time-series diversity surveillance",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

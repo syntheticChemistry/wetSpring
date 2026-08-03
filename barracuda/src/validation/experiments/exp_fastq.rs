@@ -25,15 +25,14 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::path::Path;
 use crate::bio::{derep, merge_pairs, quality};
 use crate::io::fastq;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use std::path::Path;
 
 /// Run the `validate_fastq` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // Self-contained validations (no external data)
     validate_quality_filtering(v);
     validate_merge_pairs(v);
@@ -52,7 +51,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             data_dir.display()
         );
     }
-
 }
 
 fn validate_r1(data_dir: &Path, v: &mut Validator) {
@@ -381,14 +379,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "fastq",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_fastq",
-        provenance_date: "2026-05-20",
-        description: "Validate FASTQ parser against `MiSeq` SOP training data (Exp001 baseline)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "fastq",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_fastq",
+            provenance_date: "2026-05-20",
+            description: "Validate FASTQ parser against `MiSeq` SOP training data (Exp001 baseline)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

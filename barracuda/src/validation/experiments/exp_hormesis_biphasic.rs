@@ -18,17 +18,17 @@
 //!
 //! Provenance: Hormesis biphasic dose-response validation (Exp377)
 
-use std::time::Instant;
 use crate::bio::hormesis::{self, DoseRegime, HormesisParams};
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 /// Run the `validate_hormesis_biphasic` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let t0 = Instant::now();
 
-    let params = HormesisParams::new(0.3, 1.0, 2.0, 100.0, 3.0)
-        .expect("default hormesis params are valid");
+    let params =
+        HormesisParams::new(0.3, 1.0, 2.0, 100.0, 3.0).expect("default hormesis params are valid");
 
     let doses: Vec<f64> = (0..1000).map(|i| i as f64 * 0.5).collect();
 
@@ -40,7 +40,12 @@ pub fn run(v: &mut crate::validation::Validator) {
     // §2  R(dose→∞) → 0.0  (full inhibition at high dose)
     v.section("D02: Asymptotic inhibition");
     let r_high = hormesis::response(1e6, &params);
-    v.check("R(dose=1e6) < 0.01", r_high, 0.0, tolerances::ASYMPTOTIC_LIMIT);
+    v.check(
+        "R(dose=1e6) < 0.01",
+        r_high,
+        0.0,
+        tolerances::ASYMPTOTIC_LIMIT,
+    );
 
     // §3  Peak response > 1.0  (hormesis definition)
     v.section("D03: Hormetic peak");
@@ -62,7 +67,10 @@ pub fn run(v: &mut crate::validation::Validator) {
     // §5  Dose regime classification
     v.section("D05: Regime classification");
     let pt_zero = hormesis::evaluate(0.0, &params);
-    v.check_pass("dose=0 → Subthreshold", pt_zero.regime == DoseRegime::Subthreshold);
+    v.check_pass(
+        "dose=0 → Subthreshold",
+        pt_zero.regime == DoseRegime::Subthreshold,
+    );
     let pt_toxic = hormesis::evaluate(500.0, &params);
     v.check_pass("dose=500 → Toxic", pt_toxic.regime == DoseRegime::Toxic);
 
@@ -108,7 +116,12 @@ pub fn run(v: &mut crate::validation::Validator) {
     let disorder_sweep =
         hormesis::sweep_with_disorder(&disorder_doses, &hp, w_baseline, sensitivity, gamma);
     v.check_count("disorder sweep = 50 points", disorder_sweep.len(), 50);
-    v.check("first disorder = W_baseline", disorder_sweep[0].1, w_baseline, tolerances::ANALYTICAL_F64);
+    v.check(
+        "first disorder = W_baseline",
+        disorder_sweep[0].1,
+        w_baseline,
+        tolerances::ANALYTICAL_F64,
+    );
 
     println!("\nTotal wall time: {:.2?}", t0.elapsed());
 }
@@ -121,14 +134,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "hormesis_biphasic",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_hormesis_biphasic",
-        provenance_date: "2026-05-20",
-        description: "# Exp377: Hormesis Biphasic Dose-Response Model",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "hormesis_biphasic",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_hormesis_biphasic",
+            provenance_date: "2026-05-20",
+            description: "# Exp377: Hormesis Biphasic Dose-Response Model",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -18,7 +18,6 @@
 
 use std::sync::Arc;
 
-use barracuda::device::WgpuDevice;
 use crate::bio::{
     capacitor::{self, CapacitorParams},
     cooperation::{self, CooperationParams},
@@ -35,39 +34,38 @@ use crate::bio::{
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::{self, OrExit, Validator};
+use barracuda::device::WgpuDevice;
 
 /// Run the `validate_pure_gpu_complete` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    let device = gpu.to_wgpu_device();
+        let device = gpu.to_wgpu_device();
 
-    validate_cooperation_gpu(&device, v);
-    validate_capacitor_gpu(&device, v);
-    validate_kmd_gpu(&gpu, v);
-    validate_gbm_gpu(&gpu, v);
-    validate_merge_pairs_gpu(&gpu, v);
-    validate_signal_gpu(&gpu, v);
-    validate_feature_table_gpu(&gpu, v);
-    validate_robinson_foulds_gpu(&gpu, v);
-    validate_derep_gpu(&gpu, v);
-    validate_chimera_gpu(&gpu, v);
-    validate_neighbor_joining_gpu(&gpu, v);
-    validate_reconciliation_gpu(&gpu, v);
-    validate_molecular_clock_gpu(&gpu, v);
-
+        validate_cooperation_gpu(&device, v);
+        validate_capacitor_gpu(&device, v);
+        validate_kmd_gpu(&gpu, v);
+        validate_gbm_gpu(&gpu, v);
+        validate_merge_pairs_gpu(&gpu, v);
+        validate_signal_gpu(&gpu, v);
+        validate_feature_table_gpu(&gpu, v);
+        validate_robinson_foulds_gpu(&gpu, v);
+        validate_derep_gpu(&gpu, v);
+        validate_chimera_gpu(&gpu, v);
+        validate_neighbor_joining_gpu(&gpu, v);
+        validate_reconciliation_gpu(&gpu, v);
+        validate_molecular_clock_gpu(&gpu, v);
     });
 }
 
@@ -511,14 +509,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_complete",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_pure_gpu_complete",
-        provenance_date: "2026-05-20",
-        description: "Validate all 13 pure GPU promotion modules against CPU baselines",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_complete",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_pure_gpu_complete",
+            provenance_date: "2026-05-20",
+            description: "Validate all 13 pure GPU promotion modules against CPU baselines",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

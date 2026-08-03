@@ -17,12 +17,12 @@
 //!
 //! Provenance: Trophic cascade Anderson lattice validation (Exp378)
 
-use std::time::Instant;
 use crate::bio::anderson_spectral;
 use crate::bio::diversity;
 use crate::bio::hormesis::{self, HormesisParams};
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 /// Run the `validate_trophic_cascade` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -33,8 +33,7 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let predator_params =
         HormesisParams::new(0.2, 0.5, 2.0, 30.0, 3.0).expect("predator params valid");
-    let prey_params =
-        HormesisParams::new(0.3, 2.0, 2.0, 200.0, 3.0).expect("prey params valid");
+    let prey_params = HormesisParams::new(0.3, 2.0, 2.0, 200.0, 3.0).expect("prey params valid");
 
     v.check_pass(
         "predator K_inh < prey K_inh (more sensitive)",
@@ -116,7 +115,10 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let pielou_low = diversity::pielou_evenness(&counts_low);
     let pielou_high = diversity::pielou_evenness(&counts_high);
-    v.check_pass("Pielou evenness higher at low dose", pielou_low > pielou_high);
+    v.check_pass(
+        "Pielou evenness higher at low dose",
+        pielou_low > pielou_high,
+    );
 
     // §6  Hormetic dose-disorder mapping for trophic analysis
     v.section("D06: Dose → disorder mapping for trophic species");
@@ -148,14 +150,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "trophic_cascade",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_trophic_cascade",
-        provenance_date: "2026-05-20",
-        description: "# Exp378: Trophic Cascade via Anderson Lattice",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "trophic_cascade",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_trophic_cascade",
+            provenance_date: "2026-05-20",
+            description: "# Exp378: Trophic Cascade via Anderson Lattice",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

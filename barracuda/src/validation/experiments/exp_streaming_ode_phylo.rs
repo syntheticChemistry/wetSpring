@@ -53,57 +53,56 @@ use crate::validation::{self, Validator};
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    let device = gpu.to_wgpu_device();
-    let mut timings: Vec<(&str, f64, f64)> = Vec::new();
+        let device = gpu.to_wgpu_device();
+        let mut timings: Vec<(&str, f64, f64)> = Vec::new();
 
-    // ═══ Pre-warm all primitives ═══════════════════════════════════════
-    v.section("Pre-warming 6 GPU primitives (one-time shader compilation)");
-    let warmup_start = Instant::now();
+        // ═══ Pre-warm all primitives ═══════════════════════════════════════
+        v.section("Pre-warming 6 GPU primitives (one-time shader compilation)");
+        let warmup_start = Instant::now();
 
-    let ode_gpu = OdeSweepGpu::new(device.clone());
-    let phage_gpu = PhageDefenseGpu::new(device.clone()).or_exit("PhageDefenseGpu init");
-    let bistable_gpu_inst = BistableGpu::new(device.clone()).or_exit("BistableGpu init");
-    let multi_gpu = MultiSignalGpu::new(device.clone()).or_exit("MultiSignalGpu init");
-    let felsenstein_gpu = FelsensteinGpu::new(&device);
-    let unifrac_gpu = UniFracGpu::new(&device);
+        let ode_gpu = OdeSweepGpu::new(device.clone());
+        let phage_gpu = PhageDefenseGpu::new(device.clone()).or_exit("PhageDefenseGpu init");
+        let bistable_gpu_inst = BistableGpu::new(device.clone()).or_exit("BistableGpu init");
+        let multi_gpu = MultiSignalGpu::new(device.clone()).or_exit("MultiSignalGpu init");
+        let felsenstein_gpu = FelsensteinGpu::new(&device);
+        let unifrac_gpu = UniFracGpu::new(&device);
 
-    let warmup_ms = warmup_start.elapsed().as_secs_f64() * 1000.0;
-    println!("  All 6 primitives warmed in {warmup_ms:.1} ms\n");
+        let warmup_ms = warmup_start.elapsed().as_secs_f64() * 1000.0;
+        println!("  All 6 primitives warmed in {warmup_ms:.1} ms\n");
 
-    let t0 = Instant::now();
+        let t0 = Instant::now();
 
-    validate_ode_streaming(&ode_gpu, v, &mut timings);
-    validate_phage_streaming(&phage_gpu, v, &mut timings);
-    validate_bistable_streaming(&bistable_gpu_inst, v, &mut timings);
-    validate_multi_signal_streaming(&multi_gpu, v, &mut timings);
-    validate_felsenstein_streaming(&felsenstein_gpu, &device, v, &mut timings);
-    validate_unifrac_streaming(&unifrac_gpu, v, &mut timings);
+        validate_ode_streaming(&ode_gpu, v, &mut timings);
+        validate_phage_streaming(&phage_gpu, v, &mut timings);
+        validate_bistable_streaming(&bistable_gpu_inst, v, &mut timings);
+        validate_multi_signal_streaming(&multi_gpu, v, &mut timings);
+        validate_felsenstein_streaming(&felsenstein_gpu, &device, v, &mut timings);
+        validate_unifrac_streaming(&unifrac_gpu, v, &mut timings);
 
-    v.section("═══ Streaming ODE+Phylo Summary ═══");
-    println!();
-    println!("  {:<30} {:>10} {:>10}", "Domain", "CPU (µs)", "GPU (µs)");
-    println!("  {}", "─".repeat(54));
-    for (name, cpu_us, gpu_us) in &timings {
-        println!("  {name:<30} {cpu_us:>10.0} {gpu_us:>10.0}");
-    }
-    println!("  {}", "─".repeat(54));
+        v.section("═══ Streaming ODE+Phylo Summary ═══");
+        println!();
+        println!("  {:<30} {:>10} {:>10}", "Domain", "CPU (µs)", "GPU (µs)");
+        println!("  {}", "─".repeat(54));
+        for (name, cpu_us, gpu_us) in &timings {
+            println!("  {name:<30} {cpu_us:>10.0} {gpu_us:>10.0}");
+        }
+        println!("  {}", "─".repeat(54));
 
-    let total_ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("\n  Warmup: {warmup_ms:.1} ms  Execution: {total_ms:.1} ms");
-    println!("  6 domains × pre-warmed pipelines = zero shader recompilation");
+        let total_ms = t0.elapsed().as_secs_f64() * 1000.0;
+        println!("\n  Warmup: {warmup_ms:.1} ms  Execution: {total_ms:.1} ms");
+        println!("  6 domains × pre-warmed pipelines = zero shader recompilation");
     });
 }
 
@@ -712,14 +711,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "streaming_ode_phylo",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_streaming_ode_phylo",
-        provenance_date: "2026-05-20",
-        description: "Exp106: Pure GPU Streaming — ODE Biology + Phylogenetics",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "streaming_ode_phylo",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_streaming_ode_phylo",
+            provenance_date: "2026-05-20",
+            description: "Exp106: Pure GPU Streaming — ODE Biology + Phylogenetics",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

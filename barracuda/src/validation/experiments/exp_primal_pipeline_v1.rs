@@ -33,12 +33,12 @@
 //!
 //! Provenance: Primal IPC pipeline integration validation
 
-use std::path::{Path, PathBuf};
-use std::time::Instant;
 use crate::cast;
 use crate::ipc::discover;
 use crate::ipc::primal_names;
 use crate::validation::{OrExit, Validator};
+use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 /// Discover `ToadStool` socket (tries both `.sock` and `.jsonrpc.sock`).
 #[must_use]
@@ -234,8 +234,7 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     println!("\n  Testing sovereign NCBI ESearch count...");
     let api_key = crate::ncbi::api_key().unwrap_or_default();
-    let search_result =
-        crate::ncbi::esearch_count("nucleotide", "Vibrio harveyi 16S", &api_key);
+    let search_result = crate::ncbi::esearch_count("nucleotide", "Vibrio harveyi 16S", &api_key);
 
     match search_result {
         Ok(count) => {
@@ -249,8 +248,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     }
 
     println!("  Testing three-tier fetch (NestGate → sovereign)...");
-    let fetch_result =
-        crate::ncbi::nestgate::fetch_tiered("nucleotide", "PX756524.1", &api_key);
+    let fetch_result = crate::ncbi::nestgate::fetch_tiered("nucleotide", "PX756524.1", &api_key);
     match fetch_result {
         Ok(fasta) => {
             println!("  Fetched {} bytes via tiered routing", fasta.len());
@@ -444,14 +442,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "primal_pipeline_v1",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_primal_pipeline_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp368: Primal Integration Pipeline Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "primal_pipeline_v1",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_primal_pipeline_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp368: Primal Integration Pipeline Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

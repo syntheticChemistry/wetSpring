@@ -77,7 +77,6 @@ fn cosine_int8(a: &[i8], b: &[i8]) -> i64 {
 
 /// Run the `validate_npu_spectral_screen` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Generate spectral library + queries");
     let library: Vec<Vec<f64>> = (0..LIB_SIZE)
         .map(|i| generate_spectrum(i as u64, 15 + (i % 20)))
@@ -185,7 +184,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Typical LC-MS scan rate: 10-20 Hz → NPU has 75-150× headroom");
     println!("  Power: <10 mW → battery-powered field screening");
     v.check_pass("NPU > 75× LC-MS scan rate", spectra_per_sec > 1500.0);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -196,14 +194,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "npu_spectral_screen",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_npu_spectral_screen",
-        provenance_date: "2026-05-20",
-        description: "Exp117 — Quantized Spectral Matching for NPU PFAS Screening",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "npu_spectral_screen",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_npu_spectral_screen",
+            provenance_date: "2026-05-20",
+            description: "Exp117 — Quantized Spectral Matching for NPU PFAS Screening",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

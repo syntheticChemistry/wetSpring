@@ -253,7 +253,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  D37: Cross-track determinism");
     println!("  D38: Performance measurement");
     println!("  Total: {total_ms:.1} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -264,14 +263,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_v9",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_vs_gpu_v9",
-        provenance_date: "2026-05-20",
-        description: "# Exp293: CPU vs GPU v9 — Paper Math GPU Portability",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_v9",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_vs_gpu_v9",
+            provenance_date: "2026-05-20",
+            description: "# Exp293: CPU vs GPU v9 — Paper Math GPU Portability",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -18,14 +18,14 @@
 
 use std::sync::{Mutex, OnceLock};
 
+use primalspring::bonding::ionic::{AttributionTerms, CreditMethod, DataReturnPolicy};
 use primalspring::bonding::ionic::{
-    ContractState, IonicProposal, TerminationRequest, TerminationReason,
+    ContractState, IonicProposal, TerminationReason, TerminationRequest,
 };
 use primalspring::bonding::ionic_runtime::{IonicContractRegistry, IonicProtocolError};
 use primalspring::bonding::{BondingConstraint, TrustModel};
-use primalspring::bonding::ionic::{AttributionTerms, CreditMethod, DataReturnPolicy};
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::ipc::protocol::RpcError;
 
@@ -35,7 +35,10 @@ fn registry() -> &'static Mutex<IonicContractRegistry> {
     REGISTRY.get_or_init(|| Mutex::new(IonicContractRegistry::new()))
 }
 
-#[allow(clippy::needless_pass_by_value)]
+#[expect(
+    clippy::needless_pass_by_value,
+    reason = "IonicProtocolError consumed by to_string()"
+)]
 fn map_ionic_err(e: IonicProtocolError) -> RpcError {
     RpcError {
         code: -32001,
@@ -61,7 +64,11 @@ pub fn handle_propose(params: &Value) -> Result<Value, RpcError> {
 
     let requested_capabilities: Vec<String> = params["requested_capabilities"]
         .as_array()
-        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect()
+        })
         .unwrap_or_default();
 
     if requested_capabilities.is_empty() {
@@ -72,10 +79,8 @@ pub fn handle_propose(params: &Value) -> Result<Value, RpcError> {
     }
 
     let duration_secs = params["duration_secs"].as_u64().unwrap_or(3600);
-    let rate_limit_rps = u32::try_from(
-        params["rate_limit_rps"].as_u64().unwrap_or(100),
-    )
-    .unwrap_or(u32::MAX);
+    let rate_limit_rps =
+        u32::try_from(params["rate_limit_rps"].as_u64().unwrap_or(100)).unwrap_or(u32::MAX);
 
     let trust_model = match params["trust_model"].as_str() {
         Some("nuclear") => TrustModel::NuclearLineage,
@@ -201,16 +206,17 @@ pub fn handle_terminate(params: &Value) -> Result<Value, RpcError> {
 
 /// `bonding.list` — enumerate contracts, optionally filtered by state.
 pub fn handle_list(params: &Value) -> Result<Value, RpcError> {
-    let filter: Option<ContractState> = params["state"]
-        .as_str()
-        .and_then(|s| match s.to_lowercase().as_str() {
-            "proposed" => Some(ContractState::Proposed),
-            "active" => Some(ContractState::Active),
-            "sealed" => Some(ContractState::Sealed),
-            "expired" => Some(ContractState::Expired),
-            "rejected" => Some(ContractState::Rejected),
-            _ => None,
-        });
+    let filter: Option<ContractState> =
+        params["state"]
+            .as_str()
+            .and_then(|s| match s.to_lowercase().as_str() {
+                "proposed" => Some(ContractState::Proposed),
+                "active" => Some(ContractState::Active),
+                "sealed" => Some(ContractState::Sealed),
+                "expired" => Some(ContractState::Expired),
+                "rejected" => Some(ContractState::Rejected),
+                _ => None,
+            });
 
     let reg = registry().lock().map_err(|_| lock_err())?;
 

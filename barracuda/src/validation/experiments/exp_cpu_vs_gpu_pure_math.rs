@@ -309,8 +309,8 @@ pub fn run(v: &mut crate::validation::Validator) {
     v.section("S6: GpuPipelineSession — Streaming vs Individual Parity");
     let mut s6 = 0_u32;
 
-    let session = crate::bio::streaming_gpu::GpuPipelineSession::new(&gpu)
-        .or_exit("unexpected error");
+    let session =
+        crate::bio::streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("unexpected error");
     let abundances: Vec<f64> = (0..512).map(|i| f64::from(i + 1) * 0.75 + 1.0).collect();
 
     let ind_sh = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("unexpected error");
@@ -362,7 +362,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Pure Rust math: same equations, same results, any hardware");
     println!("  Elapsed: {total_ms:.1} ms");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -373,14 +372,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_pure_math",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_vs_gpu_pure_math",
-        provenance_date: "2026-05-20",
-        description: "# Exp268: `BarraCuda` CPU vs GPU Pure Math — `ToadStool` Primitives",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_pure_math",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_vs_gpu_pure_math",
+            provenance_date: "2026-05-20",
+            description: "# Exp268: `BarraCuda` CPU vs GPU Pure Math — `ToadStool` Primitives",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

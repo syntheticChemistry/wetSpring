@@ -42,10 +42,10 @@
 //!
 //! Provenance: Cross-spring evolution benchmark (S70 baseline)
 
-use std::time::Instant;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 struct ProvenanceTiming {
     domain: &'static str,
@@ -669,7 +669,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  All springs contribute to the shared ecosystem via ToadStool.");
     println!("  wetSpring consumes 90+ primitives from this pool.");
     println!("  ═════════════════════════════════════════════════════════════════");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -680,14 +679,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_evolution_s70",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_cross_spring_evolution_s70",
-        provenance_date: "2026-05-20",
-        description: "# Exp249: Cross-Spring Evolution Benchmark — `ToadStool` S70+++ Provenance",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_evolution_s70",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_cross_spring_evolution_s70",
+            provenance_date: "2026-05-20",
+            description: "# Exp249: Cross-Spring Evolution Benchmark — `ToadStool` S70+++ Provenance",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

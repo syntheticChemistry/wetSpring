@@ -18,10 +18,10 @@
 //!
 //! Provenance: Joint colonization resistance surface validation (Exp379)
 
-use std::time::Instant;
 use crate::bio::binding_landscape;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 /// Run the `validate_colonization_resistance` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -37,15 +37,35 @@ pub fn run(v: &mut crate::validation::Validator) {
     // §1  Diversity advantage — more species → higher resistance
     v.section("D01: Diversity advantage");
 
-    let r_1 = binding_landscape::colonization_resistance(n_sites, 1, kd, disorder_w, conc, threshold, seed);
-    let r_4 = binding_landscape::colonization_resistance(n_sites, 4, kd, disorder_w, conc, threshold, seed);
-    let r_8 = binding_landscape::colonization_resistance(n_sites, 8, kd, disorder_w, conc, threshold, seed);
-    let r_15 = binding_landscape::colonization_resistance(n_sites, 15, kd, disorder_w, conc, threshold, seed);
+    let r_1 = binding_landscape::colonization_resistance(
+        n_sites, 1, kd, disorder_w, conc, threshold, seed,
+    );
+    let r_4 = binding_landscape::colonization_resistance(
+        n_sites, 4, kd, disorder_w, conc, threshold, seed,
+    );
+    let r_8 = binding_landscape::colonization_resistance(
+        n_sites, 8, kd, disorder_w, conc, threshold, seed,
+    );
+    let r_15 = binding_landscape::colonization_resistance(
+        n_sites, 15, kd, disorder_w, conc, threshold, seed,
+    );
 
-    v.check_pass("N=4 resistance ≥ N=1", r_4.resistance_fraction >= r_1.resistance_fraction);
-    v.check_pass("N=8 resistance ≥ N=4", r_8.resistance_fraction >= r_4.resistance_fraction);
-    v.check_pass("N=15 resistance ≥ N=8", r_15.resistance_fraction >= r_8.resistance_fraction);
-    v.check_pass("N=1 < N=15 resistance", r_1.resistance_fraction < r_15.resistance_fraction);
+    v.check_pass(
+        "N=4 resistance ≥ N=1",
+        r_4.resistance_fraction >= r_1.resistance_fraction,
+    );
+    v.check_pass(
+        "N=8 resistance ≥ N=4",
+        r_8.resistance_fraction >= r_4.resistance_fraction,
+    );
+    v.check_pass(
+        "N=15 resistance ≥ N=8",
+        r_15.resistance_fraction >= r_8.resistance_fraction,
+    );
+    v.check_pass(
+        "N=1 < N=15 resistance",
+        r_1.resistance_fraction < r_15.resistance_fraction,
+    );
 
     // §2  IPR — uniform vs concentrated binding
     v.section("D02: Inverse Participation Ratio (IPR)");
@@ -108,7 +128,10 @@ pub fn run(v: &mut crate::validation::Validator) {
     let profile = binding_landscape::site_occupancy_profile(n_sites, 4, kd, disorder_w, conc, seed);
     v.check_count("profile has N sites", profile.len(), n_sites);
     for (i, &occ) in profile.iter().enumerate() {
-        v.check_pass(&format!("site {i} occ in [0,1]"), (0.0..=1.0).contains(&occ));
+        v.check_pass(
+            &format!("site {i} occ in [0,1]"),
+            (0.0..=1.0).contains(&occ),
+        );
     }
 
     // §6  Resistance surface sweep (3×3×3 = 27 points)
@@ -130,17 +153,23 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     v.check_pass(
         "all resistance in [0,1]",
-        surface.iter().all(|p| (0.0..=1.0).contains(&p.resistance_fraction)),
+        surface
+            .iter()
+            .all(|p| (0.0..=1.0).contains(&p.resistance_fraction)),
     );
 
     let low_kd_high_sp = surface
         .iter()
-        .find(|p| (p.kd - 0.1).abs() < 0.01 && p.n_species == 15 && (p.disorder_w - 1.0).abs() < 0.01)
+        .find(|p| {
+            (p.kd - 0.1).abs() < 0.01 && p.n_species == 15 && (p.disorder_w - 1.0).abs() < 0.01
+        })
         .map(|p| p.resistance_fraction)
         .unwrap_or(0.0);
     let high_kd_low_sp = surface
         .iter()
-        .find(|p| (p.kd - 2.0).abs() < 0.01 && p.n_species == 2 && (p.disorder_w - 1.0).abs() < 0.01)
+        .find(|p| {
+            (p.kd - 2.0).abs() < 0.01 && p.n_species == 2 && (p.disorder_w - 1.0).abs() < 0.01
+        })
         .map(|p| p.resistance_fraction)
         .unwrap_or(1.0);
     v.check_pass(
@@ -159,14 +188,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "colonization_resistance",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_colonization_resistance",
-        provenance_date: "2026-05-20",
-        description: "# Exp379: Joint Colonization Resistance Surface",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "colonization_resistance",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_colonization_resistance",
+            provenance_date: "2026-05-20",
+            description: "# Exp379: Joint Colonization Resistance Surface",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

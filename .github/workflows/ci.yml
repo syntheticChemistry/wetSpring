@@ -102,7 +102,7 @@ jobs:
       - name: Run coverage (lib + integration tests) and enforce 90% threshold
         working-directory: barracuda
         run: |
-          cargo llvm-cov --lib --tests --fail-under-lines 90
+          RUSTFLAGS="" cargo llvm-cov --lib --tests --features barracuda-lib,json,ipc --fail-under-lines 90
 
   coverage-forge:
     name: Coverage — metalForge (90% gate)
@@ -119,7 +119,7 @@ jobs:
       - name: Run coverage (lib + integration tests) and enforce 90% threshold
         working-directory: metalForge/forge
         run: |
-          cargo llvm-cov --lib --tests --fail-under-lines 90
+          RUSTFLAGS="" cargo llvm-cov --lib --tests --fail-under-lines 90
 
   doc:
     name: Documentation

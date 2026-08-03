@@ -11,6 +11,7 @@
 //! - **barraCuda** (Absorb): `BatchToleranceSearchF64` GPU shader (`batch_tolerance_search_f64.wgsl`)
 //! - **wetSpring** (Lean): This module delegates to barraCuda's GPU primitive
 
+use crate::cast;
 use barracuda::ops::batch_tolerance_search_f64::BatchToleranceSearchF64;
 
 use crate::error::{Error, Result};
@@ -65,11 +66,7 @@ fn cpu_fallback(samples: &[f64], refs: &[f64], ppm_tol: f64, da_tol: f64) -> Vec
         for &r in refs {
             let diff = (s - r).abs();
             if diff <= tol {
-                #[expect(
-                    clippy::cast_possible_truncation,
-                    reason = "Truncation: score in [0,1], fits f32"
-                )]
-                scores.push((1.0 - diff / tol) as f32);
+                scores.push(cast::f64_f32(1.0 - diff / tol));
             } else {
                 scores.push(0.0);
             }

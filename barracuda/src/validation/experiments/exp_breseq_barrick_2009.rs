@@ -22,9 +22,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use crate::ipc::provenance;
-use crate::ipc::provenance::braid_handoff::{
-    ComputationMetadata, FermentTranscriptBraid,
-};
+use crate::ipc::provenance::braid_handoff::{ComputationMetadata, FermentTranscriptBraid};
 use crate::ncbi;
 use crate::validation::Validator;
 
@@ -132,7 +130,13 @@ fn download_sra_run(accession: &str, output_dir: &Path) -> Result<PathBuf, Strin
 
     let prefetch_out = run_in_env(
         "prefetch",
-        &["--max-size", "50G", "--output-directory", &output_dir.to_string_lossy(), accession],
+        &[
+            "--max-size",
+            "50G",
+            "--output-directory",
+            &output_dir.to_string_lossy(),
+            accession,
+        ],
         output_dir,
     )
     .map_err(|e| format!("prefetch {accession}: {e}"))?;
@@ -147,10 +151,12 @@ fn download_sra_run(accession: &str, output_dir: &Path) -> Result<PathBuf, Strin
     let fasterq_out = run_in_env(
         "fasterq-dump",
         &[
-            "--outdir", &output_dir.to_string_lossy(),
+            "--outdir",
+            &output_dir.to_string_lossy(),
             "--split-3",
             "--skip-technical",
-            "--threads", &fq_threads,
+            "--threads",
+            &fq_threads,
             accession,
         ],
         output_dir,
@@ -160,7 +166,10 @@ fn download_sra_run(accession: &str, output_dir: &Path) -> Result<PathBuf, Strin
     if !fasterq_out.status.success() {
         let stderr = String::from_utf8_lossy(&fasterq_out.stderr);
         let limit = stderr.len().min(200);
-        return Err(format!("fasterq-dump {accession} failed: {}", &stderr[..limit]));
+        return Err(format!(
+            "fasterq-dump {accession} failed: {}",
+            &stderr[..limit]
+        ));
     }
 
     if fastq_path.exists() {
@@ -173,7 +182,9 @@ fn download_sra_run(accession: &str, output_dir: &Path) -> Result<PathBuf, Strin
             println!("    [OK] {accession}_1.fastq (paired-end split)");
             Ok(alt)
         } else {
-            Err(format!("fasterq-dump succeeded but no output found for {accession}"))
+            Err(format!(
+                "fasterq-dump succeeded but no output found for {accession}"
+            ))
         }
     }
 }
@@ -194,8 +205,7 @@ fn run_breseq(
     }
 
     if output_dir.exists() {
-        std::fs::remove_dir_all(&output_dir)
-            .map_err(|e| format!("cleanup breseq output: {e}"))?;
+        std::fs::remove_dir_all(&output_dir).map_err(|e| format!("cleanup breseq output: {e}"))?;
     }
     std::fs::create_dir_all(&output_dir).map_err(|e| format!("mkdir breseq output: {e}"))?;
 
@@ -205,10 +215,14 @@ fn run_breseq(
     let output = run_in_env(
         "breseq",
         &[
-            "-r", &reference.to_string_lossy(),
-            "-o", &output_dir.to_string_lossy(),
-            "-n", clone_name,
-            "-j", &bj,
+            "-r",
+            &reference.to_string_lossy(),
+            "-o",
+            &output_dir.to_string_lossy(),
+            "-n",
+            clone_name,
+            "-j",
+            &bj,
             &fastq_path.to_string_lossy(),
         ],
         workspace,
@@ -234,7 +248,9 @@ fn run_breseq(
             println!("    [OK] breseq complete for {clone_name} (HTML output only)");
             Ok(index_html)
         } else {
-            Err(format!("breseq completed but no output.gd found for {clone_name}"))
+            Err(format!(
+                "breseq completed but no output.gd found for {clone_name}"
+            ))
         }
     }
 }
@@ -332,8 +348,16 @@ fn run_pipeline(v: &mut Validator) {
         }
     }
 
-    v.check_count("SRA runs downloaded", downloaded_runs.len(), BARRICK_RUNS.len());
-    println!("  Downloaded {}/{} runs", downloaded_runs.len(), BARRICK_RUNS.len());
+    v.check_count(
+        "SRA runs downloaded",
+        downloaded_runs.len(),
+        BARRICK_RUNS.len(),
+    );
+    println!(
+        "  Downloaded {}/{} runs",
+        downloaded_runs.len(),
+        BARRICK_RUNS.len()
+    );
 
     if downloaded_runs.len() != BARRICK_RUNS.len() {
         println!("\n  Not all runs downloaded. Proceeding with available data.");
@@ -378,14 +402,20 @@ fn run_pipeline(v: &mut Validator) {
     }
 
     let breseq_succeeded = mutation_counts.iter().filter(|(_, c)| *c > 0).count();
-    v.check_pass("at least one clone produced mutations", breseq_succeeded > 0);
+    v.check_pass(
+        "at least one clone produced mutations",
+        breseq_succeeded > 0,
+    );
 
     // PHASE 5: Science validation — mutation accumulation trend
     v.section("P05: Mutation accumulation trend");
     if mutation_counts.len() >= 2 {
         let first = mutation_counts.first().map_or(0, |(_, c)| *c);
         let last = mutation_counts.last().map_or(0, |(_, c)| *c);
-        v.check_pass("later clones have more mutations than early clones", last > first);
+        v.check_pass(
+            "later clones have more mutations than early clones",
+            last > first,
+        );
         println!(
             "  Early ({}) = {} mutations, Late ({}) = {} mutations",
             mutation_counts.first().map_or("?", |(n, _)| n),
@@ -446,13 +476,18 @@ fn run_pipeline(v: &mut Validator) {
     let braid_json = braid.to_json();
     v.check_pass(
         "braid has non-empty dataset_id",
-        braid_json["dataset_id"].as_str().is_some_and(|s| !s.is_empty()),
+        braid_json["dataset_id"]
+            .as_str()
+            .is_some_and(|s| !s.is_empty()),
     );
     v.check_pass(
         "braid has spring = wetSpring",
         braid_json["spring"].as_str() == Some("wetSpring"),
     );
-    v.check_pass("braid has non-empty summary_blake3", !summary_hash.is_empty());
+    v.check_pass(
+        "braid has non-empty summary_blake3",
+        !summary_hash.is_empty(),
+    );
 
     let braid_dir = workspace.join("provenance/braids");
     std::fs::create_dir_all(&braid_dir).ok();
@@ -489,14 +524,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "breseq_barrick_2009",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_breseq_barrick_2009",
-        provenance_date: "2026-05-20",
-        description: "# Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic Composition",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "breseq_barrick_2009",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_breseq_barrick_2009",
+            provenance_date: "2026-05-20",
+            description: "# Exp381: breseq Pipeline — Barrick 2009 via Nest Atomic Composition",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

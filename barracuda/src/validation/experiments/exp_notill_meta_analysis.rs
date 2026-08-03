@@ -37,7 +37,6 @@ use barracuda::stats::norm_cdf;
 
 /// Run the `validate_notill_meta_analysis` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // S1: Published Effect Sizes
     //
@@ -272,7 +271,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!(
         "  Key finding: No-till +16% MBC — Anderson disorder model matches direction & depth trend"
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -283,14 +281,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "notill_meta_analysis",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_notill_meta_analysis",
-        provenance_date: "2026-05-20",
-        description: "# Exp174: No-Till Meta-Analysis — Zuber & Villamil 2016",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "notill_meta_analysis",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_notill_meta_analysis",
+            provenance_date: "2026-05-20",
+            description: "# Exp174: No-Till Meta-Analysis — Zuber & Villamil 2016",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

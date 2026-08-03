@@ -29,9 +29,7 @@ use std::time::Instant;
 
 use crate::bio::diversity;
 use crate::bio::streaming_gpu::GpuPipelineSession;
-use crate::bio::taxonomy::{
-    ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq,
-};
+use crate::bio::taxonomy::{ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq};
 use crate::gpu::GpuF64;
 use crate::special;
 use crate::tolerances;
@@ -42,47 +40,46 @@ use crate::validation::{self, Validator};
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    let session = match GpuPipelineSession::new(&gpu) {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("Session init failed: {e}");
-            validation::exit_skipped("GpuPipelineSession init failed");
+        let session = match GpuPipelineSession::new(&gpu) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("Session init failed: {e}");
+                validation::exit_skipped("GpuPipelineSession init failed");
+            }
+        };
+        println!("  Session: {}", session.ctx_stats());
+
+        let t0 = Instant::now();
+        let mut timings: Vec<(&str, f64, f64)> = Vec::new();
+
+        validate_alpha_streaming(&session, v, &mut timings);
+        validate_bray_curtis_streaming(&session, v, &mut timings);
+        validate_spectral_streaming(&session, v, &mut timings);
+        validate_full_pipeline(&session, v, &mut timings);
+
+        v.section("═══ Streaming v2 Summary ═══");
+        println!();
+        println!("  {:<30} {:>10} {:>10}", "Stage", "CPU (µs)", "GPU (µs)");
+        println!("  {}", "─".repeat(54));
+        for (name, cpu_us, gpu_us) in &timings {
+            println!("  {name:<30} {cpu_us:>10.0} {gpu_us:>10.0}");
         }
-    };
-    println!("  Session: {}", session.ctx_stats());
-
-    let t0 = Instant::now();
-    let mut timings: Vec<(&str, f64, f64)> = Vec::new();
-
-    validate_alpha_streaming(&session, v, &mut timings);
-    validate_bray_curtis_streaming(&session, v, &mut timings);
-    validate_spectral_streaming(&session, v, &mut timings);
-    validate_full_pipeline(&session, v, &mut timings);
-
-    v.section("═══ Streaming v2 Summary ═══");
-    println!();
-    println!("  {:<30} {:>10} {:>10}", "Stage", "CPU (µs)", "GPU (µs)");
-    println!("  {}", "─".repeat(54));
-    for (name, cpu_us, gpu_us) in &timings {
-        println!("  {name:<30} {cpu_us:>10.0} {gpu_us:>10.0}");
-    }
-    println!("  {}", "─".repeat(54));
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("\n  Pre-warmed streaming: 4 domain groups validated");
-    println!("  [Total] {ms:.1} ms");
+        println!("  {}", "─".repeat(54));
+        let ms = t0.elapsed().as_secs_f64() * 1000.0;
+        println!("\n  Pre-warmed streaming: 4 domain groups validated");
+        println!("  [Total] {ms:.1} ms");
     });
 }
 
@@ -355,14 +352,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_streaming_v2",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_pure_gpu_streaming_v2",
-        provenance_date: "2026-05-20",
-        description: "Exp105: Pure GPU Streaming v2 — Multi-Domain Analytics Pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_streaming_v2",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_pure_gpu_streaming_v2",
+            provenance_date: "2026-05-20",
+            description: "Exp105: Pure GPU Streaming v2 — Multi-Domain Analytics Pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

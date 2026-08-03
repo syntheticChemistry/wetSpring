@@ -200,11 +200,7 @@ impl GenBankRecord {
             }
 
             if line.starts_with("LOCUS") {
-                locus = line
-                    .split_whitespace()
-                    .nth(1)
-                    .unwrap_or("")
-                    .to_string();
+                locus = line.split_whitespace().nth(1).unwrap_or("").to_string();
                 continue;
             }
 
@@ -215,7 +211,12 @@ impl GenBankRecord {
 
             if line.starts_with("ORIGIN") {
                 if let Some(feat) = current_feature.take() {
-                    apply_qualifier(&mut features, feat, &current_qualifier_key, &current_qualifier_value);
+                    apply_qualifier(
+                        &mut features,
+                        feat,
+                        &current_qualifier_key,
+                        &current_qualifier_value,
+                    );
                 }
                 in_features = false;
                 in_origin = true;
@@ -232,7 +233,12 @@ impl GenBankRecord {
             // GenBank: feature keys at column 6 (indent ~5), qualifiers at column 22 (indent ~21)
             if indent < 21 && !trimmed.is_empty() && !trimmed.starts_with('/') {
                 if let Some(feat) = current_feature.take() {
-                    apply_qualifier(&mut features, feat, &current_qualifier_key, &current_qualifier_value);
+                    apply_qualifier(
+                        &mut features,
+                        feat,
+                        &current_qualifier_key,
+                        &current_qualifier_value,
+                    );
                 }
                 current_qualifier_key.clear();
                 current_qualifier_value.clear();
@@ -253,11 +259,16 @@ impl GenBankRecord {
             } else if let Some(stripped) = trimmed.strip_prefix('/') {
                 if let Some(ref mut feat) = current_feature {
                     if !current_qualifier_key.is_empty() {
-                        apply_qualifier_to_feat(feat, &current_qualifier_key, &current_qualifier_value);
+                        apply_qualifier_to_feat(
+                            feat,
+                            &current_qualifier_key,
+                            &current_qualifier_value,
+                        );
                     }
                     if let Some(eq_pos) = stripped.find('=') {
                         current_qualifier_key = stripped[..eq_pos].to_string();
-                        current_qualifier_value = stripped[eq_pos + 1..].trim_matches('"').to_string();
+                        current_qualifier_value =
+                            stripped[eq_pos + 1..].trim_matches('"').to_string();
                     } else {
                         current_qualifier_key = stripped.to_string();
                         current_qualifier_value.clear();
@@ -270,7 +281,12 @@ impl GenBankRecord {
         }
 
         if let Some(feat) = current_feature.take() {
-            apply_qualifier(&mut features, feat, &current_qualifier_key, &current_qualifier_value);
+            apply_qualifier(
+                &mut features,
+                feat,
+                &current_qualifier_key,
+                &current_qualifier_value,
+            );
         }
 
         if sequence.is_empty() {
@@ -329,7 +345,9 @@ fn apply_qualifier_to_feat(feat: &mut GenBankFeature, key: &str, value: &str) {
 fn parse_location(loc: &str) -> (usize, usize, bool) {
     let (inner, forward) = loc
         .strip_prefix("complement(")
-        .map_or((loc, true), |stripped| (stripped.trim_end_matches(')'), false));
+        .map_or((loc, true), |stripped| {
+            (stripped.trim_end_matches(')'), false)
+        });
     let inner = inner
         .strip_prefix("join(")
         .unwrap_or(inner)

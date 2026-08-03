@@ -141,7 +141,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
     v.check("Deterministic", max_diff, 0.0, tolerances::EXACT);
-
 }
 
 fn check_non_neg(v: &mut Validator, r: &crate::bio::ode::OdeResult, pre: &str) {
@@ -162,14 +161,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "capacitor",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_capacitor",
-        provenance_date: "2026-05-20",
-        description: "Validation: Mhatre 2020 phenotypic capacitor (Exp027)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "capacitor",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_capacitor",
+            provenance_date: "2026-05-20",
+            description: "Validation: Mhatre 2020 phenotypic capacitor (Exp027)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

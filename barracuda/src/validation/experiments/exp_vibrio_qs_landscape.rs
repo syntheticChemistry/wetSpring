@@ -19,7 +19,6 @@
 //!
 //! Provenance: Vibrio QS fitness landscape validation
 
-use std::time::Instant;
 #[cfg(feature = "gpu")]
 use crate::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, OdeSweepGpu};
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
@@ -29,6 +28,7 @@ use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::time::Instant;
 
 const N_BATCHES: usize = 1024;
 const N_STEPS: u32 = 500;
@@ -100,7 +100,6 @@ fn classify_outcome(y_final: &[f64]) -> &'static str {
 )]
 /// Run the `validate_vibrio_qs_landscape` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── S1: Parameter space generation ──
     v.section("── S1: Parameter landscape ──");
 
@@ -273,7 +272,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     println!("  Bistable parameter sets: {bistable_count}/{bistable_test_n}");
     v.check_count("bistability detected", usize::from(bistable_count > 0), 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -284,14 +282,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "vibrio_qs_landscape",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_vibrio_qs_landscape",
-        provenance_date: "2026-05-20",
-        description: "# Exp108: Vibrio QS Parameter Landscape via GPU ODE Sweep",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "vibrio_qs_landscape",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_vibrio_qs_landscape",
+            provenance_date: "2026-05-20",
+            description: "# Exp108: Vibrio QS Parameter Landscape via GPU ODE Sweep",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

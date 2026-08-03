@@ -25,7 +25,6 @@
 
 use std::time::Instant;
 
-use serde_json::json;
 use crate::bio::{
     chimera, dada2, decision_tree, derep, diversity, gbm, molecular_clock, random_forest,
     reconciliation,
@@ -36,6 +35,7 @@ use crate::ipc::dispatch;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use serde_json::json;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Hardware {
@@ -355,7 +355,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Total time: {total_ms:.2} ms");
     println!("  Evolution chain: Paper → CPU → GPU → Streaming → metalForge (this)");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -366,14 +365,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v11_extended",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_metalforge_v11_extended",
-        provenance_date: "2026-05-20",
-        description: "# Exp242: `metalForge` v11 — Extended Cross-System Dispatch",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v11_extended",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_metalforge_v11_extended",
+            provenance_date: "2026-05-20",
+            description: "# Exp242: `metalForge` v11 — Extended Cross-System Dispatch",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -15,7 +15,9 @@ use crate::ipc::protocol::RpcError;
 /// primal via IPC before falling back to in-process compute.
 pub fn handle_dose_response(params: &Value) -> Result<Value, RpcError> {
     #[cfg(feature = "primal-proof")]
-    if let Some(result) = super::super::super::barracuda_route::try_forward("stats.hill_sweep", params) {
+    if let Some(result) =
+        super::super::super::barracuda_route::try_forward("stats.hill_sweep", params)
+    {
         return Ok(result);
     }
 

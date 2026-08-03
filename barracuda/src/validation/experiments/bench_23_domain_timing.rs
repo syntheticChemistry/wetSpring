@@ -26,13 +26,13 @@
 //!
 //! Provenance: 23-domain CPU timing benchmark across all science tracks
 
-use std::time::Instant;
 use crate::bio::{
     alignment, ani, bootstrap, cooperation, decision_tree::DecisionTree, diversity, dnds,
     felsenstein, gillespie, hmm, kmer, molecular_clock, multi_signal, pangenome, phage_defense,
     placement, qs_biofilm, robinson_foulds, signal, snp, spectral_match, unifrac::PhyloTree,
 };
 use crate::validation::OrExit;
+use std::time::Instant;
 
 #[expect(
     clippy::too_many_lines,
@@ -407,14 +407,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "23_domain_timing",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_23_domain_timing",
-        provenance_date: "2026-05-20",
-        description: "Exp059: 23-Domain Head-to-Head Timing Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "23_domain_timing",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_23_domain_timing",
+            provenance_date: "2026-05-20",
+            description: "Exp059: 23-Domain Head-to-Head Timing Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -244,3 +244,51 @@ fn from_kriging_result(result: KrigingResult) -> SpatialResult {
         variances: result.variances,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sample(x: f64, y: f64, value: f64) -> SpatialSample {
+        SpatialSample { x, y, value }
+    }
+
+    #[test]
+    fn variogram_config_constructors() {
+        let s = VariogramConfig::spherical(0.1, 1.0, 50.0);
+        assert!(matches!(s.model, VariogramModel::Spherical { .. }));
+        let e = VariogramConfig::exponential(0.1, 1.0, 50.0);
+        assert!(matches!(e.model, VariogramModel::Exponential { .. }));
+        let g = VariogramConfig::gaussian(0.1, 1.0, 50.0);
+        assert!(matches!(g.model, VariogramModel::Gaussian { .. }));
+        let l = VariogramConfig::linear(0.1, 1.0, 50.0);
+        assert!(matches!(l.model, VariogramModel::Linear { .. }));
+    }
+
+    #[test]
+    fn empirical_variogram_needs_at_least_two_sites() {
+        let one = vec![sample(0.0, 0.0, 1.0)];
+        assert!(empirical_variogram(&one, 10, 100.0).is_err());
+    }
+
+    #[test]
+    fn empirical_variogram_two_sites_succeeds() {
+        let sites = vec![sample(0.0, 0.0, 1.0), sample(10.0, 0.0, 2.0)];
+        let result = empirical_variogram(&sites, 5, 20.0);
+        assert!(result.is_ok(), "variogram should succeed: {result:?}");
+        let (lags, semivars) = result.unwrap_or_default();
+        assert!(!lags.is_empty());
+        assert_eq!(lags.len(), semivars.len());
+    }
+
+    #[test]
+    fn spatial_result_fields() {
+        let r = from_kriging_result(KrigingResult {
+            values: vec![1.0, 2.0],
+            variances: vec![0.1, 0.2],
+            weights: vec![],
+        });
+        assert_eq!(r.values, vec![1.0, 2.0]);
+        assert_eq!(r.variances, vec![0.1, 0.2]);
+    }
+}

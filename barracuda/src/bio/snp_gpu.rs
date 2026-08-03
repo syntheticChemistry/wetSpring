@@ -64,7 +64,11 @@ impl SnpGpu {
         clippy::cast_possible_truncation,
         reason = "Truncation: n_sequences, aln_len fit u32"
     )]
-    pub fn call_snps(&self, sequences: &[&[u8]], min_depth: u32) -> crate::error::Result<SnpGpuResult> {
+    pub fn call_snps(
+        &self,
+        sequences: &[&[u8]],
+        min_depth: u32,
+    ) -> crate::error::Result<SnpGpuResult> {
         let n_sequences = sequences.len();
         if n_sequences == 0 {
             return Ok(SnpGpuResult {

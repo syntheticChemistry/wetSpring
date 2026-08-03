@@ -36,6 +36,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// Returns an error if GPU dispatch fails.
 pub fn distance_matrix_gpu(gpu: &GpuF64, sequences: &[&[u8]]) -> Result<Vec<f64>> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for JC69 distance matrix");
 
     let dist = neighbor_joining::distance_matrix(sequences);
 
@@ -63,6 +64,7 @@ pub fn neighbor_joining_gpu(
     labels: &[impl AsRef<str>],
 ) -> Result<NjResult> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for neighbor-joining");
     Ok(neighbor_joining::neighbor_joining(dist, labels))
 }
 
@@ -75,6 +77,7 @@ pub fn neighbor_joining_gpu(
 /// Returns an error if the device lacks `SHADER_F64` support.
 pub fn distance_matrix_batch_gpu(gpu: &GpuF64, alignments: &[Vec<&[u8]>]) -> Result<Vec<Vec<f64>>> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for batch distance matrix");
     Ok(neighbor_joining::distance_matrix_batch(alignments))
 }
 

@@ -129,7 +129,6 @@ fn generate_dataset(offset: u64, count: usize) -> (Vec<Vec<f64>>, Vec<Vec<f64>>)
 
 /// Run the `validate_npu_qs_classifier` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Generate training data from QS ODE landscape");
     let (train_inputs, train_targets) = generate_dataset(0, N_TRAIN);
     let (test_inputs, test_targets) = generate_dataset(10_000, N_TEST);
@@ -257,7 +256,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Throughput: {throughput_hz:.0} classifications/s");
     println!("  Edge power budget: <10 mW (AKD1000 idle + inference)");
     v.check_pass("throughput > 1000 Hz", throughput_hz > 1000.0);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -268,14 +266,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "npu_qs_classifier",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_npu_qs_classifier",
-        provenance_date: "2026-05-20",
-        description: "Exp114 — ESN QS Phase Classifier for NPU Deployment",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "npu_qs_classifier",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_npu_qs_classifier",
+            provenance_date: "2026-05-20",
+            description: "Exp114 — ESN QS Phase Classifier for NPU Deployment",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

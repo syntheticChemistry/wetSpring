@@ -14,6 +14,7 @@
 #[cfg(test)]
 mod tests;
 
+use crate::cast;
 use crate::io::sam::{CigarType, SamRecord};
 
 #[cfg(feature = "gpu")]
@@ -73,16 +74,12 @@ impl PileupColumn {
 
     /// Mean base quality at this position.
     #[must_use]
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "Precision: quality sums bounded by coverage"
-    )]
     pub fn mean_quality(&self) -> f64 {
         if self.depth == 0 {
             return 0.0;
         }
         let total_qual: u64 = self.quality_sums.iter().sum();
-        total_qual as f64 / f64::from(self.depth)
+        cast::u64_f64(total_qual) / f64::from(self.depth)
     }
 
     /// Strand bias ratio (forward / total). 0.5 = balanced.
@@ -100,15 +97,11 @@ impl PileupColumn {
     /// position. Used by the MAPQ-aware binomial model (WS-11) to compute
     /// combined error probability (base error + mapping error).
     #[must_use]
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "Precision: mapq sums bounded by coverage"
-    )]
     pub fn mean_mapq(&self, base_idx: usize) -> f64 {
         if self.base_counts[base_idx] == 0 {
             return 0.0;
         }
-        self.mapq_sums[base_idx] as f64 / f64::from(self.base_counts[base_idx])
+        cast::u64_f64(self.mapq_sums[base_idx]) / f64::from(self.base_counts[base_idx])
     }
 }
 
@@ -123,8 +116,7 @@ const fn base_to_idx(b: u8) -> usize {
 }
 
 /// Pileup generation configuration.
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub struct PileupConfig {
     /// Minimum Phred quality score to include a base in counts.
     /// Bases below this threshold are excluded from `base_counts` and `depth`.
@@ -138,7 +130,6 @@ pub struct PileupConfig {
     /// Skip secondary and supplementary alignments (SAM FLAG 0x100 | 0x800).
     pub skip_secondary: bool,
 }
-
 
 /// Generate pileup from sorted SAM records.
 ///
@@ -194,7 +185,7 @@ pub fn generate_pileup_filtered(
         let mut query_pos = 0usize;
 
         for op in &record.cigar {
-            let len = op.len as usize;
+            let len = cast::u32_usize(op.len);
             match op.op {
                 CigarType::Match | CigarType::SeqMatch | CigarType::SeqMismatch => {
                     for i in 0..len {
@@ -270,10 +261,6 @@ pub struct CoverageStats {
 
 /// Compute coverage statistics from pileup columns.
 #[must_use]
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "Precision: position counts bounded by genome"
-)]
 pub fn coverage_stats(columns: &[PileupColumn], ref_len: usize) -> CoverageStats {
     if columns.is_empty() {
         return CoverageStats {
@@ -289,7 +276,7 @@ pub fn coverage_stats(columns: &[PileupColumn], ref_len: usize) -> CoverageStats
     depths.sort_unstable();
 
     let total_depth: u64 = depths.iter().map(|&d| u64::from(d)).sum();
-    let mean = total_depth as f64 / depths.len() as f64;
+    let mean = cast::u64_f64(total_depth) / cast::usize_f64(depths.len());
     let median = depths[depths.len() / 2];
     let max = depths.last().copied().unwrap_or(0);
 
@@ -298,7 +285,7 @@ pub fn coverage_stats(columns: &[PileupColumn], ref_len: usize) -> CoverageStats
         mean_depth: mean,
         median_depth: median,
         max_depth: max,
-        coverage_fraction: columns.len() as f64 / ref_len as f64,
+        coverage_fraction: cast::usize_f64(columns.len()) / cast::usize_f64(ref_len),
     }
 }
 
@@ -321,7 +308,10 @@ pub fn cumulative_coverage_gpu(
         return Ok(Vec::new());
     }
 
-    let depths: Vec<f32> = columns.iter().map(|c| c.depth as f32).collect();
+    let depths: Vec<f32> = columns
+        .iter()
+        .map(|c| cast::f64_f32(cast::u32_f64(c.depth)))
+        .collect();
     let shape = vec![depths.len()];
 
     let tensor = Tensor::from_data(&depths, shape, Arc::clone(device))
@@ -355,7 +345,7 @@ pub fn full_coverage_track_gpu(
     let mut depth_track: Vec<f32> = vec![0.0; ref_len];
     for col in columns {
         if col.position < ref_len {
-            depth_track[col.position] = col.depth as f32;
+            depth_track[col.position] = cast::f64_f32(cast::u32_f64(col.depth));
         }
     }
 

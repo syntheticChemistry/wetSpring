@@ -17,12 +17,12 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use std::time::Instant;
 use crate::bio::felsenstein::{self, TreeNode};
 use crate::bio::neighbor_joining;
 use crate::cast;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 const N_TAXA: usize = 128;
 const SEQ_LEN: usize = 300;
@@ -82,7 +82,6 @@ fn seq_to_states(seq: &[u8]) -> Vec<usize> {
 )]
 /// Run the `validate_phylo_placement_scale` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── S1: Reference tree construction ──
     v.section("── S1: Reference alignment + distance matrix ──");
 
@@ -244,7 +243,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     }
 
     v.check_count("scale benchmark ran", 1, 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -255,14 +253,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "phylo_placement_scale",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_phylo_placement_scale",
-        provenance_date: "2026-05-20",
-        description: "# Exp109: Large-Scale Phylogenetic Placement with GPU Felsenstein",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "phylo_placement_scale",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_phylo_placement_scale",
+            provenance_date: "2026-05-20",
+            description: "# Exp109: Large-Scale Phylogenetic Placement with GPU Felsenstein",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

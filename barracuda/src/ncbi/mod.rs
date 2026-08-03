@@ -31,6 +31,6 @@ pub use efetch::{
 };
 pub use entrez::esearch_count;
 pub use http::get as http_get;
-pub use sra::{download_sra_run, sra_tools_available};
 #[cfg(feature = "ipc")]
 pub use sra::{SraFetchResult, SraSource, fetch_sra_composed};
+pub use sra::{download_sra_run, sra_tools_available};

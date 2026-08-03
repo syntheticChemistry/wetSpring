@@ -29,13 +29,11 @@ use crate::validation::Validator;
 
 /// Run the `validate_pangenomics` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_core_accessory_unique(v);
     validate_heaps_law(v);
     validate_enrichment(v);
     validate_bh_correction(v);
     validate_python_parity(v);
-
 }
 
 fn sample_clusters() -> Vec<GeneCluster> {
@@ -220,14 +218,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pangenomics",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_pangenomics",
-        provenance_date: "2026-05-20",
-        description: "Exp056 — Moulana & Anderson 2020: Sulfurovum pangenomics",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pangenomics",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_pangenomics",
+            provenance_date: "2026-05-20",
+            description: "Exp056 — Moulana & Anderson 2020: Sulfurovum pangenomics",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

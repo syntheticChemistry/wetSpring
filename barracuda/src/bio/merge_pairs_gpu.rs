@@ -41,6 +41,7 @@ pub fn merge_pairs_gpu(
     params: &MergeParams,
 ) -> Result<(Vec<FastqRecord>, MergeStats)> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for paired-end merge");
 
     let (merged, stats) = merge_pairs::merge_pairs(fwd_reads, rev_reads, params);
 
@@ -71,6 +72,7 @@ pub fn merge_pair_gpu(
     params: &MergeParams,
 ) -> Result<merge_pairs::MergeResult> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for single pair merge");
     Ok(merge_pairs::merge_pair(fwd, rev, params))
 }
 

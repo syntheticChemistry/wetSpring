@@ -10,7 +10,7 @@
 
 use std::collections::HashMap;
 
-use crate::cast::u64_usize;
+use crate::cast::{u64_usize, usize_u64};
 
 /// 2-bit DNA encoding: A=0, C=1, G=2, T=3.
 /// Returns `None` for ambiguous bases (N, etc).
@@ -107,7 +107,7 @@ impl KmerCounts {
         let mut total_valid = 0_u64;
         for (kmer, &count) in histogram.iter().enumerate() {
             if count > 0 {
-                counts.insert(kmer as u64, count);
+                counts.insert(usize_u64(kmer), count);
                 total_valid += u64::from(count);
             }
         }

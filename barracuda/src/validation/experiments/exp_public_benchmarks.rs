@@ -18,8 +18,6 @@
 //!
 //! Provenance: Known-value formulas and algorithmic invariants
 
-use std::collections::HashMap;
-use std::path::Path;
 use crate::bio::dada2::{self, Dada2Params};
 use crate::bio::derep::{self, DerepSort};
 use crate::bio::diversity;
@@ -27,10 +25,11 @@ use crate::bio::quality::{self, QualityParams};
 use crate::bio::taxonomy::{ClassifyParams, NaiveBayesClassifier, TaxRank};
 use crate::bio::validation_helpers;
 use crate::validation::{self, Validator};
+use std::collections::HashMap;
+use std::path::Path;
 
 /// Run the `validate_public_benchmarks` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let base = validation::data_dir("WETSPRING_PUBLIC_DIR", "data/public_benchmarks");
 
     // ── Load SILVA reference database (if available) ─────────────────────
@@ -81,7 +80,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     ];
     for (project, samples) in datasets {
         run_dataset(
-                v,
+            v,
             &mut all_results,
             &base,
             project,
@@ -98,7 +97,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     // ── Taxonomy benchmark ──────────────────────────────────────────────
     taxonomy_benchmark(v, &all_results);
-
 }
 
 // ── Sample processing result ────────────────────────────────────────────────
@@ -705,14 +703,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "public_benchmarks",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_public_benchmarks",
-        provenance_date: "2026-05-20",
-        description: "Validate Rust 16S pipeline on PUBLIC open data, benchmarked against paper fin...",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "public_benchmarks",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_public_benchmarks",
+            provenance_date: "2026-05-20",
+            description: "Validate Rust 16S pipeline on PUBLIC open data, benchmarked against paper fin...",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

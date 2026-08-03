@@ -33,11 +33,7 @@ fn perfect_concordance() {
         make_call(200, VariantType::Snp),
         make_call(300, VariantType::Deletion),
     ];
-    let reference = vec![
-        make_ref_snp(100),
-        make_ref_snp(200),
-        make_ref_del(300),
-    ];
+    let reference = vec![make_ref_snp(100), make_ref_snp(200), make_ref_del(300)];
 
     let result = cross_validate(&sovereign, &reference, 5);
     assert_eq!(result.overall.true_positives, 3);
@@ -51,11 +47,7 @@ fn perfect_concordance() {
 #[test]
 fn missed_mutations_reduce_sensitivity() {
     let sovereign = vec![make_call(100, VariantType::Snp)];
-    let reference = vec![
-        make_ref_snp(100),
-        make_ref_snp(200),
-        make_ref_snp(300),
-    ];
+    let reference = vec![make_ref_snp(100), make_ref_snp(200), make_ref_snp(300)];
 
     let result = cross_validate(&sovereign, &reference, 5);
     assert_eq!(result.overall.true_positives, 1);
@@ -175,6 +167,24 @@ fn config_for_generation_varies() {
     );
     assert!(cfg_early.quality_weighted);
     assert!(cfg_late.binomial_quality);
+}
+
+#[test]
+fn unsupported_reference_types_do_not_affect_concordance() {
+    let sovereign = vec![make_call(100, VariantType::Snp)];
+    let reference = vec![
+        make_ref_snp(100),
+        ("MOB".to_string(), 200, String::new()),
+        ("AMP".to_string(), 300, String::new()),
+        ("CON".to_string(), 400, String::new()),
+        ("INV".to_string(), 500, String::new()),
+    ];
+
+    let result = cross_validate(&sovereign, &reference, 5);
+    assert_eq!(result.overall.true_positives, 1);
+    assert_eq!(result.overall.false_negatives, 0);
+    assert_eq!(result.overall.false_positives, 0);
+    assert_eq!(result.snp.reference_total(), 1);
 }
 
 #[test]

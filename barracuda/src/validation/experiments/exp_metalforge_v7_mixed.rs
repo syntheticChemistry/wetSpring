@@ -27,14 +27,14 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use serde_json::json;
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::ipc::dispatch;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use serde_json::json;
+use std::time::Instant;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -42,9 +42,8 @@ fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     for i in 0..n_species {
         rng = rng.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
         let noise = ((rng >> 33) as f64) / f64::from(u32::MAX);
-        let rank_weight = (-(crate::cast::usize_f64(i))
-            / (crate::cast::usize_f64(n_species) * evenness))
-            .exp();
+        let rank_weight =
+            (-(crate::cast::usize_f64(i)) / (crate::cast::usize_f64(n_species) * evenness)).exp();
         counts.push((rank_weight * 1000.0 * (0.5 + noise)).max(1.0));
     }
     counts
@@ -636,7 +635,6 @@ fn validate_workload_routing_model(v: &mut Validator) {
 
 /// Run the `validate_metalforge_v7_mixed` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let t_total = Instant::now();
 
     validate_cross_substrate_diversity(v);
@@ -649,7 +647,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_workload_routing_model(v);
 
     println!("\n  Total wall-clock: {} ms", t_total.elapsed().as_millis());
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -660,14 +657,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v7_mixed",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_metalforge_v7_mixed",
-        provenance_date: "2026-05-20",
-        description: "Exp208: `metalForge` v7 — Mixed Hardware NUCLEUS Atomics via IPC",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v7_mixed",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_metalforge_v7_mixed",
+            provenance_date: "2026-05-20",
+            description: "Exp208: `metalForge` v7 — Mixed Hardware NUCLEUS Atomics via IPC",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

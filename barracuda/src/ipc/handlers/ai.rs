@@ -13,6 +13,7 @@ use serde_json::{Value, json};
 
 use crate::ipc::discover;
 use crate::ipc::primal_names;
+use crate::ipc::primal_names::SQUIRREL_DISPLAY;
 use crate::ipc::protocol::RpcError;
 
 const RPC_TIMEOUT: Duration = crate::ipc::timeouts::AI_INFERENCE;
@@ -38,8 +39,9 @@ fn squirrel_query(
     let payload =
         serde_json::to_string(&request).map_err(|e| IpcError::Codec(format!("serialize: {e}")))?;
 
-    let stream = std::os::unix::net::UnixStream::connect(socket_path)
-        .map_err(|e| IpcError::Connect(format!("Squirrel {}: {e}", socket_path.display())))?;
+    let stream = std::os::unix::net::UnixStream::connect(socket_path).map_err(|e| {
+        IpcError::Connect(format!("{SQUIRREL_DISPLAY} {}: {e}", socket_path.display()))
+    })?;
     stream.set_read_timeout(Some(RPC_TIMEOUT)).ok();
     stream.set_write_timeout(Some(RPC_TIMEOUT)).ok();
 
@@ -102,9 +104,10 @@ pub fn handle_ai_ecology_interpret(params: &Value) -> Result<Value, RpcError> {
     let context = params.get("context").cloned().unwrap_or_else(|| json!({}));
 
     let Some(socket) = discover::discover_squirrel() else {
+        tracing::warn!("{SQUIRREL_DISPLAY} AI unavailable — socket not discovered");
         return Ok(json!({
             primal_names::SQUIRREL: "unavailable",
-            "message": "Squirrel AI unavailable — socket not discovered",
+            "message": format!("{SQUIRREL_DISPLAY} AI unavailable — socket not discovered"),
             "query": query,
         }));
     };
@@ -118,7 +121,10 @@ pub fn handle_ai_ecology_interpret(params: &Value) -> Result<Value, RpcError> {
         Err(e) => {
             let msg = e.to_string();
             let (status, message) = if msg.contains("timeout") || msg.contains("timed out") {
-                ("timeout", "Squirrel AI request timed out".to_string())
+                (
+                    "timeout",
+                    format!("{SQUIRREL_DISPLAY} AI request timed out"),
+                )
             } else {
                 ("error", msg)
             };

@@ -25,7 +25,6 @@ fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
 
 /// Run the `validate_anaerobic_codigestion` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Modified Gompertz (P=350, Rm=25, λ=3)");
     let p = 350.0;
     let rm = 25.0;
@@ -87,7 +86,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let rare = diversity::rarefaction_curve(&digester, &[5.0, 10.0, 20.0, 50.0]);
     let rare_mono = rare.windows(2).all(|w| w[1] >= w[0]);
     v.check_pass("Rarefaction monotonic", rare_mono);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -98,14 +96,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "anaerobic_codigestion",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_anaerobic_codigestion",
-        provenance_date: "2026-05-20",
-        description: "Exp336: Yang 2016 — Anaerobic co-digestion phylogenetics",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "anaerobic_codigestion",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_anaerobic_codigestion",
+            provenance_date: "2026-05-20",
+            description: "Exp336: Yang 2016 — Anaerobic co-digestion phylogenetics",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

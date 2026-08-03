@@ -25,18 +25,16 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
+use crate::cast;
 use barracuda::device::WgpuDevice;
 use barracuda::{FelsensteinGpu, PhyloTree};
 use std::sync::Arc;
 use std::time::Instant;
-use crate::cast;
 
 use crate::bio::dada2::{self, Dada2Params};
 use crate::bio::dada2_gpu::{self, Dada2Gpu};
 use crate::bio::derep::UniqueSequence;
-use crate::bio::felsenstein::{
-    self, N_STATES, TreeNode, encode_dna, transition_matrix,
-};
+use crate::bio::felsenstein::{self, N_STATES, TreeNode, encode_dna, transition_matrix};
 use crate::bio::kmer_gpu::KmerGpu;
 use crate::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, OdeSweepGpu};
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
@@ -50,45 +48,44 @@ use crate::validation::{self, Validator};
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    let device = gpu.to_wgpu_device();
-    let t0 = Instant::now();
-    let mut timings: Vec<(&str, f64, f64, &str)> = Vec::new();
+        let device = gpu.to_wgpu_device();
+        let t0 = Instant::now();
+        let mut timings: Vec<(&str, f64, f64, &str)> = Vec::new();
 
-    validate_qs_ode_mf(&device, v, &mut timings);
-    validate_unifrac_mf(&device, v, &mut timings);
-    validate_dada2_mf(&device, v, &mut timings);
-    validate_kmer_mf(&gpu, v, &mut timings);
-    validate_felsenstein_mf(&device, v, &mut timings);
+        validate_qs_ode_mf(&device, v, &mut timings);
+        validate_unifrac_mf(&device, v, &mut timings);
+        validate_dada2_mf(&device, v, &mut timings);
+        validate_kmer_mf(&gpu, v, &mut timings);
+        validate_felsenstein_mf(&device, v, &mut timings);
 
-    v.section("═══ metalForge Cross-Substrate v6 Summary ═══");
-    println!();
-    println!(
-        "  {:<25} {:>10} {:>10} {:>10}",
-        "Workload", "CPU (µs)", "GPU (µs)", "Substrate"
-    );
-    println!("  {}", "─".repeat(59));
-    for (name, cpu_us, gpu_us, result) in &timings {
-        println!("  {name:<25} {cpu_us:>10.0} {gpu_us:>10.0} {result:>10}");
-    }
-    println!("  {}", "─".repeat(59));
+        v.section("═══ metalForge Cross-Substrate v6 Summary ═══");
+        println!();
+        println!(
+            "  {:<25} {:>10} {:>10} {:>10}",
+            "Workload", "CPU (µs)", "GPU (µs)", "Substrate"
+        );
+        println!("  {}", "─".repeat(59));
+        for (name, cpu_us, gpu_us, result) in &timings {
+            println!("  {name:<25} {cpu_us:>10.0} {gpu_us:>10.0} {result:>10}");
+        }
+        println!("  {}", "─".repeat(59));
 
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("\n  5 gap domains: substrate-independent PROVEN");
-    println!("  Three-Tier Matrix: 25/25 actionable papers covered");
-    println!("  [Total] {ms:.1} ms");
+        let ms = t0.elapsed().as_secs_f64() * 1000.0;
+        println!("\n  5 gap domains: substrate-independent PROVEN");
+        println!("  Three-Tier Matrix: 25/25 actionable papers covered");
+        println!("  [Total] {ms:.1} ms");
     });
 }
 
@@ -667,14 +664,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v6",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_metalforge_v6",
-        provenance_date: "2026-05-20",
-        description: "Exp104: `metalForge` Cross-Substrate v6 — Complete Three-Tier Coverage",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v6",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_metalforge_v6",
+            provenance_date: "2026-05-20",
+            description: "Exp104: `metalForge` Cross-Substrate v6 — Complete Three-Tier Coverage",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

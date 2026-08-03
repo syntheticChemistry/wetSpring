@@ -33,13 +33,13 @@
 
 use std::time::Instant;
 
+use crate::tolerances;
+use crate::validation::{OrExit, Validator};
 use barracuda::shaders::provenance::report::{evolution_report, shader_count};
 use barracuda::shaders::provenance::types::SpringDomain;
 use barracuda::shaders::provenance::{
     cross_spring_matrix, cross_spring_shaders, shaders_consumed_by, shaders_from,
 };
-use crate::tolerances;
-use crate::validation::{OrExit, Validator};
 
 struct Timing {
     label: &'static str,
@@ -552,9 +552,7 @@ pub fn run(v: &mut crate::validation::Validator) {
             .enable_all()
             .build()
             .or_exit("tokio runtime");
-        let gpu = rt
-            .block_on(crate::gpu::GpuF64::new())
-            .or_exit("GPU init");
+        let gpu = rt.block_on(crate::gpu::GpuF64::new()).or_exit("GPU init");
 
         let strategy = gpu.fp64_strategy();
         let precision = gpu.optimal_precision();
@@ -680,7 +678,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║  groundSpring → Bootstrap, Jackknife, regression, 13-tier tolerances ║");
     println!("║               Used by: ALL springs via validation backbone           ║");
     println!("╚═══════════════════════════════════════════════════════════════════════╝");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -691,14 +688,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_evolution_v98",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cross_spring_evolution_v98",
-        provenance_date: "2026-05-20",
-        description: "# Exp319: Cross-Spring Modern Evolution Validation + Benchmark (V98+)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_evolution_v98",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cross_spring_evolution_v98",
+            provenance_date: "2026-05-20",
+            description: "# Exp319: Cross-Spring Modern Evolution Validation + Benchmark (V98+)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

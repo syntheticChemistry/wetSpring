@@ -55,11 +55,7 @@ fn validate_mesh_health_inner(v: &mut ValidationResult) {
                 v.check_bool(&label, true, &detail);
             }
             composition_health::ComponentStatus::Discovered => {
-                v.check_bool(
-                    &label,
-                    false,
-                    "socket discovered but health probe failed",
-                );
+                v.check_bool(&label, false, "socket discovered but health probe failed");
             }
             composition_health::ComponentStatus::Absent => {
                 v.check_skip(&label, "socket not found (primal not deployed)");
@@ -105,7 +101,10 @@ pub fn validate_manifest_ipc(ctx: &mut CompositionContext, v: &mut ValidationRes
     validate_manifest_services(ctx, v);
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "sequential validation of 15 manifest capabilities"
+)]
 fn validate_manifest_math(ctx: &mut CompositionContext, v: &mut ValidationResult) {
     validate_tensor_matmul(ctx, v);
 

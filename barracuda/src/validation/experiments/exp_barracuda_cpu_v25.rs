@@ -27,11 +27,11 @@
 //!
 //! Provenance: barraCuda CPU primitive validation (V25 NMF/ridge)
 
-use std::time::Instant;
 use crate::bio::{cooperation, diversity, felsenstein, hmm, pcoa, qs_biofilm};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{DomainResult, Validator};
+use std::time::Instant;
 
 fn domain(
     name: &'static str,
@@ -450,7 +450,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!();
     println!("  Pure Rust CPU math PROVEN — all cross-primal primitives correct");
     println!("  Chain: CPU (this) → GPU (Exp324) → CPU-vs-GPU (Exp325) → metalForge (Exp326)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -461,14 +460,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v25",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v25",
-        provenance_date: "2026-05-20",
-        description: "# Exp323: `BarraCuda` CPU v25 — V99 Cross-Primal Pure Rust Math",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v25",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v25",
+            provenance_date: "2026-05-20",
+            description: "# Exp323: `BarraCuda` CPU v25 — V99 Cross-Primal Pure Rust Math",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

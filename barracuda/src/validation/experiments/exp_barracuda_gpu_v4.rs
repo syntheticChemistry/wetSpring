@@ -24,15 +24,15 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use barracuda::spectral::{GOE_R, POISSON_R};
-use serde_json::json;
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::ipc::dispatch;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::spectral::{GOE_R, POISSON_R};
+use serde_json::json;
+use std::time::Instant;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -322,7 +322,6 @@ fn validate_toadstool_dispatch(v: &mut Validator) {
 
 /// Run the `validate_barracuda_gpu_v4` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     prewarm_gpu();
     let t_total = Instant::now();
 
@@ -334,7 +333,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_toadstool_dispatch(v);
 
     println!("\n  Total wall-clock: {} ms", t_total.elapsed().as_millis());
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -345,14 +343,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_gpu_v4",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_gpu_v4",
-        provenance_date: "2026-05-20",
-        description: "Exp207: `BarraCuda` GPU Parity v4 — IPC Science Capabilities on GPU",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_gpu_v4",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_gpu_v4",
+            provenance_date: "2026-05-20",
+            description: "Exp207: `BarraCuda` GPU Parity v4 — IPC Science Capabilities on GPU",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

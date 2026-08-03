@@ -9,15 +9,15 @@
 //! - **F1 score**: harmonic mean of sensitivity and precision
 //! - **Per-type concordance**: broken down by SNP/DEL/INS
 //!
-//! This module integrates with the [`LteeThresholds`](super::thresholds::LteeThresholds)
+//! This module integrates with the [`LteeThresholds`]
 //! to validate that generation-aware thresholds improve concordance over fixed
 //! thresholds across the LTEE evolutionary trajectory.
 
 #[cfg(test)]
 mod tests;
 
-use super::{CalledVariant, CallerConfig, VariantType};
 use super::thresholds::LteeThresholds;
+use super::{CalledVariant, CallerConfig, VariantType};
 
 /// Concordance statistics from cross-validation.
 #[derive(Debug, Clone)]
@@ -173,7 +173,9 @@ pub fn config_for_generation(generation: u64) -> CallerConfig {
     thresholds.apply_to(&base)
 }
 
-fn partition_reference(reference: &[(String, usize, String)]) -> (Vec<usize>, Vec<usize>, Vec<usize>) {
+fn partition_reference(
+    reference: &[(String, usize, String)],
+) -> (Vec<usize>, Vec<usize>, Vec<usize>) {
     let mut snp = Vec::new();
     let mut del = Vec::new();
     let mut ins = Vec::new();
@@ -183,7 +185,42 @@ fn partition_reference(reference: &[(String, usize, String)]) -> (Vec<usize>, Ve
             "SNP" | "SUB" => snp.push(*pos),
             "DEL" => del.push(*pos),
             "INS" => ins.push(*pos),
-            _ => {} // MOB, AMP, CON, INV — skip for now
+            // Gap #11: MOB/AMP/CON/INV cross-validation not yet implemented
+            "MOB" => {
+                tracing::debug!(
+                    variant_type = vtype,
+                    position = pos,
+                    "reference variant type not yet cross-validated"
+                );
+            }
+            "AMP" => {
+                tracing::debug!(
+                    variant_type = vtype,
+                    position = pos,
+                    "reference variant type not yet cross-validated"
+                );
+            }
+            "CON" => {
+                tracing::debug!(
+                    variant_type = vtype,
+                    position = pos,
+                    "reference variant type not yet cross-validated"
+                );
+            }
+            "INV" => {
+                tracing::debug!(
+                    variant_type = vtype,
+                    position = pos,
+                    "reference variant type not yet cross-validated"
+                );
+            }
+            other => {
+                tracing::debug!(
+                    variant_type = other,
+                    position = pos,
+                    "unknown reference variant type, skipping cross-validation"
+                );
+            }
         }
     }
     (snp, del, ins)

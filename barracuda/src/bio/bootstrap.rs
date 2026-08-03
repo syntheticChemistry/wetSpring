@@ -17,6 +17,7 @@
 
 use super::felsenstein::{TreeNode, log_likelihood};
 use super::gillespie::Lcg64;
+use crate::cast;
 
 /// A multiple sequence alignment stored column-major.
 #[derive(Debug, Clone)]
@@ -52,13 +53,7 @@ pub fn resample_columns(alignment: &Alignment, rng: &mut Lcg64) -> Alignment {
     let n = alignment.n_sites;
     let mut new_columns = Vec::with_capacity(n);
     for _ in 0..n {
-        #[expect(
-            clippy::cast_precision_loss,
-            clippy::cast_possible_truncation,
-            clippy::cast_sign_loss,
-            reason = "precision: bootstrap sample sizes well below 2^53"
-        )]
-        let idx = ((rng.next_f64() * n as f64) as usize).min(n - 1);
+        let idx = cast::f64_usize(rng.next_f64() * cast::usize_f64(n)).min(n - 1);
         new_columns.push(alignment.columns[idx].clone());
     }
     Alignment {
@@ -150,10 +145,7 @@ pub fn bootstrap_support(
             a_wins += 1;
         }
     }
-    #[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
-    {
-        a_wins as f64 / n_reps as f64
-    }
+    cast::usize_f64(a_wins) / cast::usize_f64(n_reps)
 }
 
 #[cfg(test)]

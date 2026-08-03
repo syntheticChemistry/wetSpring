@@ -20,10 +20,10 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 // ── D01: Sovereign Diversity Pipeline ────────────────────────────────────────
 
@@ -391,7 +391,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let total_ms = t_total.elapsed().as_millis();
     println!("\n  Total wall-clock: {total_ms} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -402,14 +401,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v10",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v10",
-        provenance_date: "2026-05-20",
-        description: "Exp190: `BarraCuda` CPU Parity v10 — Pure Rust Math for V59 Science Extensions",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v10",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v10",
+            provenance_date: "2026-05-20",
+            description: "Exp190: `BarraCuda` CPU Parity v10 — Pure Rust Math for V59 Science Extensions",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

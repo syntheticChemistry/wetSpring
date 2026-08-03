@@ -5,6 +5,7 @@
 //! computes condensed N*(N-1)/2 Euclidean distances for N feature vectors.
 //! Uses f32 internally for broad GPU compatibility.
 
+use crate::cast;
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use barracuda::ops::bio::PairwiseL2Gpu;
@@ -21,10 +22,6 @@ use wgpu::util::DeviceExt;
 /// # Errors
 ///
 /// Returns [`Error::Gpu`] if dispatch fails or dimensions are invalid.
-#[expect(
-    clippy::cast_possible_truncation,
-    reason = "Truncation: n, dim fit u32 (wgpu dispatch)"
-)]
 pub fn pairwise_l2_condensed_gpu(
     gpu: &GpuF64,
     coords: &[f64],
@@ -47,7 +44,7 @@ pub fn pairwise_l2_condensed_gpu(
     let d = device.device();
     let n_pairs = n * (n - 1) / 2;
 
-    let coords_f32: Vec<f32> = coords.iter().map(|&x| x as f32).collect();
+    let coords_f32: Vec<f32> = coords.iter().map(|&x| cast::f64_f32(x)).collect();
 
     let input_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("PairwiseL2 input"),
@@ -57,14 +54,19 @@ pub fn pairwise_l2_condensed_gpu(
 
     let output_buf = d.create_buffer(&wgpu::BufferDescriptor {
         label: Some("PairwiseL2 output"),
-        size: (n_pairs * std::mem::size_of::<f32>()) as u64,
+        size: cast::usize_u64(n_pairs * std::mem::size_of::<f32>()),
         usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         mapped_at_creation: false,
     });
 
     let pl2 = PairwiseL2Gpu::new(device.clone());
-    pl2.dispatch(&input_buf, &output_buf, n as u32, dim as u32)
-        .map_err(|e| Error::Gpu(format!("PairwiseL2 dispatch: {e}")))?;
+    pl2.dispatch(
+        &input_buf,
+        &output_buf,
+        cast::usize_u32(n),
+        cast::usize_u32(dim),
+    )
+    .map_err(|e| Error::Gpu(format!("PairwiseL2 dispatch: {e}")))?;
 
     let raw = device
         .read_buffer_f32(&output_buf, n_pairs)

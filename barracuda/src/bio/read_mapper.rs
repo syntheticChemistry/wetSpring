@@ -10,18 +10,19 @@
 //!
 //! This module is the orchestration glue — the math comes from barraCuda.
 
+pub mod mapq_calibration;
 #[cfg(test)]
 mod tests;
-pub mod mapq_calibration;
 
 use crate::bio::alignment::{self, AlignmentResult, ScoringParams};
 use crate::bio::ref_index::FmIndex;
+use crate::cast;
 use crate::io::sam::{CigarOp, CigarType, SamRecord};
 
 #[cfg(feature = "gpu")]
-use barracuda::{SmithWatermanGpu, SwConfig};
-#[cfg(feature = "gpu")]
 use barracuda::device::WgpuDevice;
+#[cfg(feature = "gpu")]
+use barracuda::{SmithWatermanGpu, SwConfig};
 #[cfg(feature = "gpu")]
 use std::sync::Arc;
 
@@ -104,17 +105,17 @@ pub fn map_read(
     for (read_offset, ref_positions) in &seeds {
         for &ref_pos in ref_positions {
             let ref_start = ref_pos.saturating_sub(*read_offset + config.extension_window);
-            let ref_end = (ref_pos + config.seed_k + config.extension_window)
-                .min(reference.len());
+            let ref_end = (ref_pos + config.seed_k + config.extension_window).min(reference.len());
 
             if ref_start >= ref_end {
                 continue;
             }
 
             // Check if we already have a candidate near this position (dedup)
-            if candidates.iter().any(|c| {
-                c.ref_start.abs_diff(ref_start) < config.seed_k
-            }) {
+            if candidates
+                .iter()
+                .any(|c| c.ref_start.abs_diff(ref_start) < config.seed_k)
+            {
                 continue;
             }
 
@@ -150,7 +151,7 @@ pub fn map_read(
         qname: read_id.to_string(),
         flag: 0,
         rname: ref_name.to_string(),
-        pos: (best.ref_start + 1) as u64, // SAM is 1-based
+        pos: cast::usize_u64(best.ref_start + 1), // SAM is 1-based
         mapq: mapq as u8,
         cigar,
         rnext: "*".to_string(),
@@ -164,7 +165,7 @@ pub fn map_read(
 /// Map a batch of reads (CPU path).
 ///
 /// For GPU-accelerated mapping, use [`map_reads_gpu`] with `--features gpu`.
-#[must_use] 
+#[must_use]
 pub fn map_reads(
     reads: &[(String, Vec<u8>, Vec<u8>)], // (id, seq, qual)
     index: &FmIndex,
@@ -184,7 +185,6 @@ pub fn map_reads(
 #[cfg(feature = "gpu")]
 const fn encode_base_gpu(b: u8) -> u32 {
     match b {
-        b'A' | b'a' => 0,
         b'C' | b'c' => 1,
         b'G' | b'g' => 2,
         b'T' | b't' => 3,
@@ -209,7 +209,6 @@ const DNA_SUBST_MATRIX: [f64; 16] = [
 ///
 /// Falls back to CPU SW for individual pairs if GPU dispatch fails.
 #[cfg(feature = "gpu")]
-#[expect(clippy::too_many_arguments, reason = "GPU mapper needs device handle")]
 pub fn map_reads_gpu(
     reads: &[(String, Vec<u8>, Vec<u8>)],
     index: &FmIndex,
@@ -228,7 +227,9 @@ pub fn map_reads_gpu(
     reads
         .iter()
         .map(|(id, seq, qual)| {
-            map_read_gpu(id, seq, qual, index, reference, ref_name, config, &sw_gpu, &sw_config)
+            map_read_gpu(
+                id, seq, qual, index, reference, ref_name, config, &sw_gpu, &sw_config,
+            )
         })
         .collect()
 }
@@ -236,7 +237,6 @@ pub fn map_reads_gpu(
 /// Map a single read using GPU SW for extension.
 #[cfg(feature = "gpu")]
 #[expect(clippy::too_many_arguments, reason = "GPU path needs SW handle")]
-#[expect(clippy::cast_possible_truncation, reason = "f64 score → i32: SW scores fit i32")]
 fn map_read_gpu(
     read_id: &str,
     read_seq: &[u8],
@@ -266,7 +266,10 @@ fn map_read_gpu(
                 continue;
             }
 
-            if candidate_windows.iter().any(|&(s, _)| s.abs_diff(ref_start) < config.seed_k) {
+            if candidate_windows
+                .iter()
+                .any(|&(s, _)| s.abs_diff(ref_start) < config.seed_k)
+            {
                 continue;
             }
 
@@ -286,8 +289,13 @@ fn map_read_gpu(
         let ref_window = &reference[ref_start..ref_end];
         let target_encoded: Vec<u32> = ref_window.iter().map(|&b| encode_base_gpu(b)).collect();
 
-        if let Ok(sw_result) = sw_gpu.align(&query_encoded, &target_encoded, &DNA_SUBST_MATRIX, sw_config) {
-            let score = sw_result.score as i32;
+        if let Ok(sw_result) = sw_gpu.align(
+            &query_encoded,
+            &target_encoded,
+            &DNA_SUBST_MATRIX,
+            sw_config,
+        ) {
+            let score = cast::f64_i32(sw_result.score);
             if score >= config.min_score {
                 let aligned_len = read_seq.len().min(ref_window.len());
                 candidates.push(MappingCandidate {
@@ -334,7 +342,7 @@ fn map_read_gpu(
         qname: read_id.to_string(),
         flag: 0,
         rname: ref_name.to_string(),
-        pos: (best.ref_start + 1) as u64,
+        pos: cast::usize_u64(best.ref_start + 1),
         mapq: mapq as u8,
         cigar,
         rnext: "*".to_string(),
@@ -407,9 +415,9 @@ fn dedup_candidates(candidates: &mut Vec<MappingCandidate>, distance: usize) {
     }
     let mut keep = Vec::with_capacity(candidates.len());
     for candidate in candidates.iter() {
-        let dominated = keep.iter().any(|kept: &MappingCandidate| {
-            kept.ref_start.abs_diff(candidate.ref_start) < distance
-        });
+        let dominated = keep
+            .iter()
+            .any(|kept: &MappingCandidate| kept.ref_start.abs_diff(candidate.ref_start) < distance);
         if !dominated {
             keep.push(candidate.clone());
         }
@@ -427,7 +435,10 @@ fn dedup_candidates(candidates: &mut Vec<MappingCandidate>, distance: usize) {
 /// Gap-based: MAPQ = min(60, gap * 6). A gap of 10 alignment score points
 /// yields MAPQ 60 (confident unique placement). Gap of 0 yields MAPQ 0
 /// (ambiguous). Gap of 2 yields MAPQ 12 (passes typical `min_mapq=10` filter).
-fn compute_mapq(candidates: &[MappingCandidate], model: Option<&mapq_calibration::MapqModel>) -> u32 {
+fn compute_mapq(
+    candidates: &[MappingCandidate],
+    model: Option<&mapq_calibration::MapqModel>,
+) -> u32 {
     if candidates.len() < 2 {
         return 60;
     }

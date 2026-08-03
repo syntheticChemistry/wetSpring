@@ -183,9 +183,8 @@ fn generate_triples(rng: &mut LcgRng) -> Vec<(usize, usize, usize)> {
         let n_targets = 1 + crate::cast::f64_usize(rng.next_f64() * 3.0);
         for _ in 0..n_targets {
             let gene = 200
-                + crate::cast::f64_usize(
-                    rng.next_f64() * crate::cast::usize_f64(N_GENES),
-                ) % N_GENES;
+                + crate::cast::f64_usize(rng.next_f64() * crate::cast::usize_f64(N_GENES))
+                    % N_GENES;
             triples.push((d, 1, gene));
         }
     }
@@ -194,9 +193,8 @@ fn generate_triples(rng: &mut LcgRng) -> Vec<(usize, usize, usize)> {
         let n_assoc = 1 + crate::cast::f64_usize(rng.next_f64() * 2.0);
         for _ in 0..n_assoc {
             let disease = 100
-                + crate::cast::f64_usize(
-                    rng.next_f64() * crate::cast::usize_f64(N_DISEASES),
-                ) % N_DISEASES;
+                + crate::cast::f64_usize(rng.next_f64() * crate::cast::usize_f64(N_DISEASES))
+                    % N_DISEASES;
             triples.push((200 + g, 2, disease));
         }
     }
@@ -297,9 +295,7 @@ fn validate_gpu_transe(v: &mut Validator, kg: &KgEmbedding, triples: &[(usize, u
     v.section("§6 GPU TransE Parity (ToadStool S60)");
 
     let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
-    let gpu = rt
-        .block_on(crate::gpu::GpuF64::new())
-        .or_exit("GPU init");
+    let gpu = rt.block_on(crate::gpu::GpuF64::new()).or_exit("GPU init");
     let device = gpu.to_wgpu_device();
 
     let heads: Vec<u32> = triples
@@ -393,7 +389,6 @@ fn validate_roadmap(v: &mut Validator) {
 
 /// Run the `validate_knowledge_graph_embedding` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("§1 Knowledge Graph Structure");
 
     println!(
@@ -446,7 +441,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     #[cfg(feature = "gpu")]
     validate_gpu_transe(v, &kg, &triples);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -457,14 +451,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "knowledge_graph_embedding",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_knowledge_graph_embedding",
-        provenance_date: "2026-05-20",
-        description: "# Exp161: Knowledge Graph Embedding Baseline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "knowledge_graph_embedding",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_knowledge_graph_embedding",
+            provenance_date: "2026-05-20",
+            description: "# Exp161: Knowledge Graph Embedding Baseline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

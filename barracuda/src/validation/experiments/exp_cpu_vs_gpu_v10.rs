@@ -30,10 +30,10 @@
 //!
 //! Provenance: CPU vs GPU numerical parity (V10 extended)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::kinetics::{haldane, monod};
 use crate::validation::{DomainResult, Validator};
+use std::time::Instant;
 
 use barracuda::stats::norm_cdf;
 
@@ -110,15 +110,13 @@ pub fn run(v: &mut crate::validation::Validator) {
             .enable_all()
             .build()
             .or_exit("tokio");
-        let gpu = rt
-            .block_on(crate::gpu::GpuF64::new())
-            .or_exit("GPU");
+        let gpu = rt.block_on(crate::gpu::GpuF64::new()).or_exit("GPU");
         gpu.print_info();
 
-        let gpu_h_dig = crate::bio::diversity_gpu::shannon_gpu(&gpu, &digester)
-            .or_exit("GPU Shannon digester");
-        let gpu_h_soil = crate::bio::diversity_gpu::shannon_gpu(&gpu, &soil)
-            .or_exit("GPU Shannon soil");
+        let gpu_h_dig =
+            crate::bio::diversity_gpu::shannon_gpu(&gpu, &digester).or_exit("GPU Shannon digester");
+        let gpu_h_soil =
+            crate::bio::diversity_gpu::shannon_gpu(&gpu, &soil).or_exit("GPU Shannon soil");
         v.check(
             "D39: GPU Shannon(digester) = CPU",
             gpu_h_dig,
@@ -285,7 +283,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!(
         "  Chain: CPU (Exp342) → Python (Exp343) → GPU (this) → Streaming (Exp345) → metalForge (Exp346)"
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -296,14 +293,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_v10",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_cpu_vs_gpu_v10",
-        provenance_date: "2026-05-20",
-        description: "# Exp344: CPU vs GPU v10 — Track 6 Anaerobic GPU Portability",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_v10",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_cpu_vs_gpu_v10",
+            provenance_date: "2026-05-20",
+            description: "# Exp344: CPU vs GPU v10 — Track 6 Anaerobic GPU Portability",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

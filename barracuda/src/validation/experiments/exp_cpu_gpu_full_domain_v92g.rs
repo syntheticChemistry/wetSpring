@@ -20,7 +20,6 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use crate::bio::{
     diversity, diversity_fusion_gpu::DiversityFusionGpu, diversity_gpu, gemm_cached::GemmCached,
     pcoa, pcoa_gpu,
@@ -29,6 +28,7 @@ use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 
 fn bench_ms(f: impl FnOnce()) -> f64 {
     let t = Instant::now();
@@ -398,7 +398,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("    Boltzmann, LHS, Sobol, DF64 pack/unpack,");
     println!("    Thornthwaite/Makkink/Turc/Hamon/Hargreaves/FAO-56,");
     println!("    fit_all regression");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -409,14 +408,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_gpu_full_domain_v92g",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_gpu_full_domain_v92g",
-        provenance_date: "2026-05-20",
-        description: "# Exp301: CPU vs GPU Full Domain Parity — V92G ComputeDispatch",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_gpu_full_domain_v92g",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_gpu_full_domain_v92g",
+            provenance_date: "2026-05-20",
+            description: "# Exp301: CPU vs GPU Full Domain Parity — V92G ComputeDispatch",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

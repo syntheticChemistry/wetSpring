@@ -28,10 +28,10 @@
 //!
 //! Provenance: Known-value formulas and algorithmic invariants
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 use barracuda::stats::norm_cdf;
 
@@ -69,7 +69,6 @@ fn generate_factorial_community(
 
 /// Run the `validate_notill_longterm_tillage` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // S1: Factorial Design — Tillage × Cover Crop × N Fertilization
     //
@@ -346,7 +345,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("\n  ── Exp175 Summary: {passed}/{total} checks ──");
     println!("  Paper: Liang et al. 2015, Soil Biol Biochem 89:37-44");
     println!("  Key finding: 31+ years shows tillage × cover crop × N interaction on communities");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -357,14 +355,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "notill_longterm_tillage",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_notill_longterm_tillage",
-        provenance_date: "2026-05-20",
-        description: "# Exp175: Long-Term Tillage Effects — Liang et al. 2015",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "notill_longterm_tillage",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_notill_longterm_tillage",
+            provenance_date: "2026-05-20",
+            description: "# Exp175: Long-Term Tillage Effects — Liang et al. 2015",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

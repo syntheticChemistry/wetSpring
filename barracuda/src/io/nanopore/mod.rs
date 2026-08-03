@@ -23,20 +23,27 @@
 //! # Usage
 //!
 //! ```
-//! use wetspring_barracuda::io::nanopore::{NanoporeRead, SyntheticSignalGenerator};
+//! use wetspring_barracuda::io::nanopore::NanoporeRead;
 //!
-//! let sig = SyntheticSignalGenerator::new(42);
-//! let read = sig.generate_read(1, 4000, 4000.0);
-//! assert_eq!(read.signal.len(), 4000);
+//! let read = NanoporeRead {
+//!     read_id: [0; 16],
+//!     signal: vec![100, -50, 200],
+//!     channel: 1,
+//!     sample_rate: 4000.0,
+//!     calibration_offset: 200.0,
+//!     calibration_scale: 0.15,
+//! };
 //! let cal = read.calibrated_signal();
-//! assert_eq!(cal.len(), 4000);
+//! assert_eq!(cal.len(), 3);
 //! ```
 
 mod nrs;
+#[cfg(any(test, feature = "validation"))]
 mod synthetic;
 mod types;
 
 pub use nrs::{NanoporeIter, write_nrs};
+#[cfg(any(test, feature = "validation"))]
 pub use synthetic::{SyntheticSignalGenerator, simple_basecall, threshold_basecall};
 pub use types::{NanoporeRead, SignalStats};
 

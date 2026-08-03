@@ -22,12 +22,12 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use std::collections::HashMap;
 use crate::bio::diversity;
 use crate::cast;
 use crate::ncbi;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::collections::HashMap;
 
 const ACCESSIONS: &[(&str, &str)] = &[
     ("SRR5314241", "Cold seep sediment 16S V4 (Ruff et al.)"),
@@ -82,7 +82,6 @@ fn fasta_to_species_counts(fasta: &str) -> Vec<f64> {
 
 /// Run the `validate_real_ncbi_pipeline` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Data acquisition ──");
 
     let api_key = ncbi::api_key();
@@ -392,7 +391,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     #[cfg(not(feature = "gpu"))]
     println!("  Spectral overlay:  deferred (requires --features gpu)");
     v.check_pass("pipeline complete", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -403,14 +401,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "real_ncbi_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_real_ncbi_pipeline",
-        provenance_date: "2026-05-20",
-        description: "# Exp184: Real NCBI 16S Through Sovereign Pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "real_ncbi_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_real_ncbi_pipeline",
+            provenance_date: "2026-05-20",
+            description: "# Exp184: Real NCBI 16S Through Sovereign Pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

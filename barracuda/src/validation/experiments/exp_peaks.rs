@@ -27,15 +27,14 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::path::Path;
 use crate::bio::signal::{PeakParams, find_peaks};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::path::Path;
 
 /// Run the `validate_peaks` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let baseline_dir = validation::data_dir(
         "WETSPRING_PEAKS_DIR",
         "experiments/results/010_peak_baselines",
@@ -50,7 +49,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     }
 
     validate_case(
-                v,
+        v,
         &baseline_dir,
         "single_gaussian",
         &PeakParams {
@@ -62,7 +61,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
 
     validate_case(
-                v,
+        v,
         &baseline_dir,
         "three_chromatographic",
         &PeakParams {
@@ -74,7 +73,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
 
     validate_case(
-                v,
+        v,
         &baseline_dir,
         "noisy_with_spikes",
         &PeakParams {
@@ -86,7 +85,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
 
     validate_case(
-                v,
+        v,
         &baseline_dir,
         "overlapping_peaks",
         &PeakParams {
@@ -96,12 +95,11 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
 
     validate_case(
-                v,
+        v,
         &baseline_dir,
         "monotonic_no_peaks",
         &PeakParams::default(),
     );
-
 }
 
 fn validate_case(v: &mut Validator, dir: &Path, name: &str, params: &PeakParams) {
@@ -218,14 +216,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "peaks",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_peaks",
-        provenance_date: "2026-05-20",
-        description: "Validate `bio::signal::find_peaks` against `scipy.signal.find_peaks` (Exp010)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "peaks",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_peaks",
+            provenance_date: "2026-05-20",
+            description: "Validate `bio::signal::find_peaks` against `scipy.signal.find_peaks` (Exp010)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -52,433 +52,433 @@ struct BenchResult {
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-    println!("════════════════════════════════════════════════════════════════════");
-    println!("  Exp095: Cross-Spring Scaling Benchmark");
-    println!("  GPU advantage at realistic bioinformatics sizes");
-    println!("════════════════════════════════════════════════════════════════════\n");
+        println!("════════════════════════════════════════════════════════════════════");
+        println!("  Exp095: Cross-Spring Scaling Benchmark");
+        println!("  GPU advantage at realistic bioinformatics sizes");
+        println!("════════════════════════════════════════════════════════════════════\n");
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        let device = gpu.to_wgpu_device();
+        let d = device.device();
+
+        let mut results: Vec<BenchResult> = Vec::new();
+
+        // ═══ neuralSpring-evolved primitives (buffer-based) ═════════════════
+
+        // PairwiseHamming: 500 sequences × 1000 bases
+        println!("\n── PairwiseHamming: 500 seqs × 1000 bp (neuralSpring) ──");
+        {
+            let n_seqs: u32 = 500;
+            let seq_len: u32 = 1000;
+            let sequences: Vec<u32> = (0..(n_seqs * seq_len) as usize)
+                .map(|i| (i % 4) as u32)
+                .collect();
+
+            let tc = Instant::now();
+            cpu_pairwise_hamming(&sequences, n_seqs as usize, seq_len as usize);
+            let cpu_us = tc.elapsed().as_micros() as f64;
+
+            let seq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&sequences),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let n_pairs = n_seqs * (n_seqs - 1) / 2;
+            let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: None,
+                size: (n_pairs as usize * 4) as u64,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
+            let hamming = PairwiseHammingGpu::new(device.clone());
+            hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
+
+            let tg = Instant::now();
+            hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
+            let gpu_us = tg.elapsed().as_micros() as f64;
+
+            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+            results.push(BenchResult {
+                primitive: "PairwiseHamming",
+                evolved_by: "neuralSpring",
+                problem_size: format!("500×1000 ({n_pairs} pairs)"),
+                cpu_us,
+                gpu_us,
+                speedup,
+            });
         }
-    };
-    gpu.print_info();
-    let device = gpu.to_wgpu_device();
-    let d = device.device();
 
-    let mut results: Vec<BenchResult> = Vec::new();
+        // PairwiseJaccard: 200 genomes × 2000 genes
+        println!("\n── PairwiseJaccard: 200 genomes × 2000 genes (neuralSpring) ──");
+        {
+            let n_genomes: u32 = 200;
+            let n_genes: u32 = 2000;
+            let pa: Vec<f32> = (0..(n_genes * n_genomes) as usize)
+                .map(|i| if i % 3 == 0 { 1.0 } else { 0.0 })
+                .collect();
 
-    // ═══ neuralSpring-evolved primitives (buffer-based) ═════════════════
+            let tc = Instant::now();
+            cpu_pairwise_jaccard(&pa, n_genomes as usize, n_genes as usize);
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-    // PairwiseHamming: 500 sequences × 1000 bases
-    println!("\n── PairwiseHamming: 500 seqs × 1000 bp (neuralSpring) ──");
-    {
-        let n_seqs: u32 = 500;
-        let seq_len: u32 = 1000;
-        let sequences: Vec<u32> = (0..(n_seqs * seq_len) as usize)
-            .map(|i| (i % 4) as u32)
-            .collect();
+            let pa_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&pa),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let n_pairs = n_genomes * (n_genomes - 1) / 2;
+            let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: None,
+                size: (n_pairs as usize * 4) as u64,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
+            let jaccard = PairwiseJaccardGpu::new(device.clone());
+            jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
 
-        let tc = Instant::now();
-        cpu_pairwise_hamming(&sequences, n_seqs as usize, seq_len as usize);
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tg = Instant::now();
+            jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        let seq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: None,
-            contents: bytemuck::cast_slice(&sequences),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let n_pairs = n_seqs * (n_seqs - 1) / 2;
-        let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: None,
-            size: (n_pairs as usize * 4) as u64,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
-        let hamming = PairwiseHammingGpu::new(device.clone());
-        hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
+            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+            results.push(BenchResult {
+                primitive: "PairwiseJaccard",
+                evolved_by: "neuralSpring",
+                problem_size: format!("200×2000 ({n_pairs} pairs)"),
+                cpu_us,
+                gpu_us,
+                speedup,
+            });
+        }
 
-        let tg = Instant::now();
-        hamming.dispatch(&seq_buf, &dist_buf, n_seqs, seq_len);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
-        let gpu_us = tg.elapsed().as_micros() as f64;
+        // SpatialPayoff: 256×256 grid
+        println!("\n── SpatialPayoff: 256×256 grid (neuralSpring) ──");
+        {
+            let grid_size: u32 = 256;
+            let benefit: f32 = 3.0;
+            let cost: f32 = 1.0;
+            let n = (grid_size * grid_size) as usize;
+            let grid: Vec<u32> = (0..n).map(|i| u32::from(i % 3 == 0)).collect();
 
-        let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-        println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-        results.push(BenchResult {
-            primitive: "PairwiseHamming",
-            evolved_by: "neuralSpring",
-            problem_size: format!("500×1000 ({n_pairs} pairs)"),
-            cpu_us,
-            gpu_us,
-            speedup,
-        });
-    }
+            let tc = Instant::now();
+            cpu_spatial_payoff(&grid, grid_size as usize, benefit, cost);
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-    // PairwiseJaccard: 200 genomes × 2000 genes
-    println!("\n── PairwiseJaccard: 200 genomes × 2000 genes (neuralSpring) ──");
-    {
-        let n_genomes: u32 = 200;
-        let n_genes: u32 = 2000;
-        let pa: Vec<f32> = (0..(n_genes * n_genomes) as usize)
-            .map(|i| if i % 3 == 0 { 1.0 } else { 0.0 })
-            .collect();
+            let grid_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&grid),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: None,
+                size: (n * 4) as u64,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
+            let spatial = SpatialPayoffGpu::new(device.clone());
+            spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
 
-        let tc = Instant::now();
-        cpu_pairwise_jaccard(&pa, n_genomes as usize, n_genes as usize);
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tg = Instant::now();
+            spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        let pa_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: None,
-            contents: bytemuck::cast_slice(&pa),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let n_pairs = n_genomes * (n_genomes - 1) / 2;
-        let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: None,
-            size: (n_pairs as usize * 4) as u64,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
-        let jaccard = PairwiseJaccardGpu::new(device.clone());
-        jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
+            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+            results.push(BenchResult {
+                primitive: "SpatialPayoff",
+                evolved_by: "neuralSpring",
+                problem_size: "256×256 (65K cells)".to_string(),
+                cpu_us,
+                gpu_us,
+                speedup,
+            });
+        }
 
-        let tg = Instant::now();
-        jaccard.dispatch(&pa_buf, &dist_buf, n_genomes, n_genes);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
-        let gpu_us = tg.elapsed().as_micros() as f64;
+        // BatchFitness: 4096 pop × 256 genome
+        println!("\n── BatchFitness: 4096 × 256 genome (neuralSpring) ──");
+        {
+            let pop_size: u32 = 4096;
+            let genome_len: u32 = 256;
+            let population: Vec<f32> = (0..(pop_size * genome_len) as usize)
+                .map(|i| if i % 2 == 0 { 1.0 } else { 0.0 })
+                .collect();
+            let weights: Vec<f32> = (0..genome_len)
+                .map(|i| (i as f32 + 1.0) / genome_len as f32)
+                .collect();
 
-        let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-        println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-        results.push(BenchResult {
-            primitive: "PairwiseJaccard",
-            evolved_by: "neuralSpring",
-            problem_size: format!("200×2000 ({n_pairs} pairs)"),
-            cpu_us,
-            gpu_us,
-            speedup,
-        });
-    }
+            let tc = Instant::now();
+            cpu_batch_fitness(
+                &population,
+                &weights,
+                pop_size as usize,
+                genome_len as usize,
+            );
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-    // SpatialPayoff: 256×256 grid
-    println!("\n── SpatialPayoff: 256×256 grid (neuralSpring) ──");
-    {
-        let grid_size: u32 = 256;
-        let benefit: f32 = 3.0;
-        let cost: f32 = 1.0;
-        let n = (grid_size * grid_size) as usize;
-        let grid: Vec<u32> = (0..n).map(|i| u32::from(i % 3 == 0)).collect();
+            let pop_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&population),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let w_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&weights),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: None,
+                size: u64::from(pop_size * 4),
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
+            let bf = BatchFitnessGpu::new(device.clone());
+            bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
 
-        let tc = Instant::now();
-        cpu_spatial_payoff(&grid, grid_size as usize, benefit, cost);
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tg = Instant::now();
+            bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        let grid_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: None,
-            contents: bytemuck::cast_slice(&grid),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: None,
-            size: (n * 4) as u64,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
-        let spatial = SpatialPayoffGpu::new(device.clone());
-        spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
+            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+            results.push(BenchResult {
+                primitive: "BatchFitness",
+                evolved_by: "neuralSpring",
+                problem_size: "4096×256 (1M elems)".to_string(),
+                cpu_us,
+                gpu_us,
+                speedup,
+            });
+        }
 
-        let tg = Instant::now();
-        spatial.dispatch(&grid_buf, &fit_buf, grid_size, benefit, cost);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
-        let gpu_us = tg.elapsed().as_micros() as f64;
+        // LocusVariance: 100 pops × 10,000 loci
+        println!("\n── LocusVariance: 100 pops × 10K loci (neuralSpring) ──");
+        {
+            let n_pops: u32 = 100;
+            let n_loci: u32 = 10_000;
+            let freqs: Vec<f32> = (0..(n_pops * n_loci) as usize)
+                .map(|i| (i as f32 * 0.001) % 1.0)
+                .collect();
 
-        let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-        println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-        results.push(BenchResult {
-            primitive: "SpatialPayoff",
-            evolved_by: "neuralSpring",
-            problem_size: "256×256 (65K cells)".to_string(),
-            cpu_us,
-            gpu_us,
-            speedup,
-        });
-    }
+            let tc = Instant::now();
+            cpu_locus_variance_rowmajor(&freqs, n_pops as usize, n_loci as usize);
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-    // BatchFitness: 4096 pop × 256 genome
-    println!("\n── BatchFitness: 4096 × 256 genome (neuralSpring) ──");
-    {
-        let pop_size: u32 = 4096;
-        let genome_len: u32 = 256;
-        let population: Vec<f32> = (0..(pop_size * genome_len) as usize)
-            .map(|i| if i % 2 == 0 { 1.0 } else { 0.0 })
-            .collect();
-        let weights: Vec<f32> = (0..genome_len)
-            .map(|i| (i as f32 + 1.0) / genome_len as f32)
-            .collect();
+            let freq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&freqs),
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+            let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
+                label: None,
+                size: u64::from(n_loci * 4),
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+                mapped_at_creation: false,
+            });
+            let lv = LocusVarianceGpu::new(device.clone());
+            lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
 
-        let tc = Instant::now();
-        cpu_batch_fitness(
-            &population,
-            &weights,
-            pop_size as usize,
-            genome_len as usize,
-        );
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let tg = Instant::now();
+            lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
+            let _ = d.poll(wgpu::PollType::Wait {
+                submission_index: None,
+                timeout: None,
+            });
+            let gpu_us = tg.elapsed().as_micros() as f64;
 
-        let pop_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: None,
-            contents: bytemuck::cast_slice(&population),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let w_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: None,
-            contents: bytemuck::cast_slice(&weights),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: None,
-            size: u64::from(pop_size * 4),
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
-        let bf = BatchFitnessGpu::new(device.clone());
-        bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
+            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+            results.push(BenchResult {
+                primitive: "LocusVariance",
+                evolved_by: "neuralSpring",
+                problem_size: "100×10K (1M elems)".to_string(),
+                cpu_us,
+                gpu_us,
+                speedup,
+            });
+        }
 
-        let tg = Instant::now();
-        bf.dispatch(&pop_buf, &w_buf, &fit_buf, pop_size, genome_len);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
-        let gpu_us = tg.elapsed().as_micros() as f64;
+        // ═══ hotSpring-evolved: FusedMapReduceF64 ═══════════════════════════
 
-        let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-        println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-        results.push(BenchResult {
-            primitive: "BatchFitness",
-            evolved_by: "neuralSpring",
-            problem_size: "4096×256 (1M elems)".to_string(),
-            cpu_us,
-            gpu_us,
-            speedup,
-        });
-    }
+        println!("\n── FusedMapReduceF64 (Shannon): 100K f64 (hotSpring) ──");
+        {
+            let n: usize = 100_000;
+            let data: Vec<f64> = (0..n).map(|i| (i as f64 + 1.0) / n as f64).collect();
 
-    // LocusVariance: 100 pops × 10,000 loci
-    println!("\n── LocusVariance: 100 pops × 10K loci (neuralSpring) ──");
-    {
-        let n_pops: u32 = 100;
-        let n_loci: u32 = 10_000;
-        let freqs: Vec<f32> = (0..(n_pops * n_loci) as usize)
-            .map(|i| (i as f32 * 0.001) % 1.0)
-            .collect();
+            let tc = Instant::now();
+            let total: f64 = data.iter().sum();
+            let mut _cpu_h = 0.0f64;
+            for &x in &data {
+                let p = x / total;
+                if p > 0.0 {
+                    _cpu_h -= p * p.ln();
+                }
+            }
+            let cpu_us = tc.elapsed().as_micros() as f64;
 
-        let tc = Instant::now();
-        cpu_locus_variance_rowmajor(&freqs, n_pops as usize, n_loci as usize);
-        let cpu_us = tc.elapsed().as_micros() as f64;
+            let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let fmr = FusedMapReduceF64::new(device.clone()).or_exit("FMR");
+                fmr.shannon_entropy(&data).or_exit("shannon warm");
 
-        let freq_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: None,
-            contents: bytemuck::cast_slice(&freqs),
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
-            label: None,
-            size: u64::from(n_loci * 4),
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-            mapped_at_creation: false,
-        });
-        let lv = LocusVarianceGpu::new(device.clone());
-        lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
+                let tg = Instant::now();
+                let _result = fmr.shannon_entropy(&data).or_exit("shannon bench");
+                tg.elapsed().as_micros() as f64
+            }));
 
-        let tg = Instant::now();
-        lv.dispatch(&freq_buf, &var_buf, n_pops, n_loci);
-        let _ = d.poll(wgpu::PollType::Wait {
-            submission_index: None,
-            timeout: None,
-        });
-        let gpu_us = tg.elapsed().as_micros() as f64;
-
-        let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-        println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-        results.push(BenchResult {
-            primitive: "LocusVariance",
-            evolved_by: "neuralSpring",
-            problem_size: "100×10K (1M elems)".to_string(),
-            cpu_us,
-            gpu_us,
-            speedup,
-        });
-    }
-
-    // ═══ hotSpring-evolved: FusedMapReduceF64 ═══════════════════════════
-
-    println!("\n── FusedMapReduceF64 (Shannon): 100K f64 (hotSpring) ──");
-    {
-        let n: usize = 100_000;
-        let data: Vec<f64> = (0..n).map(|i| (i as f64 + 1.0) / n as f64).collect();
-
-        let tc = Instant::now();
-        let total: f64 = data.iter().sum();
-        let mut _cpu_h = 0.0f64;
-        for &x in &data {
-            let p = x / total;
-            if p > 0.0 {
-                _cpu_h -= p * p.ln();
+            if let Ok(gpu_us) = gpu_result {
+                let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+                println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+                results.push(BenchResult {
+                    primitive: "FusedMapReduce(Shannon)",
+                    evolved_by: "hotSpring",
+                    problem_size: "100K f64".to_string(),
+                    cpu_us,
+                    gpu_us,
+                    speedup,
+                });
+            } else {
+                println!("  SKIP: driver issue");
+                results.push(BenchResult {
+                    primitive: "FusedMapReduce(Shannon)",
+                    evolved_by: "hotSpring",
+                    problem_size: "100K f64".to_string(),
+                    cpu_us,
+                    gpu_us: 0.0,
+                    speedup: 0.0,
+                });
             }
         }
-        let cpu_us = tc.elapsed().as_micros() as f64;
 
-        let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let fmr = FusedMapReduceF64::new(device.clone()).or_exit("FMR");
-            fmr.shannon_entropy(&data).or_exit("shannon warm");
+        // ═══ wetSpring-evolved: GemmF64 ═════════════════════════════════════
 
-            let tg = Instant::now();
-            let _result = fmr.shannon_entropy(&data).or_exit("shannon bench");
-            tg.elapsed().as_micros() as f64
-        }));
+        println!("\n── GemmF64: 256×256 matmul (wetSpring → hotSpring HFB) ──");
+        {
+            let n: usize = 256;
+            let a: Vec<f64> = (0..n * n).map(|i| (i as f64) * 0.001).collect();
+            let b: Vec<f64> = (0..n * n).map(|i| ((n * n - i) as f64) * 0.001).collect();
 
-        if let Ok(gpu_us) = gpu_result {
-            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-            results.push(BenchResult {
-                primitive: "FusedMapReduce(Shannon)",
-                evolved_by: "hotSpring",
-                problem_size: "100K f64".to_string(),
-                cpu_us,
-                gpu_us,
-                speedup,
-            });
-        } else {
-            println!("  SKIP: driver issue");
-            results.push(BenchResult {
-                primitive: "FusedMapReduce(Shannon)",
-                evolved_by: "hotSpring",
-                problem_size: "100K f64".to_string(),
-                cpu_us,
-                gpu_us: 0.0,
-                speedup: 0.0,
-            });
+            let tc = Instant::now();
+            cpu_matmul(&a, &b, n);
+            let cpu_us = tc.elapsed().as_micros() as f64;
+
+            let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).or_exit("gemm warm");
+
+                let tg = Instant::now();
+                let _c = GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).or_exit("gemm bench");
+                tg.elapsed().as_micros() as f64
+            }));
+
+            if let Ok(gpu_us) = gpu_result {
+                let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
+                println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
+                results.push(BenchResult {
+                    primitive: "GemmF64 (256×256)",
+                    evolved_by: "wetSpring",
+                    problem_size: "256×256 f64 matmul".to_string(),
+                    cpu_us,
+                    gpu_us,
+                    speedup,
+                });
+            } else {
+                println!("  SKIP: driver issue");
+                results.push(BenchResult {
+                    primitive: "GemmF64 (256×256)",
+                    evolved_by: "wetSpring",
+                    problem_size: "256×256 f64".to_string(),
+                    cpu_us,
+                    gpu_us: 0.0,
+                    speedup: 0.0,
+                });
+            }
         }
-    }
 
-    // ═══ wetSpring-evolved: GemmF64 ═════════════════════════════════════
-
-    println!("\n── GemmF64: 256×256 matmul (wetSpring → hotSpring HFB) ──");
-    {
-        let n: usize = 256;
-        let a: Vec<f64> = (0..n * n).map(|i| (i as f64) * 0.001).collect();
-        let b: Vec<f64> = (0..n * n).map(|i| ((n * n - i) as f64) * 0.001).collect();
-
-        let tc = Instant::now();
-        cpu_matmul(&a, &b, n);
-        let cpu_us = tc.elapsed().as_micros() as f64;
-
-        let gpu_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).or_exit("gemm warm");
-
-            let tg = Instant::now();
-            let _c = GemmF64::execute(device.clone(), &a, &b, n, n, n, 1).or_exit("gemm bench");
-            tg.elapsed().as_micros() as f64
-        }));
-
-        if let Ok(gpu_us) = gpu_result {
-            let speedup = if gpu_us > 0.0 { cpu_us / gpu_us } else { 0.0 };
-            println!("  CPU: {cpu_us:.0} µs | GPU: {gpu_us:.0} µs | Speedup: {speedup:.1}×");
-            results.push(BenchResult {
-                primitive: "GemmF64 (256×256)",
-                evolved_by: "wetSpring",
-                problem_size: "256×256 f64 matmul".to_string(),
-                cpu_us,
-                gpu_us,
-                speedup,
-            });
-        } else {
-            println!("  SKIP: driver issue");
-            results.push(BenchResult {
-                primitive: "GemmF64 (256×256)",
-                evolved_by: "wetSpring",
-                problem_size: "256×256 f64".to_string(),
-                cpu_us,
-                gpu_us: 0.0,
-                speedup: 0.0,
-            });
-        }
-    }
-
-    // ═══ Summary Table ═══════════════════════════════════════════════════
-    println!("\n═══ Cross-Spring Scaling Results ════════════════════════════════\n");
-    let hdr_sp = "Speedup";
-    println!(
-        "  {prim:25} {evol:15} {size:25} {cpu:>10} {gpu:>10} {hdr_sp:>8}",
-        prim = "Primitive",
-        evol = "Evolved By",
-        size = "Problem Size",
-        cpu = "CPU (µs)",
-        gpu = "GPU (µs)",
-    );
-    let sep = "─";
-    println!(
-        "  {a:25} {b:15} {c:25} {d:>10} {e:>10} {f:>8}",
-        a = sep.repeat(25),
-        b = sep.repeat(15),
-        c = sep.repeat(25),
-        d = sep.repeat(10),
-        e = sep.repeat(10),
-        f = sep.repeat(8),
-    );
-    for r in &results {
-        let sp = if r.speedup > 0.0 {
-            format!("{:.1}×", r.speedup)
-        } else {
-            "SKIP".to_string()
-        };
+        // ═══ Summary Table ═══════════════════════════════════════════════════
+        println!("\n═══ Cross-Spring Scaling Results ════════════════════════════════\n");
+        let hdr_sp = "Speedup";
         println!(
-            "  {prim:25} {evol:15} {size:25} {cpu:>10.0} {gpu:>10.0} {sp:>8}",
-            prim = r.primitive,
-            evol = r.evolved_by,
-            size = r.problem_size,
-            cpu = r.cpu_us,
-            gpu = r.gpu_us,
+            "  {prim:25} {evol:15} {size:25} {cpu:>10} {gpu:>10} {hdr_sp:>8}",
+            prim = "Primitive",
+            evol = "Evolved By",
+            size = "Problem Size",
+            cpu = "CPU (µs)",
+            gpu = "GPU (µs)",
         );
-    }
+        let sep = "─";
+        println!(
+            "  {a:25} {b:15} {c:25} {d:>10} {e:>10} {f:>8}",
+            a = sep.repeat(25),
+            b = sep.repeat(15),
+            c = sep.repeat(25),
+            d = sep.repeat(10),
+            e = sep.repeat(10),
+            f = sep.repeat(8),
+        );
+        for r in &results {
+            let sp = if r.speedup > 0.0 {
+                format!("{:.1}×", r.speedup)
+            } else {
+                "SKIP".to_string()
+            };
+            println!(
+                "  {prim:25} {evol:15} {size:25} {cpu:>10.0} {gpu:>10.0} {sp:>8}",
+                prim = r.primitive,
+                evol = r.evolved_by,
+                size = r.problem_size,
+                cpu = r.cpu_us,
+                gpu = r.gpu_us,
+            );
+        }
 
-    println!("\n═══ Cross-Spring Evolution = Biome Acceleration ═══════════════");
-    println!("  hotSpring  → precision shaders, driver workarounds, eigensolvers");
-    println!("  wetSpring  → bio shaders (12), GEMM 60× (powers HFB), f64 fixes");
-    println!("  neuralSpring → distance metrics, fitness eval, locus variance");
-    println!("  ToadStool  → absorbs all → every Spring benefits\n");
+        println!("\n═══ Cross-Spring Evolution = Biome Acceleration ═══════════════");
+        println!("  hotSpring  → precision shaders, driver workarounds, eigensolvers");
+        println!("  wetSpring  → bio shaders (12), GEMM 60× (powers HFB), f64 fixes");
+        println!("  neuralSpring → distance metrics, fitness eval, locus variance");
+        println!("  ToadStool  → absorbs all → every Spring benefits\n");
     });
 }
 
@@ -600,14 +600,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_scaling",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_cross_spring_scaling",
-        provenance_date: "2026-05-20",
-        description: "Exp095: Cross-Spring Scaling Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_scaling",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_cross_spring_scaling",
+            provenance_date: "2026-05-20",
+            description: "Exp095: Cross-Spring Scaling Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -28,11 +28,11 @@
 //!
 //! Provenance: metalForge validation (V15 domain coverage)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, DomainResult, Validator};
+use std::time::Instant;
 
 /// Run the `validate_metalforge_v15` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -296,7 +296,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("\n  Pipeline: CPU reference → determinism → mixed composition → cross-spring");
     println!("  Total: {total_ms:.1} ms — substrate-independent math proven.");
     println!("  Same results on CPU, GPU, or mixed dispatch via metalForge routing.");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -307,14 +306,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v15",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_metalforge_v15",
-        provenance_date: "2026-05-20",
-        description: "# Exp310: `metalForge` v15 — V97 Cross-System Fused Ops",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v15",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_metalforge_v15",
+            provenance_date: "2026-05-20",
+            description: "# Exp310: `metalForge` v15 — V97 Cross-System Fused Ops",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

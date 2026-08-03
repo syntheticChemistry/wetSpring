@@ -59,6 +59,7 @@ pub fn reconcile_dtl_gpu<'a>(
     costs: &DtlCosts,
 ) -> Result<DtlResult<'a>> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for DTL reconciliation");
 
     let result = reconciliation::reconcile_dtl(host, parasite, tip_mapping, costs);
 
@@ -91,6 +92,7 @@ pub fn reconcile_batch_gpu<'a>(
     costs: &DtlCosts,
 ) -> Result<Vec<DtlResult<'a>>> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for batch DTL reconciliation");
 
     let results: Vec<DtlResult> = parasites
         .iter()

@@ -50,7 +50,6 @@ struct OrganismQs {
 )]
 /// Run the `validate_qs_gene_prevalence` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Curated organism-QS-habitat dataset ──");
 
     let organisms = vec![
@@ -650,7 +649,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("     abundance correlates with root proximity (rhizoplane > bulk).");
     println!("     Predict: QS enriched where 3D biofilm structure exists.");
     v.check_pass("NCBI predictions documented", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -661,14 +659,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "qs_gene_prevalence",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_qs_gene_prevalence",
-        provenance_date: "2026-05-20",
-        description: "# Exp140: QS Gene Prevalence by Habitat Geometry",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "qs_gene_prevalence",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_qs_gene_prevalence",
+            provenance_date: "2026-05-20",
+            description: "# Exp140: QS Gene Prevalence by Habitat Geometry",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

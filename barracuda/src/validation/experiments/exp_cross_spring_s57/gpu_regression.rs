@@ -216,13 +216,9 @@ pub(super) fn validate_gpu_primitives(
     let bf_matching = cpu_bf
         .iter()
         .zip(bf_out.iter())
-        .filter(|(c, g)| {
-            (f64::from(**g) - f64::from(**c)).abs() < tolerances::GPU_VS_CPU_HMM_BATCH
-        })
+        .filter(|(c, g)| (f64::from(**g) - f64::from(**c)).abs() < tolerances::GPU_VS_CPU_HMM_BATCH)
         .count();
-    println!(
-        "    BatchFitness: {bf_matching}/{bf_pop} GPU↔CPU match (Exp094 validates at scale)"
-    );
+    println!("    BatchFitness: {bf_matching}/{bf_pop} GPU↔CPU match (Exp094 validates at scale)");
 
     // LocusVariance
     let lv_pops: u32 = 4;

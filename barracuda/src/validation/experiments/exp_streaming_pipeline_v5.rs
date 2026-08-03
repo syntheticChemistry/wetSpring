@@ -28,11 +28,11 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use std::time::Instant;
 use crate::bio::{diversity, kmer, pcoa, taxonomy};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 /// Run the `validate_streaming_pipeline_v5` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -338,14 +338,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "streaming_pipeline_v5",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_streaming_pipeline_v5",
-        provenance_date: "2026-05-20",
-        description: "# Exp231: Streaming Pipeline v5 — Diversity → L2 → `PCoA` → Rarefaction Chain",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "streaming_pipeline_v5",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_streaming_pipeline_v5",
+            provenance_date: "2026-05-20",
+            description: "# Exp231: Streaming Pipeline v5 — Diversity → L2 → `PCoA` → Rarefaction Chain",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

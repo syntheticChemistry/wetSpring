@@ -25,10 +25,10 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use std::io::Write as IoWrite;
-use std::time::Duration;
 use crate::ncbi;
 use crate::validation::Validator;
+use std::io::Write as IoWrite;
+use std::time::Duration;
 
 fn cache_path() -> std::path::PathBuf {
     ncbi::cache_file("ncbi_qs_habitat_cache.txt")
@@ -77,7 +77,6 @@ fn chrono_date() -> String {
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 /// Run the `validate_ncbi_qs_habitat` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: API key and query setup ──");
     let api_key = ncbi::api_key();
     let have_key = api_key.is_some();
@@ -386,7 +385,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Future work: use metagenome-assembled genomes (MAGs) from");
     println!("  environment-specific shotgun studies to reduce bias.");
     v.check_pass("interpretation documented", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -397,14 +395,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "ncbi_qs_habitat",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_ncbi_qs_habitat",
-        provenance_date: "2026-05-20",
-        description: "# Exp141: NCBI QS Gene Query by Habitat",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "ncbi_qs_habitat",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_ncbi_qs_habitat",
+            provenance_date: "2026-05-20",
+            description: "# Exp141: NCBI QS Gene Query by Habitat",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

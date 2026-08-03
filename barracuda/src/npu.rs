@@ -39,13 +39,9 @@ const fn u8_to_i8_dma_byte(b: u8) -> i8 {
     b as i8
 }
 
-#[expect(
-    clippy::cast_possible_truncation,
-    reason = "ESN reservoir weights quantized to f32 for NPU SRAM"
-)]
 #[inline]
 const fn f64_to_f32_esn_weight(x: f64) -> f32 {
-    x as f32
+    cast::f64_f32(x)
 }
 
 /// NPU handle wrapping an opened `AkidaDevice` with its capabilities.

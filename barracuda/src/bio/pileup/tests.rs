@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #![expect(clippy::unwrap_used, reason = "test assertions")]
 use super::*;
-use crate::io::sam::{CigarOp, CigarType, SamRecord, FLAG_REVERSE, FLAG_UNMAPPED};
+use crate::io::sam::{CigarOp, CigarType, FLAG_REVERSE, FLAG_UNMAPPED, SamRecord};
 
 fn simple_record(pos: u64, seq: &[u8], cigar_len: u32) -> SamRecord {
     SamRecord {
@@ -37,10 +37,7 @@ fn single_read_pileup() {
 
 #[test]
 fn overlapping_reads() {
-    let records = vec![
-        simple_record(1, b"ACGT", 4),
-        simple_record(3, b"GTAA", 4),
-    ];
+    let records = vec![simple_record(1, b"ACGT", 4), simple_record(3, b"GTAA", 4)];
     let pileup = generate_pileup(&records, 10);
 
     // Position 2 (0-based) should have depth 2 (overlap of "GT")
@@ -91,9 +88,18 @@ fn deletion_in_cigar() {
         pos: 1,
         mapq: 60,
         cigar: vec![
-            CigarOp { len: 2, op: CigarType::Match },
-            CigarOp { len: 3, op: CigarType::Deletion },
-            CigarOp { len: 2, op: CigarType::Match },
+            CigarOp {
+                len: 2,
+                op: CigarType::Match,
+            },
+            CigarOp {
+                len: 3,
+                op: CigarType::Deletion,
+            },
+            CigarOp {
+                len: 2,
+                op: CigarType::Match,
+            },
         ],
         rnext: "*".into(),
         pnext: 0,
@@ -119,9 +125,18 @@ fn insertion_in_cigar() {
         pos: 1,
         mapq: 60,
         cigar: vec![
-            CigarOp { len: 3, op: CigarType::Match },
-            CigarOp { len: 2, op: CigarType::Insertion },
-            CigarOp { len: 3, op: CigarType::Match },
+            CigarOp {
+                len: 3,
+                op: CigarType::Match,
+            },
+            CigarOp {
+                len: 2,
+                op: CigarType::Insertion,
+            },
+            CigarOp {
+                len: 3,
+                op: CigarType::Match,
+            },
         ],
         rnext: "*".into(),
         pnext: 0,

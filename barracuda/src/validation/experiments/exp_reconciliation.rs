@@ -21,16 +21,13 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use crate::bio::reconciliation::{
-    DtlCosts, DtlEvent, FlatRecTree, reconcile_batch, reconcile_dtl,
-};
+use crate::bio::reconciliation::{DtlCosts, DtlEvent, FlatRecTree, reconcile_batch, reconcile_dtl};
 use crate::validation::Validator;
 
 const NO_CHILD: u32 = u32::MAX;
 
 /// Run the `validate_reconciliation` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let costs = DtlCosts::default();
 
     // ── Test 1: Congruent 2-leaf trees (zero cost) ──
@@ -145,7 +142,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let r2b = reconcile_dtl(&host_4, &para_dup, &tip_map_dup, &costs);
     v.check_pass("Deterministic (cost)", r2.optimal_cost == r2b.optimal_cost);
     v.check_pass("Deterministic (host)", r2.optimal_host == r2b.optimal_host);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -156,14 +152,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "reconciliation",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_reconciliation",
-        provenance_date: "2026-05-20",
-        description: "Validation binary for Exp034: DTL Reconciliation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "reconciliation",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_reconciliation",
+            provenance_date: "2026-05-20",
+            description: "Validation binary for Exp034: DTL Reconciliation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

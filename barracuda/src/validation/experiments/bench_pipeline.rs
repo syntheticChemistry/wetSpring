@@ -29,22 +29,18 @@
 //!
 //! Provenance: End-to-end pipeline benchmark
 
-use std::collections::HashMap;
-use std::path::Path;
-use std::time::Instant;
-use crate::bench::{
-    self, BenchReport, EnergyReport, HardwareInventory, PhaseResult, PowerMonitor,
-};
+use crate::bench::{self, BenchReport, EnergyReport, HardwareInventory, PhaseResult, PowerMonitor};
 use crate::bio::chimera::{self, ChimeraParams};
 use crate::bio::dada2::{self, Dada2Params};
 use crate::bio::derep::{self, DerepSort};
 use crate::bio::diversity;
 use crate::bio::quality::{self, QualityParams};
-use crate::bio::taxonomy::{
-    ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq,
-};
+use crate::bio::taxonomy::{ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq};
 use crate::io::fastq::FastqRecord;
 use crate::validation;
+use std::collections::HashMap;
+use std::path::Path;
+use std::time::Instant;
 
 #[derive(Default)]
 struct TimingAccumulator {
@@ -85,7 +81,8 @@ impl TimingAccumulator {
     }
 }
 
-#[expect(clippy::too_many_lines, clippy::similar_names)] // benchmark harness: sequential timing of each pipeline stage; pipeline_ms/pipeline_s are related units
+#[expect(clippy::too_many_lines, clippy::similar_names)]
+// benchmark harness: sequential timing of each pipeline stage; pipeline_ms/pipeline_s are related units
 /// Run the `benchmark_pipeline` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let wall_monitor = PowerMonitor::start();
@@ -549,14 +546,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_pipeline",
-        provenance_date: "2026-05-20",
-        description: "Benchmark: Full 16S pipeline timing — Rust CPU vs `Galaxy`/Python reference",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_pipeline",
+            provenance_date: "2026-05-20",
+            description: "Benchmark: Full 16S pipeline timing — Rust CPU vs `Galaxy`/Python reference",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

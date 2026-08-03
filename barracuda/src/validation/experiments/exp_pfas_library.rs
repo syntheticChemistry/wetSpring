@@ -214,7 +214,6 @@ fn all_pfas() -> Vec<&'static PfasRef> {
 
 /// Run the `validate_pfas_library` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let all = all_pfas();
     println!("  Library: {} compounds across {} series", all.len(), {
         let mut series: Vec<&str> = all.iter().map(|p| p.series).collect();
@@ -243,7 +242,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_spectral_match_pfas(v);
     validate_cross_series_discrimination(v);
     validate_jones_library_expansion(v);
-
 }
 
 // ── Systematic tolerance search at 5, 10, 20 ppm ───────────────────────────
@@ -768,14 +766,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pfas_library",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_pfas_library",
-        provenance_date: "2026-05-20",
-        description: "Validate PFAS suspect screening against ground-truth reference library (Exp018)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pfas_library",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_pfas_library",
+            provenance_date: "2026-05-20",
+            description: "Validate PFAS suspect screening against ground-truth reference library (Exp018)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

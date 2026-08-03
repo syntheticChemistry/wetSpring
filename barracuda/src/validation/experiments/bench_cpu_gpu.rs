@@ -37,10 +37,7 @@
 //!
 //! Provenance: Core CPU vs GPU performance comparison
 
-use std::time::Instant;
-use crate::bench::{
-    self, BenchReport, EnergyReport, HardwareInventory, PhaseResult, PowerMonitor,
-};
+use crate::bench::{self, BenchReport, EnergyReport, HardwareInventory, PhaseResult, PowerMonitor};
 use crate::bio::{
     diversity, diversity_gpu, pcoa, pcoa_gpu, spectral_match, spectral_match_gpu, stats_gpu,
 };
@@ -48,6 +45,7 @@ use crate::gpu::GpuF64;
 use crate::special;
 use crate::validation;
 use crate::validation::OrExit;
+use std::time::Instant;
 
 /// Run the `benchmark_cpu_gpu` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -365,14 +363,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_gpu",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_cpu_gpu",
-        provenance_date: "2026-05-20",
-        description: "Benchmark: CPU Rust vs GPU (`ToadStool`/`BarraCuda`) across scientific workloads",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_gpu",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_cpu_gpu",
+            provenance_date: "2026-05-20",
+            description: "Benchmark: CPU Rust vs GPU (`ToadStool`/`BarraCuda`) across scientific workloads",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -17,6 +17,7 @@
 //! and chimera detection, as it collapses redundant sequences and provides
 //! the abundance information needed for error modelling.
 
+use crate::cast;
 use crate::io::fastq::FastqRecord;
 use std::collections::HashMap;
 use std::fmt::Write;
@@ -74,7 +75,6 @@ pub struct DerepStats {
 /// # Returns
 ///
 /// Tuple of (unique sequences, statistics).
-#[expect(clippy::cast_precision_loss, reason = "integer fits in f64 mantissa")]
 pub fn dereplicate(
     records: &[FastqRecord],
     sort: DerepSort,
@@ -141,7 +141,7 @@ pub fn dereplicate(
         max_abundance,
         singletons,
         mean_abundance: if n_unique > 0 {
-            total_abundance as f64 / n_unique as f64
+            cast::usize_f64(total_abundance) / cast::usize_f64(n_unique)
         } else {
             0.0
         },
@@ -162,7 +162,7 @@ pub(crate) fn mean_quality(qual: &[u8]) -> f64 {
     if phred_values.is_empty() {
         return 0.0;
     }
-    phred_values.iter().sum::<f64>() / crate::cast::usize_f64(phred_values.len())
+    phred_values.iter().sum::<f64>() / cast::usize_f64(phred_values.len())
 }
 
 /// Write dereplicated sequences to FASTA format with abundance annotations.
@@ -196,12 +196,11 @@ pub fn to_fasta_with_abundance(uniques: &[UniqueSequence]) -> String {
 /// Returns a vector of f64 counts (one per unique sequence), sorted
 /// by abundance descending — ready for Shannon/Simpson/Chao1.
 #[must_use]
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "abundance to f64 for diversity calculations"
-)]
 pub fn abundance_vector(uniques: &[UniqueSequence]) -> Vec<f64> {
-    let mut counts: Vec<f64> = uniques.iter().map(|u| u.abundance as f64).collect();
+    let mut counts: Vec<f64> = uniques
+        .iter()
+        .map(|u| cast::usize_f64(u.abundance))
+        .collect();
     counts.sort_by(|a, b| b.total_cmp(a));
     counts
 }

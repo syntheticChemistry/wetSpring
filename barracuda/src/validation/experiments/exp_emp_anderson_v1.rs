@@ -42,9 +42,9 @@
 //!
 //! Provenance: Earth Microbiome Project Anderson analysis (V1)
 
+use crate::validation::Validator;
 use std::collections::HashMap;
 use std::time::Instant;
-use crate::validation::Validator;
 
 struct OtuSample {
     sample_id: String,
@@ -111,19 +111,15 @@ fn generate_emp_scale_synthetic(n_per_biome: usize) -> Vec<OtuSample> {
                 .wrapping_add(crate::cast::usize_u64(i));
             let mut counts = vec![0.0_f64; n_taxa];
             let richness_frac = (*mean_h / 4.5).clamp(0.1, 1.0);
-            let n_present = crate::cast::f64_usize(
-                richness_frac * crate::cast::usize_f64(n_taxa),
-            )
-            .max(3);
+            let n_present =
+                crate::cast::f64_usize(richness_frac * crate::cast::usize_f64(n_taxa)).max(3);
 
             for (j, count) in counts.iter_mut().take(n_present).enumerate() {
                 let pseudo = crate::cast::u64_f64(
-                    seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(
-                        crate::cast::usize_u64(j) * 1_442_695_040_888_963_407,
-                    ),
+                    seed.wrapping_mul(6_364_136_223_846_793_005)
+                        .wrapping_add(crate::cast::usize_u64(j) * 1_442_695_040_888_963_407),
                 ) / crate::cast::u64_f64(u64::MAX);
-                let rank_weight =
-                    1.0 / (1.0 + crate::cast::usize_f64(j)).powf(0.8 + pseudo * 0.4);
+                let rank_weight = 1.0 / (1.0 + crate::cast::usize_f64(j)).powf(0.8 + pseudo * 0.4);
                 *count = (rank_weight * 100.0 * (0.5 + pseudo)).max(1.0);
             }
 
@@ -248,12 +244,12 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let results: Vec<DiversityResult> = samples.iter().map(compute_diversity).collect();
 
-    let mean_shannon: f64 = results.iter().map(|r| r.shannon).sum::<f64>()
-        / crate::cast::usize_f64(results.len());
-    let mean_simpson: f64 = results.iter().map(|r| r.simpson).sum::<f64>()
-        / crate::cast::usize_f64(results.len());
-    let mean_pielou: f64 = results.iter().map(|r| r.pielou).sum::<f64>()
-        / crate::cast::usize_f64(results.len());
+    let mean_shannon: f64 =
+        results.iter().map(|r| r.shannon).sum::<f64>() / crate::cast::usize_f64(results.len());
+    let mean_simpson: f64 =
+        results.iter().map(|r| r.simpson).sum::<f64>() / crate::cast::usize_f64(results.len());
+    let mean_pielou: f64 =
+        results.iter().map(|r| r.pielou).sum::<f64>() / crate::cast::usize_f64(results.len());
     let mean_richness: f64 = results
         .iter()
         .map(|r| crate::cast::usize_f64(r.richness))
@@ -282,12 +278,12 @@ pub fn run(v: &mut crate::validation::Validator) {
     // ─── D103: Anderson W Mapping ───
     println!("\n  ── D103: Anderson W Mapping ──");
 
-    let mean_w_h1: f64 = results.iter().map(|r| r.w_h1).sum::<f64>()
-        / crate::cast::usize_f64(results.len());
-    let mean_w_h2: f64 = results.iter().map(|r| r.w_h2).sum::<f64>()
-        / crate::cast::usize_f64(results.len());
-    let mean_w_h3: f64 = results.iter().map(|r| r.w_h3).sum::<f64>()
-        / crate::cast::usize_f64(results.len());
+    let mean_w_h1: f64 =
+        results.iter().map(|r| r.w_h1).sum::<f64>() / crate::cast::usize_f64(results.len());
+    let mean_w_h2: f64 =
+        results.iter().map(|r| r.w_h2).sum::<f64>() / crate::cast::usize_f64(results.len());
+    let mean_w_h3: f64 =
+        results.iter().map(|r| r.w_h3).sum::<f64>() / crate::cast::usize_f64(results.len());
 
     println!("  Mean W(H1 inverse diversity): {mean_w_h1:.4}");
     println!("  Mean W(H2 signal dilution):   {mean_w_h2:.4}");
@@ -308,12 +304,12 @@ pub fn run(v: &mut crate::validation::Validator) {
     let mut biome_summary: Vec<(String, f64, f64, f64, usize)> = biome_stats
         .iter()
         .map(|(biome, rs)| {
-            let mean_p_h3 = rs.iter().map(|r| r.p_qs_h3).sum::<f64>()
-                / crate::cast::usize_f64(rs.len());
-            let mean_h = rs.iter().map(|r| r.shannon).sum::<f64>()
-                / crate::cast::usize_f64(rs.len());
-            let mean_o2 = rs.iter().map(|r| r.oxygen_regime).sum::<f64>()
-                / crate::cast::usize_f64(rs.len());
+            let mean_p_h3 =
+                rs.iter().map(|r| r.p_qs_h3).sum::<f64>() / crate::cast::usize_f64(rs.len());
+            let mean_h =
+                rs.iter().map(|r| r.shannon).sum::<f64>() / crate::cast::usize_f64(rs.len());
+            let mean_o2 =
+                rs.iter().map(|r| r.oxygen_regime).sum::<f64>() / crate::cast::usize_f64(rs.len());
             (biome.clone(), mean_p_h3, mean_h, mean_o2, rs.len())
         })
         .collect();
@@ -524,14 +520,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "emp_anderson_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_emp_anderson_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp364: EMP Anderson QS Validation — Real Data at Scale",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "emp_anderson_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_emp_anderson_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp364: EMP Anderson QS Validation — Real Data at Scale",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

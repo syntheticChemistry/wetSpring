@@ -4,6 +4,11 @@
 use std::io::Write as _;
 
 /// [`Result::unwrap`]/[`Option::expect`] replacement via stderr + exit 1.
+///
+/// **Validation-only.** This trait intentionally terminates the process on
+/// failure so experiment binaries can stay panic-free without propagating
+/// `Result` through deep call stacks. Do not use in production code, IPC
+/// handlers, or library paths — prefer `?` and explicit error returns there.
 pub trait OrExit<T> {
     /// Unwrap or print to stderr and `process::exit(1)`.
     fn or_exit(self, context: &str) -> T;

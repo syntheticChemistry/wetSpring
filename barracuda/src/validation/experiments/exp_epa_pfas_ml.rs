@@ -27,7 +27,6 @@ use crate::validation::Validator;
 
 /// Run the `validate_epa_pfas_ml` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // Build a stump matching Python baseline:
     // feature=4 (total_PFAS), threshold=70.0, left→0, right→1
     let tree = DecisionTree::from_arrays(
@@ -88,7 +87,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let batch2 = tree.predict_batch(&samples);
     let batch_match = batch1 == batch2;
     v.check_count("batch deterministic", usize::from(batch_match), 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -99,14 +97,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "epa_pfas_ml",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_epa_pfas_ml",
-        provenance_date: "2026-05-20",
-        description: "Exp041 — PFAS detection ML on surface water data",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "epa_pfas_ml",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_epa_pfas_ml",
+            provenance_date: "2026-05-20",
+            description: "Exp041 — PFAS detection ML on surface water data",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -29,8 +29,8 @@
 #[cfg(test)]
 mod tests;
 
-use crate::bio::ref_index::FmIndex;
 use super::{MapperConfig, map_read};
+use crate::bio::ref_index::FmIndex;
 use crate::io::sam::SamRecord;
 
 /// Configuration for MAPQ calibration.
@@ -77,7 +77,10 @@ struct CalibrationSample {
     /// Score gap between best and second-best alignment.
     score_gap: u32,
     /// Number of mapping candidates found (reserved for 2D model extension).
-    #[expect(dead_code, reason = "reserved for 2D calibration model (gap × candidates)")]
+    #[expect(
+        dead_code,
+        reason = "reserved for 2D calibration model (gap × candidates)"
+    )]
     n_candidates: usize,
     /// Whether the mapping position matched the true position.
     correct: bool,
@@ -167,10 +170,7 @@ impl MapqModel {
 /// Samples `n_reads` positions uniformly, extracts fragments of `read_length`,
 /// and injects substitution errors at `error_rate`.
 #[must_use]
-pub fn simulate_reads(
-    reference: &[u8],
-    config: &CalibrationConfig,
-) -> Vec<SimulatedRead> {
+pub fn simulate_reads(reference: &[u8], config: &CalibrationConfig) -> Vec<SimulatedRead> {
     let mut reads = Vec::with_capacity(config.n_reads);
     let max_start = reference.len().saturating_sub(config.read_length);
 
@@ -237,8 +237,8 @@ pub fn calibrate(
             if rec.is_mapped() {
                 mapped += 1;
                 let mapped_pos = rec.pos.saturating_sub(1) as usize;
-                let is_correct = mapped_pos.abs_diff(sim_read.true_position)
-                    <= cal_config.position_tolerance;
+                let is_correct =
+                    mapped_pos.abs_diff(sim_read.true_position) <= cal_config.position_tolerance;
 
                 if is_correct {
                     correct += 1;
@@ -317,7 +317,11 @@ fn extract_score_gap(rec: &SamRecord) -> u32 {
 
 fn mutate_base(base: u8, rng: &mut SimpleRng) -> u8 {
     let bases = [b'A', b'C', b'G', b'T'];
-    let alt_bases: Vec<u8> = bases.iter().copied().filter(|&b| b != base.to_ascii_uppercase()).collect();
+    let alt_bases: Vec<u8> = bases
+        .iter()
+        .copied()
+        .filter(|&b| b != base.to_ascii_uppercase())
+        .collect();
     if alt_bases.is_empty() {
         return base;
     }

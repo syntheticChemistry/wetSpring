@@ -39,14 +39,14 @@
 //! | Date | 2026-04-17 |
 //! | Command | `cargo run --features ipc --bin validate_primal_parity_v1` |
 
+use crate::ipc::discover;
+use crate::tolerances;
+use crate::validation::Validator;
 use serde_json::{Value, json};
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
-use crate::ipc::discover;
-use crate::tolerances;
-use crate::validation::Validator;
 
 const RPC_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -105,7 +105,6 @@ fn check_skip(label: &str, socket: Option<&PathBuf>, primal: &str) -> bool {
 
 /// Run the `validate_primal_parity_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let barracuda_socket = discover::discover_primal("barracuda");
     let nestgate_socket = discover::discover_primal("nestgate");
     let squirrel_socket = discover::discover_primal("squirrel");
@@ -505,14 +504,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "primal_parity_v1",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_primal_parity_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp403: Primal Parity — Live NUCLEUS IPC vs Local Rust Baselines",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "primal_parity_v1",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_primal_parity_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp403: Primal Parity — Live NUCLEUS IPC vs Local Rust Baselines",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

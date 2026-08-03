@@ -251,11 +251,9 @@ fn validate_density_and_disorder(v: &mut Validator) {
 
 /// Run the `validate_physical_comm_anderson` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_signal_catalog(v);
     validate_range_and_geometry(v);
     validate_density_and_disorder(v);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -266,14 +264,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "physical_comm_anderson",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_physical_comm_anderson",
-        provenance_date: "2026-05-20",
-        description: "# Exp152: Physical Communication Pathways vs Anderson Framework",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "physical_comm_anderson",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_physical_comm_anderson",
+            provenance_date: "2026-05-20",
+            description: "# Exp152: Physical Communication Pathways vs Anderson Framework",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

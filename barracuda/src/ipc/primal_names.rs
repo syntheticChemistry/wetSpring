@@ -19,3 +19,16 @@ pub use crate::primal_names::SONGBIRD;
 pub use crate::primal_names::SQUIRREL;
 pub use crate::primal_names::SWEETGRASS;
 pub use crate::primal_names::TOADSTOOL;
+
+pub use crate::primal_names::BEARDOG_DISPLAY;
+pub use crate::primal_names::BIOMEOS_DISPLAY;
+pub use crate::primal_names::CORALREEF_DISPLAY;
+pub use crate::primal_names::LOAMSPINE_DISPLAY;
+pub use crate::primal_names::NESTGATE_DISPLAY;
+pub use crate::primal_names::PETALTONGUE_DISPLAY;
+pub use crate::primal_names::RHIZOCRYPT_DISPLAY;
+pub use crate::primal_names::SKUNKBAT_DISPLAY;
+pub use crate::primal_names::SONGBIRD_DISPLAY;
+pub use crate::primal_names::SQUIRREL_DISPLAY;
+pub use crate::primal_names::SWEETGRASS_DISPLAY;
+pub use crate::primal_names::TOADSTOOL_DISPLAY;

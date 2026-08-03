@@ -33,15 +33,15 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::cooperation::{self, CooperationParams};
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
+use crate::validation::OrExit;
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
-use crate::validation::OrExit;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
@@ -50,7 +50,6 @@ use barracuda::spectral::{
 
 /// Run the `validate_soil_qs_pore_geometry` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // S1: QS Biofilm Model — Baseline Dynamics
     //
@@ -354,7 +353,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Paper: Martínez-García et al. 2023, Nature Comms 14:8332");
     println!("  Key finding: Pore geometry → Anderson disorder → QS activation threshold");
     println!("  Evolution: Python baseline → BarraCuda CPU → GPU → Pure GPU → metalForge");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -365,14 +363,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "soil_qs_pore_geometry",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_soil_qs_pore_geometry",
-        provenance_date: "2026-05-20",
-        description: "# Exp170: Soil QS-Pore Geometry — Martínez-García et al. 2023",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "soil_qs_pore_geometry",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_soil_qs_pore_geometry",
+            provenance_date: "2026-05-20",
+            description: "# Exp170: Soil QS-Pore Geometry — Martínez-García et al. 2023",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

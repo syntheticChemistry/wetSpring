@@ -23,16 +23,15 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::collections::HashSet;
-use std::path::Path;
 use crate::bio::{kmd, spectral_match, tolerance_search};
 use crate::io::ms2;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use std::collections::HashSet;
+use std::path::Path;
 
 /// Run the `validate_pfas` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // Self-contained analytical validations (no external data needed)
     validate_spectral_match(v);
     validate_kmd(v);
@@ -51,7 +50,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             ms2_path.display()
         );
     }
-
 }
 
 fn validate_ms2_parsing(ms2_path: &Path, v: &mut Validator) {
@@ -259,14 +257,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pfas",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_pfas",
-        provenance_date: "2026-05-20",
-        description: "Validate PFAS screening against `FindPFAS` baseline (Exp006)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pfas",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_pfas",
+            provenance_date: "2026-05-20",
+            description: "Validate PFAS screening against `FindPFAS` baseline (Exp006)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

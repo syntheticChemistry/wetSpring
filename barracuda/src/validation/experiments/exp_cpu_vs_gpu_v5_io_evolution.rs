@@ -436,14 +436,12 @@ pub fn run(v: &mut crate::validation::Validator) {
     gpu.print_info();
     println!();
 
-
     validate_fastq_gpu_diversity(v, &gpu);
     validate_quality_gpu_derep(v, &gpu);
     validate_ms2_gpu_spectral(v, &gpu);
     validate_nanopore_gpu_stats(v, &gpu);
     validate_full_gpu_chain(v, &gpu);
     validate_gpu_threshold(v, &gpu);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -454,14 +452,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_v5_io_evolution",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_vs_gpu_v5_io_evolution",
-        provenance_date: "2026-05-20",
-        description: "# Exp215: CPU vs GPU v5 — V66 I/O Evolution Domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_v5_io_evolution",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_vs_gpu_v5_io_evolution",
+            provenance_date: "2026-05-20",
+            description: "# Exp215: CPU vs GPU v5 — V66 I/O Evolution Domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

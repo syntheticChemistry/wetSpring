@@ -43,8 +43,8 @@ use crate::ipc::primal_names;
 use crate::tolerances;
 use crate::validation::Validator;
 
-use barracuda::stats::norm_cdf;
 use crate::validation::OrExit;
+use barracuda::stats::norm_cdf;
 
 fn discover_biomeos_bin() -> Option<PathBuf> {
     super::primal_binary::discover(primal_names::BIOMEOS)
@@ -279,7 +279,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Nest:  {}", if nest_ready { "READY" } else { "pending" });
     println!("  IPC overhead: {direct_us:.2}µs (direct) vs {json_us:.2}µs (IPC)");
     println!("  Chain: CPU → GPU → ToadStool → Streaming → metalForge → NUCLEUS (this)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -290,14 +289,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nucleus_v4",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_nucleus_v4",
-        provenance_date: "2026-05-20",
-        description: "# Exp352: NUCLEUS v4 — V109 Tower/Node/Nest + biomeOS Graph Execution",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nucleus_v4",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_nucleus_v4",
+            provenance_date: "2026-05-20",
+            description: "# Exp352: NUCLEUS v4 — V109 Tower/Node/Nest + biomeOS Graph Execution",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -159,7 +159,8 @@ mod tests {
     fn server_bind_and_health_check() {
         let sock = test_socket_path("server_bind_and_health_check");
         cleanup_test_socket(&sock);
-        let server = Server::bind_with_policy(&sock, crate::ipc::ribocipher::Policy::Error).unwrap();
+        let server =
+            Server::bind_with_policy(&sock, crate::ipc::ribocipher::Policy::Error).unwrap();
 
         assert!(sock.exists());
 
@@ -193,7 +194,8 @@ mod tests {
     fn server_diversity_wetspring_prefixed_method_normalized() {
         let sock = test_socket_path("server_diversity_wetspring_prefixed_method_normalized");
         cleanup_test_socket(&sock);
-        let server = Server::bind_with_policy(&sock, crate::ipc::ribocipher::Policy::Error).unwrap();
+        let server =
+            Server::bind_with_policy(&sock, crate::ipc::ribocipher::Policy::Error).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
         std::thread::spawn(move || server.run());
@@ -593,11 +595,8 @@ mod tests {
 
         let sock = test_socket_path("server_ribocipher_reject");
         cleanup_test_socket(&sock);
-        let server = Server::bind_with_policy(
-            &sock,
-            crate::ipc::ribocipher::Policy::Reject,
-        )
-        .unwrap();
+        let server =
+            Server::bind_with_policy(&sock, crate::ipc::ribocipher::Policy::Reject).unwrap();
         let server_path = server.socket_path().to_path_buf();
 
         std::thread::spawn(move || server.run());

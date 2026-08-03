@@ -34,7 +34,6 @@ const TREE_2: &str = "((((((01aA:0.00087835,02aA:0.00087835):0.00033491,03aA:0.0
 
 /// Run the `validate_phynetpy_rf` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let t0 = PhyloTree::from_newick(TREE_0);
     let t1 = PhyloTree::from_newick(TREE_1);
     let t2 = PhyloTree::from_newick(TREE_2);
@@ -114,7 +113,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let d12 = rf_distance(&t1, &t2);
     let triangle_holds = d01 <= d02 + d12 && d02 <= d01 + d12 && d12 <= d01 + d02;
     v.check_count("triangle_inequality", usize::from(triangle_holds), 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -125,14 +123,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "phynetpy_rf",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_phynetpy_rf",
-        provenance_date: "2026-05-20",
-        description: "Exp036 — RF distances on real `PhyNetPy` DEFJ gene trees",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "phynetpy_rf",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_phynetpy_rf",
+            provenance_date: "2026-05-20",
+            description: "Exp036 — RF distances on real `PhyNetPy` DEFJ gene trees",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

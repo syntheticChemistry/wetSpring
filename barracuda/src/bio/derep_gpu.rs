@@ -22,6 +22,7 @@
 
 use super::derep::{DerepSort, DerepStats, UniqueSequence, mean_quality};
 use crate::bio::kmer_gpu::KmerGpu;
+use crate::cast;
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
@@ -89,7 +90,10 @@ pub fn dereplicate_gpu(
         .collect();
 
     // Fall back to CPU if any sequence too short for k-mer
-    if sequences.iter().any(|s| s.len() < SKETCH_K as usize) {
+    if sequences
+        .iter()
+        .any(|s| s.len() < cast::u32_usize(SKETCH_K))
+    {
         return Ok(super::derep::dereplicate(records, sort, min_abundance));
     }
 

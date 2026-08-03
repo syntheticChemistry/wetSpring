@@ -80,11 +80,10 @@ fn compute_r_at_w(l: usize, w: f64, n_real: usize) -> (f64, f64) {
 
 /// Run the `validate_dynamic_anderson` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
-        use barracuda::spectral::{GOE_R, POISSON_R};
         use crate::validation::OrExit;
+        use barracuda::spectral::{GOE_R, POISSON_R};
 
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
         let l = 8;
@@ -266,7 +265,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             (w_seasonal(91.25) - 20.0).abs() < tolerances::SEASONAL_OSCILLATION,
         );
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -277,14 +275,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "dynamic_anderson",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_dynamic_anderson",
-        provenance_date: "2026-05-20",
-        description: "# Exp186: Dynamic Anderson W(t) — Community Evolution Under Perturbation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "dynamic_anderson",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_dynamic_anderson",
+            provenance_date: "2026-05-20",
+            description: "# Exp186: Dynamic Anderson W(t) — Community Evolution Under Perturbation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

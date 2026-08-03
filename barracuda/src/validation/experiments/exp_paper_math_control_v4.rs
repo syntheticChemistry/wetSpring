@@ -433,7 +433,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Track 5: 202 checks (7 Gonzales experiments)");
     println!("  Immuno-Anderson: 157 checks (7 experiments)");
     println!("  Chain: Paper (this) → CPU v22 → GPU v9 → Pure GPU → metalForge v14");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -444,14 +443,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "paper_math_control_v4",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_paper_math_control_v4",
-        provenance_date: "2026-05-20",
-        description: "# Exp291: Paper Math Control v4 — 52 Papers Complete + V92D",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "paper_math_control_v4",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_paper_math_control_v4",
+            provenance_date: "2026-05-20",
+            description: "# Exp291: Paper Math Control v4 — 52 Papers Complete + V92D",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -23,6 +23,7 @@
 //! be dispatched in parallel. For multi-class, the K class chains can
 //! also run in parallel. barraCuda absorption as `GbmBatchInferenceGpu`.
 
+use crate::cast;
 use crate::error;
 
 /// A regression tree for GBM (predicts f64 residuals, not class labels).
@@ -83,10 +84,6 @@ impl GbmTree {
 
     /// Predict the residual for a single sample.
     #[must_use]
-    #[expect(
-        clippy::cast_sign_loss,
-        reason = "Sign: node.feature and child indices from tree structure"
-    )]
     pub fn predict(&self, features: &[f64]) -> f64 {
         let mut idx = 0usize;
         loop {
@@ -94,11 +91,13 @@ impl GbmTree {
             if node.feature < 0 {
                 return node.value;
             }
-            let feat_val = features.get(node.feature as usize).map_or(0.0, |x| *x);
+            let feat_val = features
+                .get(cast::i32_usize(node.feature))
+                .map_or(0.0, |x| *x);
             idx = if feat_val <= node.threshold {
-                node.left_child as usize
+                cast::i32_usize(node.left_child)
             } else {
-                node.right_child as usize
+                cast::i32_usize(node.right_child)
             };
         }
     }

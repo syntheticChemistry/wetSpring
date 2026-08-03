@@ -11,6 +11,7 @@
 //! across observation sequences. Each thread runs the full T-step
 //! forward for one sequence, yielding one log-likelihood per sequence.
 
+use crate::cast;
 use barracuda::HmmBatchForwardF64;
 use barracuda::device::WgpuDevice;
 use barracuda::ops::bio::hmm::HmmForwardArgs;
@@ -62,10 +63,6 @@ impl HmmGpuForward {
     /// # Errors
     ///
     /// Returns `Err` if GPU dispatch or buffer readback fails.
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "Truncation: n_seqs, n_steps fit u32"
-    )]
     pub fn forward_batch(
         &self,
         model: &HmmModel,
@@ -110,10 +107,10 @@ impl HmmGpuForward {
 
         self.inner
             .dispatch(&HmmForwardArgs {
-                n_states: s as u32,
-                n_symbols: model.n_symbols as u32,
-                n_steps: n_steps as u32,
-                n_seqs: n_seqs as u32,
+                n_states: cast::usize_u32(s),
+                n_symbols: cast::usize_u32(model.n_symbols),
+                n_steps: cast::usize_u32(n_steps),
+                n_seqs: cast::usize_u32(n_seqs),
                 log_trans: &trans_buf,
                 log_emit: &emit_buf,
                 log_pi: &pi_buf,

@@ -95,7 +95,6 @@ fn find_crossing(sweep_a: &[(f64, f64, f64)], sweep_b: &[(f64, f64, f64)]) -> Op
 
 /// Run the `validate_anderson_gpu_scaling` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
         use std::time::Instant;
@@ -297,7 +296,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             tolerances::LEVEL_SPACING_STDERR_MAX > 0.0,
         );
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -308,14 +306,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "anderson_gpu_scaling",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_anderson_gpu_scaling",
-        provenance_date: "2026-05-20",
-        description: "# Exp184b: GPU Anderson Finite-Size Scaling L=14–20",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "anderson_gpu_scaling",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_anderson_gpu_scaling",
+            provenance_date: "2026-05-20",
+            description: "# Exp184b: GPU Anderson Finite-Size Scaling L=14–20",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

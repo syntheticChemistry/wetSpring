@@ -28,12 +28,11 @@ use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::tolerances;
 use crate::validation::Validator;
 
-use barracuda::stats::norm_cdf;
 use crate::validation::OrExit;
+use barracuda::stats::norm_cdf;
 
 /// Run the `validate_soil_biofilm_aggregate` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // S1: Water Film Thickness → Diffusion Connectivity
     //
@@ -240,7 +239,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("\n  ── Exp176 Summary: {passed}/{total} checks ──");
     println!("  Paper: Tecon & Or 2017, BBA 1858:2774-2781");
     println!("  Key finding: Soil aggregate geometry → biofilm → QS (Anderson bridge)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -251,14 +249,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "soil_biofilm_aggregate",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_soil_biofilm_aggregate",
-        provenance_date: "2026-05-20",
-        description: "# Exp176: Soil Biofilm & Aggregate Geometry — Tecon & Or 2017",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "soil_biofilm_aggregate",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_soil_biofilm_aggregate",
+            provenance_date: "2026-05-20",
+            description: "# Exp176: Soil Biofilm & Aggregate Geometry — Tecon & Or 2017",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

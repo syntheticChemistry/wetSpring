@@ -56,6 +56,8 @@ fn main() {
     v.section("═══ D01: Niche ↔ IPC Surface Alignment ═══");
 
     let aspirational = [
+        "integration.braid",
+        "integration.performance_surface",
         "integration.sweetgrass.braid",
         "integration.toadstool.performance_surface",
         "protocol.stream_item",

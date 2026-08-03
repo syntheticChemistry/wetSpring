@@ -77,11 +77,10 @@ fn classify_outcome(y_final: &[f64]) -> &'static str {
 }
 
 fn derive_params(assembly: &VibrioAssembly) -> QsBiofilmParams {
-    let density = f64::from(assembly.gene_count)
-        / (crate::cast::u64_f64(assembly.genome_size_bp) / 1e6);
+    let density =
+        f64::from(assembly.gene_count) / (crate::cast::u64_f64(assembly.genome_size_bp) / 1e6);
     QsBiofilmParams {
-        mu_max: ((crate::cast::u64_f64(assembly.genome_size_bp) - 3_500_000.0)
-            / 5_000_000.0)
+        mu_max: ((crate::cast::u64_f64(assembly.genome_size_bp) - 3_500_000.0) / 5_000_000.0)
             .mul_add(-1.0, 1.2)
             .clamp(0.2, 1.2),
         k_ai_prod: (f64::from(assembly.gene_count) / 1000.0).clamp(0.5, 15.0),
@@ -101,7 +100,6 @@ fn is_clinical(source: &str) -> bool {
 )]
 /// Run the `validate_ncbi_vibrio_qs` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Load assemblies ──");
     let (assemblies, is_ncbi) = load_vibrio_assemblies();
     println!(
@@ -284,14 +282,12 @@ pub fn run(v: &mut crate::validation::Validator) {
     let env_total: usize = assemblies.len() - clinical_total;
 
     let clinical_frac = if clinical_total > 0 {
-        crate::cast::usize_f64(clinical_biofilm)
-            / crate::cast::usize_f64(clinical_total)
+        crate::cast::usize_f64(clinical_biofilm) / crate::cast::usize_f64(clinical_total)
     } else {
         0.0
     };
     let env_frac = if env_total > 0 {
-        crate::cast::usize_f64(env_biofilm)
-            / crate::cast::usize_f64(env_total)
+        crate::cast::usize_f64(env_biofilm) / crate::cast::usize_f64(env_total)
     } else {
         0.0
     };
@@ -326,7 +322,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Exp108 uniform-grid: 1024 param sets, diverse outcomes");
     println!("  Real genomic diversity yields different landscape than synthetic grid.");
     v.check_count("comparison summary printed", 1, 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -337,14 +332,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "ncbi_vibrio_qs",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_ncbi_vibrio_qs",
-        provenance_date: "2026-05-20",
-        description: "# Exp121: NCBI Vibrio QS Parameter Landscape",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "ncbi_vibrio_qs",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_ncbi_vibrio_qs",
+            provenance_date: "2026-05-20",
+            description: "# Exp121: NCBI Vibrio QS Parameter Landscape",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

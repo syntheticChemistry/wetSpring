@@ -41,12 +41,12 @@
 
 use std::time::Instant;
 
-use barracuda::spectral::{
-    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
-};
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::{self, DomainResult, Validator};
+use barracuda::spectral::{
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+};
 
 fn ensemble_r_2d(lx: usize, ly: usize, w: f64, seeds: &[u64]) -> f64 {
     let n = lx * ly;
@@ -555,7 +555,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Scratch PROMOTION (2D→3D) = cytokines escape = inflammatory cascade");
     println!("  Same Anderson physics, opposite direction, opposite pathology.");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -566,14 +565,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barrier_disruption_s79",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barrier_disruption_s79",
-        provenance_date: "2026-05-20",
-        description: "# Exp274: Barrier Disruption — Dimensional Promotion Threshold",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barrier_disruption_s79",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barrier_disruption_s79",
+            provenance_date: "2026-05-20",
+            description: "# Exp274: Barrier Disruption — Dimensional Promotion Threshold",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

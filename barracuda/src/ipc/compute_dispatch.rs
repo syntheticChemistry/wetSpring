@@ -133,9 +133,10 @@ fn rpc_call(socket: &Path, request: &str) -> Result<String, DispatchError> {
         .map_err(|e| DispatchError::Transport(format!("read: {e}")))?;
 
     if line.is_empty() {
-        return Err(DispatchError::Transport(
-            "empty response from toadStool".to_string(),
-        ));
+        return Err(DispatchError::Transport(format!(
+            "empty response from {}",
+            crate::primal_names::TOADSTOOL_DISPLAY
+        )));
     }
 
     if let Some((code, message)) = super::protocol::extract_rpc_error(&line) {
@@ -228,9 +229,10 @@ fn rpc_call_outcome(socket: &Path, request: &str) -> DispatchOutcome<String> {
     }
 
     if line.is_empty() {
-        return DispatchOutcome::Protocol(DispatchError::Transport(
-            "empty response from toadStool".to_string(),
-        ));
+        return DispatchOutcome::Protocol(DispatchError::Transport(format!(
+            "empty response from {}",
+            crate::primal_names::TOADSTOOL_DISPLAY
+        )));
     }
 
     if let Some((code, message)) = super::protocol::extract_rpc_error(&line) {

@@ -20,13 +20,6 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use barracuda::device::WgpuDevice;
-use barracuda::ops::bio::gillespie::GillespieModel;
-use barracuda::{
-    FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig, TreeInferenceGpu,
-};
-use std::sync::Arc;
-use std::time::Instant;
 use crate::bio::decision_tree::DecisionTree;
 use crate::bio::{
     alignment, ani, ani_gpu::AniGpu, diversity, diversity_gpu, dnds, dnds_gpu::DnDsGpu, eic,
@@ -40,6 +33,13 @@ use crate::special;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use barracuda::device::WgpuDevice;
+use barracuda::ops::bio::gillespie::GillespieModel;
+use barracuda::{
+    FlatForest, GillespieConfig, GillespieGpu, SmithWatermanGpu, SwConfig, TreeInferenceGpu,
+};
+use std::sync::Arc;
+use std::time::Instant;
 
 fn validate_shannon_simpson(
     v: &mut Validator,
@@ -615,56 +615,55 @@ fn validate_rarefaction(
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    let device = gpu.to_wgpu_device();
-    let t0 = Instant::now();
-    let mut timings: Vec<(&str, f64, f64, &str)> = Vec::new();
+        let device = gpu.to_wgpu_device();
+        let t0 = Instant::now();
+        let mut timings: Vec<(&str, f64, f64, &str)> = Vec::new();
 
-    validate_shannon_simpson(v, &gpu, &mut timings);
-    validate_bray_curtis(v, &gpu, &mut timings);
-    validate_ani(v, &device, &mut timings);
-    validate_snp(v, &device, &mut timings);
-    validate_dnds(v, &device, &mut timings);
-    validate_pangenome(v, &device, &mut timings);
-    validate_random_forest(v, &device, &mut timings);
-    validate_hmm_forward(v, &device, &mut timings);
-    validate_smith_waterman(v, &device, &mut timings);
-    validate_gillespie_ssa(v, &device, &mut timings);
-    validate_decision_tree(v, &device, &mut timings);
-    validate_spectral_cosine(v, &gpu, &mut timings);
-    validate_eic(v, &gpu, &mut timings);
-    validate_pcoa(v, &gpu, &mut timings);
-    validate_kriging(v, &gpu, &mut timings);
-    validate_rarefaction(v, &gpu, &mut timings);
+        validate_shannon_simpson(v, &gpu, &mut timings);
+        validate_bray_curtis(v, &gpu, &mut timings);
+        validate_ani(v, &device, &mut timings);
+        validate_snp(v, &device, &mut timings);
+        validate_dnds(v, &device, &mut timings);
+        validate_pangenome(v, &device, &mut timings);
+        validate_random_forest(v, &device, &mut timings);
+        validate_hmm_forward(v, &device, &mut timings);
+        validate_smith_waterman(v, &device, &mut timings);
+        validate_gillespie_ssa(v, &device, &mut timings);
+        validate_decision_tree(v, &device, &mut timings);
+        validate_spectral_cosine(v, &gpu, &mut timings);
+        validate_eic(v, &gpu, &mut timings);
+        validate_pcoa(v, &gpu, &mut timings);
+        validate_kriging(v, &gpu, &mut timings);
+        validate_rarefaction(v, &gpu, &mut timings);
 
-    // ═══ Summary ════════════════════════════════════════════════════
-    v.section("═══ metalForge Cross-Substrate v3 Summary ═══");
-    println!();
-    println!(
-        "  {:<25} {:>10} {:>10} {:>10}",
-        "Workload", "CPU (µs)", "GPU (µs)", "Substrate"
-    );
-    println!("  {}", "─".repeat(59));
-    for (name, cpu, gpu_t, result) in &timings {
-        println!("  {name:<25} {cpu:>10.0} {gpu_t:>10.0} {result:>10}");
-    }
-    println!("  {}", "─".repeat(59));
+        // ═══ Summary ════════════════════════════════════════════════════
+        v.section("═══ metalForge Cross-Substrate v3 Summary ═══");
+        println!();
+        println!(
+            "  {:<25} {:>10} {:>10} {:>10}",
+            "Workload", "CPU (µs)", "GPU (µs)", "Substrate"
+        );
+        println!("  {}", "─".repeat(59));
+        for (name, cpu, gpu_t, result) in &timings {
+            println!("  {name:<25} {cpu:>10.0} {gpu_t:>10.0} {result:>10}");
+        }
+        println!("  {}", "─".repeat(59));
 
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("\n  16/16 domains: substrate-independent PROVEN");
-    println!("  [Total] {ms:.1} ms");
+        let ms = t0.elapsed().as_secs_f64() * 1000.0;
+        println!("\n  16/16 domains: substrate-independent PROVEN");
+        println!("  [Total] {ms:.1} ms");
     });
 }
 
@@ -718,14 +717,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_full_v3",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_metalforge_full_v3",
-        provenance_date: "2026-05-20",
-        description: "Exp093: `metalForge` Full Cross-Substrate v3 — 16 Domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_full_v3",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_metalforge_full_v3",
+            provenance_date: "2026-05-20",
+            description: "Exp093: `metalForge` Full Cross-Substrate v3 — 16 Domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

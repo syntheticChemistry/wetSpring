@@ -25,13 +25,11 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::sync::Arc;
-use crate::bio::diversity_fusion_gpu::{
-    DiversityFusionGpu, DiversityResult, diversity_fusion_cpu,
-};
+use crate::bio::diversity_fusion_gpu::{DiversityFusionGpu, DiversityResult, diversity_fusion_cpu};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::sync::Arc;
 
 fn validate_uniform(v: &mut Validator, fusion: &DiversityFusionGpu) {
     let n_species = 4;
@@ -167,15 +165,12 @@ fn check_batch_parity(cpu: &[DiversityResult], gpu: &[DiversityResult]) -> bool 
 
 /// Run the `validate_gpu_diversity_fusion` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .or_exit("tokio runtime");
 
-    let gpu = rt
-        .block_on(crate::gpu::GpuF64::new())
-        .or_exit("GPU init");
+    let gpu = rt.block_on(crate::gpu::GpuF64::new()).or_exit("GPU init");
     let device = Arc::new(gpu.to_wgpu_device());
 
     let fusion =
@@ -195,7 +190,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  CPU:   barracuda::ops::bio::diversity_fusion::diversity_fusion_cpu (S63)");
     println!("  Local: thin re-export in bio/diversity_fusion_gpu.rs");
     println!("  WGSL:  deleted (was bio/shaders/diversity_fusion_f64.wgsl)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -206,14 +200,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_diversity_fusion",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_diversity_fusion",
-        provenance_date: "2026-05-20",
-        description: "# Exp167: Diversity Fusion GPU — Lean Phase (absorbed S63)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_diversity_fusion",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_diversity_fusion",
+            provenance_date: "2026-05-20",
+            description: "# Exp167: Diversity Fusion GPU — Lean Phase (absorbed S63)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -27,10 +27,10 @@
 //!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
-use std::io::Write as IoWrite;
-use std::time::Duration;
 use crate::ncbi;
 use crate::validation::Validator;
+use std::io::Write as IoWrite;
+use std::time::Duration;
 
 fn cache_path() -> std::path::PathBuf {
     ncbi::cache_file("ncbi_producer_receiver_cache.txt")
@@ -79,7 +79,6 @@ fn save_cache(results: &[(String, String, String, u64)]) {
 #[expect(clippy::too_many_lines, clippy::cast_precision_loss)]
 /// Run the `validate_producer_receiver_qs` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Query design ──");
 
     let synthases = [
@@ -407,7 +406,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("     mixing creates transient aggregates that enable signaling.");
     println!("     These are the NP solutions: engineering geometry from chaos.");
     v.check_pass("anomalies catalogued", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -418,14 +416,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "producer_receiver_qs",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_producer_receiver_qs",
-        provenance_date: "2026-05-20",
-        description: "# Exp142: QS Producer vs Receiver Separation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "producer_receiver_qs",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_producer_receiver_qs",
+            provenance_date: "2026-05-20",
+            description: "# Exp142: QS Producer vs Receiver Separation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

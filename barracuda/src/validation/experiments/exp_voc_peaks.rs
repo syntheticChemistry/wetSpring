@@ -30,11 +30,11 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use std::path::Path;
 use crate::bio::signal::{PeakParams, find_peaks};
 use crate::bio::tolerance_search;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use std::path::Path;
 
 #[derive(Debug)]
 struct VocCompound {
@@ -81,7 +81,6 @@ fn parse_baseline(path: &Path) -> Vec<VocCompound> {
 
 /// Run the `validate_voc_peaks` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let baseline_path = validation::data_dir(
         "WETSPRING_VOC_DIR",
         "experiments/results/013_voc_baselines/reese2019_table1.tsv",
@@ -101,7 +100,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_synthetic_chromatogram(v, &compounds);
     validate_biomarker_classification(v, &compounds);
     validate_ri_tolerance_matching(v, &compounds);
-
 }
 
 fn validate_parsing(v: &mut Validator, compounds: &[VocCompound]) {
@@ -327,14 +325,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "voc_peaks",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_voc_peaks",
-        provenance_date: "2026-05-20",
-        description: "Validate peak detection and retention index matching against Reese 2019 (Exp013)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "voc_peaks",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_voc_peaks",
+            provenance_date: "2026-05-20",
+            description: "Validate peak detection and retention index matching against Reese 2019 (Exp013)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

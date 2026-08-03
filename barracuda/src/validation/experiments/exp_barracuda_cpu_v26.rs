@@ -32,7 +32,6 @@
 //!
 //! Provenance: barraCuda CPU primitive validation (V26 spectral)
 
-use std::time::Instant;
 use crate::bio::{
     diversity,
     kinetics::{haldane, monod},
@@ -40,6 +39,7 @@ use crate::bio::{
 };
 use crate::tolerances;
 use crate::validation::{DomainResult, Validator};
+use std::time::Instant;
 
 use barracuda::stats::norm_cdf;
 
@@ -410,7 +410,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "  {:30} {:>8} {:>6.2} ms  {:>3} checks",
         "TOTAL", "", total_ms, total_checks
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -421,14 +420,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v26",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v26",
-        provenance_date: "2026-05-20",
-        description: "# Exp342: `BarraCuda` CPU v26 — Track 6 Anaerobic Pure Rust Math",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v26",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v26",
+            provenance_date: "2026-05-20",
+            description: "# Exp342: `BarraCuda` CPU v26 — Track 6 Anaerobic Pure Rust Math",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

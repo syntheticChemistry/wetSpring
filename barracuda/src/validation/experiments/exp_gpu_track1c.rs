@@ -33,7 +33,6 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::time::Instant;
 use crate::bio::{
     ani, ani_gpu::AniGpu, dnds, dnds_gpu::DnDsGpu, pangenome, pangenome_gpu::PangenomeGpu, snp,
     snp_gpu::SnpGpu,
@@ -42,60 +41,59 @@ use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::time::Instant;
 
 /// Run the `validate_gpu_track1c` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    println!();
+        println!();
 
-    let device = gpu.to_wgpu_device();
-    let mut timings: Vec<(&str, f64)> = Vec::new();
+        let device = gpu.to_wgpu_device();
+        let mut timings: Vec<(&str, f64)> = Vec::new();
 
-    validate_ani_gpu(
-        &AniGpu::new(&device).or_exit("ANI GPU shader"),
-                v,
-        &mut timings,
-    );
-    validate_snp_gpu(
-        &SnpGpu::new(&device).or_exit("SNP GPU shader"),
-                v,
-        &mut timings,
-    );
-    validate_pangenome_gpu(
-        &PangenomeGpu::new(&device).or_exit("Pangenome GPU shader"),
-                v,
-        &mut timings,
-    );
-    validate_dnds_gpu(
-        &DnDsGpu::new(&device).or_exit("dN/dS GPU shader"),
-                v,
-        &mut timings,
-    );
+        validate_ani_gpu(
+            &AniGpu::new(&device).or_exit("ANI GPU shader"),
+            v,
+            &mut timings,
+        );
+        validate_snp_gpu(
+            &SnpGpu::new(&device).or_exit("SNP GPU shader"),
+            v,
+            &mut timings,
+        );
+        validate_pangenome_gpu(
+            &PangenomeGpu::new(&device).or_exit("Pangenome GPU shader"),
+            v,
+            &mut timings,
+        );
+        validate_dnds_gpu(
+            &DnDsGpu::new(&device).or_exit("dN/dS GPU shader"),
+            v,
+            &mut timings,
+        );
 
-    // Timing summary
-    v.section("═══ GPU Track 1c Timing Summary ═══");
-    println!("\n  {:<45} {:>12}", "Workload", "Time (µs)");
-    println!("  {}", "-".repeat(60));
-    for (name, us) in &timings {
-        println!("  {name:<45} {us:>12.0}");
-    }
-    let total_us: f64 = timings.iter().map(|(_, t)| t).sum();
-    println!("  {}", "-".repeat(60));
-    println!("  {:<45} {:>12.0}", "TOTAL GPU", total_us);
-    println!();
-
+        // Timing summary
+        v.section("═══ GPU Track 1c Timing Summary ═══");
+        println!("\n  {:<45} {:>12}", "Workload", "Time (µs)");
+        println!("  {}", "-".repeat(60));
+        for (name, us) in &timings {
+            println!("  {name:<45} {us:>12.0}");
+        }
+        let total_us: f64 = timings.iter().map(|(_, t)| t).sum();
+        println!("  {}", "-".repeat(60));
+        println!("  {:<45} {:>12.0}", "TOTAL GPU", total_us);
+        println!();
     });
 }
 
@@ -535,14 +533,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_track1c",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_track1c",
-        provenance_date: "2026-05-20",
-        description: "Exp058: GPU Track 1c Promotion — ANI + SNP + Pangenome + dN/dS",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_track1c",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_track1c",
+            provenance_date: "2026-05-20",
+            description: "Exp058: GPU Track 1c Promotion — ANI + SNP + Pangenome + dN/dS",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

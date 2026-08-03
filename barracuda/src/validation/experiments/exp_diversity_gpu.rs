@@ -47,32 +47,30 @@ use crate::validation::{self, Validator};
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
+        // ── GPU init
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
 
-    // ── GPU init
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        gpu.print_info();
+
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
 
-    gpu.print_info();
+        println!();
 
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-
-    println!();
-
-    validate_shannon(&gpu, v);
-    validate_simpson(&gpu, v);
-    validate_bray_curtis(&gpu, v);
-    validate_pcoa(&gpu, v);
-    validate_pairwise_l2(&gpu, v);
-    validate_alpha_diversity(&gpu, v);
-    validate_spectral_match(&gpu, v);
-    validate_stats_gpu(v, &gpu);
-
+        validate_shannon(&gpu, v);
+        validate_simpson(&gpu, v);
+        validate_bray_curtis(&gpu, v);
+        validate_pcoa(&gpu, v);
+        validate_pairwise_l2(&gpu, v);
+        validate_alpha_diversity(&gpu, v);
+        validate_spectral_match(&gpu, v);
+        validate_stats_gpu(v, &gpu);
     });
 }
 
@@ -613,14 +611,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "diversity_gpu",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_diversity_gpu",
-        provenance_date: "2026-05-20",
-        description: "GPU validation — compare all GPU results against CPU baselines",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "diversity_gpu",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_diversity_gpu",
+            provenance_date: "2026-05-20",
+            description: "GPU validation — compare all GPU results against CPU baselines",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

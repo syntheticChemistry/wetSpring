@@ -38,11 +38,11 @@
 //!
 //! Provenance: barraCuda CPU primitive validation (V23 stats domain)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, DomainResult, Validator};
+use std::time::Instant;
 
 /// Run the `validate_barracuda_cpu_v23` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -539,7 +539,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  These CPU results are the reference for GPU fused ops (Exp308).");
     println!("  GPU mean_variance_gpu → must match D41 values.");
     println!("  GPU correlation_full_gpu → must match D42 values.");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -550,14 +549,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v23",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v23",
-        provenance_date: "2026-05-20",
-        description: "# Exp306: `BarraCuda` CPU v23 — V97 Fused Ops Decomposition Parity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v23",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v23",
+            provenance_date: "2026-05-20",
+            description: "# Exp306: `BarraCuda` CPU v23 — V97 Fused Ops Decomposition Parity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

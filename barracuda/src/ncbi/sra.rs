@@ -116,11 +116,17 @@ impl std::fmt::Display for SraSource {
 ///
 /// Returns `Err` if all tiers fail.
 #[cfg(feature = "ipc")]
-pub fn fetch_sra_composed(accession: &str, output_dir: &Path) -> crate::error::Result<SraFetchResult> {
+pub fn fetch_sra_composed(
+    accession: &str,
+    output_dir: &Path,
+) -> crate::error::Result<SraFetchResult> {
     validate_accession(accession)?;
 
     std::fs::create_dir_all(output_dir).map_err(|e| {
-        Error::Ncbi(format!("cannot create output dir {}: {e}", output_dir.display()))
+        Error::Ncbi(format!(
+            "cannot create output dir {}: {e}",
+            output_dir.display()
+        ))
     })?;
 
     // Tier 1: local cache check (single-end, then paired-end forward mate)
@@ -133,7 +139,11 @@ pub fn fetch_sra_composed(accession: &str, output_dir: &Path) -> crate::error::R
     for path in &local_candidates {
         if path.exists() {
             let hash = blake3_of_file(path);
-            return Ok(SraFetchResult { path: path.clone(), blake3: hash, source: SraSource::LocalCache });
+            return Ok(SraFetchResult {
+                path: path.clone(),
+                blake3: hash,
+                source: SraSource::LocalCache,
+            });
         }
     }
 
@@ -146,7 +156,11 @@ pub fn fetch_sra_composed(accession: &str, output_dir: &Path) -> crate::error::R
                 let cached_path = PathBuf::from(cached_path_str.trim());
                 if cached_path.exists() {
                     let hash = blake3_of_file(&cached_path);
-                    return Ok(SraFetchResult { path: cached_path, blake3: hash, source: SraSource::NestGate });
+                    return Ok(SraFetchResult {
+                        path: cached_path,
+                        blake3: hash,
+                        source: SraSource::NestGate,
+                    });
                 }
             }
         }
@@ -162,7 +176,11 @@ pub fn fetch_sra_composed(accession: &str, output_dir: &Path) -> crate::error::R
         let _ = super::nestgate::store(sock, &cache_key, &downloaded.to_string_lossy());
     }
 
-    Ok(SraFetchResult { path: downloaded, blake3: hash, source: SraSource::SraToolkit })
+    Ok(SraFetchResult {
+        path: downloaded,
+        blake3: hash,
+        source: SraSource::SraToolkit,
+    })
 }
 
 /// BLAKE3 hash of a file on disk; returns "unavailable" if the file can't be read.
@@ -215,6 +233,16 @@ fn validate_accession(accession: &str) -> crate::error::Result<()> {
 }
 
 /// Run `fasterq-dump` to download a run.
+///
+/// # External dependency (last-resort fallback)
+///
+/// This function shells out to `fasterq-dump`, an external C binary from the
+/// [NCBI SRA Toolkit](https://github.com/ncbi/sra-tools). It is invoked only
+/// when higher tiers fail: local cache misses and [`fetch_sra_composed`] cannot
+/// satisfy the request via NestGate data federation (`nest.fetch` / cache key
+/// `sra:fastq:{accession}`). Prefer NestGate-backed fetch whenever the socket
+/// is available — SRA Toolkit is a last-resort fallback for environments
+/// without federated storage.
 fn run_fasterq_dump(
     accession: &str,
     output_dir: &Path,

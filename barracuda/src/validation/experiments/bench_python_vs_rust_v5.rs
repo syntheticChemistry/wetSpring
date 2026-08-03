@@ -31,11 +31,11 @@
 //!
 //! Provenance: Python vs Rust parity benchmark (V5)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::kinetics::{haldane, monod};
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 #[expect(
     dead_code,
@@ -355,7 +355,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!();
     println!("  Pure Rust math proven bit-identical to Python/SciPy for Track 6 domains");
     println!("  Chain: Paper (Exp341) → CPU (Exp342) → Python parity (this) → GPU (Exp344)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -366,14 +365,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "python_vs_rust_v5",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_python_vs_rust_v5",
-        provenance_date: "2026-05-20",
-        description: "# Exp343: Python vs Rust Benchmark v5 — Track 6 Anaerobic Parity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "python_vs_rust_v5",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_python_vs_rust_v5",
+            provenance_date: "2026-05-20",
+            description: "# Exp343: Python vs Rust Benchmark v5 — Track 6 Anaerobic Parity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -77,7 +77,11 @@ fn error_reads_differ_from_reference() {
         .iter()
         .map(|r| {
             let expected = &reference[r.true_position..r.true_position + config.read_length];
-            r.sequence.iter().zip(expected.iter()).filter(|(a, b)| a != b).count()
+            r.sequence
+                .iter()
+                .zip(expected.iter())
+                .filter(|(a, b)| a != b)
+                .count()
         })
         .sum();
     assert!(mismatches > 0, "high error rate should produce mismatches");
@@ -134,13 +138,29 @@ fn mapq_model_from_mixed_training() {
     // Gap 5: 99% correct → MAPQ = -10*log10(0.01) = 20
     let mut samples = Vec::new();
     for _ in 0..50 {
-        samples.push(CalibrationSample { score_gap: 0, n_candidates: 3, correct: true });
-        samples.push(CalibrationSample { score_gap: 0, n_candidates: 3, correct: false });
+        samples.push(CalibrationSample {
+            score_gap: 0,
+            n_candidates: 3,
+            correct: true,
+        });
+        samples.push(CalibrationSample {
+            score_gap: 0,
+            n_candidates: 3,
+            correct: false,
+        });
     }
     for _ in 0..99 {
-        samples.push(CalibrationSample { score_gap: 5, n_candidates: 2, correct: true });
+        samples.push(CalibrationSample {
+            score_gap: 5,
+            n_candidates: 2,
+            correct: true,
+        });
     }
-    samples.push(CalibrationSample { score_gap: 5, n_candidates: 2, correct: false });
+    samples.push(CalibrationSample {
+        score_gap: 5,
+        n_candidates: 2,
+        correct: false,
+    });
 
     let model = MapqModel::from_training_data(&samples);
     let mapq_0 = model.lookup(0);
@@ -173,7 +193,11 @@ fn calibrate_small_reference() {
 
     assert_eq!(stats.total_reads, 50);
     assert!(stats.mapped > 0, "at least some reads should map");
-    assert!(stats.accuracy() > 0.5, "accuracy should be reasonable: {}", stats.accuracy());
+    assert!(
+        stats.accuracy() > 0.5,
+        "accuracy should be reasonable: {}",
+        stats.accuracy()
+    );
     assert!(model.max_gap() > 0);
 }
 

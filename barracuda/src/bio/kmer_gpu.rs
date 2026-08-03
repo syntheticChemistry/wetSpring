@@ -11,6 +11,7 @@
 //! For short k (4-8), the histogram fits in L1; for k=16, 4^16 = 4 GB — only
 //! practical with streaming or hash-based approaches.
 
+use crate::cast;
 use barracuda::KmerHistogramGpu;
 use barracuda::device::WgpuDevice;
 use std::sync::Arc;
@@ -49,10 +50,6 @@ impl KmerGpu {
     /// # Errors
     ///
     /// Returns `Err` if GPU buffer readback fails.
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "Truncation: hist_len = 4^k, k small, fits u32"
-    )]
     pub fn count_histogram(
         &self,
         kmer_indices: &[u32],
@@ -81,7 +78,8 @@ impl KmerGpu {
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
         });
 
-        self.inner.dispatch(&kmer_buf, &hist_buf, n_kmers as u32, k);
+        self.inner
+            .dispatch(&kmer_buf, &hist_buf, cast::usize_u32(n_kmers), k);
         let _ = d.poll(wgpu::PollType::Wait {
             submission_index: None,
             timeout: None,
@@ -107,7 +105,7 @@ impl KmerGpu {
         sequence: &[u8],
         k: u32,
     ) -> crate::error::Result<KmerGpuResult> {
-        let ku = k as usize;
+        let ku = cast::u32_usize(k);
         if sequence.len() < ku {
             return Ok(KmerGpuResult {
                 histogram: vec![0u32; 4_usize.pow(k)],

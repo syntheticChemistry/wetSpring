@@ -22,14 +22,14 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use serde_json::json;
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::ipc::dispatch;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use serde_json::json;
+use std::time::Instant;
 
 // ── D01: Dispatch↔Direct Diversity Parity ────────────────────────────────────
 
@@ -377,7 +377,6 @@ fn validate_dispatch_errors(v: &mut Validator) {
 
 /// Run the `validate_barracuda_cpu_v11` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let t_total = Instant::now();
 
     validate_diversity_dispatch_parity(v);
@@ -389,7 +388,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_dispatch_errors(v);
 
     println!("\n  Total wall-clock: {} ms", t_total.elapsed().as_millis());
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -400,14 +398,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v11",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_barracuda_cpu_v11",
-        provenance_date: "2026-05-20",
-        description: "Exp206: `BarraCuda` CPU Parity v11 — IPC Dispatch Layer Math Fidelity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v11",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_barracuda_cpu_v11",
+            provenance_date: "2026-05-20",
+            description: "Exp206: `BarraCuda` CPU Parity v11 — IPC Dispatch Layer Math Fidelity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

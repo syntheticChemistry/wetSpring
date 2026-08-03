@@ -380,6 +380,7 @@ fn grammar_response(
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     super::grammar::render_grammar(grammar, data, domain).map_or_else(
         || {
+            tracing::debug!("petalTongue RPC not reachable — falling back to Plotly.js renderer");
             Err((
                 StatusCode::SERVICE_UNAVAILABLE,
                 Json(json!({

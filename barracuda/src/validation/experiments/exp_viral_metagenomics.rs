@@ -32,12 +32,10 @@ use crate::validation::Validator;
 
 /// Run the `validate_viral_metagenomics` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_community_diversity(v);
     validate_dnds_analytical(v);
     validate_dnds_python_parity(v);
     validate_spectral_comparison(v);
-
 }
 
 fn validate_community_diversity(v: &mut Validator) {
@@ -264,14 +262,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "viral_metagenomics",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_viral_metagenomics",
-        provenance_date: "2026-05-20",
-        description: "Exp052 — Anderson 2014: Viral metagenomics at hydrothermal vents",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "viral_metagenomics",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_viral_metagenomics",
+            provenance_date: "2026-05-20",
+            description: "Exp052 — Anderson 2014: Viral metagenomics at hydrothermal vents",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

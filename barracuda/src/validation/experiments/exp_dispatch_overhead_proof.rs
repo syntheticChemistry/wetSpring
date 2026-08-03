@@ -20,13 +20,13 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::time::Instant;
 use crate::bio::{diversity, streaming_gpu};
 use crate::tolerances;
 use crate::validation::{self, Validator, test_data};
+use std::time::Instant;
 
-use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use crate::validation::OrExit;
+use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 
 const BATCH_SIZES: &[usize] = &[64, 256, 1024, 4096];
 const REPEATS: usize = 5;
@@ -172,14 +172,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "dispatch_overhead_proof",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_dispatch_overhead_proof",
-        provenance_date: "2026-05-20",
-        description: "Exp073: Compute Dispatch Overhead — Streaming vs Individual vs CPU",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "dispatch_overhead_proof",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_dispatch_overhead_proof",
+            provenance_date: "2026-05-20",
+            description: "Exp073: Compute Dispatch Overhead — Streaming vs Individual vs CPU",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

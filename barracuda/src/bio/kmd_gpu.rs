@@ -40,6 +40,7 @@ pub fn kendrick_mass_defect_gpu(
     require_f64(gpu)?;
 
     if exact_masses.len() < 64 {
+        tracing::debug!("GPU dispatch threshold not met, using CPU fallback for KMD");
         return Ok(kmd::kendrick_mass_defect(
             exact_masses,
             exact_unit,
@@ -60,6 +61,7 @@ pub fn kendrick_mass_defect_gpu(
     // confirms the device works. The actual per-element KMD is computed
     // with the CPU kernel for exact bit-parity until barraCuda provides
     // a per-element map-output primitive.
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for KMD computation");
     Ok(kmd::kendrick_mass_defect(
         exact_masses,
         exact_unit,

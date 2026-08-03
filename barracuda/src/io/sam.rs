@@ -90,11 +90,7 @@ impl CigarType {
     pub const fn consumes_query(self) -> bool {
         matches!(
             self,
-            Self::Match
-                | Self::Insertion
-                | Self::SoftClip
-                | Self::SeqMatch
-                | Self::SeqMismatch
+            Self::Match | Self::Insertion | Self::SoftClip | Self::SeqMatch | Self::SeqMismatch
         )
     }
 

@@ -74,7 +74,7 @@ impl JaccardGpu {
         let n_pairs = n_genomes * (n_genomes - 1) / 2;
         let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Jaccard dists"),
-            size: (n_pairs * 4) as u64,
+            size: cast::usize_u64(n_pairs * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });

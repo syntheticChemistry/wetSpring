@@ -413,7 +413,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  groundSpring → Bootstrap, jackknife, regression");
     println!("  wetSpring  → Bio diversity (Shannon, Bray-Curtis, fusion)");
     println!("  ═════════════════════════════════════════════════════════════════");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -424,14 +423,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "s86_streaming_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_s86_streaming_pipeline",
-        provenance_date: "2026-05-20",
-        description: "# Exp300: S86 Streaming Pipeline — Spectral + Graph + Sampling",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "s86_streaming_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_s86_streaming_pipeline",
+            provenance_date: "2026-05-20",
+            description: "# Exp300: S86 Streaming Pipeline — Spectral + Graph + Sampling",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

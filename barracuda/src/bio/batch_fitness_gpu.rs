@@ -69,7 +69,7 @@ impl BatchFitnessGpuWrapper {
         });
         let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Fitness output"),
-            size: (pop_size * 4) as u64,
+            size: cast::usize_u64(pop_size * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });

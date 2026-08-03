@@ -26,10 +26,10 @@
 //!
 //! Provenance: barraCuda GPU primitive validation (V14 Track 3)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::{self, DomainResult, Validator};
+use std::time::Instant;
 
 #[cfg(feature = "gpu")]
 use crate::bio::{diversity_gpu, stats_gpu};
@@ -329,7 +329,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         println!("  GPU math PROVEN portable — identical to CPU reference (Exp323)");
         println!("  ToadStool dispatch: {fp64} strategy, {provenance_count} shaders tracked");
         println!("  Chain: CPU → GPU (this) → CPU-vs-GPU → metalForge");
-
     }
 }
 
@@ -341,14 +340,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_gpu_v14",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_gpu_v14",
-        provenance_date: "2026-05-20",
-        description: "# Exp324: `BarraCuda` GPU v14 — V99 GPU Portability + `ToadStool` Dispatch",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_gpu_v14",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_gpu_v14",
+            provenance_date: "2026-05-20",
+            description: "# Exp324: `BarraCuda` GPU v14 — V99 GPU Portability + `ToadStool` Dispatch",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

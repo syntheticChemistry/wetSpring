@@ -319,7 +319,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  D39: Pharmacology (Hill/PK/selectivity)");
     println!("  D40: Statistics (bootstrap/jackknife/regression)");
     println!("  Total: {total_ms:.1} ms — pure Rust, faster than Python");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -330,14 +329,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v22",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v22",
-        provenance_date: "2026-05-20",
-        description: "# Exp292: `BarraCuda` CPU v22 — Comprehensive Paper Parity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v22",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v22",
+            provenance_date: "2026-05-20",
+            description: "# Exp292: `BarraCuda` CPU v22 — Comprehensive Paper Parity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

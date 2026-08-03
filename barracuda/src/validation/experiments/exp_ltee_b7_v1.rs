@@ -46,7 +46,6 @@ fn mutation_accumulation_linear(generations: u64) -> f64 {
 
 /// Run the `validate_ltee_b7_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════════
     // SECTION 1: Population Structure
     // ═══════════════════════════════════════════════════════════════════
@@ -76,7 +75,12 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Genome-wide rate: {genome_wide_rate:.4e} mutations/generation");
     v.check("genome_wide_rate", genome_wide_rate, 4.12e-4, 5e-5);
 
-    v.check("mutator_rate_multiplier", MUTATOR_RATE_MULTIPLIER, 100.0, 50.0);
+    v.check(
+        "mutator_rate_multiplier",
+        MUTATOR_RATE_MULTIPLIER,
+        100.0,
+        50.0,
+    );
     println!("  Mutator populations (Ara-1 etc.) ~100× higher rate");
 
     // ═══════════════════════════════════════════════════════════════════
@@ -127,7 +131,10 @@ pub fn run(v: &mut crate::validation::Validator) {
     }
     v.check("spectrum_sum", spectrum_sum, 1.0, 0.01);
     println!("  Spectrum sum: {spectrum_sum:.4} (should be ~1.0)");
-    println!("  Dominant bias: G:C→A:T ({:.0}%)", GC_TO_AT_FRACTION * 100.0);
+    println!(
+        "  Dominant bias: G:C→A:T ({:.0}%)",
+        GC_TO_AT_FRACTION * 100.0
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // SECTION 5: Model Validation
@@ -142,9 +149,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     let slope = linear_slope(&generations, &expected);
     let expected_slope = NONMUTATOR_RATE_PER_BP_PER_GEN * GENOME_LENGTH_BP as f64;
     v.check_relative("slope_vs_rate", slope, expected_slope, 0.05);
-    println!(
-        "  Slope: {slope:.6e} mutations/gen (rate predicts {expected_slope:.6e})"
-    );
+    println!("  Slope: {slope:.6e} mutations/gen (rate predicts {expected_slope:.6e})");
 
     // ═══════════════════════════════════════════════════════════════════
     // SECTION 6: Provenance
@@ -156,7 +161,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Tier:       2 (Rust validation binary)");
     println!("  lithoSpore: Module 6 (ltee-genomics)");
     println!("  Spring:     wetSpring V168");
-
 }
 
 #[expect(clippy::cast_precision_loss, reason = "u64 gen counts fit in f64")]
@@ -212,14 +216,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "ltee_b7_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_ltee_b7_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp380: LTEE B7 — Tenaillon 2016 Mutation Accumulation (Tier 2)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "ltee_b7_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_ltee_b7_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp380: LTEE B7 — Tenaillon 2016 Mutation Accumulation (Tier 2)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

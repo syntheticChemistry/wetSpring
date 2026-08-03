@@ -157,7 +157,10 @@ pub fn neural_api_socket() -> Option<PathBuf> {
         Some(std::env::temp_dir().join(&sock_name)),
     ];
 
-    candidates.into_iter().flatten().find(|p| super::discover::socket_is_alive(p))
+    candidates
+        .into_iter()
+        .flatten()
+        .find(|p| super::discover::socket_is_alive(p))
 }
 
 /// Send a `capability.call` JSON-RPC request to the Neural API.
@@ -325,7 +328,7 @@ pub fn complete_session(session_id: &str) -> Value {
             "primals_reached": primals_reached,
         });
     };
-    primals_reached.push("rhizoCrypt");
+    primals_reached.push(crate::primal_names::RHIZOCRYPT_DISPLAY);
 
     let merkle_root = json_str_or(&dehydration, "merkle_root", "").to_string();
 
@@ -340,7 +343,7 @@ pub fn complete_session(session_id: &str) -> Value {
             "primals_reached": primals_reached,
         });
     };
-    primals_reached.push("loamSpine");
+    primals_reached.push(crate::primal_names::LOAMSPINE_DISPLAY);
 
     let commit_id = commit_result
         .get("commit_id")
@@ -353,7 +356,7 @@ pub fn complete_session(session_id: &str) -> Value {
     let braid_id = sweetgrass::create_attribution_braid(&socket, &commit_id)
         .ok()
         .and_then(|r| {
-            primals_reached.push("sweetGrass");
+            primals_reached.push(crate::primal_names::SWEETGRASS_DISPLAY);
             let id = r.get("braid_id").or_else(|| r.get("id"));
             id.and_then(Value::as_str).map(str::to_string)
         })

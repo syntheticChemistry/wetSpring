@@ -25,8 +25,8 @@ mod s56_primitives;
 
 use std::sync::Arc;
 
-use barracuda::spectral::{lanczos, lanczos_eigenvalues};
 use crate::validation::{self, CrossSpringEntry, OrExit, dense_to_csr};
+use barracuda::spectral::{lanczos, lanczos_eigenvalues};
 
 fn eigenvalues_from_dense(matrix: &[f64], n: usize) -> Vec<f64> {
     let csr = dense_to_csr(matrix, n);
@@ -72,22 +72,21 @@ fn readback_f32(
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-    println!("════════════════════════════════════════════════════════════════════");
-    println!("  Exp162: Cross-Spring S57 Evolution — Rewire + Validate + Benchmark");
-    println!("  Proving: neuralSpring graph/MCMC primitives benefit wetSpring bio");
-    println!("════════════════════════════════════════════════════════════════════\n");
+        println!("════════════════════════════════════════════════════════════════════");
+        println!("  Exp162: Cross-Spring S57 Evolution — Rewire + Validate + Benchmark");
+        println!("  Proving: neuralSpring graph/MCMC primitives benefit wetSpring bio");
+        println!("════════════════════════════════════════════════════════════════════\n");
 
-    let gpu = validation::gpu_or_skip().await;
-    let device = gpu.to_wgpu_device();
+        let gpu = validation::gpu_or_skip().await;
+        let device = gpu.to_wgpu_device();
 
-    let mut bench_results: Vec<CrossSpringEntry> = Vec::new();
+        let mut bench_results: Vec<CrossSpringEntry> = Vec::new();
 
-    s54_primitives::validate(v, &mut bench_results);
-    s56_primitives::validate(v, &mut bench_results);
-    gpu_regression::validate_compound(v, &mut bench_results);
-    gpu_regression::validate_gpu_primitives(v, &device);
-    gpu_regression::print_summary(&bench_results);
-
+        s54_primitives::validate(v, &mut bench_results);
+        s56_primitives::validate(v, &mut bench_results);
+        gpu_regression::validate_compound(v, &mut bench_results);
+        gpu_regression::validate_gpu_primitives(v, &device);
+        gpu_regression::print_summary(&bench_results);
     });
 }
 
@@ -99,14 +98,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_s57",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cross_spring_s57",
-        provenance_date: "2026-05-20",
-        description: "Exp162: Cross-Spring S57 Evolution — Rewire + Validate + Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_s57",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cross_spring_s57",
+            provenance_date: "2026-05-20",
+            description: "Exp162: Cross-Spring S57 Evolution — Rewire + Validate + Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

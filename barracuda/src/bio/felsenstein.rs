@@ -16,6 +16,8 @@
 //! can be computed independently. barraCuda can dispatch one workgroup
 //! per site with shared memory for the transition matrix.
 
+use crate::cast;
+
 /// Nucleotide states: A=0, C=1, G=2, T=3.
 pub const N_STATES: usize = 4;
 
@@ -218,7 +220,7 @@ impl FlatTree {
                 TreeNode::Leaf { states, .. } => {
                     let idx = c.leaf_seqs.len();
                     c.leaf_seqs.push(states.clone());
-                    -(idx as i32 + 1)
+                    -(cast::usize_i32(idx) + 1)
                 }
                 TreeNode::Internal {
                     left,
@@ -368,7 +370,7 @@ impl FlatTree {
             }
             p
         } else {
-            partials[child as usize]
+            partials[cast::i32_usize(child)]
         }
     }
 }

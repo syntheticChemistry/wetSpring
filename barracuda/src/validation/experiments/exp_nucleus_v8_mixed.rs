@@ -27,10 +27,6 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use serde_json::{Value, json};
-use std::io::Write;
-use std::path::PathBuf;
-use std::time::{Duration, Instant};
 use crate::bio::{derep, diversity, quality};
 use crate::cast::usize_f64;
 use crate::io::fastq::{self, FastqRefRecord};
@@ -41,6 +37,10 @@ use crate::ipc::metrics::Metrics;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use serde_json::{Value, json};
+use std::io::Write;
+use std::path::PathBuf;
+use std::time::{Duration, Instant};
 
 fn temp_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("wetspring_exp214_{name}"))
@@ -534,7 +534,6 @@ fn validate_dispatch_routing(v: &mut Validator) {
 
 /// Run the `validate_nucleus_v8_mixed` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_tower_capabilities(v);
     validate_fastq_diversity_dispatch(v);
     validate_nanopore_signal(v);
@@ -543,7 +542,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_cpu_fallback(v);
     validate_full_pipeline(v);
     validate_dispatch_routing(v);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -554,14 +552,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nucleus_v8_mixed",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_nucleus_v8_mixed",
-        provenance_date: "2026-05-20",
-        description: "# Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution via IPC",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nucleus_v8_mixed",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_nucleus_v8_mixed",
+            provenance_date: "2026-05-20",
+            description: "# Exp214: NUCLEUS Mixed Hardware V8 — V66 I/O Evolution via IPC",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

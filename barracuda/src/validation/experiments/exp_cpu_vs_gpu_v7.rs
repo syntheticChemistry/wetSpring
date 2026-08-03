@@ -29,9 +29,7 @@
 
 use std::time::Instant;
 
-use crate::bio::{
-    diversity, diversity_gpu, kmd, kmd_gpu, kmer, kmer_gpu, kriging, pcoa, pcoa_gpu,
-};
+use crate::bio::{diversity, diversity_gpu, kmd, kmd_gpu, kmer, kmer_gpu, kriging, pcoa, pcoa_gpu};
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
@@ -416,7 +414,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let total_ms = t_total.elapsed().as_secs_f64() * 1000.0;
     println!("  Elapsed: {total_ms:.1} ms\n");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -427,14 +424,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_v7",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_vs_gpu_v7",
-        provenance_date: "2026-05-20",
-        description: "# Exp264: CPU vs GPU v7 — 5 New Domains Head-to-Head (G17–G21 Parity)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_v7",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_vs_gpu_v7",
+            provenance_date: "2026-05-20",
+            description: "# Exp264: CPU vs GPU v7 — 5 New Domains Head-to-Head (G17–G21 Parity)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -35,13 +35,11 @@ use crate::validation::Validator;
 
 /// Run the `validate_phosphorus_phylogenomics` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_molecular_clock(v);
     validate_dtl_reconciliation(v);
     validate_rf_distance(v);
     validate_python_parity(v);
     validate_cross_exp053(v);
-
 }
 
 fn validate_molecular_clock(v: &mut Validator) {
@@ -227,14 +225,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "phosphorus_phylogenomics",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_phosphorus_phylogenomics",
-        provenance_date: "2026-05-20",
-        description: "Exp054 — Boden & Anderson 2024: Phosphorus-cycling enzyme phylogenomics",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "phosphorus_phylogenomics",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_phosphorus_phylogenomics",
+            provenance_date: "2026-05-20",
+            description: "Exp054 — Boden & Anderson 2024: Phosphorus-cycling enzyme phylogenomics",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

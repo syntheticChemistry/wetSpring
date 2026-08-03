@@ -252,11 +252,7 @@ fn cmd_serve(
     server.run();
 }
 
-fn cmd_benchmark(
-    scenario_id: Option<&str>,
-    list: bool,
-    format: cli::OutputFormat,
-) {
+fn cmd_benchmark(scenario_id: Option<&str>, list: bool, format: cli::OutputFormat) {
     let registry = scenarios::build_benchmark_registry();
     let json_mode = matches!(format, cli::OutputFormat::Json);
 

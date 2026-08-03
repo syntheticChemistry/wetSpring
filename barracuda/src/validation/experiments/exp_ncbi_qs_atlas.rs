@@ -17,10 +17,10 @@
 //!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::ncbi_data::{biome_diversity_params, load_biome_projects};
 use crate::validation::Validator;
+use std::time::Instant;
 
 #[cfg(feature = "gpu")]
 use barracuda::spectral::{
@@ -71,7 +71,6 @@ type AtlasEntry = (String, f64, f64, f64, Option<f64>, Option<&'static str>);
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_ncbi_qs_atlas` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Load biome data ──");
     let t0 = Instant::now();
     let (projects, is_ncbi) = load_biome_projects();
@@ -244,7 +243,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         v.section("── S7: Clustering ──");
         println!("  [skipped]");
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -255,14 +253,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "ncbi_qs_atlas",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_ncbi_qs_atlas",
-        provenance_date: "2026-05-20",
-        description: "# Exp126: Global QS-Disorder Atlas from NCBI 16S Surveys",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "ncbi_qs_atlas",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_ncbi_qs_atlas",
+            provenance_date: "2026-05-20",
+            description: "# Exp126: Global QS-Disorder Atlas from NCBI 16S Surveys",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

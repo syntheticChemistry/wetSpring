@@ -15,6 +15,7 @@
 //!   wetSpring's custom shader. One thread per pair, with CPU fallback for
 //!   N < 32 samples.
 
+use crate::cast;
 use crate::error::{Error, Result};
 use crate::gpu::GpuF64;
 use barracuda::ops::bray_curtis_f64::BrayCurtisF64;
@@ -217,11 +218,7 @@ pub fn alpha_diversity_session(
         });
     }
 
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "f32 session: intentional narrowing"
-    )]
-    let proportions_f32: Vec<f32> = counts.iter().map(|&c| (c / total) as f32).collect();
+    let proportions_f32: Vec<f32> = counts.iter().map(|&c| cast::f64_f32(c / total)).collect();
 
     let mut session = TensorSession::with_device(ctx.device_arc());
     let props = session
@@ -249,11 +246,7 @@ pub fn alpha_diversity_session(
         .map(|&p| -f64::from(p) * f64::from(p).ln())
         .sum();
 
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "species count fits in f64 mantissa"
-    )]
-    let observed: f64 = counts.iter().filter(|&&c| c > 0.0).count() as f64;
+    let observed: f64 = cast::usize_f64(counts.iter().filter(|&&c| c > 0.0).count());
     let chao1 = super::diversity::chao1(counts);
     let evenness = if observed > 1.0 {
         shannon / observed.ln()

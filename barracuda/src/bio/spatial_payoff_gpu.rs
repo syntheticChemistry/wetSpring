@@ -74,7 +74,7 @@ impl SpatialPayoffGpuWrapper {
         });
         let fit_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Spatial fitness"),
-            size: (n * 4) as u64,
+            size: cast::usize_u64(n * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });

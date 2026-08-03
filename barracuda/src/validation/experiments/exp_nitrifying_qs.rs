@@ -34,7 +34,6 @@ struct CommunityQsData {
 
 /// Run the `validate_nitrifying_qs` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("§1 Published Data (npj Biofilms 2021)");
 
     let sludge = CommunityQsData {
@@ -139,7 +138,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "sludge QS gene count confirms Anderson extended prediction",
         true,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -150,14 +148,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nitrifying_qs",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_nitrifying_qs",
-        provenance_date: "2026-05-20",
-        description: "# Exp153: Nitrifying Community QS — Functional Metagenomics",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nitrifying_qs",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_nitrifying_qs",
+            provenance_date: "2026-05-20",
+            description: "# Exp153: Nitrifying Community QS — Functional Metagenomics",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

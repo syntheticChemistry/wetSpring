@@ -117,7 +117,6 @@ pub mod pangenome;
 #[cfg(feature = "gpu")]
 pub mod pangenome_gpu;
 pub mod pcoa;
-pub mod pileup;
 #[cfg(feature = "gpu")]
 pub mod pcoa_gpu;
 #[cfg(feature = "barracuda-lib")]
@@ -125,6 +124,7 @@ pub mod phage_defense;
 #[cfg(feature = "gpu")]
 pub mod phage_defense_gpu;
 pub mod phred;
+pub mod pileup;
 pub mod placement;
 #[cfg(feature = "barracuda-lib")]
 pub mod qs_biofilm;
@@ -138,9 +138,9 @@ pub mod random_forest_gpu;
 pub mod rarefaction_gpu;
 pub mod read_mapper;
 pub mod reconciliation;
-pub mod ref_index;
 #[cfg(feature = "gpu")]
 pub mod reconciliation_gpu;
+pub mod ref_index;
 pub mod robinson_foulds;
 #[cfg(feature = "gpu")]
 pub mod robinson_foulds_gpu;

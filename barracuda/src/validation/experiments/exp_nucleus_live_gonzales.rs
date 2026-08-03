@@ -31,13 +31,12 @@
 //! | Date | 2026-04-17 |
 //! | Command | `cargo run --features ipc --bin validate_nucleus_live_gonzales` |
 
-use serde_json::json;
 use crate::ipc::dispatch::dispatch;
 use crate::validation::Validator;
+use serde_json::json;
 
 /// Run the `validate_nucleus_live_gonzales` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // D01: wetSpring science composition health (composition.science_health)
     // ═══════════════════════════════════════════════════════════════
@@ -307,7 +306,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     }
 
     v.check_pass("pipeline: all science computations succeed", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -318,14 +316,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nucleus_live_gonzales",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_nucleus_live_gonzales",
-        provenance_date: "2026-05-20",
-        description: "# Exp311: Live NUCLEUS Gonzales — Full Stack Deployment Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nucleus_live_gonzales",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_nucleus_live_gonzales",
+            provenance_date: "2026-05-20",
+            description: "# Exp311: Live NUCLEUS Gonzales — Full Stack Deployment Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

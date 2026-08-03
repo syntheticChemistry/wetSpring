@@ -24,7 +24,6 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::{
     decision_tree::DecisionTree,
     gbm::{GbmClassifier, GbmMultiClassifier, GbmTree},
@@ -33,6 +32,7 @@ use crate::bio::{
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 /// Run the `validate_barracuda_cpu_v5` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -416,7 +416,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  {}", "─".repeat(55));
     println!("  {:<40} {total:>12.0}", "TOTAL");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -427,14 +426,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v5",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v5",
-        provenance_date: "2026-05-20",
-        description: "Exp061/062: `BarraCuda` CPU Parity v5 — Random Forest + GBM",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v5",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v5",
+            provenance_date: "2026-05-20",
+            description: "Exp061/062: `BarraCuda` CPU Parity v5 — Random Forest + GBM",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

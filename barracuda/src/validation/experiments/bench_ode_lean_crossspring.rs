@@ -23,10 +23,6 @@
 
 use std::time::Instant;
 
-use barracuda::numerical::ode_generic::{BatchedOdeRK4, OdeSystem};
-use barracuda::numerical::{
-    BistableOde, CapacitorOde, CooperationOde, MultiSignalOde, PhageDefenseOde,
-};
 use crate::bio::bistable::BistableParams;
 use crate::bio::capacitor::CapacitorParams;
 use crate::bio::cooperation::CooperationParams;
@@ -34,6 +30,10 @@ use crate::bio::multi_signal::MultiSignalParams;
 use crate::bio::phage_defense::PhageDefenseParams;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::numerical::ode_generic::{BatchedOdeRK4, OdeSystem};
+use barracuda::numerical::{
+    BistableOde, CapacitorOde, CooperationOde, MultiSignalOde, PhageDefenseOde,
+};
 
 const DT: f64 = 0.01;
 const N_STEPS: usize = 4800;
@@ -61,7 +61,6 @@ struct SystemBench {
 
 /// Run the `benchmark_ode_lean_crossspring` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     println!("  This benchmark validates the complete lean: all 5 biological ODE");
     println!("  systems now use ToadStool's generate_shader() for GPU WGSL and");
     println!("  integrate_cpu() for CPU parity. No local WGSL files remain.\n");
@@ -435,7 +434,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "all parity diffs finite",
         benches.iter().all(|b| b.max_diff.is_finite()),
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -446,14 +444,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "ode_lean_crossspring",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_ode_lean_crossspring",
-        provenance_date: "2026-05-20",
-        description: "Benchmark: ODE Lean Validation + Cross-Spring Evolution",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "ode_lean_crossspring",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_ode_lean_crossspring",
+            provenance_date: "2026-05-20",
+            description: "Benchmark: ODE Lean Validation + Cross-Spring Evolution",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

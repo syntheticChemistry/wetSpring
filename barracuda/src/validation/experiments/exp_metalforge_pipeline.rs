@@ -25,13 +25,13 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use std::collections::HashMap;
-use std::fmt;
-use std::time::Instant;
 use crate::bio::{kmer, taxonomy, unifrac};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::collections::HashMap;
+use std::fmt;
+use std::time::Instant;
 
 // ═══════════════════════════════════════════════════════════
 //  Local substrate router (mirrors metalForge/forge dispatch)
@@ -510,14 +510,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_metalforge_pipeline",
-        provenance_date: "2026-05-20",
-        description: "Exp086: `metalForge` End-to-End Pipeline Proof",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_metalforge_pipeline",
+            provenance_date: "2026-05-20",
+            description: "Exp086: `metalForge` End-to-End Pipeline Proof",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

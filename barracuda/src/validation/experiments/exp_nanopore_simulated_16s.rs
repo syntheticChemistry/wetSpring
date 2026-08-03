@@ -139,7 +139,6 @@ fn classify_read(read: &[u8], n_species: usize) -> usize {
 
 /// Run the `validate_nanopore_simulated_16s` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── S1: Even community ─────────────────────────────────────
 
     v.section("── S1: Even community (4 species, equal abundance) ──");
@@ -279,7 +278,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Bray-Curtis(even vs uneven): {bc_diff:.4}");
     v.check_pass("Bray-Curtis(even vs uneven) > 0.0", bc_diff > 0.0);
     v.check_pass("Bray-Curtis(even vs uneven) < 1.0", bc_diff < 1.0);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -290,14 +288,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nanopore_simulated_16s",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_nanopore_simulated_16s",
-        provenance_date: "2026-05-20",
-        description: "# Exp196b: Simulated Long-Read 16S Through `BarraCuda` Pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nanopore_simulated_16s",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_nanopore_simulated_16s",
+            provenance_date: "2026-05-20",
+            description: "# Exp196b: Simulated Long-Read 16S Through `BarraCuda` Pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

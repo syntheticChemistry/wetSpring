@@ -25,14 +25,14 @@
 
 use std::time::Instant;
 
-use barracuda::spectral::{
-    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
-};
-use barracuda::stats::{fit_exponential, hill, mean, r_squared};
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::spectral::{
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+};
+use barracuda::stats::{fit_exponential, hill, mean, r_squared};
 
 const TOL: f64 = tolerances::ANALYTICAL_F64;
 
@@ -396,7 +396,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
     println!("╚═════════════════════════╩════════════╩═══════════════════════╝");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -407,14 +406,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gonzales_cpu_parity",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_gonzales_cpu_parity",
-        provenance_date: "2026-05-20",
-        description: "# Exp283: CPU Parity — Gonzales Reproductions (Papers 53-56)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gonzales_cpu_parity",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_gonzales_cpu_parity",
+            provenance_date: "2026-05-20",
+            description: "# Exp283: CPU Parity — Gonzales Reproductions (Papers 53-56)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

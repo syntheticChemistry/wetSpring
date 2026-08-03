@@ -225,21 +225,19 @@ fn validate_edge_cases(v: &mut Validator, gpu: &GpuF64) {
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
-        }
-    };
-    gpu.print_info();
-
-    validate_ordinary(v, &gpu);
-    validate_simple(v, &gpu);
-    validate_variogram(v);
-    validate_edge_cases(v, &gpu);
-
+        validate_ordinary(v, &gpu);
+        validate_simple(v, &gpu);
+        validate_variogram(v);
+        validate_edge_cases(v, &gpu);
     });
 }
 
@@ -251,14 +249,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "kriging",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_kriging",
-        provenance_date: "2026-05-20",
-        description: "# Exp280: Kriging Spatial Diversity Interpolation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "kriging",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_kriging",
+            provenance_date: "2026-05-20",
+            description: "# Exp280: Kriging Spatial Diversity Interpolation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

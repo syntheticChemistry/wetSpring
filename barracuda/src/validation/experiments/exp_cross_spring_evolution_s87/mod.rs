@@ -20,10 +20,10 @@
 mod spring_core;
 mod spring_extended;
 
-use barracuda::shaders::Precision;
 use crate::gpu::GpuF64;
 use crate::validation::timing::BenchRowEvolved;
 use crate::validation::{self, OrExit, Validator, bench_print};
+use barracuda::shaders::Precision;
 
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
     bench_print(label, f)
@@ -121,14 +121,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_spring_evolution_s87",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cross_spring_evolution_s87",
-        provenance_date: "2026-05-20",
-        description: "# Exp304: Cross-Spring Evolution — ToadStool S87 Modern Systems",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_spring_evolution_s87",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cross_spring_evolution_s87",
+            provenance_date: "2026-05-20",
+            description: "# Exp304: Cross-Spring Evolution — ToadStool S87 Modern Systems",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

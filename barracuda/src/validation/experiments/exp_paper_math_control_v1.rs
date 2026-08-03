@@ -45,7 +45,6 @@ use barracuda::stats::norm_cdf;
 
 /// Run the `validate_paper_math_control_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════════
     // Track 1: Microbial Ecology & QS Signaling
     // ═══════════════════════════════════════════════════════════════════
@@ -551,7 +550,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Papers validated: 18 (Tracks 1, 1b, 2, 3, 4, cross-spring)");
     println!("  All checks use published equations/values or Python baselines");
     println!("  Chain: Paper → Python → CPU (this) → GPU (Exp226) → Streaming (Exp227)");
-
 }
 
 use crate::bio::ode::OdeResult;
@@ -573,14 +571,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "paper_math_control_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_paper_math_control_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp224: Paper Math Control Validations — Published Equations via `BarraCuda...",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "paper_math_control_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_paper_math_control_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp224: Paper Math Control Validations — Published Equations via `BarraCuda...",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

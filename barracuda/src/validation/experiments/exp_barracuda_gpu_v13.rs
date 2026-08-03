@@ -25,10 +25,10 @@
 //!
 //! Provenance: barraCuda GPU primitive validation (V13 ODE lean)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::{self, DomainResult, Validator};
+use std::time::Instant;
 
 #[cfg(feature = "gpu")]
 use crate::bio::{diversity_gpu, stats_gpu};
@@ -349,7 +349,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         println!();
         println!("  GPU math PROVEN portable — identical to CPU reference (Exp314)");
         println!("  Chain: Paper → CPU → GPU (this) → Streaming → metalForge");
-
     }
 }
 
@@ -361,14 +360,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_gpu_v13",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_gpu_v13",
-        provenance_date: "2026-05-20",
-        description: "# Exp316: `BarraCuda` GPU v13 — V98 Full-Domain GPU Portability",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_gpu_v13",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_gpu_v13",
+            provenance_date: "2026-05-20",
+            description: "# Exp316: `BarraCuda` GPU v13 — V98 Full-Domain GPU Portability",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

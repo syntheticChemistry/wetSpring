@@ -20,21 +20,15 @@
 //! storage buffers. `df64_core.wgsl` provides arithmetic (add, mul, fma,
 //! sqrt, div) that preserves the double-float invariant.
 
+use crate::cast;
+
 /// Split a single f64 into a DF64 (hi, lo) pair.
 ///
 /// Matches `df64_from_f64()` in `df64_core.wgsl`.
 #[must_use]
 pub const fn pack(v: f64) -> [f32; 2] {
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "DF64 hi/lo are intentional f32 truncations of f64 (wire format)"
-    )]
-    let hi = v as f32;
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "DF64 residual is stored as f32 (double-float decomposition)"
-    )]
-    let lo = (v - hi as f64) as f32;
+    let hi = cast::f64_f32(v);
+    let lo = cast::f64_f32(v - hi as f64);
     [hi, lo]
 }
 

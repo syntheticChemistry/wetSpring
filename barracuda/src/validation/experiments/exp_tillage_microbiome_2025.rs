@@ -65,7 +65,6 @@ fn generate_compartment_community(
 
 /// Run the `validate_tillage_microbiome_2025` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // S1: Tillage Treatments × Root Compartments
     //
@@ -266,7 +265,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("\n  ── Exp178 Summary: {passed}/{total} checks ──");
     println!("  Paper: Wang et al. 2025, npj Sustainable Agriculture 3:12");
     println!("  Key finding: Tillage × compartment interaction — endosphere most sensitive");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -277,14 +275,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "tillage_microbiome_2025",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_tillage_microbiome_2025",
-        provenance_date: "2026-05-20",
-        description: "# Exp178: Tillage → Endosphere/Rhizosphere Microbiomes — Wang et al. 2025",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "tillage_microbiome_2025",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_tillage_microbiome_2025",
+            provenance_date: "2026-05-20",
+            description: "# Exp178: Tillage → Endosphere/Rhizosphere Microbiomes — Wang et al. 2025",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

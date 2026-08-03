@@ -31,9 +31,6 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use barracuda::device::WgpuDevice;
-use barracuda::{FelsensteinGpu, FelsensteinResult, PhyloTree};
-use std::sync::Arc;
 use crate::bio::bootstrap::{self, Alignment};
 use crate::bio::felsenstein::{
     FlatTree, N_STATES, TreeNode, encode_dna, log_likelihood, transition_matrix,
@@ -43,6 +40,9 @@ use crate::bio::placement;
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use barracuda::device::WgpuDevice;
+use barracuda::{FelsensteinGpu, FelsensteinResult, PhyloTree};
+use std::sync::Arc;
 
 const MU: f64 = 1.0;
 const PI: [f64; 4] = [0.25, 0.25, 0.25, 0.25];
@@ -316,25 +316,23 @@ fn alignment_from_tree(tree: &TreeNode) -> Alignment {
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    println!();
+        println!();
 
-    let device = gpu.to_wgpu_device();
+        let device = gpu.to_wgpu_device();
 
-    validate_felsenstein_parity(&device, v);
-    validate_gpu_bootstrap(&device, v);
-    validate_gpu_placement(&device, v);
-
+        validate_felsenstein_parity(&device, v);
+        validate_gpu_bootstrap(&device, v);
+        validate_gpu_placement(&device, v);
     });
 }
 
@@ -715,14 +713,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_phylo_compose",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_phylo_compose",
-        provenance_date: "2026-05-20",
-        description: "Exp046: GPU Phylogenetic Composition",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_phylo_compose",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_phylo_compose",
+            provenance_date: "2026-05-20",
+            description: "Exp046: GPU Phylogenetic Composition",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

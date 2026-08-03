@@ -36,11 +36,11 @@ use std::time::Instant;
 
 use crate::tolerances;
 
+use crate::bio::diversity;
+use crate::validation::Validator;
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
-use crate::bio::diversity;
-use crate::validation::Validator;
 
 struct CellProfile {
     name: &'static str,
@@ -374,7 +374,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║ TOTAL                  │ {total_ms:>6.1}ms │ {total_checks:>3} ║");
     println!("╚════════════════════════════════════════════════════════════════════╝");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -385,14 +384,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "heterogeneity_sweep_s79",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_heterogeneity_sweep_s79",
-        provenance_date: "2026-05-20",
-        description: "# Exp275: Cell-Type Heterogeneity Sweep — W vs r in 3D Dermis",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "heterogeneity_sweep_s79",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_heterogeneity_sweep_s79",
+            provenance_date: "2026-05-20",
+            description: "# Exp275: Cell-Type Heterogeneity Sweep — W vs r in 3D Dermis",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

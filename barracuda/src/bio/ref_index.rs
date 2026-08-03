@@ -28,6 +28,8 @@
 #[cfg(test)]
 mod tests;
 
+use crate::cast;
+
 /// Sampling interval for the occurrence table.
 const OCC_INTERVAL: usize = 32;
 
@@ -38,7 +40,10 @@ const ALPHA_SIZE: usize = 5;
 /// Sentinel ($) = 0, A = 1, C = 2, G = 3, T = 4.
 /// Non-ACGT bases map to A (conservative).
 #[inline]
-#[allow(clippy::match_same_arms)]
+#[expect(
+    clippy::match_same_arms,
+    reason = "explicit DNA base mapping for clarity"
+)]
 const fn base_to_idx(b: u8) -> usize {
     match b {
         0 | b'$' => 0,
@@ -57,7 +62,10 @@ const fn base_to_idx(b: u8) -> usize {
 /// Input is an integer sequence with a sentinel (0) as the smallest element.
 /// `alpha_size` is the number of distinct symbols (max value + 1).
 /// Returns a suffix array of length `text.len()`.
-#[expect(clippy::too_many_lines, reason = "SA-IS is a single algorithm, splitting would obscure flow")]
+#[expect(
+    clippy::too_many_lines,
+    reason = "SA-IS is a single algorithm, splitting would obscure flow"
+)]
 fn sais(text: &[usize], alpha_size: usize) -> Vec<usize> {
     let n = text.len();
     if n == 0 {
@@ -119,45 +127,46 @@ fn sais(text: &[usize], alpha_size: usize) -> Vec<usize> {
         ends
     };
 
-    let induced_sort = |sa: &mut Vec<usize>, text: &[usize], stype: &[bool], lms_order: &[usize]| {
-        sa.fill(usize::MAX);
+    let induced_sort =
+        |sa: &mut Vec<usize>, text: &[usize], stype: &[bool], lms_order: &[usize]| {
+            sa.fill(usize::MAX);
 
-        // Place LMS suffixes at the end of their buckets
-        let mut tails = bucket_ends.clone();
-        for &pos in lms_order.iter().rev() {
-            let c = text[pos];
-            tails[c] -= 1;
-            sa[tails[c]] = pos;
-        }
+            // Place LMS suffixes at the end of their buckets
+            let mut tails = bucket_ends.clone();
+            for &pos in lms_order.iter().rev() {
+                let c = text[pos];
+                tails[c] -= 1;
+                sa[tails[c]] = pos;
+            }
 
-        // Induce L-type from left to right
-        let mut heads = bucket_starts.clone();
-        for i in 0..n {
-            if sa[i] == usize::MAX || sa[i] == 0 {
-                continue;
+            // Induce L-type from left to right
+            let mut heads = bucket_starts.clone();
+            for i in 0..n {
+                if sa[i] == usize::MAX || sa[i] == 0 {
+                    continue;
+                }
+                let j = sa[i] - 1;
+                if !stype[j] {
+                    let c = text[j];
+                    sa[heads[c]] = j;
+                    heads[c] += 1;
+                }
             }
-            let j = sa[i] - 1;
-            if !stype[j] {
-                let c = text[j];
-                sa[heads[c]] = j;
-                heads[c] += 1;
-            }
-        }
 
-        // Induce S-type from right to left
-        let mut tails2 = bucket_ends.clone();
-        for i in (0..n).rev() {
-            if sa[i] == usize::MAX || sa[i] == 0 {
-                continue;
+            // Induce S-type from right to left
+            let mut tails2 = bucket_ends.clone();
+            for i in (0..n).rev() {
+                if sa[i] == usize::MAX || sa[i] == 0 {
+                    continue;
+                }
+                let j = sa[i] - 1;
+                if stype[j] {
+                    let c = text[j];
+                    tails2[c] -= 1;
+                    sa[tails2[c]] = j;
+                }
             }
-            let j = sa[i] - 1;
-            if stype[j] {
-                let c = text[j];
-                tails2[c] -= 1;
-                sa[tails2[c]] = j;
-            }
-        }
-    };
+        };
 
     // Step 2: initial induced sort with LMS positions in text order
     let mut sa = vec![usize::MAX; n];
@@ -258,7 +267,10 @@ impl FmIndex {
         // Convert DNA bytes to integer alphabet and append sentinel
         let mut text: Vec<usize> = Vec::with_capacity(reference.len() + 1);
         for &b in reference {
-            #[allow(clippy::match_same_arms)]
+            #[expect(
+                clippy::match_same_arms,
+                reason = "explicit DNA base mapping for clarity"
+            )]
             text.push(match b {
                 b'A' | b'a' => 1,
                 b'C' | b'c' => 2,
@@ -275,14 +287,18 @@ impl FmIndex {
         // Derive BWT from suffix array (back to u8 for storage)
         let mut bwt = vec![0u8; n];
         for (i, &sa_val) in sa.iter().enumerate() {
-            let sym = if sa_val == 0 { text[n - 1] } else { text[sa_val - 1] };
+            let sym = if sa_val == 0 {
+                text[n - 1]
+            } else {
+                text[sa_val - 1]
+            };
             bwt[i] = u8::try_from(sym).unwrap_or(0);
         }
 
         // Build C table
         let mut c_table = [0usize; ALPHA_SIZE + 1];
         for &b in &bwt {
-            c_table[b as usize + 1] += 1;
+            c_table[usize::from(b) + 1] += 1;
         }
         for i in 1..=ALPHA_SIZE {
             c_table[i] += c_table[i - 1];
@@ -293,7 +309,7 @@ impl FmIndex {
         let mut occ = vec![0u32; num_samples * ALPHA_SIZE];
         let mut counts = [0u32; ALPHA_SIZE];
         for (i, &b) in bwt.iter().enumerate() {
-            counts[b as usize] += 1;
+            counts[usize::from(b)] += 1;
             if (i + 1) % OCC_INTERVAL == 0 {
                 let sample_idx = (i + 1) / OCC_INTERVAL;
                 for c in 0..ALPHA_SIZE {
@@ -326,12 +342,12 @@ impl FmIndex {
         let base = if block == 0 {
             0
         } else {
-            self.occ[block * ALPHA_SIZE + c] as usize
+            cast::u32_usize(self.occ[block * ALPHA_SIZE + c])
         };
         let start = block * OCC_INTERVAL;
         let mut count = base;
         for i in start..pos {
-            if self.bwt[i] as usize == c {
+            if usize::from(self.bwt[i]) == c {
                 count += 1;
             }
         }
@@ -346,12 +362,16 @@ impl FmIndex {
         let mut steps = 0;
         loop {
             if idx.is_multiple_of(OCC_INTERVAL) {
-                let sa_val = self.sa_sample[idx / OCC_INTERVAL] as usize;
+                let sa_val = cast::u32_usize(self.sa_sample[idx / OCC_INTERVAL]);
                 let result = sa_val + steps;
                 // Subtract 1 because we appended a sentinel
-                return if result >= self.len { result - self.len } else { result };
+                return if result >= self.len {
+                    result - self.len
+                } else {
+                    result
+                };
             }
-            let c = self.bwt[idx] as usize;
+            let c = usize::from(self.bwt[idx]);
             idx = self.c_table[c] + self.occ_count(c, idx);
             steps += 1;
         }

@@ -24,15 +24,15 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use barracuda::device::WgpuDevice;
-use barracuda::ops::linalg::BatchedEighGpu;
-use std::sync::Arc;
 use crate::bio::ode_sweep_gpu::{N_PARAMS, N_VARS, OdeSweepConfig, OdeSweepGpu};
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::gpu::GpuF64;
 use crate::special;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use barracuda::device::WgpuDevice;
+use barracuda::ops::linalg::BatchedEighGpu;
+use std::sync::Arc;
 
 fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
     [
@@ -60,24 +60,22 @@ fn params_to_flat(p: &QsBiofilmParams) -> [f64; N_PARAMS] {
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    println!();
+        println!();
 
-    let device = gpu.to_wgpu_device();
+        let device = gpu.to_wgpu_device();
 
-    validate_ode_sweep(&device, v);
-    validate_bifurcation(&device, v);
-
+        validate_ode_sweep(&device, v);
+        validate_bifurcation(&device, v);
     });
 }
 
@@ -371,14 +369,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_ode_sweep",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_ode_sweep",
-        provenance_date: "2026-05-20",
-        description: "Exp049: GPU ODE Parameter Sweep — QS/c-di-GMP",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_ode_sweep",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_ode_sweep",
+            provenance_date: "2026-05-20",
+            description: "Exp049: GPU ODE Parameter Sweep — QS/c-di-GMP",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

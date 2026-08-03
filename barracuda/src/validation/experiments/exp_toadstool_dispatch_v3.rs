@@ -337,7 +337,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("    spectral:   Anderson 3D, Lanczos, LSR");
     println!("  Total: {total_ms:.1} ms");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -348,14 +347,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "toadstool_dispatch_v3",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_toadstool_dispatch_v3",
-        provenance_date: "2026-05-20",
-        description: "# Exp267: `ToadStool` Dispatch v3 — Pure Rust Math Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "toadstool_dispatch_v3",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_toadstool_dispatch_v3",
+            provenance_date: "2026-05-20",
+            description: "# Exp267: `ToadStool` Dispatch v3 — Pure Rust Math Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

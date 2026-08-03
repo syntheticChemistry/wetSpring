@@ -3,7 +3,13 @@
 use super::*;
 use crate::bio::pileup::PileupColumn;
 
-fn make_snp_column(position: usize, ref_count: u32, alt_count: u32, ref_idx: usize, alt_idx: usize) -> PileupColumn {
+fn make_snp_column(
+    position: usize,
+    ref_count: u32,
+    alt_count: u32,
+    ref_idx: usize,
+    alt_idx: usize,
+) -> PileupColumn {
     let total = ref_count + alt_count;
     let mut col = PileupColumn {
         position,
@@ -77,7 +83,9 @@ fn call_deletion() {
     let config = CallerConfig::default();
     let variants = call_variants(&[col], reference, &[], &config);
 
-    let del = variants.iter().find(|v| v.variant_type == VariantType::Deletion);
+    let del = variants
+        .iter()
+        .find(|v| v.variant_type == VariantType::Deletion);
     assert!(del.is_some());
     let del = del.unwrap();
     assert_eq!(del.position, 2);
@@ -100,7 +108,9 @@ fn call_insertion() {
     let config = CallerConfig::default();
     let variants = call_variants(&[col], reference, &[], &config);
 
-    let ins = variants.iter().find(|v| v.variant_type == VariantType::Insertion);
+    let ins = variants
+        .iter()
+        .find(|v| v.variant_type == VariantType::Insertion);
     assert!(ins.is_some());
 }
 
@@ -217,7 +227,10 @@ fn variant_type_display() {
 fn binomial_quality_high_for_strong_variant() {
     let col = make_snp_column(0, 5, 45, 0, 3); // 90% alt at Q30
     let q = binomial_quality(&col, 3, 45);
-    assert!(q > 100.0, "strong variant at Q30 should have high quality: {q}");
+    assert!(
+        q > 100.0,
+        "strong variant at Q30 should have high quality: {q}"
+    );
 }
 
 #[test]
@@ -226,7 +239,10 @@ fn binomial_quality_low_for_noise_level() {
     let q = binomial_quality(&col, 1, 1);
     // Q30 error rate is 0.001, seeing 1/100 at 1% is still above error
     // but should be much lower quality than a strong variant
-    assert!(q < 50.0, "noise-level variant should have moderate quality: {q}");
+    assert!(
+        q < 50.0,
+        "noise-level variant should have moderate quality: {q}"
+    );
 }
 
 #[test]
@@ -246,7 +262,10 @@ fn binomial_quality_zero_when_at_error_rate() {
 
     let q = binomial_quality(&col, 1, 10);
     // At Q10, p_err = 0.1, seeing 10% is expected under null
-    assert!(q < 5.0, "variant at error rate should have near-zero quality: {q}");
+    assert!(
+        q < 5.0,
+        "variant at error rate should have near-zero quality: {q}"
+    );
 }
 
 #[test]
@@ -278,7 +297,11 @@ fn binomial_model_calls_same_clear_variant() {
     let config_binom = CallerConfig::default();
     assert!(config_binom.binomial_quality);
     let variants = call_variants(&pileup, reference, &[], &config_binom);
-    assert_eq!(variants.len(), 1, "binomial model should call clear variant");
+    assert_eq!(
+        variants.len(),
+        1,
+        "binomial model should call clear variant"
+    );
 
     // Legacy model
     let config_legacy = CallerConfig {
@@ -340,11 +363,7 @@ fn log_gamma_basic_values() {
 fn binomial_log_sf_trivial() {
     // P(X >= 0) = 1, ln(1) = 0
     let p = binomial_log_sf(0, 10, 0.5);
-    assert!(
-        p.exp_m1().abs() < 0.1,
-        "P(X>=0) should be ~1: {}",
-        p.exp()
-    );
+    assert!(p.exp_m1().abs() < 0.1, "P(X>=0) should be ~1: {}", p.exp());
 }
 
 #[test]

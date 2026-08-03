@@ -51,10 +51,10 @@
 #[cfg(feature = "json")]
 pub mod stream_item;
 
-#[cfg(feature = "guidestone")]
-pub mod bonding;
 #[cfg(feature = "ipc")]
 pub mod barracuda_route;
+#[cfg(feature = "guidestone")]
+pub mod bonding;
 #[cfg(feature = "ipc")]
 pub mod capability_domains;
 #[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
@@ -98,10 +98,10 @@ pub mod skunkbat;
 pub mod songbird;
 #[cfg(feature = "ipc")]
 pub mod timeouts;
-#[cfg(feature = "ipc")]
-pub mod toadstool_validate;
 #[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub mod timeseries;
+#[cfg(feature = "ipc")]
+pub mod toadstool_validate;
 #[cfg(feature = "ipc")]
 pub mod transport;
 

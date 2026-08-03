@@ -28,7 +28,6 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::{
     bistable::{self, BistableParams},
     capacitor::{self, CapacitorParams},
@@ -40,6 +39,7 @@ use crate::bio::{
 };
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 const DT: f64 = 0.001;
 const SS_FRAC: f64 = 0.1;
@@ -58,7 +58,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     #[expect(clippy::cast_precision_loss)]
     let elapsed_us = t_total.elapsed().as_nanos() as f64 / 1000.0;
     println!("\n  Total ODE flat-param validation: {elapsed_us:.0} µs");
-
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -408,14 +407,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v6",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v6",
-        provenance_date: "2026-05-20",
-        description: "Exp079: `BarraCuda` CPU Parity v6 — ODE Flat Param Fidelity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v6",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v6",
+            provenance_date: "2026-05-20",
+            description: "Exp079: `BarraCuda` CPU Parity v6 — ODE Flat Param Fidelity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -46,7 +46,6 @@ fn bench<F: FnOnce() -> R, R>(label: &str, f: F) -> (R, f64) {
 )]
 /// Run the `benchmark_modern_systems_df64` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let rt = tokio::runtime::Runtime::new().or_exit("tokio runtime");
     let gpu = rt.block_on(GpuF64::new()).or_exit("GPU init");
     let device = gpu.to_wgpu_device();
@@ -490,7 +489,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  ESN train+infer (100×100):         {esn_ms:.2} ms");
 
     v.check_pass("all benchmarks complete", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -501,14 +499,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "modern_systems_df64",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_modern_systems_df64",
-        provenance_date: "2026-05-20",
-        description: "Exp166 — Modern Systems Benchmark (S62+DF64 era)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "modern_systems_df64",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_modern_systems_df64",
+            provenance_date: "2026-05-20",
+            description: "Exp166 — Modern Systems Benchmark (S62+DF64 era)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

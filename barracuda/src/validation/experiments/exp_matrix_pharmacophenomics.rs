@@ -21,10 +21,10 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective, NmfResult, cosine_similarity};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective, NmfResult, cosine_similarity};
 
 fn top_k_cosine(result: &NmfResult, top_k: usize) -> Vec<(usize, usize, f64)> {
     let m = result.m;
@@ -166,7 +166,6 @@ fn validate_nmf_analysis(v: &mut Validator, matrix_scores: &[f64], ranked: &[(us
 
 /// Run the `validate_matrix_pharmacophenomics` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("§1 MATRIX Framework Components");
 
     println!("  The MATRIX pipeline has 4 stages:");
@@ -206,7 +205,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let (matrix_scores, ranked) = validate_matrix_scoring(v, &drug_pathway, &disease_pathway);
     validate_nmf_analysis(v, &matrix_scores, &ranked);
-
 }
 
 struct LcgRng(u64);
@@ -233,14 +231,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "matrix_pharmacophenomics",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_matrix_pharmacophenomics",
-        provenance_date: "2026-05-20",
-        description: "# Exp158: MATRIX Computational Pharmacophenomics Methodology",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "matrix_pharmacophenomics",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_matrix_pharmacophenomics",
+            provenance_date: "2026-05-20",
+            description: "# Exp158: MATRIX Computational Pharmacophenomics Methodology",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

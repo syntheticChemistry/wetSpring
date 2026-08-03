@@ -15,6 +15,7 @@
 //! - Bio feature mapping: wetSpring (diversity, taxonomy, AMR, bloom, disorder heads)
 
 use super::{EsnConfig, NpuReadoutWeights};
+use crate::cast;
 use barracuda::esn_v2::{ESN, ESNConfig, ExportedWeights, HeadConfig, MultiHeadEsn};
 use barracuda::tensor::Tensor;
 use std::sync::OnceLock;
@@ -112,19 +113,15 @@ impl From<&EsnConfig> for BioEsnConfig {
 impl BioEsnConfig {
     /// Convert to barraCuda `ESNConfig` (f32).
     #[must_use]
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "bio ESN hyperparameters are narrowed to f32 for barraCuda tensor ops"
-    )]
     pub fn to_esn_config(&self) -> ESNConfig {
         ESNConfig {
             input_size: self.input_size,
             reservoir_size: self.reservoir_size,
             output_size: self.output_size,
-            spectral_radius: self.spectral_radius as f32,
-            connectivity: self.connectivity as f32,
-            leak_rate: self.leak_rate as f32,
-            regularization: self.regularization as f32,
+            spectral_radius: cast::f64_f32(self.spectral_radius),
+            connectivity: cast::f64_f32(self.connectivity),
+            leak_rate: cast::f64_f32(self.leak_rate),
+            regularization: cast::f64_f32(self.regularization),
             seed: self.seed,
             sgd_learning_rate: 0.01,
             sgd_min_iterations: 50,
@@ -173,12 +170,8 @@ impl BioEsn {
     }
 
     /// Run one reservoir update step.
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "device tensors use f32; host f64 state is narrowed at the boundary"
-    )]
     pub fn update(&mut self, input: &[f64]) -> Result<(), barracuda::error::BarracudaError> {
-        let input_f32: Vec<f32> = input.iter().map(|&x| x as f32).collect();
+        let input_f32: Vec<f32> = input.iter().map(|&x| cast::f64_f32(x)).collect();
         let device = self.inner.state().device().clone();
         let input_tensor =
             Tensor::from_data(&input_f32, vec![self.inner.config().input_size, 1], device)?;
@@ -193,10 +186,6 @@ impl BioEsn {
     }
 
     /// Train readout via ridge regression on collected states.
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "ridge training uses f32 tensors in barraCuda"
-    )]
     pub fn train(
         &mut self,
         inputs: &[Vec<f64>],
@@ -204,20 +193,16 @@ impl BioEsn {
     ) -> Result<f32, barracuda::error::BarracudaError> {
         let inputs_f32: Vec<Vec<f32>> = inputs
             .iter()
-            .map(|v| v.iter().map(|&x| x as f32).collect())
+            .map(|v| v.iter().map(|&x| cast::f64_f32(x)).collect())
             .collect();
         let targets_f32: Vec<Vec<f32>> = targets
             .iter()
-            .map(|v| v.iter().map(|&x| x as f32).collect())
+            .map(|v| v.iter().map(|&x| cast::f64_f32(x)).collect())
             .collect();
         block_on(self.inner.train(&inputs_f32, &targets_f32))?
     }
 
     /// Predict on a sequence of inputs.
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "inference uses f32 tensors on device; results widened back to f64"
-    )]
     pub fn predict(
         &mut self,
         inputs: &[Vec<f64>],
@@ -225,7 +210,7 @@ impl BioEsn {
         self.reset_state()?;
         let mut outputs = Vec::with_capacity(inputs.len());
         for input in inputs {
-            let input_f32: Vec<f32> = input.iter().map(|&x| x as f32).collect();
+            let input_f32: Vec<f32> = input.iter().map(|&x| cast::f64_f32(x)).collect();
             let out = block_on(self.inner.predict(&input_f32))??;
             outputs.push(out.iter().map(|&x| f64::from(x)).collect());
         }

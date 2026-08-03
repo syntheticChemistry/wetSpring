@@ -39,7 +39,6 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use std::path::Path;
 use crate::bio::eic;
 use crate::bio::feature_table::{self, FeatureParams};
 use crate::bio::signal::PeakParams;
@@ -47,6 +46,7 @@ use crate::io::mzml;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::path::Path;
 
 #[expect(
     clippy::too_many_lines,
@@ -54,7 +54,6 @@ use crate::validation::{self, Validator};
 )]
 /// Run the `validate_features` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let data_dir = validation::data_dir("WETSPRING_MZML_DIR", "data/exp005_asari/MT02/MT02Dataset");
 
     let asari_tsv = validation::data_dir(
@@ -240,7 +239,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     } else {
         println!("  (skipping cross-reference — no features to compare)");
     }
-
 }
 
 struct AsariFeature {
@@ -312,14 +310,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "features",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_features",
-        provenance_date: "2026-05-20",
-        description: "Validate feature extraction pipeline against `asari` MT02 baseline (Exp009)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "features",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_features",
+            provenance_date: "2026-05-20",
+            description: "Validate feature extraction pipeline against `asari` MT02 baseline (Exp009)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

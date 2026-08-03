@@ -29,9 +29,7 @@ use crate::bio::pcoa_gpu;
 use crate::bio::quality::{self, QualityParams};
 use crate::bio::spectral_match_gpu;
 use crate::bio::streaming_gpu::GpuPipelineSession;
-use crate::bio::taxonomy::{
-    ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq,
-};
+use crate::bio::taxonomy::{ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq};
 use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
 use crate::special;
@@ -42,61 +40,60 @@ use crate::validation::{self, OrExit, Validator};
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    let session = match GpuPipelineSession::new(&gpu) {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("Session init failed: {e}");
-            validation::exit_skipped("GpuPipelineSession init failed");
+        let session = match GpuPipelineSession::new(&gpu) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("Session init failed: {e}");
+                validation::exit_skipped("GpuPipelineSession init failed");
+            }
+        };
+        println!("  Session: {}", session.ctx_stats());
+
+        let mut timings: Vec<(&str, f64, f64)> = Vec::new();
+        let pipeline_start = Instant::now();
+
+        // ═══ Stage 1: Quality Filtering (GPU pre-warmed) ═════════════════
+        validate_quality_filter(&session, v, &mut timings);
+
+        // ═══ Stage 2: Alpha + Beta Diversity Streaming ═══════════════════
+        let (cpu_bc, gpu_bc) = validate_diversity_streaming(&session, v, &mut timings);
+
+        // ═══ Stage 3: PCoA from Streaming BC ═════════════════════════════
+        validate_pcoa_streaming(&gpu, &cpu_bc, &gpu_bc, v, &mut timings);
+
+        // ═══ Stage 4: Spectral Cosine Streaming ══════════════════════════
+        validate_spectral_streaming(&session, &gpu, v, &mut timings);
+
+        // ═══ Stage 5: Full End-to-End Pipeline ═══════════════════════════
+        validate_full_pipeline(&session, v, &mut timings);
+
+        // ═══ Stage 6: Streaming vs Individual Dispatch Benchmark ═════════
+        benchmark_streaming_vs_dispatch(&session, &gpu, v, &mut timings);
+
+        // ═══ Summary ═════════════════════════════════════════════════════
+        v.section("═══ Streaming v3 Summary ═══");
+        println!();
+        println!("  {:<35} {:>10} {:>10}", "Stage", "CPU (µs)", "GPU (µs)");
+        println!("  {}", "─".repeat(58));
+        for (name, cpu_us, gpu_us) in &timings {
+            println!("  {name:<35} {cpu_us:>10.0} {gpu_us:>10.0}");
         }
-    };
-    println!("  Session: {}", session.ctx_stats());
-
-    let mut timings: Vec<(&str, f64, f64)> = Vec::new();
-    let pipeline_start = Instant::now();
-
-    // ═══ Stage 1: Quality Filtering (GPU pre-warmed) ═════════════════
-    validate_quality_filter(&session, v, &mut timings);
-
-    // ═══ Stage 2: Alpha + Beta Diversity Streaming ═══════════════════
-    let (cpu_bc, gpu_bc) = validate_diversity_streaming(&session, v, &mut timings);
-
-    // ═══ Stage 3: PCoA from Streaming BC ═════════════════════════════
-    validate_pcoa_streaming(&gpu, &cpu_bc, &gpu_bc, v, &mut timings);
-
-    // ═══ Stage 4: Spectral Cosine Streaming ══════════════════════════
-    validate_spectral_streaming(&session, &gpu, v, &mut timings);
-
-    // ═══ Stage 5: Full End-to-End Pipeline ═══════════════════════════
-    validate_full_pipeline(&session, v, &mut timings);
-
-    // ═══ Stage 6: Streaming vs Individual Dispatch Benchmark ═════════
-    benchmark_streaming_vs_dispatch(&session, &gpu, v, &mut timings);
-
-    // ═══ Summary ═════════════════════════════════════════════════════
-    v.section("═══ Streaming v3 Summary ═══");
-    println!();
-    println!("  {:<35} {:>10} {:>10}", "Stage", "CPU (µs)", "GPU (µs)");
-    println!("  {}", "─".repeat(58));
-    for (name, cpu_us, gpu_us) in &timings {
-        println!("  {name:<35} {cpu_us:>10.0} {gpu_us:>10.0}");
-    }
-    println!("  {}", "─".repeat(58));
-    let total_ms = pipeline_start.elapsed().as_secs_f64() * 1000.0;
-    println!("\n  Unidirectional streaming: 6 stages validated");
-    println!("  [Total] {total_ms:.1} ms");
+        println!("  {}", "─".repeat(58));
+        let total_ms = pipeline_start.elapsed().as_secs_f64() * 1000.0;
+        println!("\n  Unidirectional streaming: 6 stages validated");
+        println!("  [Total] {total_ms:.1} ms");
     });
 }
 
@@ -384,8 +381,8 @@ fn benchmark_streaming_vs_dispatch(
     let individual_us = t_individual.elapsed().as_micros() as f64;
 
     let stream_val = session.shannon(&counts).or_exit("unexpected error");
-    let individual_val = crate::bio::diversity_gpu::shannon_gpu(gpu, &counts)
-        .or_exit("unexpected error");
+    let individual_val =
+        crate::bio::diversity_gpu::shannon_gpu(gpu, &counts).or_exit("unexpected error");
     v.check(
         "Streaming == Individual (Shannon)",
         stream_val,
@@ -455,14 +452,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_streaming_v3",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_pure_gpu_streaming_v3",
-        provenance_date: "2026-05-20",
-        description: "# Exp219: Pure GPU Streaming v3 — Unidirectional Pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_streaming_v3",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_pure_gpu_streaming_v3",
+            provenance_date: "2026-05-20",
+            description: "# Exp219: Pure GPU Streaming v3 — Unidirectional Pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

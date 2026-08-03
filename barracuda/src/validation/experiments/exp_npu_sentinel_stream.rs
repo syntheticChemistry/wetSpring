@@ -197,7 +197,6 @@ fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
 
 /// Run the `validate_npu_sentinel_stream` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Steady-state monitoring ──");
 
     let steady = simulate_steady_state(200, 42);
@@ -368,7 +367,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("    - Throughput: >> 1 Hz requirement");
     println!("    - AKD1000 hardware: PENDING (CPU simulation validated)");
     v.check_pass("NPU sentinel pipeline complete", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -379,14 +377,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "npu_sentinel_stream",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_npu_sentinel_stream",
-        provenance_date: "2026-05-20",
-        description: "# Exp188: NPU Sentinel with Real Sensor Stream",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "npu_sentinel_stream",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_npu_sentinel_stream",
+            provenance_date: "2026-05-20",
+            description: "# Exp188: NPU Sentinel with Real Sensor Stream",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

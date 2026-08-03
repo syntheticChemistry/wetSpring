@@ -28,11 +28,11 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use crate::cast;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 
 struct LcgRng(u64);
 
@@ -310,7 +310,6 @@ fn validate_kl_and_sparsity(
 
 /// Run the `validate_nmf_drug_repurposing` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let n_drugs = 200;
     let n_diseases = 100;
 
@@ -343,7 +342,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     v.check_pass("test set has expected size", test_pairs.len() == n_test);
 
     validate_factorisation(v, &train_matrix, &test_pairs, n_test, actual_sparsity);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -354,14 +352,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nmf_drug_repurposing",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_nmf_drug_repurposing",
-        provenance_date: "2026-05-20",
-        description: "# Exp159: NMF Drug-Disease Matrix Factorization",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nmf_drug_repurposing",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_nmf_drug_repurposing",
+            provenance_date: "2026-05-20",
+            description: "# Exp159: NMF Drug-Disease Matrix Factorization",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

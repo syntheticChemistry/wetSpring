@@ -18,8 +18,6 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::sync::Arc;
-use std::time::Instant;
 use crate::bio::kmer;
 use crate::bio::kmer_gpu::KmerGpu;
 use crate::bio::ode_sweep_gpu::{self, OdeSweepConfig, OdeSweepGpu};
@@ -31,6 +29,8 @@ use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::sync::Arc;
+use std::time::Instant;
 
 fn validate_kmer(v: &mut Validator, device: &Arc<barracuda::device::WgpuDevice>) {
     v.section("K-mer Histogram: CPU ↔ GPU (k=4, raw)");
@@ -342,27 +342,25 @@ fn validate_metalforge_pipeline(v: &mut Validator, device: &Arc<barracuda::devic
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-    println!("════════════════════════════════════════════════════════════════════");
-    println!("  Exp099: Expanded CPU vs GPU Parity + metalForge Mixed Hardware");
-    println!("════════════════════════════════════════════════════════════════════\n");
+        println!("════════════════════════════════════════════════════════════════════");
+        println!("  Exp099: Expanded CPU vs GPU Parity + metalForge Mixed Hardware");
+        println!("════════════════════════════════════════════════════════════════════\n");
 
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        let device = gpu.to_wgpu_device();
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
-        }
-    };
-    gpu.print_info();
-    let device = gpu.to_wgpu_device();
-
-    validate_kmer(v, &device);
-    validate_unifrac(v, &device);
-    validate_ode_sweep(v, &device);
-    validate_phage_defense(v, &device);
-    validate_metalforge_pipeline(v, &device);
-
+        validate_kmer(v, &device);
+        validate_unifrac(v, &device);
+        validate_ode_sweep(v, &device);
+        validate_phage_defense(v, &device);
+        validate_metalforge_pipeline(v, &device);
     });
 }
 
@@ -374,14 +372,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_gpu_expanded",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_gpu_expanded",
-        provenance_date: "2026-05-20",
-        description: "Exp099: Expanded CPU vs GPU Parity — K-mer, `UniFrac`, ODE Domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_gpu_expanded",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_gpu_expanded",
+            provenance_date: "2026-05-20",
+            description: "Exp099: Expanded CPU vs GPU Parity — K-mer, `UniFrac`, ODE Domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

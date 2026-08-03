@@ -129,7 +129,9 @@ fn parse_route_response(response: &str) -> Result<PrecisionAdvice, PrecisionErro
     if let Some(err) = v.get("error") {
         return Err(PrecisionError::Protocol(format!(
             "RPC error: {}",
-            err.get("message").and_then(|m| m.as_str()).unwrap_or("unknown")
+            err.get("message")
+                .and_then(|m| m.as_str())
+                .unwrap_or("unknown")
         )));
     }
 

@@ -473,14 +473,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "progression_cpu_gpu_stream",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_progression_cpu_gpu_stream",
-        provenance_date: "2026-05-20",
-        description: "Exp211 — `BarraCuda` Progression Benchmark: CPU → GPU → Pure GPU Streaming",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "progression_cpu_gpu_stream",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_progression_cpu_gpu_stream",
+            provenance_date: "2026-05-20",
+            description: "Exp211 — `BarraCuda` Progression Benchmark: CPU → GPU → Pure GPU Streaming",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

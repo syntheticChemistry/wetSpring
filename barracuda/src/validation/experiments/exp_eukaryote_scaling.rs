@@ -33,7 +33,6 @@ use barracuda::spectral::{
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_eukaryote_scaling` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
         struct CellType {
@@ -229,7 +228,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         println!("  [skipped — no GPU feature]");
         v.check_count("cell types defined", 7, 7);
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -240,14 +238,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "eukaryote_scaling",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_eukaryote_scaling",
-        provenance_date: "2026-05-20",
-        description: "# Exp138: Eukaryote vs Bacteria Colony Scaling",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "eukaryote_scaling",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_eukaryote_scaling",
+            provenance_date: "2026-05-20",
+            description: "# Exp138: Eukaryote vs Bacteria Colony Scaling",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

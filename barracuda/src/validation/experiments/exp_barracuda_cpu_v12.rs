@@ -475,14 +475,12 @@ fn validate_end_to_end_pipeline(v: &mut Validator) {
 
 /// Run the `validate_barracuda_cpu_v12` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_fastq_to_diversity(v);
     validate_quality_derep_chain(v);
     validate_nanopore_calibration_math(v);
     validate_ms2_spectral_math(v);
     validate_tolerance_centralization(v);
     validate_end_to_end_pipeline(v);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -493,14 +491,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v12",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v12",
-        provenance_date: "2026-05-20",
-        description: "Exp212: `BarraCuda` CPU Parity v12 — Post-Audit Math Fidelity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v12",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v12",
+            provenance_date: "2026-05-20",
+            description: "Exp212: `BarraCuda` CPU Parity v12 — Post-Audit Math Fidelity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

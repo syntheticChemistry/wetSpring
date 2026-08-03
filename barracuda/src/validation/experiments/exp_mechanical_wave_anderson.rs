@@ -39,7 +39,6 @@ struct SignalMode {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_mechanical_wave_anderson` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Bacterial communication modalities ──");
 
     let modes = vec![
@@ -234,7 +233,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Dictyostelium relay = converts localized wave into propagating wave.");
     println!("  These solutions work for ANY wave mode, not just chemical QS.");
     v.check_pass("constrained evolution connection", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -245,14 +243,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "mechanical_wave_anderson",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_mechanical_wave_anderson",
-        provenance_date: "2026-05-20",
-        description: "# Exp147: Anderson Framework for Mechanical Wave Signaling",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "mechanical_wave_anderson",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_mechanical_wave_anderson",
+            provenance_date: "2026-05-20",
+            description: "# Exp147: Anderson Framework for Mechanical Wave Signaling",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

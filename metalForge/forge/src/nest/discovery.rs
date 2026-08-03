@@ -9,6 +9,12 @@
 
 use std::path::PathBuf;
 
+use wetspring_barracuda::primal_names::{BIOMEOS, NESTGATE};
+
+fn sock_name() -> String {
+    format!("{NESTGATE}-default.sock")
+}
+
 /// Default socket path when `NESTGATE_SOCKET` is not set.
 ///
 /// Uses environment-based discovery: checks `NESTGATE_SOCKET` first,
@@ -20,9 +26,9 @@ pub fn default_socket_path() -> PathBuf {
         return PathBuf::from(path);
     }
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(xdg).join("biomeos/nestgate-default.sock");
+        return PathBuf::from(xdg).join(BIOMEOS).join(sock_name());
     }
-    std::env::temp_dir().join("nestgate-default.sock")
+    std::env::temp_dir().join(sock_name())
 }
 
 /// Discover the `NestGate` Unix socket.
@@ -37,7 +43,7 @@ pub fn discover_nestgate_socket() -> Option<PathBuf> {
         }
     }
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join("biomeos/nestgate-default.sock");
+        let p = PathBuf::from(xdg).join(BIOMEOS).join(sock_name());
         if p.exists() {
             return Some(p);
         }

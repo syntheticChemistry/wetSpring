@@ -10,6 +10,7 @@ use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::timing::BenchRowEvolved;
 use crate::validation::{self, OrExit, Validator, bench_print};
+use barracuda::ops::linalg::gemm_f64::GemmF64;
 
 fn bench<T>(label: &str, f: impl FnOnce() -> T) -> (T, f64) {
     bench_print(label, f)
@@ -104,7 +105,8 @@ fn validate_gemm_f64(
             .collect();
 
         let label = format!("GEMM {n}×{n}");
-        let (result, ms) = bench(&label, || gpu.matmul(&a, &b, n, n, n));
+        let dev = gpu.to_wgpu_device();
+        let (result, ms) = bench(&label, || GemmF64::execute(dev.clone(), &a, &b, n, n, n, 1));
         match result {
             Ok(ref c) => {
                 let norm: f64 = c.iter().map(|x| x * x).sum::<f64>().sqrt();
@@ -120,7 +122,11 @@ fn validate_gemm_f64(
                             out[i * n + j] = s;
                         }
                     }
-                    out.iter().enumerate().filter(|&(i, _)| i / n == i % n).map(|(_, &v)| v).sum::<f64>()
+                    out.iter()
+                        .enumerate()
+                        .filter(|&(i, _)| i / n == i % n)
+                        .map(|(_, &v)| v)
+                        .sum::<f64>()
                 });
                 let trace_gpu: f64 = (0..n).map(|i| c[i * n + i]).sum();
                 v.check_pass(
@@ -149,7 +155,7 @@ fn validate_gemm_f64(
 fn validate_gemm_cached(
     v: &mut Validator,
     device: &Arc<barracuda::device::WgpuDevice>,
-    ctx: barracuda::tensor::TensorContext,
+    ctx: Arc<barracuda::device::TensorContext>,
     timings: &mut Vec<BenchRowEvolved>,
 ) {
     v.section("§3 wetSpring — GemmCached (neuralSpring GEMM + hotSpring precision)");

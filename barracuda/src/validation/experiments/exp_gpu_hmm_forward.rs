@@ -89,27 +89,25 @@ fn genomic_model() -> HmmModel {
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    println!();
+        println!();
 
-    let device = gpu.to_wgpu_device();
-    let hmm_gpu = HmmGpuForward::new(&device).or_exit("HMM GPU shader");
+        let device = gpu.to_wgpu_device();
+        let hmm_gpu = HmmGpuForward::new(&device).or_exit("HMM GPU shader");
 
-    validate_2state(&hmm_gpu, v);
-    validate_3state(&hmm_gpu, v);
-    validate_batch(&hmm_gpu, v);
-    validate_forward_backward(&hmm_gpu, v);
-
+        validate_2state(&hmm_gpu, v);
+        validate_3state(&hmm_gpu, v);
+        validate_batch(&hmm_gpu, v);
+        validate_forward_backward(&hmm_gpu, v);
     });
 }
 
@@ -156,9 +154,7 @@ fn validate_2state(gpu: &HmmGpuForward, v: &mut Validator) {
             }
             v.check(
                 "2-state: max |alpha CPU−GPU| < GPU_VS_CPU_F64",
-                f64::from(u8::from(
-                    max_alpha_diff < crate::tolerances::GPU_VS_CPU_F64,
-                )),
+                f64::from(u8::from(max_alpha_diff < crate::tolerances::GPU_VS_CPU_F64)),
                 1.0,
                 tolerances::EXACT,
             );
@@ -385,9 +381,7 @@ fn validate_forward_backward(gpu: &HmmGpuForward, v: &mut Validator) {
             }
             v.check(
                 "FB: GPU alpha + CPU beta consistent",
-                f64::from(u8::from(
-                    max_fb_diff < crate::tolerances::GPU_VS_CPU_F64,
-                )),
+                f64::from(u8::from(max_fb_diff < crate::tolerances::GPU_VS_CPU_F64)),
                 1.0,
                 tolerances::EXACT,
             );
@@ -417,14 +411,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_hmm_forward",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_hmm_forward",
-        provenance_date: "2026-05-20",
-        description: "Exp047: GPU HMM Batch Forward",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_hmm_forward",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_hmm_forward",
+            provenance_date: "2026-05-20",
+            description: "Exp047: GPU HMM Batch Forward",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

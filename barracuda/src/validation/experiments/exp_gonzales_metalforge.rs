@@ -35,15 +35,15 @@
 
 use std::time::Instant;
 
-use barracuda::spectral::{
-    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
-};
-use barracuda::stats::hill;
 use crate::bio::{diversity, diversity_gpu};
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::spectral::{
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+};
+use barracuda::stats::hill;
 
 struct Timing {
     domain: &'static str,
@@ -336,14 +336,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gonzales_metalforge",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gonzales_metalforge",
-        provenance_date: "2026-05-20",
-        description: "# Exp286: `metalForge` Cross-Substrate — Gonzales Reproductions",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gonzales_metalforge",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gonzales_metalforge",
+            provenance_date: "2026-05-20",
+            description: "# Exp286: `metalForge` Cross-Substrate — Gonzales Reproductions",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

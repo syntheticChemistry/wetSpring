@@ -11,6 +11,8 @@ use barracuda::device::WgpuDevice;
 use barracuda::ops::{BatchedOdeRK4F64, BatchedRk4Config};
 use std::sync::Arc;
 
+use crate::cast;
+
 /// Number of state variables in the QS biofilm ODE system.
 pub const N_VARS: usize = 5;
 /// Number of parameters per ODE batch element.
@@ -62,7 +64,7 @@ impl OdeSweepGpu {
         initial_states: &[f64],
         batch_params: &[f64],
     ) -> crate::error::Result<Vec<f64>> {
-        let b = config.n_batches as usize;
+        let b = cast::u32_usize(config.n_batches);
         assert_eq!(initial_states.len(), b * N_VARS);
         assert_eq!(batch_params.len(), b * N_PARAMS);
 

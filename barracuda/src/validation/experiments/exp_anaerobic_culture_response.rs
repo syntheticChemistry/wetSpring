@@ -22,7 +22,6 @@ fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
 
 /// Run the `validate_anaerobic_culture_response` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("First-order kinetics (B_max=320, k=0.08)");
     let b_max = 320.0;
     let k = 0.08;
@@ -103,7 +102,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "Chao1(meso) >= observed richness",
         chao1_meso >= meso_comm.len() as f64,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -114,14 +112,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "anaerobic_culture_response",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_anaerobic_culture_response",
-        provenance_date: "2026-05-20",
-        description: "Exp337: Chen 2016 — Culture conditions response",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "anaerobic_culture_response",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_anaerobic_culture_response",
+            provenance_date: "2026-05-20",
+            description: "Exp337: Chen 2016 — Culture conditions response",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

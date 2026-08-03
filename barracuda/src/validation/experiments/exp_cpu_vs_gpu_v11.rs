@@ -31,11 +31,11 @@
 //!
 //! Provenance: CPU vs GPU numerical parity (V11 full domain)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::kinetics::{haldane, monod};
 use crate::tolerances;
 use crate::validation::{DomainResult, Validator};
+use std::time::Instant;
 
 use barracuda::stats::norm_cdf;
 
@@ -292,7 +292,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "  {:30} {:>8} {:>6.2} ms  {:>3} checks",
         "TOTAL", "", total_ms, total_checks
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -303,14 +302,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_v11",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_vs_gpu_v11",
-        provenance_date: "2026-05-20",
-        description: "# Exp348: CPU vs GPU v11 — V109 Sync Diversity API + Upstream Evolution",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_v11",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_vs_gpu_v11",
+            provenance_date: "2026-05-20",
+            description: "# Exp348: CPU vs GPU v11 — V109 Sync Diversity API + Upstream Evolution",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

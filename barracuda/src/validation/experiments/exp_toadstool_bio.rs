@@ -31,41 +31,39 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
+use crate::cast;
+use crate::gpu::GpuF64;
+use crate::tolerances;
+use crate::validation::OrExit;
+use crate::validation::{self, Validator};
 use barracuda::device::WgpuDevice;
 use barracuda::ops::bio::gillespie::GillespieModel;
 use barracuda::{FlatForest, TreeInferenceGpu};
 use barracuda::{GillespieConfig, GillespieGpu};
 use barracuda::{SmithWatermanGpu, SwConfig};
 use std::sync::Arc;
-use crate::cast;
-use crate::gpu::GpuF64;
-use crate::tolerances;
-use crate::validation::OrExit;
-use crate::validation::{self, Validator};
 
 /// Run the `validate_toadstool_bio` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    println!();
+        println!();
 
-    let device = gpu.to_wgpu_device();
+        let device = gpu.to_wgpu_device();
 
-    validate_tree_inference(&device, v);
-    validate_gillespie(&device, v);
-    validate_smith_waterman(&device, v);
-
+        validate_tree_inference(&device, v);
+        validate_gillespie(&device, v);
+        validate_smith_waterman(&device, v);
     });
 }
 
@@ -326,14 +324,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "toadstool_bio",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_toadstool_bio",
-        provenance_date: "2026-05-20",
-        description: "Exp045: `ToadStool` Bio Absorption Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "toadstool_bio",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_toadstool_bio",
+            provenance_date: "2026-05-20",
+            description: "Exp045: `ToadStool` Bio Absorption Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

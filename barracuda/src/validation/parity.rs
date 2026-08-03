@@ -91,7 +91,7 @@ pub struct ParitySummary {
 
 impl ParityResult {
     /// Serialize to pretty JSON for lithoSpore consumption.
-    #[must_use] 
+    #[must_use]
     pub fn to_json(&self) -> String {
         serde_json::to_string_pretty(self).unwrap_or_default()
     }

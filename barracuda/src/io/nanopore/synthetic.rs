@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+#![cfg(any(test, feature = "validation"))]
 //! Synthetic nanopore signal generation for pre-hardware validation.
 
 use crate::cast::{u64_f64, usize_u32};

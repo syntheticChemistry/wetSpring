@@ -44,7 +44,6 @@ struct AndersonAnomaly {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_anderson_anomalies` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Known Anderson anomalies ──");
 
     let anomalies = vec![
@@ -254,7 +253,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  QS circuit BEFORE the inversion mutation could be beneficial.");
     println!("  Like Ara-3's citrate innovation: potentiating → actualizing.");
     v.check_pass("thesis connection documented", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -265,14 +263,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "anderson_anomalies",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_anderson_anomalies",
-        provenance_date: "2026-05-20",
-        description: "# Exp143: Anderson Anomaly Hunter — QS Where It Shouldn't Exist",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "anderson_anomalies",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_anderson_anomalies",
+            provenance_date: "2026-05-20",
+            description: "# Exp143: Anderson Anomaly Hunter — QS Where It Shouldn't Exist",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

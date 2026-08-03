@@ -332,24 +332,21 @@ pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
         pipeline_result.insert("diversity".into(), diversity);
     }
 
-    let qs_params = if params.get("scenario").is_some() || params.get("dt").is_some() {
-        params.clone()
+    let qs_result = if params.get("scenario").is_some() || params.get("dt").is_some() {
+        handle_qs_model(params)?
     } else {
-        json!({"scenario": "standard_growth"})
+        handle_qs_model(&json!({"scenario": "standard_growth"}))?
     };
-    let qs_result = handle_qs_model(&qs_params)?;
     pipeline_result.insert("qs_model".into(), qs_result);
 
-    match handle_anderson(params) {
-        Ok(anderson) => {
-            pipeline_result.insert("anderson".into(), anderson);
-        }
-        Err(_) => {
-            pipeline_result.insert(
-                "anderson".into(),
-                json!({"status": "skipped", "reason": "gpu not available"}),
-            );
-        }
+    if let Ok(anderson) = handle_anderson(params) {
+        pipeline_result.insert("anderson".into(), anderson);
+    } else {
+        tracing::debug!("Anderson GPU path skipped — gpu not available");
+        pipeline_result.insert(
+            "anderson".into(),
+            json!({"status": "skipped", "reason": "gpu not available"}),
+        );
     }
 
     if params

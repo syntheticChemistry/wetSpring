@@ -39,7 +39,6 @@
 
 use std::path::PathBuf;
 
-use barracuda::stats::{covariance, mean, norm_cdf};
 use crate::bio::diversity;
 use crate::ipc::discover;
 use crate::ipc::primal_names;
@@ -56,10 +55,10 @@ use crate::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, UiConfig,
     scenario_to_json, scenario_with_edges_json,
 };
+use barracuda::stats::{covariance, mean, norm_cdf};
 
 /// Run the `validate_petaltongue_live_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Section 1: Scenario builder validation (all 9 DataChannel types) ──
     println!("\n── S1: DataChannel coverage ──");
 
@@ -619,7 +618,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  petaltongue ui --scenario output/ecology_dashboard.json");
     println!("  petaltongue ui --scenario output/anderson_qs_landscape.json");
     println!("  petaltongue ui --scenario output/amplicon_pipeline.json");
-
 }
 
 /// Discover primal sockets via env-based discovery. Returns capability names
@@ -657,14 +655,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "petaltongue_live_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_petaltongue_live_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp353: petalTongue Live Ecology Dashboard v1",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "petaltongue_live_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_petaltongue_live_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp353: petalTongue Live Ecology Dashboard v1",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

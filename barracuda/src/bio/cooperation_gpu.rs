@@ -83,7 +83,7 @@ impl CooperationGpu {
         initial_states: &[f64],
         batch_params: &[f64],
     ) -> crate::error::Result<Vec<f64>> {
-        let b = config.n_batches as usize;
+        let b = cast::u32_usize(config.n_batches);
         assert_eq!(initial_states.len(), b * N_VARS);
         assert_eq!(batch_params.len(), b * N_PARAMS);
 

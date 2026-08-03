@@ -169,8 +169,12 @@ pub fn handle_export_braid(params: &Value) -> Result<Value, RpcError> {
         .and_then(Value::as_str)
         .unwrap_or("");
 
-    let braid =
-        FermentTranscriptBraid::from_session_result(dataset_id, &session_result, computation, summary_blake3);
+    let braid = FermentTranscriptBraid::from_session_result(
+        dataset_id,
+        &session_result,
+        computation,
+        summary_blake3,
+    );
 
     Ok(json!({
         "braid": braid.to_json(),

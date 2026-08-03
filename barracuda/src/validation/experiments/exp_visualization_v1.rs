@@ -343,9 +343,7 @@ fn validate_full_chain(v: &mut Validator, samples: &[Vec<f64>], labels: &[String
     });
     v.check_pass(
         "node family is wetspring",
-        full.nodes
-            .iter()
-            .all(|n| n.family == crate::PRIMAL_NAME),
+        full.nodes.iter().all(|n| n.family == crate::PRIMAL_NAME),
     );
     v.check_pass("version is semver", full.version.split('.').count() == 3);
     v.check_pass("mode is live-ecosystem", full.mode == "live-ecosystem");
@@ -353,7 +351,6 @@ fn validate_full_chain(v: &mut Validator, samples: &[Vec<f64>], labels: &[String
 
 /// Run the `validate_visualization_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let samples = vec![
         vec![10.0, 20.0, 30.0, 40.0, 50.0, 5.0, 15.0, 25.0],
         vec![15.0, 25.0, 5.0, 35.0, 45.0, 10.0, 20.0, 30.0],
@@ -365,7 +362,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_scenario_builders(v, &samples, &labels);
     validate_ipc(v, &ts);
     validate_full_chain(v, &samples, &labels);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -376,14 +372,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "visualization_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_visualization_v1",
-        provenance_date: "2026-05-20",
-        description: "Exp327: `petalTongue` visualization module — schema compliance and control",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "visualization_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_visualization_v1",
+            provenance_date: "2026-05-20",
+            description: "Exp327: `petalTongue` visualization module — schema compliance and control",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

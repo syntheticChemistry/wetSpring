@@ -25,9 +25,9 @@
 
 use std::time::Instant;
 
-use serde_json::json;
 use crate::ipc::dispatch::dispatch;
 use crate::validation::Validator;
+use serde_json::json;
 
 /// Run the `validate_gonzales_provenance_chain` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -353,7 +353,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let total_us = t_start.elapsed().as_secs_f64() * 1e6;
     println!("\n  Total validation time: {total_us:.0} µs");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -364,14 +363,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gonzales_provenance_chain",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_gonzales_provenance_chain",
-        provenance_date: "2026-05-20",
-        description: "# Exp310: Gonzales Provenance Chain — Pure Primal Composition",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gonzales_provenance_chain",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_gonzales_provenance_chain",
+            provenance_date: "2026-05-20",
+            description: "# Exp310: Gonzales Provenance Chain — Pure Primal Composition",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

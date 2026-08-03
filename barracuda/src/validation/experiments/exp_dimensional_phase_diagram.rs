@@ -51,7 +51,6 @@ fn generate_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
 )]
 /// Run the `validate_dimensional_phase_diagram` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
@@ -244,7 +243,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         let biomes = ncbi_data::biome_diversity_params();
         v.check_count("biome params loaded", biomes.len(), 28);
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -255,14 +253,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "dimensional_phase_diagram",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_dimensional_phase_diagram",
-        provenance_date: "2026-05-20",
-        description: "# Exp129: Dimensional QS Phase Diagram",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "dimensional_phase_diagram",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_dimensional_phase_diagram",
+            provenance_date: "2026-05-20",
+            description: "# Exp129: Dimensional QS Phase Diagram",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

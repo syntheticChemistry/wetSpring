@@ -336,14 +336,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gonzales_gpu",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gonzales_gpu",
-        provenance_date: "2026-05-20",
-        description: "# Exp284: GPU Validation — Gonzales Reproductions",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gonzales_gpu",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gonzales_gpu",
+            provenance_date: "2026-05-20",
+            description: "# Exp284: GPU Validation — Gonzales Reproductions",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

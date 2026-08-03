@@ -48,7 +48,6 @@ const RPC_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Run the `validate_nucleus_data_pipeline` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Phase 1: Ecosystem Probe — Socket Discovery");
 
     let biomeos_socket = discover::discover_socket("BIOMEOS_SOCKET", primal_names::BIOMEOS);
@@ -357,7 +356,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "  3. WETSPRING_DATA_PROVIDER=nestgate cargo run --release --bin validate_nucleus_data_pipeline"
     );
     println!("  4. Wire EMP OTU table download via NestGate HTTP fetch");
-
 }
 
 fn report_socket(label: &str, path: Option<&PathBuf>) {
@@ -402,14 +400,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nucleus_data_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_nucleus_data_pipeline",
-        provenance_date: "2026-05-20",
-        description: "# Exp257: NUCLEUS Data Acquisition Pipeline — Three-Tier Primal Routing",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nucleus_data_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_nucleus_data_pipeline",
+            provenance_date: "2026-05-20",
+            description: "# Exp257: NUCLEUS Data Acquisition Pipeline — Three-Tier Primal Routing",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

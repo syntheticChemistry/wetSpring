@@ -25,6 +25,8 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
+use super::primal_names::SONGBIRD_DISPLAY;
+
 const HEARTBEAT_INTERVAL: Duration = super::timeouts::HEARTBEAT;
 const RPC_TIMEOUT: Duration = super::timeouts::DISCOVERY;
 
@@ -72,7 +74,7 @@ pub fn register(songbird_socket: &Path, wetspring_socket: &Path) -> crate::error
     if let Some((code, msg)) = super::protocol::extract_rpc_error(&response) {
         Err(IpcError::RpcReject {
             code,
-            message: format!("Songbird registration: {msg}"),
+            message: format!("{SONGBIRD_DISPLAY} registration: {msg}"),
         })?
     } else {
         Ok(())
@@ -95,7 +97,7 @@ pub fn heartbeat(songbird_socket: &Path) -> crate::error::Result<()> {
     if let Some((code, msg)) = super::protocol::extract_rpc_error(&response) {
         Err(IpcError::RpcReject {
             code,
-            message: format!("Songbird heartbeat: {msg}"),
+            message: format!("{SONGBIRD_DISPLAY} heartbeat: {msg}"),
         })?
     } else {
         Ok(())
@@ -117,8 +119,8 @@ pub fn start_heartbeat_loop(
 
     std::thread::spawn(move || {
         match register(&songbird_socket, &wetspring_socket) {
-            Ok(()) => tracing::info!("registered with Songbird"),
-            Err(e) => tracing::warn!(error = %e, "Songbird registration failed"),
+            Ok(()) => tracing::info!("registered with {SONGBIRD_DISPLAY}"),
+            Err(e) => tracing::warn!(error = %e, "{SONGBIRD_DISPLAY} registration failed"),
         }
 
         while !shutdown_clone.load(Ordering::Relaxed) {
@@ -129,8 +131,10 @@ pub fn start_heartbeat_loop(
             if let Err(e) = heartbeat(&songbird_socket) {
                 tracing::warn!(error = %e, "heartbeat failed");
                 match register(&songbird_socket, &wetspring_socket) {
-                    Ok(()) => tracing::info!("re-registered with Songbird"),
-                    Err(e2) => tracing::warn!(error = %e2, "re-registration failed"),
+                    Ok(()) => tracing::info!("re-registered with {SONGBIRD_DISPLAY}"),
+                    Err(e2) => {
+                        tracing::warn!(error = %e2, "{SONGBIRD_DISPLAY} re-registration failed");
+                    }
                 }
             }
         }
@@ -149,7 +153,7 @@ fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
         .map_err(|e| IpcError::SocketPath(format!("{}: {e}", socket.display())))?;
 
     let stream = UnixStream::connect_addr(&addr)
-        .map_err(|e| IpcError::Connect(format!("Songbird {}: {e}", socket.display())))?;
+        .map_err(|e| IpcError::Connect(format!("{SONGBIRD_DISPLAY} {}: {e}", socket.display())))?;
 
     stream
         .set_read_timeout(Some(RPC_TIMEOUT))

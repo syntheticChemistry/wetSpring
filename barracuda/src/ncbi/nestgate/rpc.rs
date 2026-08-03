@@ -2,6 +2,7 @@
 //! JSON-RPC transport over Unix socket.
 
 use crate::error::Error;
+use crate::primal_names::NESTGATE_DISPLAY;
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
 use std::path::Path;
@@ -16,7 +17,12 @@ pub fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
         &std::os::unix::net::SocketAddr::from_pathname(socket)
             .map_err(|e| Error::Ncbi(format!("invalid socket path: {e}")))?,
     )
-    .map_err(|e| Error::Ncbi(format!("NestGate connect {}: {e}", socket.display())))?;
+    .map_err(|e| {
+        Error::Ncbi(format!(
+            "{NESTGATE_DISPLAY} connect {}: {e}",
+            socket.display()
+        ))
+    })?;
 
     stream
         .set_read_timeout(Some(READ_TIMEOUT))
@@ -28,7 +34,7 @@ pub fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
     let mut writer = std::io::BufWriter::new(&stream);
     writer
         .write_all(request.as_bytes())
-        .map_err(|e| Error::Ncbi(format!("write to NestGate: {e}")))?;
+        .map_err(|e| Error::Ncbi(format!("write to {NESTGATE_DISPLAY}: {e}")))?;
     writer
         .write_all(b"\n")
         .map_err(|e| Error::Ncbi(format!("write newline: {e}")))?;
@@ -40,10 +46,12 @@ pub fn rpc_call(socket: &Path, request: &str) -> crate::error::Result<String> {
     let mut line = String::new();
     reader
         .read_line(&mut line)
-        .map_err(|e| Error::Ncbi(format!("read from NestGate: {e}")))?;
+        .map_err(|e| Error::Ncbi(format!("read from {NESTGATE_DISPLAY}: {e}")))?;
 
     if line.is_empty() {
-        return Err(Error::Ncbi("NestGate returned empty response".to_string()));
+        return Err(Error::Ncbi(format!(
+            "{NESTGATE_DISPLAY} returned empty response"
+        )));
     }
 
     Ok(line)
@@ -74,7 +82,7 @@ pub fn extract_error(response: &str) -> String {
         }
     }
     format!(
-        "NestGate RPC error: {}",
+        "{NESTGATE_DISPLAY} RPC error: {}",
         &response[..response.len().min(200)]
     )
 }
@@ -100,9 +108,9 @@ pub fn extract_result_value(response: &str) -> crate::error::Result<String> {
             }
         }
     }
-    Err(Error::Ncbi(
-        "could not extract result from NestGate response".to_string(),
-    ))
+    Err(Error::Ncbi(format!(
+        "could not extract result from {NESTGATE_DISPLAY} response"
+    )))
 }
 
 /// Health check: verify `NestGate` is alive.

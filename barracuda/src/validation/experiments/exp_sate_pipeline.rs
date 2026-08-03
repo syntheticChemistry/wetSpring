@@ -21,9 +21,7 @@
 //! Provenance: End-to-end pipeline integration test
 
 use crate::bio::alignment::{ScoringParams, smith_waterman_score};
-use crate::bio::neighbor_joining::{
-    distance_matrix, jukes_cantor_distance, neighbor_joining,
-};
+use crate::bio::neighbor_joining::{distance_matrix, jukes_cantor_distance, neighbor_joining};
 use crate::tolerances;
 use crate::validation::Validator;
 
@@ -37,7 +35,6 @@ const SEQ_T4: &[u8] = b"AAGCCCCATAAACCACCTTGGCTGGCTGAACAGGGATATAGGCAACGACATGTGCG
 #[expect(clippy::cast_sign_loss)]
 /// Run the `validate_sate_pipeline` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let seqs_5: Vec<&[u8]> = vec![SEQ_T0, SEQ_T1, SEQ_T2, SEQ_T3, SEQ_T4];
 
     // ── Section 1: JC distance matrix ───────────────────────────
@@ -129,7 +126,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let sw1 = smith_waterman_score(SEQ_T0, SEQ_T3, &params);
     let sw2 = smith_waterman_score(SEQ_T0, SEQ_T3, &params);
     v.check_count("SW deterministic", sw1 as usize, sw2 as usize);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -140,14 +136,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "sate_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_sate_pipeline",
-        provenance_date: "2026-05-20",
-        description: "Exp038 — SATe-style NJ + SW + Felsenstein pipeline benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "sate_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_sate_pipeline",
+            provenance_date: "2026-05-20",
+            description: "Exp038 — SATe-style NJ + SW + Felsenstein pipeline benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

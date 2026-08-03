@@ -5,6 +5,8 @@
 //! aligned sequences. Used in Anderson 2017 for population-level
 //! genomic variation analysis at hydrothermal vents.
 
+use crate::cast;
+
 /// A detected variant at a specific position.
 #[derive(Debug, Clone)]
 pub struct Variant {
@@ -21,30 +23,22 @@ pub struct Variant {
 impl Variant {
     /// Allele frequency of the reference allele.
     #[must_use]
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "Precision: depth bounded by alignment"
-    )]
     pub fn ref_frequency(&self) -> f64 {
         if self.depth == 0 {
             return 0.0;
         }
         let alt_count: usize = self.alt_alleles.iter().map(|(_, c)| c).sum();
-        (self.depth - alt_count) as f64 / self.depth as f64
+        cast::usize_f64(self.depth - alt_count) / cast::usize_f64(self.depth)
     }
 
     /// Allele frequency of the major alternative allele.
     #[must_use]
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "Precision: depth and max_alt bounded"
-    )]
     pub fn alt_frequency(&self) -> f64 {
         if self.depth == 0 {
             return 0.0;
         }
         let max_alt = self.alt_alleles.iter().map(|(_, c)| *c).max().unwrap_or(0);
-        max_alt as f64 / self.depth as f64
+        cast::usize_f64(max_alt) / cast::usize_f64(self.depth)
     }
 }
 
@@ -62,15 +56,11 @@ pub struct SnpResult {
 impl SnpResult {
     /// SNP density: variants per base pair.
     #[must_use]
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "Precision: variant count and alignment length bounded"
-    )]
     pub fn snp_density(&self) -> f64 {
         if self.alignment_length == 0 {
             return 0.0;
         }
-        self.variants.len() as f64 / self.alignment_length as f64
+        cast::usize_f64(self.variants.len()) / cast::usize_f64(self.alignment_length)
     }
 }
 
@@ -114,10 +104,6 @@ pub struct SnpFlatResult {
 /// Equivalent to `call_snps` but returns `SoA` layout for direct
 /// GPU buffer binding in future absorption.
 #[must_use]
-#[expect(
-    clippy::cast_possible_truncation,
-    reason = "Truncation: alignment_length, n_sequences fit u32"
-)]
 pub fn call_snps_flat(sequences: &[&[u8]]) -> SnpFlatResult {
     let result = call_snps(sequences);
     let n = result.variants.len();
@@ -128,7 +114,7 @@ pub fn call_snps_flat(sequences: &[&[u8]]) -> SnpFlatResult {
     let mut alt_frequencies = Vec::with_capacity(n);
 
     for v in &result.variants {
-        positions.push(v.position as u32);
+        positions.push(cast::usize_u32(v.position));
         ref_alleles.push(v.ref_allele);
         let major_alt = v
             .alt_alleles
@@ -136,7 +122,7 @@ pub fn call_snps_flat(sequences: &[&[u8]]) -> SnpFlatResult {
             .max_by_key(|(_, c)| *c)
             .map_or(b'N', |(b, _)| *b);
         alt_alleles.push(major_alt);
-        depths.push(v.depth as u32);
+        depths.push(cast::usize_u32(v.depth));
         alt_frequencies.push(v.alt_frequency());
     }
 

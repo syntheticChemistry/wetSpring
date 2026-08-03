@@ -157,14 +157,9 @@ pub fn run(v: &mut crate::validation::Validator) {
         0.0,
         tolerances::EXACT,
     );
-
 }
 
-fn check_non_negative(
-    v: &mut Validator,
-    result: &crate::bio::ode::OdeResult,
-    prefix: &str,
-) {
+fn check_non_negative(v: &mut Validator, result: &crate::bio::ode::OdeResult, prefix: &str) {
     let min_val: f64 = result.y.iter().copied().fold(f64::INFINITY, f64::min);
     // min_val should be ≥ 0; we check it's within tolerance of 0 from below
     // by verifying actual ≥ expected (0.0) - tolerance (0.0)
@@ -194,14 +189,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "qs_ode",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_qs_ode",
-        provenance_date: "2026-05-20",
-        description: "Validation binary: Waters 2008 QS/c-di-GMP ODE model (Exp020)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "qs_ode",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_qs_ode",
+            provenance_date: "2026-05-20",
+            description: "Validation binary: Waters 2008 QS/c-di-GMP ODE model (Exp020)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

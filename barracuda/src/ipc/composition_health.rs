@@ -6,7 +6,7 @@
 //! and degrade gracefully — the health endpoint stays responsive even
 //! when primals are absent or unresponsive.
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::io::{BufRead, BufReader, Write as _};
 use std::os::unix::net::UnixStream;
 use std::path::Path;
@@ -68,7 +68,10 @@ impl TrioStatus {
     #[must_use]
     pub fn summary(&self) -> &'static str {
         let components = [self.rhizocrypt, self.loamspine, self.sweetgrass];
-        let live_count = components.iter().filter(|c| **c == ComponentStatus::Live).count();
+        let live_count = components
+            .iter()
+            .filter(|c| **c == ComponentStatus::Live)
+            .count();
         let discovered_count = components
             .iter()
             .filter(|c| **c == ComponentStatus::Discovered)
@@ -156,7 +159,10 @@ pub fn probe_biomeos_status() -> BiomeOsLiveStatus {
 /// Self-check: validate that our own `capability.list` response conforms
 /// to the Wave 20 canonical schema (`capabilities` array + `count` field).
 #[derive(Debug)]
-#[expect(clippy::struct_excessive_bools, reason = "each bool maps to a distinct schema check")]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "each bool maps to a distinct schema check"
+)]
 pub struct SchemaParity {
     /// Overall conformance: all three sub-checks pass.
     pub conformant: bool,
@@ -427,7 +433,9 @@ fn try_primal_list(socket_path: &Path) -> Option<u64> {
 fn probe_rpc(socket_path: &Path, request: &str) -> Option<Value> {
     let stream = UnixStream::connect(socket_path).ok()?;
     stream.set_read_timeout(Some(timeouts::HEALTH_PROBE)).ok()?;
-    stream.set_write_timeout(Some(timeouts::HEALTH_PROBE)).ok()?;
+    stream
+        .set_write_timeout(Some(timeouts::HEALTH_PROBE))
+        .ok()?;
 
     let mut writer = std::io::BufWriter::new(&stream);
     writer.write_all(request.as_bytes()).ok()?;
@@ -473,7 +481,10 @@ mod tests {
     #[test]
     fn schema_parity_self_check() {
         let parity = probe_schema_parity();
-        assert!(parity.conformant, "own capability.list must pass Wave 20 schema check");
+        assert!(
+            parity.conformant,
+            "own capability.list must pass Wave 20 schema check"
+        );
         assert!(parity.has_capabilities_array);
         assert!(parity.has_count);
         assert!(parity.count_matches);
@@ -530,7 +541,10 @@ mod tests {
     #[test]
     fn mesh_health_probes_all_primals() {
         let audit = probe_mesh_health();
-        assert_eq!(audit.total_probed, 13, "should probe all 13 NUCLEUS primals");
+        assert_eq!(
+            audit.total_probed, 13,
+            "should probe all 13 NUCLEUS primals"
+        );
         assert_eq!(audit.primals.len(), 13);
         for info in &audit.primals {
             assert!(!info.primal.is_empty());
@@ -610,8 +624,12 @@ mod tests {
         for p in &primals {
             if p.status == ComponentStatus::Live {
                 alive_count += 1;
-                if let Some(ref v) = p.version { versions.insert(v.clone()); }
-                if let Some(ref s) = p.git_sha { git_shas.insert(s.clone()); }
+                if let Some(ref v) = p.version {
+                    versions.insert(v.clone());
+                }
+                if let Some(ref s) = p.git_sha {
+                    git_shas.insert(s.clone());
+                }
             }
         }
 
@@ -624,7 +642,11 @@ mod tests {
             primals,
         };
 
-        assert_eq!(audit.distinct_versions.len(), 2, "two distinct versions = skew");
+        assert_eq!(
+            audit.distinct_versions.len(),
+            2,
+            "two distinct versions = skew"
+        );
         assert_eq!(audit.distinct_git_shas.len(), 1, "same SHA = no sha skew");
 
         let j = audit.to_json();
@@ -662,11 +684,13 @@ mod tests {
 
         let j = audit.to_json();
         assert_eq!(
-            j.get("version_skew").and_then(Value::as_bool), Some(false),
+            j.get("version_skew").and_then(Value::as_bool),
+            Some(false),
             "same version for both primals"
         );
         assert_eq!(
-            j.get("sha_skew").and_then(Value::as_bool), Some(true),
+            j.get("sha_skew").and_then(Value::as_bool),
+            Some(true),
             "different SHAs = stale deploy detected"
         );
     }

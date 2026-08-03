@@ -18,11 +18,11 @@
 //!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
-use std::collections::HashMap;
-use std::time::Instant;
 use crate::bio::ncbi_data::{CampyAssembly, load_campylobacterota};
 use crate::bio::pangenome::{GeneCluster, analyze};
 use crate::validation::Validator;
+use std::collections::HashMap;
+use std::time::Instant;
 
 fn ecosystem_category(source: &str) -> &'static str {
     let s = source.to_lowercase();
@@ -114,7 +114,6 @@ fn accessory_overlap(acc_a: &[usize], acc_b: &[usize]) -> f64 {
 
 /// Run the `validate_ncbi_pangenome` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Load assemblies ──");
     let t0 = Instant::now();
     let (assemblies, is_ncbi) = load_campylobacterota();
@@ -159,11 +158,7 @@ pub fn run(v: &mut crate::validation::Validator) {
     let global_clusters = generate_global_pangenome(&flat, 42);
 
     v.section("── S3: Per-ecosystem pangenome ──");
-    let mut results: Vec<(
-        String,
-        crate::bio::pangenome::PangenomeResult,
-        Vec<usize>,
-    )> = Vec::new();
+    let mut results: Vec<(String, crate::bio::pangenome::PangenomeResult, Vec<usize>)> = Vec::new();
     for (name, start, end) in &eco_offsets {
         let n = end - start;
         let eco_clusters: Vec<GeneCluster> = global_clusters
@@ -230,7 +225,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             result.n_genomes, result.core_size, result.accessory_size, result.unique_size, alpha
         );
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -241,14 +235,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "ncbi_pangenome",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_ncbi_pangenome",
-        provenance_date: "2026-05-20",
-        description: "# Exp125: NCBI Campylobacterota Cross-Ecosystem Pangenome",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "ncbi_pangenome",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_ncbi_pangenome",
+            provenance_date: "2026-05-20",
+            description: "# Exp125: NCBI Campylobacterota Cross-Ecosystem Pangenome",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

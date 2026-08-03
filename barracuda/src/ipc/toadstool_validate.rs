@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Typed `toadstool.validate` + `toadstool.list_workloads` IPC client.
+//! Typed `compute.validate` + `compute.list_workloads` IPC client.
 //!
 //! Tier 2 pre-flight: validates a workload TOML against toadStool before
 //! dispatch. Returns GPU availability, precision tier, estimated time,
 //! warnings, and required capabilities.
 //!
-//! RPC: `toadstool.validate`, `toadstool.list_workloads` (toadStool S245+).
+//! RPC: `compute.validate`, `compute.list_workloads` (toadStool S245+).
 //! Discovery: reuses `compute_dispatch::discover()`.
 
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
+
+use crate::primal_names::TOADSTOOL_DISPLAY;
 
 const RPC_TIMEOUT: Duration = super::timeouts::COMPUTE;
 
@@ -72,7 +74,7 @@ pub enum ValidateError {
 impl std::fmt::Display for ValidateError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::NoToadStool => f.write_str("toadStool not discovered"),
+            Self::NoToadStool => write!(f, "{TOADSTOOL_DISPLAY} not discovered"),
             Self::Transport(msg) => write!(f, "transport: {msg}"),
             Self::Protocol(msg) => write!(f, "protocol: {msg}"),
         }
@@ -107,7 +109,7 @@ pub fn validate_at(
     dry_run: bool,
 ) -> Result<ValidateResult, ValidateError> {
     let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"toadstool.validate","params":{{"workload_path":"{workload_path}","dry_run":{dry_run}}},"id":1}}"#,
+        r#"{{"jsonrpc":"2.0","method":"compute.validate","params":{{"workload_path":"{workload_path}","dry_run":{dry_run}}},"id":1}}"#,
     );
     let response = rpc_call(socket, &request)?;
     parse_validate_response(&response)
@@ -134,7 +136,7 @@ pub fn list_workloads_at(
     filter: &str,
 ) -> Result<ListWorkloadsResult, ValidateError> {
     let request = format!(
-        r#"{{"jsonrpc":"2.0","method":"toadstool.list_workloads","params":{{"filter":"{filter}"}},"id":2}}"#,
+        r#"{{"jsonrpc":"2.0","method":"compute.list_workloads","params":{{"filter":"{filter}"}},"id":2}}"#,
     );
     let response = rpc_call(socket, &request)?;
     parse_list_response(&response)
@@ -169,9 +171,9 @@ fn rpc_call(socket: &Path, request: &str) -> Result<String, ValidateError> {
         .map_err(|e| ValidateError::Transport(format!("read: {e}")))?;
 
     if line.is_empty() {
-        return Err(ValidateError::Transport(
-            "empty response from toadStool".to_string(),
-        ));
+        return Err(ValidateError::Transport(format!(
+            "empty response from {TOADSTOOL_DISPLAY}"
+        )));
     }
     Ok(line)
 }
@@ -183,7 +185,9 @@ fn parse_validate_response(response: &str) -> Result<ValidateResult, ValidateErr
     if let Some(err) = v.get("error") {
         return Err(ValidateError::Protocol(format!(
             "RPC error: {}",
-            err.get("message").and_then(|m| m.as_str()).unwrap_or("unknown")
+            err.get("message")
+                .and_then(|m| m.as_str())
+                .unwrap_or("unknown")
         )));
     }
 
@@ -192,7 +196,10 @@ fn parse_validate_response(response: &str) -> Result<ValidateResult, ValidateErr
         .ok_or_else(|| ValidateError::Protocol("missing result".to_string()))?;
 
     Ok(ValidateResult {
-        valid: result.get("valid").and_then(serde_json::Value::as_bool).unwrap_or(false),
+        valid: result
+            .get("valid")
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or(false),
         gpu_available: result
             .get("gpu_available")
             .and_then(serde_json::Value::as_bool)
@@ -238,7 +245,9 @@ fn parse_list_response(response: &str) -> Result<ListWorkloadsResult, ValidateEr
     if let Some(err) = v.get("error") {
         return Err(ValidateError::Protocol(format!(
             "RPC error: {}",
-            err.get("message").and_then(|m| m.as_str()).unwrap_or("unknown")
+            err.get("message")
+                .and_then(|m| m.as_str())
+                .unwrap_or("unknown")
         )));
     }
 
@@ -246,7 +255,10 @@ fn parse_list_response(response: &str) -> Result<ListWorkloadsResult, ValidateEr
         .get("result")
         .ok_or_else(|| ValidateError::Protocol("missing result".to_string()))?;
 
-    let total = result.get("total").and_then(serde_json::Value::as_u64).unwrap_or(0);
+    let total = result
+        .get("total")
+        .and_then(serde_json::Value::as_u64)
+        .unwrap_or(0);
 
     let workloads = result
         .get("workloads")
@@ -307,7 +319,8 @@ mod tests {
 
     #[test]
     fn parse_validate_response_error() {
-        let json = r#"{"jsonrpc":"2.0","error":{"code":-32602,"message":"invalid workload path"},"id":1}"#;
+        let json =
+            r#"{"jsonrpc":"2.0","error":{"code":-32602,"message":"invalid workload path"},"id":1}"#;
         let result = parse_validate_response(json);
         assert!(result.is_err());
     }

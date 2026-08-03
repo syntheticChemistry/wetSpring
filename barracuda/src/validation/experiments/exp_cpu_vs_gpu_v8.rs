@@ -265,7 +265,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  D31: Statistics (mean/variance/percentile)");
     println!("  D32: Streaming determinism (bitwise rerun)");
     println!("  Total: {total_ms:.1} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -276,14 +275,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_v8",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_vs_gpu_v8",
-        provenance_date: "2026-05-20",
-        description: "# Exp288: CPU vs GPU v8 — `ToadStool` Compute Dispatch + Pure Math",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_v8",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_vs_gpu_v8",
+            provenance_date: "2026-05-20",
+            description: "# Exp288: CPU vs GPU v8 — `ToadStool` Compute Dispatch + Pure Math",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

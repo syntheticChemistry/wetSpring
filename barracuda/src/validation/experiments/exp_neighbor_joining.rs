@@ -22,15 +22,12 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use crate::bio::neighbor_joining::{
-    distance_matrix, jukes_cantor_distance, neighbor_joining,
-};
+use crate::bio::neighbor_joining::{distance_matrix, jukes_cantor_distance, neighbor_joining};
 use crate::tolerances;
 use crate::validation::Validator;
 
 /// Run the `validate_neighbor_joining` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Test 1: 3-taxon ──
     v.section("3-taxon (X,Y,Z)");
     let labels_3: Vec<String> = vec!["X".into(), "Y".into(), "Z".into()];
@@ -130,7 +127,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     v.section("Determinism");
     let r5b = neighbor_joining(&dm, &labels_5);
     v.check_pass("Deterministic", r5.newick == r5b.newick);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -141,14 +137,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "neighbor_joining",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_neighbor_joining",
-        provenance_date: "2026-05-20",
-        description: "Validation binary for Exp033: Neighbor-Joining tree construction",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "neighbor_joining",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_neighbor_joining",
+            provenance_date: "2026-05-20",
+            description: "Validation binary for Exp033: Neighbor-Joining tree construction",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

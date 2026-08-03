@@ -26,7 +26,6 @@ fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
 
 /// Run the `validate_anaerobic_coffee_residues` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Haldane inhibition (mu_max=0.4, Ks=200, Ki=3000)");
     let mu_max = 0.4;
     let ks = 200.0;
@@ -87,7 +86,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let bc = diversity::bray_curtis(&control_comm, &coffee_comm);
     v.check_pass("BC(control, coffee) > 0", bc > 0.0);
     v.check_pass("BC(control, coffee) <= 1", bc <= 1.0);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -98,14 +96,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "anaerobic_coffee_residues",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_anaerobic_coffee_residues",
-        provenance_date: "2026-05-20",
-        description: "Exp338: Rojas-Sossa 2017 — Coffee residues",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "anaerobic_coffee_residues",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_anaerobic_coffee_residues",
+            provenance_date: "2026-05-20",
+            description: "Exp338: Rojas-Sossa 2017 — Coffee residues",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

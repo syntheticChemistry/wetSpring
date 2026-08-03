@@ -34,12 +34,12 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::time::Instant;
 use crate::bio::{diversity, diversity_gpu, streaming_gpu, taxonomy};
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator, test_data};
+use std::time::Instant;
 
 const N_SAMPLES: usize = 8;
 const N_FEATURES: usize = 256;
@@ -68,18 +68,17 @@ fn training_refs() -> Vec<taxonomy::ReferenceSeq> {
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
+        let gpu = validation::gpu_or_skip().await;
 
-    let gpu = validation::gpu_or_skip().await;
+        let t0 = Instant::now();
 
-    let t0 = Instant::now();
+        validate_roundtrip_mode(v, &gpu);
+        validate_streaming_mode(v, &gpu);
+        validate_modes_match(v, &gpu);
+        validate_batch_scaling(v, &gpu);
 
-    validate_roundtrip_mode(v, &gpu);
-    validate_streaming_mode(v, &gpu);
-    validate_modes_match(v, &gpu);
-    validate_batch_scaling(v, &gpu);
-
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("\n  [Total] {ms:.1} ms");
+        let ms = t0.elapsed().as_secs_f64() * 1000.0;
+        println!("\n  [Total] {ms:.1} ms");
     });
 }
 
@@ -363,14 +362,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_streaming",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_pure_gpu_streaming",
-        provenance_date: "2026-05-20",
-        description: "Exp090: Pure GPU Streaming Pipeline — Zero CPU Round-Trips",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_streaming",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_pure_gpu_streaming",
+            provenance_date: "2026-05-20",
+            description: "Exp090: Pure GPU Streaming Pipeline — Zero CPU Round-Trips",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

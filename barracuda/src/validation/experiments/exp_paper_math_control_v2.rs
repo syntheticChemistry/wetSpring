@@ -27,7 +27,6 @@
 //!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
-use std::collections::HashMap;
 use crate::bio::{
     ani, bistable, capacitor, cooperation, diversity, dnds, felsenstein, gillespie, hmm, kmer,
     multi_signal, neighbor_joining, pangenome, phage_defense, qs_biofilm, robinson_foulds, snp,
@@ -36,6 +35,7 @@ use crate::bio::{
 use crate::cast;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::collections::HashMap;
 
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
@@ -451,7 +451,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Inherited: 18 papers (v1) — Tracks 1, 1b, 2, 3, 4, cross-spring");
     println!("  NEW: P19 Yang 2020, P20-P22 Track 1c, P23-P25 Phase 37 extensions");
     println!("  Chain: Paper (this) → CPU → GPU → Streaming → metalForge");
-
 }
 
 use crate::bio::ode::OdeResult;
@@ -473,14 +472,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "paper_math_control_v2",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_paper_math_control_v2",
-        provenance_date: "2026-05-20",
-        description: "# Exp233: Paper Math Control v2 — 25 Papers Validated via `BarraCuda` CPU",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "paper_math_control_v2",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_paper_math_control_v2",
+            provenance_date: "2026-05-20",
+            description: "# Exp233: Paper Math Control v2 — 25 Papers Validated via `BarraCuda` CPU",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -45,10 +45,10 @@
 
 mod visualization;
 
-use barracuda::stats::norm_cdf;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::{OrExit, Validator};
+use barracuda::stats::norm_cdf;
 
 /// Environment profile with literature-based community + O₂ regime.
 struct Environment {
@@ -63,7 +63,6 @@ struct Environment {
 
 /// Run the `validate_anderson_qs_environments_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Literature-based community profiles ──
     //
     // Abundances are synthetic but parameterized from published data:
@@ -452,8 +451,7 @@ pub fn run(v: &mut crate::validation::Validator) {
         if indices.is_empty() {
             return 0.0;
         }
-        indices.iter().map(|&i| vals[i]).sum::<f64>()
-            / crate::cast::usize_f64(indices.len())
+        indices.iter().map(|&i| vals[i]).sum::<f64>() / crate::cast::usize_f64(indices.len())
     };
 
     println!("  Model H1 (inverse diversity):");
@@ -558,21 +556,24 @@ pub fn run(v: &mut crate::validation::Validator) {
     // ── S7: petalTongue scenario export (extracted) ──
     let env_names: Vec<String> = model_results.iter().map(|r| r.name.clone()).collect();
     let o2_levels: Vec<f64> = results.iter().map(|r| r.o2_level).collect();
-    visualization::export_scenario(v, &visualization::ModelData {
-        env_names,
-        known: known.clone(),
-        p1_vals,
-        p2_vals: p2_vals.clone(),
-        p3_vals: p3_vals.clone(),
-        o2_levels,
-        corr_h1,
-        corr_h2,
-        corr_h3,
-        mae_h3,
-        h3_anaerobic,
-        h3_aerobic,
-        microaerobic_envs: &microaerobic_envs,
-    });
+    visualization::export_scenario(
+        v,
+        &visualization::ModelData {
+            env_names,
+            known: known.clone(),
+            p1_vals,
+            p2_vals: p2_vals.clone(),
+            p3_vals: p3_vals.clone(),
+            o2_levels,
+            corr_h1,
+            corr_h2,
+            corr_h3,
+            mae_h3,
+            h3_anaerobic,
+            h3_aerobic,
+            microaerobic_envs: &microaerobic_envs,
+        },
+    );
 
     // ── Summary ──
     println!("\n── Summary: What the data says ──");
@@ -611,7 +612,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("\n  Implication: the Anderson QS model needs BOTH diversity");
     println!("  AND oxygen as disorder dimensions. H' alone is insufficient.");
     println!("  This is testable with real 16S + metatranscriptomic data.");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -622,14 +622,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "anderson_qs_environments_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_anderson_qs_environments_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp356: Anderson QS Cross-Environment Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "anderson_qs_environments_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_anderson_qs_environments_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp356: Anderson QS Cross-Environment Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

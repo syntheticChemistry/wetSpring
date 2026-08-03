@@ -23,7 +23,6 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use barracuda::device::WgpuDevice;
 use crate::bio::{
     capacitor::{self, CapacitorParams},
     chimera::{self, ChimeraParams},
@@ -45,58 +44,58 @@ use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
 use crate::tolerances;
 use crate::validation::{self, OrExit, Validator};
+use barracuda::device::WgpuDevice;
 
 /// Run the `validate_metalforge_v5` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    let device = gpu.to_wgpu_device();
-    let t0 = Instant::now();
-    let mut timings: Vec<(&str, f64, f64, &str)> = Vec::new();
+        let device = gpu.to_wgpu_device();
+        let t0 = Instant::now();
+        let mut timings: Vec<(&str, f64, f64, &str)> = Vec::new();
 
-    validate_cooperation_mf(&device, v, &mut timings);
-    validate_capacitor_mf(&device, v, &mut timings);
-    validate_kmd_mf(&gpu, v, &mut timings);
-    validate_gbm_mf(&gpu, v, &mut timings);
-    validate_merge_pairs_mf(&gpu, v, &mut timings);
-    validate_signal_mf(&gpu, v, &mut timings);
-    validate_feature_table_mf(&gpu, v, &mut timings);
-    validate_robinson_foulds_mf(&gpu, v, &mut timings);
-    validate_derep_mf(&gpu, v, &mut timings);
-    validate_chimera_mf(&gpu, v, &mut timings);
-    validate_neighbor_joining_mf(&gpu, v, &mut timings);
-    validate_reconciliation_mf(&gpu, v, &mut timings);
-    validate_molecular_clock_mf(&gpu, v, &mut timings);
+        validate_cooperation_mf(&device, v, &mut timings);
+        validate_capacitor_mf(&device, v, &mut timings);
+        validate_kmd_mf(&gpu, v, &mut timings);
+        validate_gbm_mf(&gpu, v, &mut timings);
+        validate_merge_pairs_mf(&gpu, v, &mut timings);
+        validate_signal_mf(&gpu, v, &mut timings);
+        validate_feature_table_mf(&gpu, v, &mut timings);
+        validate_robinson_foulds_mf(&gpu, v, &mut timings);
+        validate_derep_mf(&gpu, v, &mut timings);
+        validate_chimera_mf(&gpu, v, &mut timings);
+        validate_neighbor_joining_mf(&gpu, v, &mut timings);
+        validate_reconciliation_mf(&gpu, v, &mut timings);
+        validate_molecular_clock_mf(&gpu, v, &mut timings);
 
-    // ═══ Summary ════════════════════════════════════════════════════
-    v.section("═══ metalForge Cross-Substrate v5 Summary ═══");
-    println!();
-    println!(
-        "  {:<25} {:>10} {:>10} {:>10}",
-        "Workload", "CPU (µs)", "GPU (µs)", "Substrate"
-    );
-    println!("  {}", "─".repeat(59));
-    for (name, cpu, gpu_t, result) in &timings {
-        println!("  {name:<25} {cpu:>10.0} {gpu_t:>10.0} {result:>10}");
-    }
-    println!("  {}", "─".repeat(59));
+        // ═══ Summary ════════════════════════════════════════════════════
+        v.section("═══ metalForge Cross-Substrate v5 Summary ═══");
+        println!();
+        println!(
+            "  {:<25} {:>10} {:>10} {:>10}",
+            "Workload", "CPU (µs)", "GPU (µs)", "Substrate"
+        );
+        println!("  {}", "─".repeat(59));
+        for (name, cpu, gpu_t, result) in &timings {
+            println!("  {name:<25} {cpu:>10.0} {gpu_t:>10.0} {result:>10}");
+        }
+        println!("  {}", "─".repeat(59));
 
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("\n  13/13 new GPU domains: substrate-independent PROVEN");
-    println!("  [Total] {ms:.1} ms");
+        let ms = t0.elapsed().as_secs_f64() * 1000.0;
+        println!("\n  13/13 new GPU domains: substrate-independent PROVEN");
+        println!("  [Total] {ms:.1} ms");
     });
 }
 
@@ -676,14 +675,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v5",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_metalforge_v5",
-        provenance_date: "2026-05-20",
-        description: "Exp103: `metalForge` Cross-Substrate v5 — 13 Pure GPU Promotion Domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v5",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_metalforge_v5",
+            provenance_date: "2026-05-20",
+            description: "Exp103: `metalForge` Cross-Substrate v5 — 13 Pure GPU Promotion Domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

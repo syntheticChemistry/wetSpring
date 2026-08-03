@@ -15,14 +15,14 @@
 //!
 //! Provenance: Python vs Rust parity benchmark (V2)
 
-use std::collections::HashMap;
-use std::time::Instant;
 use crate::bio::{
     bistable, cooperation, derep, diversity, dnds, felsenstein, gillespie, hmm, kmd, kmer,
     merge_pairs, neighbor_joining, pangenome, pcoa, phage_defense, qs_biofilm, quality,
     robinson_foulds, signal, snp, spectral_match, unifrac,
 };
 use crate::validation::Validator;
+use std::collections::HashMap;
+use std::time::Instant;
 
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
@@ -395,7 +395,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         "\n  All {} domains benchmarked in pure Rust.",
         benches.len()
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -406,14 +405,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "python_vs_rust_v2",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_python_vs_rust_v2",
-        provenance_date: "2026-05-20",
-        description: "# Exp217: Python vs Rust v2 — 47-Domain Timing Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "python_vs_rust_v2",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_python_vs_rust_v2",
+            provenance_date: "2026-05-20",
+            description: "# Exp217: Python vs Rust v2 — 47-Domain Timing Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

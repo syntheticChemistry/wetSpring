@@ -20,6 +20,8 @@
 //! multiple gene families is embarrassingly parallel — one workgroup per
 //! gene tree.
 
+use crate::cast;
+
 /// Event types in DTL reconciliation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DtlEvent {
@@ -157,16 +159,16 @@ pub fn reconcile_dtl<'a>(
             }
         } else {
             // Internal parasite node
-            let p1 = parasite.left_child[p] as usize;
-            let p2 = parasite.right_child[p] as usize;
+            let p1 = cast::u32_usize(parasite.left_child[p]);
+            let p2 = cast::u32_usize(parasite.right_child[p]);
 
             for h in 0..nh {
                 let mut best = INF_COST;
                 let mut best_ev = DtlEvent::Impossible;
 
                 if !host.is_leaf(h) {
-                    let h1 = host.left_child[h] as usize;
-                    let h2 = host.right_child[h] as usize;
+                    let h1 = cast::u32_usize(host.left_child[h]);
+                    let h2 = cast::u32_usize(host.right_child[h]);
 
                     // Co-speciation: p1→h1,p2→h2 or p1→h2,p2→h1
                     let spec1 = cost[p1 * nh + h1].saturating_add(cost[p2 * nh + h2]);
@@ -266,8 +268,8 @@ fn propagate_losses(
             continue;
         }
         if !host.is_leaf(h) {
-            let h1 = host.left_child[h] as usize;
-            let h2 = host.right_child[h] as usize;
+            let h1 = cast::u32_usize(host.left_child[h]);
+            let h2 = cast::u32_usize(host.right_child[h]);
             // If either child has a valid mapping, we can reach through loss
             for &hc in &[h1, h2] {
                 if cost[p * nh + hc] < INF_COST {

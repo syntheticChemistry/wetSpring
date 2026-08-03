@@ -43,7 +43,6 @@ use crate::vault::storage::VaultStore;
 
 /// Run the `validate_genomic_vault` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Phase 1: Consent Ticket Protocol");
 
     let ticket = ConsentTicket::new(
@@ -324,7 +323,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║    biomeOS  → Neural API vault.* capability routing          ║");
     println!("║                                                              ║");
     println!("╚══════════════════════════════════════════════════════════════╝");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -335,14 +333,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "genomic_vault",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_genomic_vault",
-        provenance_date: "2026-05-20",
-        description: "# Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "genomic_vault",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_genomic_vault",
+            provenance_date: "2026-05-20",
+            description: "# Exp259: Genomic Vault — Consent + Encrypted Storage + Provenance",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

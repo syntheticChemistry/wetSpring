@@ -87,7 +87,6 @@ const CASES: &[(&str, &str, &str, usize)] = &[
 
 /// Run the `validate_rf_distance` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Python-matched RF distances ─────────────────────────────
     v.section("── RF distance vs dendropy baseline ──");
 
@@ -135,7 +134,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let d1 = rf_distance(&tree_a, &tree_b);
     let d2 = rf_distance(&tree_a, &tree_b);
     v.check_count("deterministic_rerun", d1, d2);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -146,14 +144,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "rf_distance",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_rf_distance",
-        provenance_date: "2026-05-20",
-        description: "Validation binary: Robinson-Foulds tree distance (Exp021)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "rf_distance",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_rf_distance",
+            provenance_date: "2026-05-20",
+            description: "Validation binary: Robinson-Foulds tree distance (Exp021)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

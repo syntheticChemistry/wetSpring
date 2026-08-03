@@ -27,13 +27,13 @@
 //!
 //! Provenance: metalForge validation (V17)
 
-use std::path::PathBuf;
-use std::time::Instant;
 use crate::bio::{cooperation, diversity, qs_biofilm};
 use crate::ipc::primal_names;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{DomainResult, Validator};
+use std::path::PathBuf;
+use std::time::Instant;
 
 fn domain(
     name: &'static str,
@@ -392,7 +392,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  NUCLEUS atomics: Tower={tower_ready} Node={node_ready} Nest={nest_ready}");
     println!("  metalForge: substrate-independent math proven across all domains");
     println!("  Chain: CPU → GPU → CPU-vs-GPU → metalForge (this)");
-
 }
 
 fn discover_biomeos_bin() -> Option<PathBuf> {
@@ -407,14 +406,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v17",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_metalforge_v17",
-        provenance_date: "2026-05-20",
-        description: "# Exp326: `metalForge` v17 — V99 Mixed NUCLEUS Atomics + biomeOS Graph",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v17",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_metalforge_v17",
+            provenance_date: "2026-05-20",
+            description: "# Exp326: `metalForge` v17 — V99 Mixed NUCLEUS Atomics + biomeOS Graph",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

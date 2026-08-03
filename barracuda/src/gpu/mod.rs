@@ -257,19 +257,19 @@ impl GpuF64 {
         }
     }
 
-    /// Print GPU capabilities to stdout.
+    /// Log GPU capabilities via tracing.
     pub fn print_info(&self) {
-        println!("  GPU: {}", self.adapter_name);
-        println!("  SHADER_F64: {}", if self.has_f64 { "YES" } else { "NO" });
-        println!("  Backend: {:?}", self.capabilities.backend);
-        println!("  DeviceType: {:?}", self.capabilities.device_type);
-        println!("  Fp64Strategy: {:?}", self.fp64_strategy());
-        println!("  PrecisionRouting: {:?}", self.precision_routing());
-        println!("  Optimal precision: {:?}", self.optimal_precision());
-        println!(
-            "  f64 workarounds: exp={}, log={}",
-            self.capabilities.needs_exp_f64_workaround(),
-            self.capabilities.needs_log_f64_workaround()
+        tracing::info!(
+            gpu = %self.adapter_name,
+            shader_f64 = self.has_f64,
+            backend = ?self.capabilities.backend,
+            device_type = ?self.capabilities.device_type,
+            fp64_strategy = ?self.fp64_strategy(),
+            precision_routing = ?self.precision_routing(),
+            optimal_precision = ?self.optimal_precision(),
+            exp_f64_workaround = self.capabilities.needs_exp_f64_workaround(),
+            log_f64_workaround = self.capabilities.needs_log_f64_workaround(),
+            "GPU context info"
         );
     }
 }

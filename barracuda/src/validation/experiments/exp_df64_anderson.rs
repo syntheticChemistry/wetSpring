@@ -49,9 +49,7 @@ const LITERATURE_NU: f64 = 1.57;
 
 #[cfg(feature = "gpu")]
 fn sweep_w(i: usize) -> f64 {
-    W_MIN
-        + crate::cast::usize_f64(i) * (W_MAX - W_MIN)
-            / crate::cast::usize_f64(N_W_POINTS - 1)
+    W_MIN + crate::cast::usize_f64(i) * (W_MAX - W_MIN) / crate::cast::usize_f64(N_W_POINTS - 1)
 }
 
 #[cfg(feature = "gpu")]
@@ -70,15 +68,11 @@ fn compute_r_stats(l: usize, w: f64, n_real: usize) -> (f64, f64) {
     }
     let mean = mean(&r_values);
     let variance = correlation::variance(&r_values).unwrap_or(0.0);
-    (
-        mean,
-        (variance / crate::cast::usize_f64(n_real)).sqrt(),
-    )
+    (mean, (variance / crate::cast::usize_f64(n_real)).sqrt())
 }
 
 /// Run the `validate_df64_anderson` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
         use barracuda::spectral::{AndersonSweepPoint, GOE_R, POISSON_R, find_w_c};
@@ -192,8 +186,7 @@ pub fn run(v: &mut crate::validation::Validator) {
                     .iter()
                     .flat_map(|sr| {
                         sr.sweep.iter().map(move |(w, r, _)| {
-                            let x = (w - mean_wc)
-                                * crate::cast::usize_f64(sr.l).powf(1.0 / nu);
+                            let x = (w - mean_wc) * crate::cast::usize_f64(sr.l).powf(1.0 / nu);
                             (x, *r)
                         })
                     })
@@ -276,7 +269,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             EXPECTED_W_C_MAX > EXPECTED_W_C_MIN,
         );
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -287,14 +279,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "df64_anderson",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_df64_anderson",
-        provenance_date: "2026-05-20",
-        description: "# Exp187: DF64 Anderson at L=24+ — Extended Precision Large Lattice",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "df64_anderson",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_df64_anderson",
+            provenance_date: "2026-05-20",
+            description: "# Exp187: DF64 Anderson at L=24+ — Extended Precision Large Lattice",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

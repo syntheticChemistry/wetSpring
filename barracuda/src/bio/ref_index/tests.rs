@@ -130,9 +130,17 @@ fn longer_reference() {
 #[test]
 fn sais_correctness() {
     let text = b"ABRACADABRA";
-    let mut text_with_sentinel: Vec<usize> = text.iter().map(|&b| match b {
-        b'A' => 1, b'B' => 2, b'C' => 3, b'D' => 4, b'R' => 5, _ => 0,
-    }).collect();
+    let mut text_with_sentinel: Vec<usize> = text
+        .iter()
+        .map(|&b| match b {
+            b'A' => 1,
+            b'B' => 2,
+            b'C' => 3,
+            b'D' => 4,
+            b'R' => 5,
+            _ => 0,
+        })
+        .collect();
     text_with_sentinel.push(0);
 
     let sa = sais(&text_with_sentinel, 6);

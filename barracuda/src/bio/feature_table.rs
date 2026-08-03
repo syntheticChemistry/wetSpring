@@ -17,6 +17,7 @@
 //! - Li, S. et al. "Trackable and scalable LC-MS metabolomics data processing
 //!   using `asari`." Nature Communications 14, 4113 (2023).
 
+use crate::cast;
 use crate::io::mzml::MzmlSpectrum;
 
 use super::eic;
@@ -112,10 +113,6 @@ pub struct FeatureTable {
 /// # Returns
 ///
 /// [`FeatureTable`] with detected features.
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "index → f64 for RT interpolation; right_ips/left_ips are small"
-)]
 #[must_use]
 pub fn extract_features(spectra: &[MzmlSpectrum], params: &FeatureParams) -> FeatureTable {
     // 1. Detect mass tracks
@@ -181,7 +178,7 @@ pub fn extract_features(spectra: &[MzmlSpectrum], params: &FeatureParams) -> Fea
             } else {
                 chromatogram.rt[peak.left_base]
             };
-            let rt_end = if peak.right_ips < chromatogram.rt.len() as f64 {
+            let rt_end = if peak.right_ips < cast::usize_f64(chromatogram.rt.len()) {
                 interpolate_rt(&chromatogram.rt, peak.right_ips)
             } else {
                 chromatogram.rt[peak.right_base]
@@ -232,21 +229,15 @@ fn estimate_noise(intensity: &[f64], peak_start: usize, peak_end: usize) -> f64 
 }
 
 /// Interpolate RT at a fractional index position.
-#[expect(
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    reason = "RT index fractional→usize conversion bounded by array length"
-)]
 fn interpolate_rt(rt: &[f64], fractional_idx: f64) -> f64 {
     if rt.is_empty() {
         return 0.0;
     }
-    let idx = fractional_idx.floor() as usize;
+    let idx = cast::f64_usize(fractional_idx.floor());
     if idx >= rt.len() - 1 {
         return rt[rt.len() - 1];
     }
-    let frac = fractional_idx - idx as f64;
+    let frac = fractional_idx - cast::usize_f64(idx);
     frac.mul_add(rt[idx + 1] - rt[idx], rt[idx])
 }
 

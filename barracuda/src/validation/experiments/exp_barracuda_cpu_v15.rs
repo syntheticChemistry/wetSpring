@@ -36,17 +36,17 @@
 //! - `scripts/spectral_match_baseline.py` (spectral cosine)
 //! - `scripts/zheng2023_dtl_reconciliation.py` (DTL reconciliation)
 
-use std::collections::HashMap;
 use crate::bio::{
     diversity, fst_variance, kmer, merge_pairs, neighbor_joining, pcoa, reconciliation, signal,
     snp, spectral_match, taxonomy, unifrac,
 };
 use crate::tolerances;
 use crate::validation::Validator;
+use std::collections::HashMap;
 
+use crate::validation::OrExit;
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
-use crate::validation::OrExit;
 
 /// Run the `validate_barracuda_cpu_v15` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -354,7 +354,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
     println!("  Inherited: core 50 domains (v14) + 4 new = {total_domains} total");
     println!("  All pure Rust CPU math — zero Python, zero GPU, zero unsafe");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -365,14 +364,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v15",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_cpu_v15",
-        provenance_date: "2026-05-20",
-        description: "# Exp229: `BarraCuda` CPU v15 — V76 Pure Rust Math (FST + `PairwiseL2` + Rare...",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v15",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_cpu_v15",
+            provenance_date: "2026-05-20",
+            description: "# Exp229: `BarraCuda` CPU v15 — V76 Pure Rust Math (FST + `PairwiseL2` + Rare...",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

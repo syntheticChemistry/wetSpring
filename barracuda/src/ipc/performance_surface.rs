@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::primal_names::TOADSTOOL;
+use crate::primal_names::{TOADSTOOL, TOADSTOOL_DISPLAY};
 
 use super::transport;
 
@@ -64,7 +64,7 @@ pub fn report_performance_surface(samples: &[PerformanceSurfaceSample]) {
     let Some(socket) = discover_socket() else {
         tracing::debug!(
             primal = TOADSTOOL,
-            "toadStool socket not found; skipping performance_surface.report"
+            "{TOADSTOOL_DISPLAY} socket not found; skipping performance_surface.report"
         );
         return;
     };
@@ -73,7 +73,7 @@ pub fn report_performance_surface(samples: &[PerformanceSurfaceSample]) {
         tracing::warn!(
             error = %e,
             primal = TOADSTOOL,
-            "toadStool performance_surface.report failed; continuing without remote routing hints"
+            "{TOADSTOOL_DISPLAY} performance_surface.report failed; continuing without remote routing hints"
         );
     }
 }
@@ -87,7 +87,7 @@ pub fn query_performance_surface() -> Option<Vec<PerformanceSurfaceHint>> {
     let Some(socket) = discover_socket() else {
         tracing::debug!(
             primal = TOADSTOOL,
-            "toadStool socket not found; skipping performance_surface.query"
+            "{TOADSTOOL_DISPLAY} socket not found; skipping performance_surface.query"
         );
         return None;
     };
@@ -98,7 +98,7 @@ pub fn query_performance_surface() -> Option<Vec<PerformanceSurfaceHint>> {
             tracing::warn!(
                 error = %e,
                 primal = TOADSTOOL,
-                "toadStool performance_surface.query failed; continuing without remote routing hints"
+                "{TOADSTOOL_DISPLAY} performance_surface.query failed; continuing without remote routing hints"
             );
             None
         }
@@ -139,7 +139,7 @@ fn report_performance_surface_to(
 
     tracing::debug!(
         count = samples.len(),
-        "toadStool compute.performance_surface.report completed"
+        "{TOADSTOOL_DISPLAY} compute.performance_surface.report completed"
     );
     Ok(())
 }
@@ -163,21 +163,21 @@ fn query_performance_surface_to(socket: &Path) -> Result<Vec<PerformanceSurfaceH
         return Err("missing result in performance_surface.query response".to_string());
     };
 
-    parse_hints_from_result(result)
+    parse_hints_from_result(result.clone())
 }
 
 fn parse_hints_from_result(
-    result: &serde_json::Value,
+    result: serde_json::Value,
 ) -> Result<Vec<PerformanceSurfaceHint>, String> {
     if let Ok(hints) = serde_json::from_value::<Vec<PerformanceSurfaceHint>>(result.clone()) {
         return Ok(hints);
     }
 
-    if let Ok(env) = serde_json::from_value::<HintsEnvelope>(result.clone()) {
-        return Ok(env.hints);
-    }
-
-    Err("could not parse performance_surface.query result (expected hints array or { \"hints\": [...] })".to_string())
+    serde_json::from_value::<HintsEnvelope>(result)
+        .map(|env| env.hints)
+        .map_err(|_| {
+            "could not parse performance_surface.query result (expected hints array or { \"hints\": [...] })".to_string()
+        })
 }
 
 #[cfg(test)]
@@ -243,7 +243,7 @@ mod tests {
         let v = serde_json::json!([
             {"op":"a","recommended_precision":"f64","estimated_throughput":1.0}
         ]);
-        let hints = parse_hints_from_result(&v).unwrap();
+        let hints = parse_hints_from_result(v).unwrap();
         assert_eq!(hints.len(), 1);
         assert_eq!(hints[0].op, "a");
     }
@@ -255,7 +255,7 @@ mod tests {
                 {"op":"b","recommended_precision":"df64","estimated_throughput":2.0}
             ]
         });
-        let hints = parse_hints_from_result(&v).unwrap();
+        let hints = parse_hints_from_result(v).unwrap();
         assert_eq!(hints.len(), 1);
         assert_eq!(hints[0].op, "b");
     }

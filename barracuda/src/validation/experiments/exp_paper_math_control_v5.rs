@@ -32,9 +32,7 @@
 //!
 //! Provenance: Paper math control validation (V5 statistics)
 
-use crate::bio::{
-    cooperation, diversity, kmer, phred, qs_biofilm, robinson_foulds, signal, snp,
-};
+use crate::bio::{cooperation, diversity, kmer, phred, qs_biofilm, robinson_foulds, signal, snp};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
@@ -329,7 +327,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Strengthened: analytical identities (erf, Φ, BC, Shannon, RF, SNP, Phred)");
     println!("  Cross-track: soil + ecology + pharmacology diversity composition");
     println!("  Chain: Paper (this) → CPU v24 → GPU v13 → Streaming v11 → metalForge v16");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -340,14 +337,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "paper_math_control_v5",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_paper_math_control_v5",
-        provenance_date: "2026-05-20",
-        description: "# Exp313: Paper Math Control v5 — All 52 Papers Complete (V98)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "paper_math_control_v5",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_paper_math_control_v5",
+            provenance_date: "2026-05-20",
+            description: "# Exp313: Paper Math Control v5 — All 52 Papers Complete (V98)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -70,7 +70,6 @@ fn three_state_model() -> HmmModel {
 
 /// Run the `validate_hmm` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── 2-state weather model ───────────────────────────────────────
     v.section("── 2-state weather model (obs = [Walk, Shop, Clean, Walk, Shop]) ──");
     let model = weather_model();
@@ -186,7 +185,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         0.0,
         tolerances::EXACT,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -197,14 +195,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "hmm",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_hmm",
-        provenance_date: "2026-05-20",
-        description: "Validated against: `scripts/liu2014_hmm_baseline.py`; `liu2014_hmm_python_bas...",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "hmm",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_hmm",
+            provenance_date: "2026-05-20",
+            description: "Validated against: `scripts/liu2014_hmm_baseline.py`; `liu2014_hmm_python_bas...",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

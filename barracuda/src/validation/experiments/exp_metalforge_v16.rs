@@ -31,13 +31,13 @@
 //!
 //! Provenance: metalForge validation (V16)
 
-use std::time::Instant;
 use crate::bio::{
     ani, cooperation, diversity, kmd, pangenome, qs_biofilm, signal, snp, spectral_match,
 };
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{DomainResult, Validator};
+use std::time::Instant;
 
 fn domain(
     name: &'static str,
@@ -309,7 +309,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Cross-system: CPU = GPU = NPU for all paper math domains");
     println!("  metalForge routes: GPU > NPU > CPU (capability-based)");
     println!("  Chain: Paper → CPU → GPU → Streaming → metalForge (this)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -320,14 +319,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v16",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_metalforge_v16",
-        provenance_date: "2026-05-20",
-        description: "# Exp318: `metalForge` v16 — V98 Cross-System Paper Math",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v16",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_metalforge_v16",
+            provenance_date: "2026-05-20",
+            description: "# Exp318: `metalForge` v16 — V98 Cross-System Paper Math",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

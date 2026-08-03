@@ -33,6 +33,7 @@ fn require_f64(gpu: &GpuF64) -> Result<()> {
 /// Returns an error if the device lacks `SHADER_F64` support.
 pub fn rf_distance_gpu(gpu: &GpuF64, tree_a: &PhyloTree, tree_b: &PhyloTree) -> Result<usize> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for RF distance");
     Ok(robinson_foulds::rf_distance(tree_a, tree_b))
 }
 
@@ -47,6 +48,7 @@ pub fn rf_distance_normalized_gpu(
     tree_b: &PhyloTree,
 ) -> Result<f64> {
     require_f64(gpu)?;
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for normalized RF distance");
     Ok(robinson_foulds::rf_distance_normalized(tree_a, tree_b))
 }
 
@@ -68,6 +70,9 @@ pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f
 
     let n = trees.len();
     if n < 16 {
+        tracing::debug!(
+            "GPU dispatch threshold not met, using CPU fallback for RF distance matrix"
+        );
         let mut condensed = Vec::with_capacity(n * (n - 1) / 2);
         for i in 0..n {
             for j in (i + 1)..n {
@@ -82,6 +87,7 @@ pub fn rf_distance_matrix_gpu(gpu: &GpuF64, trees: &[PhyloTree]) -> Result<Vec<f
     //   1. Split representation evolves to bit-vector encoding
     //   2. barraCuda provides BipartitionEncodeGpu (string → bitvec)
     // Tracked: BARRACUDA_REQUIREMENTS.md, Tier B compose
+    tracing::debug!("GPU pipeline sentinel: using CPU fallback for RF distance matrix");
     let mut condensed = Vec::with_capacity(n * (n - 1) / 2);
     for i in 0..n {
         for j in (i + 1)..n {

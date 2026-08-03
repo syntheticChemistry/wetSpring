@@ -25,41 +25,40 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::time::Instant;
 use crate::bio::{diversity, eic, eic_gpu, kriging, pcoa, pcoa_gpu, rarefaction_gpu};
 use crate::gpu::GpuF64;
 use crate::io::mzml::MzmlSpectrum;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::time::Instant;
 
 /// Run the `validate_gpu_extended` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
 
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
 
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
+        let t0 = Instant::now();
 
-    let t0 = Instant::now();
+        validate_eic_total_intensity(v, &gpu);
+        validate_pcoa(v, &gpu);
+        validate_kriging(v, &gpu);
+        validate_rarefaction(v, &gpu);
 
-    validate_eic_total_intensity(v, &gpu);
-    validate_pcoa(v, &gpu);
-    validate_kriging(v, &gpu);
-    validate_rarefaction(v, &gpu);
-
-    let ms = t0.elapsed().as_secs_f64() * 1000.0;
-    println!("  [Total] {ms:.1} ms");
+        let ms = t0.elapsed().as_secs_f64() * 1000.0;
+        println!("  [Total] {ms:.1} ms");
     });
 }
 
@@ -435,14 +434,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_extended",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_extended",
-        provenance_date: "2026-05-20",
-        description: "Exp087: GPU Extended Domains — EIC, `PCoA`, Kriging, Rarefaction",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_extended",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_extended",
+            provenance_date: "2026-05-20",
+            description: "Exp087: GPU Extended Domains — EIC, `PCoA`, Kriging, Rarefaction",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

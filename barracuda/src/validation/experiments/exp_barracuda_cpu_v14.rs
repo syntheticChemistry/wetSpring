@@ -35,7 +35,6 @@
 //! - `scripts/anderson2017_population_genomics.py` (dN/dS, ANI, SNP)
 //! - `scripts/gillespie_baseline.py` (stochastic SSA)
 
-use std::collections::HashMap;
 use crate::bio::{
     bistable, capacitor, cooperation, derep, diversity, dnds, felsenstein, gillespie, hmm, kmd,
     kmer, merge_pairs, multi_signal, neighbor_joining, pangenome, pcoa, phage_defense, qs_biofilm,
@@ -44,10 +43,11 @@ use crate::bio::{
 use crate::df64_host;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::collections::HashMap;
 
+use crate::validation::OrExit;
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
-use crate::validation::OrExit;
 
 /// Run the `validate_barracuda_cpu_v14` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -524,7 +524,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
     println!("  V71 additions: df64_host, graph_laplacian, effective_rank, numerical_hessian");
     println!("  All pure Rust CPU math — zero Python, zero GPU, zero unsafe");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -535,14 +534,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v14",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_barracuda_cpu_v14",
-        provenance_date: "2026-05-20",
-        description: "# Exp225: `BarraCuda` CPU v14 — V71 Pure Rust Math (Cross-Spring + DF64)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v14",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_barracuda_cpu_v14",
+            provenance_date: "2026-05-20",
+            description: "# Exp225: `BarraCuda` CPU v14 — V71 Pure Rust Math (Cross-Spring + DF64)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -27,13 +27,13 @@
 //!
 //! Provenance: metalForge validation (V18)
 
-use std::time::Instant;
 use crate::bio::{diversity, kinetics::monod, qs_biofilm};
 use crate::tolerances;
 use crate::validation::{DomainResult, Validator};
+use std::time::Instant;
 
-use barracuda::stats::norm_cdf;
 use crate::validation::OrExit;
+use barracuda::stats::norm_cdf;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     p * (-(rm * std::f64::consts::E / p)
@@ -278,7 +278,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Cross-substrate PROVEN: CPU = GPU = NPU for Track 6 anaerobic math");
     println!("  metalForge routing produces identical results across all hardware");
     println!("  Chain: Paper → CPU → Python → GPU → Streaming → metalForge (this)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -289,14 +288,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v18",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_metalforge_v18",
-        provenance_date: "2026-05-20",
-        description: "# Exp346: `metalForge` v18 — Track 6 Cross-Substrate Proof",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v18",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_metalforge_v18",
+            provenance_date: "2026-05-20",
+            description: "# Exp346: `metalForge` v18 — Track 6 Cross-Substrate Proof",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

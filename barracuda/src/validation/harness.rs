@@ -167,17 +167,18 @@ impl Validator {
         (self.passed, self.total)
     }
 
-    /// Print summary and exit with 0 (pass) or 1 (fail).
-    pub fn finish(mut self) -> ! {
-        let success = self.total > 0 && self.passed == self.total;
-        self.sink.on_finish(&self.name, self.passed, self.total);
-        std::process::exit(i32::from(!success))
+    /// Print summary and return 0 (pass) or 1 (fail).
+    ///
+    /// Legacy entry point — return the result from `fn main() -> ExitCode` when
+    /// possible. Prefer [`finish_with_code`](Self::finish_with_code) in new binaries.
+    pub fn finish(self) -> std::process::ExitCode {
+        self.finish_with_code()
     }
 
     /// Print summary and return `ExitCode` without calling `process::exit`.
     ///
-    /// Prefer this over [`finish`](Self::finish) in binaries that use the
-    /// `fn main() -> ExitCode` + `fn run()` zero-panic pattern.
+    /// Prefer this in binaries that use the `fn main() -> ExitCode` + `fn run()`
+    /// zero-panic pattern.
     #[must_use]
     pub fn finish_with_code(mut self) -> std::process::ExitCode {
         let success = self.total > 0 && self.passed == self.total;

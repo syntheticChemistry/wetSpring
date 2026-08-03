@@ -131,7 +131,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         .map(|(a, b)| (a - b).abs())
         .fold(0.0_f64, f64::max);
     v.check("Deterministic", max_diff, 0.0, tolerances::EXACT);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -142,14 +141,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "phage_defense",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_phage_defense",
-        provenance_date: "2026-05-20",
-        description: "Validation: Hsueh/Severin 2022 phage defense deaminase (Exp030)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "phage_defense",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_phage_defense",
+            provenance_date: "2026-05-20",
+            description: "Validation: Hsueh/Severin 2022 phage defense deaminase (Exp030)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

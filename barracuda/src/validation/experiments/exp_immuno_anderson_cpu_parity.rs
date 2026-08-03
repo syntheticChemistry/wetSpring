@@ -36,14 +36,14 @@
 
 use std::time::Instant;
 
-use barracuda::spectral::{
-    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
-};
-use barracuda::stats::norm_cdf;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::spectral::{
+    GOE_R, POISSON_R, anderson_2d, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
+};
+use barracuda::stats::norm_cdf;
 
 struct Timing {
     domain: &'static str,
@@ -358,7 +358,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
     println!("╚═════════════════════════╩════════════╩═══════════════════════╝");
     println!();
-
 }
 
 fn ensemble_r_2d(lx: usize, ly: usize, w: f64, seeds: &[u64]) -> f64 {
@@ -393,14 +392,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "immuno_anderson_cpu_parity",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_immuno_anderson_cpu_parity",
-        provenance_date: "2026-05-20",
-        description: "# Exp276: Track 5 CPU Parity — Immunological Anderson Pure Rust Math",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "immuno_anderson_cpu_parity",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_immuno_anderson_cpu_parity",
+            provenance_date: "2026-05-20",
+            description: "# Exp276: Track 5 CPU Parity — Immunological Anderson Pure Rust Math",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

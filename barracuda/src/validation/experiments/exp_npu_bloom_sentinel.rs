@@ -83,7 +83,6 @@ fn simulate_diversity_window(seed: u64, state: usize) -> Vec<f64> {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_npu_bloom_sentinel` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Generate diversity time-series training data");
     let mut train_inputs = Vec::with_capacity(N_TRAIN);
     let mut train_targets = Vec::with_capacity(N_TRAIN);
@@ -242,7 +241,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  GPU energy: {gpu_energy_j:.0} J");
     println!("  Ratio: {:.0}×", gpu_energy_j / npu_energy_j);
     v.check_pass("NPU energy < GPU", npu_energy_j < gpu_energy_j);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -253,14 +251,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "npu_bloom_sentinel",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_npu_bloom_sentinel",
-        provenance_date: "2026-05-20",
-        description: "Exp118 — ESN Bloom Sentinel for NPU Edge Deployment",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "npu_bloom_sentinel",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_npu_bloom_sentinel",
+            provenance_date: "2026-05-20",
+            description: "Exp118 — ESN Bloom Sentinel for NPU Edge Deployment",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

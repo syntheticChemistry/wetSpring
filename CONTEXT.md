@@ -8,7 +8,7 @@ biology using the barraCuda GPU compute library. It is part of the ecoPrimals
 sovereign computing ecosystem — components coordinate via JSON-RPC 2.0 over
 Unix sockets, with zero compile-time coupling.
 
-**Current release — V210:** guideStone amendment compliance (`health.liveness` now includes `version`). DEPLOY-THEN-STALE structurally validated — `lifecycle.status` returns `git_sha` (12-char, resolved at build time), mesh audit detects both version skew and SHA skew. riboCipher REJECT mode active. **Clippy zero warnings**. 1,805 tests (0 failures). WS-11 variant caller parity 6/8 complete.
+**Current release — V210+:** Deep debt evolution — capability-based discovery, 186 bare `as` casts migrated to `crate::cast::*`, idiom modernization (`#[allow]→#[expect]`, `println→tracing`, `process::exit→ExitCode`, `Mutex→RwLock`), GPU sentinel logging, mock isolation (`SyntheticSignalGenerator` feature-gated), dependency evolution (`pollster` removed), variant cross-validation completion (MOB/AMP/CON/INV explicitly handled with Gap #11 tracking). Hardcoded primal names replaced with SSOT display constants. **Clippy zero warnings**. 2,201 tests (0 failures). WS-11 variant caller parity 6/8 complete.
 
 ## Role in the Ecosystem
 
@@ -26,7 +26,7 @@ evolution pipeline.
 - **Architecture:** 2 library crates + 1 UniBin (`wetspring`, 346 scenarios)
 - **Communication:** JSON-RPC 2.0 over Unix sockets, 52 niche capabilities, 59 consumed (33 barraCuda canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 47 dispatch methods, 22 domains, Wire Standard L2+L3
 - **License:** AGPL-3.0-or-later
-- **Tests:** 2,124 workspace (0 failed)
+- **Tests:** 2,201 workspace (0 failed)
 - **Validation checks:** 5,967+ across 346 scenarios (UniBin)
 - **Composition:** 136/136 proto-nucleate (Exp400), Exp401 IPC parity (43/43), Exp402 niche gate (63/63), Exp403 primal parity (Tier 2, 5 primals), `wetspring certify` (Level 5, NUCLEUS 38/38, 4 skip), 9 niche deps (5 required + 4 optional)
 - **Deploy graphs:** 7 (all canonical `[[graph.nodes]]` schema, bonding + fragments metadata, validated by `graph_validate.rs`)
@@ -90,8 +90,8 @@ Tier 5: guideStone       → Self-validating NUCLEUS node (Level 5)
 
 | Field | Value |
 |-------|-------|
-| **Gate** | southGate |
-| **Hardware** | AMD Ryzen 7 5800X3D 8-Core, 128GB DDR4, NVIDIA RTX 4060 |
+| **Gate** | westGate (primary); southGate (NUCLEUS); strandGate (GPU science) |
+| **Hardware** | westGate: Data NAS + dev; southGate: AMD Ryzen 7 5800X3D, 128GB DDR4, RTX 4060 |
 | **Composition** | Full NUCLEUS (13/13 processes, 11/13 health-responding, 2 BTSP-gated) |
 | **NUCLEUS status** | **eukaryotic** (plasmidBin v2026.05.28, biomeOS 1725 caps / 21 surfaces) |
 | **Songbird federation** | 0.0.0.0:7700 (LAN-reachable, cross-subnet confirmed) |

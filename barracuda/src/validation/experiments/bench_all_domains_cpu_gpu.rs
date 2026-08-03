@@ -21,7 +21,6 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use barracuda::device::WgpuDevice;
 use crate::bio::{
     ani, ani_gpu::AniGpu, decision_tree::DecisionTree, dnds, dnds_gpu::DnDsGpu, hmm,
     hmm_gpu::HmmGpuForward, pangenome, pangenome_gpu::PangenomeGpu, random_forest::RandomForest,
@@ -30,6 +29,7 @@ use crate::bio::{
 use crate::gpu::GpuF64;
 use crate::validation;
 use crate::validation::OrExit;
+use barracuda::device::WgpuDevice;
 
 const WARMUP: usize = 2;
 const MIN_ITERS: u64 = 3;
@@ -38,34 +38,34 @@ const MIN_ITERS: u64 = 3;
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    let device = gpu.to_wgpu_device();
+        let device = gpu.to_wgpu_device();
 
-    println!("╔══════════════════════════════════════════════════════════════════════╗");
-    println!("║  Exp066: CPU vs GPU Scaling — All Domains                          ║");
-    println!("║  GPU: {:<60} ║", gpu.adapter_name);
-    println!("╚══════════════════════════════════════════════════════════════════════╝");
+        println!("╔══════════════════════════════════════════════════════════════════════╗");
+        println!("║  Exp066: CPU vs GPU Scaling — All Domains                          ║");
+        println!("║  GPU: {:<60} ║", gpu.adapter_name);
+        println!("╚══════════════════════════════════════════════════════════════════════╝");
 
-    bench_ani(&device);
-    bench_snp(&device);
-    bench_dnds(&device);
-    bench_pangenome(&device);
-    bench_random_forest(&device);
-    bench_hmm(&device);
+        bench_ani(&device);
+        bench_snp(&device);
+        bench_dnds(&device);
+        bench_pangenome(&device);
+        bench_random_forest(&device);
+        bench_hmm(&device);
 
-    println!();
-    println!("  Benchmark complete. GPU dispatch overhead is ~0.5-2ms.");
-    println!("  GPU wins when batch size exceeds the dispatch breakeven.");
+        println!();
+        println!("  Benchmark complete. GPU dispatch overhead is ~0.5-2ms.");
+        println!("  GPU wins when batch size exceeds the dispatch breakeven.");
     });
 }
 
@@ -362,14 +362,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "all_domains_cpu_gpu",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_all_domains_cpu_gpu",
-        provenance_date: "2026-05-20",
-        description: "Exp066: CPU vs GPU Scaling Benchmark — All GPU Domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "all_domains_cpu_gpu",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_all_domains_cpu_gpu",
+            provenance_date: "2026-05-20",
+            description: "Exp066: CPU vs GPU Scaling Benchmark — All GPU Domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

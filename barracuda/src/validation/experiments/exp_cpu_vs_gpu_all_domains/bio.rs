@@ -50,11 +50,7 @@ pub(super) fn validate_shannon_simpson(
     });
 }
 
-pub(super) fn validate_bray_curtis(
-    v: &mut Validator,
-    gpu: &GpuF64,
-    timings: &mut Vec<CpuGpuRow>,
-) {
+pub(super) fn validate_bray_curtis(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D02: Bray-Curtis");
     let a: Vec<f64> = vec![10.0, 20.0, 30.0, 0.0, 15.0, 5.0, 8.0, 12.0];
     let b: Vec<f64> = vec![12.0, 18.0, 25.0, 5.0, 10.0, 7.0, 6.0, 14.0];
@@ -272,11 +268,7 @@ pub(super) fn validate_pangenome(
     });
 }
 
-pub(super) fn validate_rarefaction(
-    v: &mut Validator,
-    gpu: &GpuF64,
-    timings: &mut Vec<CpuGpuRow>,
-) {
+pub(super) fn validate_rarefaction(v: &mut Validator, gpu: &GpuF64, timings: &mut Vec<CpuGpuRow>) {
     v.section("D16: Rarefaction Bootstrap");
     let counts: Vec<f64> = vec![
         120.0, 85.0, 230.0, 55.0, 180.0, 12.0, 42.0, 310.0, 8.0, 95.0, 33.0, 67.0, 145.0, 22.0,

@@ -4,10 +4,10 @@
 
 use std::time::Instant;
 
-use barracuda::linalg::{effective_rank, graph_laplacian};
-use barracuda::numerical::numerical_hessian;
 use crate::tolerances;
 use crate::validation::{CrossSpringEntry, Validator};
+use barracuda::linalg::{effective_rank, graph_laplacian};
+use barracuda::numerical::numerical_hessian;
 
 pub(super) fn validate(v: &mut Validator, bench_results: &mut Vec<CrossSpringEntry>) {
     println!("\n══ S54: neuralSpring baseCamp Primitives ════════════════════════\n");
@@ -135,10 +135,30 @@ fn validate_numerical_hessian(v: &mut Validator, bench_results: &mut Vec<CrossSp
     let hessian = numerical_hessian(&loss, &params, tolerances::NUMERICAL_HESSIAN_EPSILON);
     let hess_us = t0.elapsed().as_micros() as f64;
 
-    v.check("Hessian[0,0] = 2", hessian[0], 2.0, tolerances::PYTHON_PVALUE);
-    v.check("Hessian[0,1] = 1", hessian[1], 1.0, tolerances::PYTHON_PVALUE);
-    v.check("Hessian[1,0] = 1", hessian[2], 1.0, tolerances::PYTHON_PVALUE);
-    v.check("Hessian[1,1] = 4", hessian[3], 4.0, tolerances::PYTHON_PVALUE);
+    v.check(
+        "Hessian[0,0] = 2",
+        hessian[0],
+        2.0,
+        tolerances::PYTHON_PVALUE,
+    );
+    v.check(
+        "Hessian[0,1] = 1",
+        hessian[1],
+        1.0,
+        tolerances::PYTHON_PVALUE,
+    );
+    v.check(
+        "Hessian[1,0] = 1",
+        hessian[2],
+        1.0,
+        tolerances::PYTHON_PVALUE,
+    );
+    v.check(
+        "Hessian[1,1] = 4",
+        hessian[3],
+        4.0,
+        tolerances::PYTHON_PVALUE,
+    );
 
     let trace = hessian[0] + hessian[3];
     let det = hessian[0].mul_add(hessian[3], -(hessian[1] * hessian[2]));

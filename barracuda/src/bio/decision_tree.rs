@@ -18,6 +18,7 @@
 //! let prediction = tree.predict(&features);
 //! ```
 
+use crate::cast;
 use crate::error;
 
 /// A node in the decision tree.
@@ -93,10 +94,6 @@ impl DecisionTree {
     /// Traverses from root to leaf, returning the predicted class.
     /// Panics if the tree structure is invalid (broken child pointers).
     #[must_use]
-    #[expect(
-        clippy::cast_sign_loss,
-        reason = "Sign: left_child/right_child from tree build, non-negative"
-    )]
     pub fn predict(&self, features: &[f64]) -> usize {
         let mut idx = 0usize;
         loop {
@@ -104,11 +101,13 @@ impl DecisionTree {
             if node.is_leaf() {
                 return node.prediction.unwrap_or(0);
             }
-            let feat_val = features.get(node.feature as usize).map_or(0.0, |x| *x);
+            let feat_val = features
+                .get(cast::i32_usize(node.feature))
+                .map_or(0.0, |x| *x);
             idx = if feat_val <= node.threshold {
-                node.left_child as usize
+                cast::i32_usize(node.left_child)
             } else {
-                node.right_child as usize
+                cast::i32_usize(node.right_child)
             };
         }
     }
@@ -152,17 +151,13 @@ impl DecisionTree {
         self.node_depth(0)
     }
 
-    #[expect(
-        clippy::cast_sign_loss,
-        reason = "Sign: left_child/right_child from tree build, non-negative"
-    )]
     fn node_depth(&self, idx: usize) -> usize {
         let node = &self.nodes[idx];
         if node.is_leaf() {
             return 0;
         }
-        let left_depth = self.node_depth(node.left_child as usize);
-        let right_depth = self.node_depth(node.right_child as usize);
+        let left_depth = self.node_depth(cast::i32_usize(node.left_child));
+        let right_depth = self.node_depth(cast::i32_usize(node.right_child));
         1 + left_depth.max(right_depth)
     }
 }

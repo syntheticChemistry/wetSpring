@@ -439,10 +439,7 @@ mod tests {
         let trio = &result["subsystems"]["provenance_trio"];
         assert!(trio.is_object(), "trio must be a live-probing object");
         for key in &["rhizocrypt", "loamspine", "sweetgrass", "summary"] {
-            assert!(
-                trio.get(key).is_some(),
-                "trio missing key: {key}"
-            );
+            assert!(trio.get(key).is_some(), "trio missing key: {key}");
         }
 
         let nestgate = &result["subsystems"]["nestgate"];

@@ -167,8 +167,7 @@ fn validate_wateringhole_sampling(v: &mut Validator, timings: &mut Vec<BenchRowE
     v.check_pass("Sobol: 10k points", sobol.len() == 10_000);
 
     let (lhs, _) = bench("LHS 10k×5D", || {
-        barracuda::sample::latin_hypercube(10_000, &[(0.0, 1.0); 5], 42)
-            .or_exit("unexpected error")
+        barracuda::sample::latin_hypercube(10_000, &[(0.0, 1.0); 5], 42).or_exit("unexpected error")
     });
     v.check_pass("LHS: 10k points", lhs.len() == 10_000);
 
@@ -306,39 +305,73 @@ fn run_cpu_benchmarks(v: &mut Validator) {
     let mut cpu_rows: Vec<CpuRow> = Vec::new();
 
     let (_, us) = validation::bench_n_us(1000, || barracuda::stats::shannon(&vec_1k));
-    cpu_rows.push(CpuRow { name: "Shannon", origin: "wetSpring→S63", us });
+    cpu_rows.push(CpuRow {
+        name: "Shannon",
+        origin: "wetSpring→S63",
+        us,
+    });
 
     let (_, us) = validation::bench_n_us(1000, || barracuda::stats::simpson(&vec_1k));
-    cpu_rows.push(CpuRow { name: "Simpson", origin: "wetSpring→S63", us });
+    cpu_rows.push(CpuRow {
+        name: "Simpson",
+        origin: "wetSpring→S63",
+        us,
+    });
 
     let (_, us) = validation::bench_n_us(1000, || barracuda::stats::bray_curtis(&vec_a, &vec_b));
-    cpu_rows.push(CpuRow { name: "Bray-Curtis", origin: "wetSpring→S82", us });
+    cpu_rows.push(CpuRow {
+        name: "Bray-Curtis",
+        origin: "wetSpring→S82",
+        us,
+    });
 
     let (_, us) = validation::bench_n_us(1000, || barracuda::stats::chao1(&vec_1k));
-    cpu_rows.push(CpuRow { name: "Chao1", origin: "wetSpring→S63", us });
+    cpu_rows.push(CpuRow {
+        name: "Chao1",
+        origin: "wetSpring→S63",
+        us,
+    });
 
     let (_, us) = validation::bench_n_us(1000, || {
         barracuda::stats::pearson_correlation(&vec_a, &vec_b)
     });
-    cpu_rows.push(CpuRow { name: "Pearson r", origin: "neuralSpring→S66", us });
+    cpu_rows.push(CpuRow {
+        name: "Pearson r",
+        origin: "neuralSpring→S66",
+        us,
+    });
 
     let x_fit: Vec<f64> = (0..500).map(f64::from).collect();
     let y_fit: Vec<f64> = x_fit.iter().map(|&xi| 3.0f64.mul_add(xi, 7.0)).collect();
     let (_, us) = validation::bench_n_us(1000, || barracuda::stats::fit_linear(&x_fit, &y_fit));
-    cpu_rows.push(CpuRow { name: "Linear fit", origin: "neuralSpring→S66", us });
+    cpu_rows.push(CpuRow {
+        name: "Linear fit",
+        origin: "neuralSpring→S66",
+        us,
+    });
 
     let trap_x: Vec<f64> = (0..1000).map(|i| f64::from(i) * 0.001).collect();
     let trap_y: Vec<f64> = trap_x.iter().map(|x| x * x).collect();
     let (_, us) = validation::bench_n_us(5000, || barracuda::numerical::trapz(&trap_y, &trap_x));
-    cpu_rows.push(CpuRow { name: "Trapz", origin: "hotSpring→S59", us });
+    cpu_rows.push(CpuRow {
+        name: "Trapz",
+        origin: "hotSpring→S59",
+        us,
+    });
 
     let erf_pts: Vec<f64> = (0..1000).map(|i| (f64::from(i) - 500.0) / 500.0).collect();
     let (_, us) = validation::bench_n_us(5000, || {
         let mut acc = 0.0;
-        for &x in &erf_pts { acc += barracuda::special::erf(x); }
+        for &x in &erf_pts {
+            acc += barracuda::special::erf(x);
+        }
         acc
     });
-    cpu_rows.push(CpuRow { name: "Erf (1k pts)", origin: "hotSpring→S59", us });
+    cpu_rows.push(CpuRow {
+        name: "Erf (1k pts)",
+        origin: "hotSpring→S59",
+        us,
+    });
 
     let n_ridge = 50_usize;
     let n_cols = 10_usize;
@@ -353,7 +386,11 @@ fn run_cpu_benchmarks(v: &mut Validator) {
     let (_, us) = validation::bench_n_us(100, || {
         barracuda::linalg::ridge_regression(&x_ridge, &y_ridge, n_ridge, n_cols, 1, 0.1)
     });
-    cpu_rows.push(CpuRow { name: "Ridge (50×10)", origin: "hotSpring→S59", us });
+    cpu_rows.push(CpuRow {
+        name: "Ridge (50×10)",
+        origin: "hotSpring→S59",
+        us,
+    });
 
     v.check_pass("CPU benchmarks complete", !cpu_rows.is_empty());
 
@@ -366,7 +403,10 @@ fn run_cpu_benchmarks(v: &mut Validator) {
     for r in &cpu_rows {
         println!(
             "  │ {:<16} │ {:<15} │ {:>8.3} │ {:>12.0} │",
-            r.name, r.origin, r.us, 1_000_000.0 / r.us
+            r.name,
+            r.origin,
+            r.us,
+            1_000_000.0 / r.us
         );
     }
     println!("  └──────────────────┴─────────────────┴──────────┴──────────────┘");

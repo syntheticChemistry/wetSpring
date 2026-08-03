@@ -26,6 +26,8 @@ use std::time::Duration;
 
 use serde_json::{Value, json};
 
+use super::primal_names::SKUNKBAT_DISPLAY;
+
 const RPC_TIMEOUT: Duration = super::timeouts::DISCOVERY;
 
 /// Discover the skunkBat Unix socket path.
@@ -156,7 +158,7 @@ pub fn try_emit(event: &AuditEvent) {
         tracing::trace!(
             domain = event.domain,
             action = event.action,
-            "skunkBat not available — audit event suppressed"
+            "{SKUNKBAT_DISPLAY} not available — audit event suppressed"
         );
         return;
     };
@@ -165,7 +167,7 @@ pub fn try_emit(event: &AuditEvent) {
             error = %e,
             domain = event.domain,
             action = event.action,
-            "skunkBat audit emit failed — continuing"
+            "{SKUNKBAT_DISPLAY} audit emit failed — continuing"
         );
     }
 }
@@ -206,7 +208,7 @@ fn rpc_call(socket: &Path, request: &Value) -> crate::error::Result<Value> {
         serde_json::to_string(request).map_err(|e| IpcError::Codec(format!("serialize: {e}")))?;
 
     let stream = UnixStream::connect(socket)
-        .map_err(|e| IpcError::Connect(format!("skunkBat {}: {e}", socket.display())))?;
+        .map_err(|e| IpcError::Connect(format!("{SKUNKBAT_DISPLAY} {}: {e}", socket.display())))?;
     stream.set_read_timeout(Some(RPC_TIMEOUT)).ok();
     stream.set_write_timeout(Some(RPC_TIMEOUT)).ok();
 
@@ -242,7 +244,7 @@ fn rpc_call(socket: &Path, request: &Value) -> crate::error::Result<Value> {
             .unwrap_or("unknown");
         return Err(IpcError::RpcReject {
             code,
-            message: format!("skunkBat: {msg}"),
+            message: format!("{SKUNKBAT_DISPLAY}: {msg}"),
         }
         .into());
     }

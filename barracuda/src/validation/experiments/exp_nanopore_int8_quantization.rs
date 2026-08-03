@@ -341,7 +341,6 @@ fn validate_throughput(v: &mut Validator, batch: &[NanoporeRead]) {
 
 /// Run the `validate_nanopore_int8_quantization` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let sig = SyntheticSignalGenerator::new(42);
     let read = sig.generate_read(1, 4000, 4000.0);
     let cal = read.calibrated_signal();
@@ -354,7 +353,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_reservoir(v, &features);
     validate_diversity(v, &batch);
     validate_throughput(v, &batch);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -365,14 +363,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nanopore_int8_quantization",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_nanopore_int8_quantization",
-        provenance_date: "2026-05-20",
-        description: "# Exp196c: Int8 Quantization from Noisy Nanopore Reads",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nanopore_int8_quantization",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_nanopore_int8_quantization",
+            provenance_date: "2026-05-20",
+            description: "# Exp196c: Int8 Quantization from Noisy Nanopore Reads",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

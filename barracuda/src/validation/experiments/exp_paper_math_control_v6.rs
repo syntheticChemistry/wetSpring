@@ -457,14 +457,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "paper_math_control_v6",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_paper_math_control_v6",
-        provenance_date: "2026-05-20",
-        description: "# Exp341: Paper Math Control v6 — 63 Papers (V108)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "paper_math_control_v6",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_paper_math_control_v6",
+            provenance_date: "2026-05-20",
+            description: "# Exp341: Paper Math Control v6 — 63 Papers (V108)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

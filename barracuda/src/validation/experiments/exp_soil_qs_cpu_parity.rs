@@ -36,17 +36,17 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::time::Instant;
 use crate::bio::cooperation::{self, CooperationParams};
 use crate::bio::diversity;
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::cast;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
+use crate::validation::OrExit;
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
-use crate::validation::OrExit;
 
 struct Timing {
     domain: &'static str,
@@ -479,7 +479,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let (passed, total) = v.counts();
     println!("\n  ── Exp179 Summary: {passed}/{total} checks ──");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -490,14 +489,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "soil_qs_cpu_parity",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_soil_qs_cpu_parity",
-        provenance_date: "2026-05-20",
-        description: "# Exp179: Track 4 CPU Parity Benchmark — Pure Rust Math vs Python-Equivalent",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "soil_qs_cpu_parity",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_soil_qs_cpu_parity",
+            provenance_date: "2026-05-20",
+            description: "# Exp179: Track 4 CPU Parity Benchmark — Pure Rust Math vs Python-Equivalent",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

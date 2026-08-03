@@ -46,24 +46,21 @@
 //!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
-use std::collections::HashMap;
-use std::path::Path;
 use crate::bio::chimera::{self, ChimeraParams};
 use crate::bio::dada2::{self, Dada2Params};
 use crate::bio::derep::{self, DerepSort};
 use crate::bio::diversity;
 use crate::bio::quality::{self, QualityParams};
-use crate::bio::taxonomy::{
-    ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq,
-};
+use crate::bio::taxonomy::{ClassifyParams, Lineage, NaiveBayesClassifier, ReferenceSeq};
 use crate::bio::unifrac::{self, PhyloTree};
 use crate::io::fastq::{self, FastqRecord};
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use std::collections::HashMap;
+use std::path::Path;
 
 /// Run the `validate_algae_16s` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     validate_synthetic_pipeline(v);
     validate_humphrey_reference(v);
     validate_python_control(v);
@@ -83,7 +80,6 @@ pub fn run(v: &mut crate::validation::Validator) {
             data_dir.display()
         );
     }
-
 }
 
 // ── Synthetic pipeline: Nannochloropsis-like communities ────────────────────
@@ -623,14 +619,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "algae_16s",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_algae_16s",
-        provenance_date: "2026-05-20",
-        description: "Validate Rust 16S pipeline on real algae-pond proxy data (Exp012)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "algae_16s",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_algae_16s",
+            provenance_date: "2026-05-20",
+            description: "Validate Rust 16S pipeline on real algae-pond proxy data (Exp012)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

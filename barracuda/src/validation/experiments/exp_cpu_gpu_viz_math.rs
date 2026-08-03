@@ -29,9 +29,7 @@
 //!
 //! Provenance: CPU/GPU parity with visualization math checks
 
-use crate::bio::{
-    diversity, diversity_gpu, kmd, kmd_gpu, pcoa, pcoa_gpu, qs_biofilm,
-};
+use crate::bio::{diversity, diversity_gpu, kmd, kmd_gpu, pcoa, pcoa_gpu, qs_biofilm};
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
@@ -204,7 +202,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     validate_beta_and_ordination(v, &gpu);
     validate_kmd(v, &gpu);
     validate_ode_determinism(v);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -215,14 +212,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_gpu_viz_math",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_gpu_viz_math",
-        provenance_date: "2026-05-20",
-        description: "Exp328: CPU vs GPU pure math parity for visualization-exercised domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_gpu_viz_math",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_gpu_viz_math",
+            provenance_date: "2026-05-20",
+            description: "Exp328: CPU vs GPU pure math parity for visualization-exercised domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

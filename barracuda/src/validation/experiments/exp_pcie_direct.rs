@@ -27,13 +27,13 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use std::collections::HashMap;
-use std::fmt;
-use std::time::Instant;
 use crate::bio::{diversity, kmer, taxonomy, unifrac};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::collections::HashMap;
+use std::fmt;
+use std::time::Instant;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Substrate {
@@ -474,14 +474,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pcie_direct",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_pcie_direct",
-        provenance_date: "2026-05-20",
-        description: "Exp088: `metalForge` `PCIe` Direct Transfer Proof",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pcie_direct",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_pcie_direct",
+            provenance_date: "2026-05-20",
+            description: "Exp088: `metalForge` `PCIe` Direct Transfer Proof",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

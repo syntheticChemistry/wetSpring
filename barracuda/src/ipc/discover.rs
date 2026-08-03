@@ -15,15 +15,15 @@
 
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
-use std::sync::{Mutex, OnceLock};
+use std::sync::{OnceLock, RwLock};
 
 /// Process-level negative cache for dead sockets.
 /// Prevents repeated ~100ms probe costs for known-dead sockets within a session.
 /// Absorbed from primalSpring `DEAD_SOCKET_CACHE` pattern (Wave 22).
-static DEAD_SOCKET_CACHE: OnceLock<Mutex<HashSet<PathBuf>>> = OnceLock::new();
+static DEAD_SOCKET_CACHE: OnceLock<RwLock<HashSet<PathBuf>>> = OnceLock::new();
 
-fn dead_cache() -> &'static Mutex<HashSet<PathBuf>> {
-    DEAD_SOCKET_CACHE.get_or_init(|| Mutex::new(HashSet::new()))
+fn dead_cache() -> &'static RwLock<HashSet<PathBuf>> {
+    DEAD_SOCKET_CACHE.get_or_init(|| RwLock::new(HashSet::new()))
 }
 
 /// Check if a Unix domain socket has an active listener.
@@ -43,7 +43,7 @@ pub fn socket_is_alive(path: &Path) -> bool {
         return false;
     }
 
-    if let Ok(cache) = dead_cache().lock() {
+    if let Ok(cache) = dead_cache().read() {
         if cache.contains(path) {
             return false;
         }
@@ -57,7 +57,7 @@ pub fn socket_is_alive(path: &Path) -> bool {
         .is_ok();
 
     if !alive {
-        if let Ok(mut cache) = dead_cache().lock() {
+        if let Ok(mut cache) = dead_cache().write() {
             cache.insert(path.to_path_buf());
         }
     }
@@ -121,20 +121,44 @@ macro_rules! primal_discover_fn {
 
 primal_discover_fn! {
     /// Discover Squirrel AI socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"ai"` or `"inference"` for
+    /// capability-based discovery. Retained for backward compatibility.
     discover_squirrel   => SQUIRREL,
     /// Discover coralReef sovereign shader compiler socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"shader"` for capability-based
+    /// discovery. Retained for backward compatibility.
     discover_coralreef  => CORALREEF,
     /// Discover toadStool compute orchestrator socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"compute"` for capability-based
+    /// discovery. Retained for backward compatibility.
     discover_toadstool  => TOADSTOOL,
     /// Discover petalTongue visualization socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"render"` for capability-based
+    /// discovery. Retained for backward compatibility.
     discover_petaltongue => PETALTONGUE,
     /// Discover rhizoCrypt derivation DAG socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"dag"` for capability-based
+    /// discovery. Retained for backward compatibility.
     discover_rhizocrypt => RHIZOCRYPT,
     /// Discover loamSpine immutable ledger socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"spine"` or `"entry"` for
+    /// capability-based discovery. Retained for backward compatibility.
     discover_loamspine  => LOAMSPINE,
     /// Discover sweetGrass provenance socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"braid"` or `"provenance"` for
+    /// capability-based discovery. Retained for backward compatibility.
     discover_sweetgrass => SWEETGRASS,
     /// Discover skunkBat audit socket.
+    ///
+    /// Prefer [`discover_by_capability`] with `"audit"` for capability-based
+    /// discovery. Retained for backward compatibility.
     discover_skunkbat   => SKUNKBAT,
 }
 
@@ -230,7 +254,10 @@ fn songbird_capability_resolve(capability_domain: &str) -> Option<serde_json::Va
     reader.read_line(&mut line).ok()?;
 
     let v: serde_json::Value = serde_json::from_str(&line).ok()?;
-    v.get("result").cloned()
+    match v {
+        serde_json::Value::Object(mut map) => map.remove("result"),
+        _ => None,
+    }
 }
 
 /// UDS-only capability resolution via Songbird `capability.resolve`.
@@ -256,7 +283,11 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
     // Legacy: plain socket path
     let socket_path = result.get("socket")?.as_str()?;
     let path = PathBuf::from(socket_path);
-    if socket_is_alive(&path) { Some(path) } else { None }
+    if socket_is_alive(&path) {
+        Some(path)
+    } else {
+        None
+    }
 }
 
 /// Transport-aware capability resolution via Songbird.
@@ -270,9 +301,7 @@ fn resolve_via_songbird(capability_domain: &str) -> Option<PathBuf> {
 /// Falls back to legacy `{"socket":"/path"}` → `Transport::Unix`.
 /// Returns `None` when Songbird is absent or the capability is unresolved.
 #[cfg(feature = "ipc")]
-fn resolve_transport_via_songbird(
-    capability_domain: &str,
-) -> Option<super::transport::Transport> {
+fn resolve_transport_via_songbird(capability_domain: &str) -> Option<super::transport::Transport> {
     let result = songbird_capability_resolve(capability_domain)?;
 
     // Wave 107 M1: structured TransportEndpoint in result.endpoint
@@ -360,11 +389,7 @@ pub fn discover_socket(env_var: &str, primal: &str) -> Option<PathBuf> {
     }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        let p = PathBuf::from(xdg).join(format!(
-            "{}/{}",
-            super::primal_names::BIOMEOS,
-            sock_name
-        ));
+        let p = PathBuf::from(xdg).join(format!("{}/{}", super::primal_names::BIOMEOS, sock_name));
         if socket_is_alive(&p) {
             return Some(p);
         }
@@ -404,11 +429,7 @@ pub fn resolve_bind_path(env_var: &str, primal: &str) -> PathBuf {
     }
 
     if let Ok(xdg) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(xdg).join(format!(
-            "{}/{}",
-            super::primal_names::BIOMEOS,
-            sock_name
-        ));
+        return PathBuf::from(xdg).join(format!("{}/{}", super::primal_names::BIOMEOS, sock_name));
     }
 
     std::env::temp_dir()
@@ -601,7 +622,7 @@ mod tests {
 
         assert!(!socket_is_alive(&p));
         assert!(
-            dead_cache().lock().unwrap().contains(&p),
+            dead_cache().read().unwrap().contains(&p),
             "dead socket should be cached after first probe"
         );
 

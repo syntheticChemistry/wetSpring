@@ -3,7 +3,7 @@
 use super::*;
 use crate::bio::ref_index::FmIndex;
 
-#[allow(dead_code)]
+#[allow(dead_code, reason = "shared test helper used by subset of cfg'd tests")]
 fn test_reference() -> Vec<u8> {
     // 200bp reference with a unique region
     let mut seq = Vec::with_capacity(200);
@@ -13,7 +13,7 @@ fn test_reference() -> Vec<u8> {
     seq
 }
 
-#[allow(dead_code)]
+#[allow(dead_code, reason = "shared test helper used by subset of cfg'd tests")]
 fn make_index_and_ref() -> (FmIndex, Vec<u8>) {
     let reference = test_reference();
     let index = FmIndex::build(&reference);
@@ -73,16 +73,8 @@ fn map_batch() {
     };
 
     let reads = vec![
-        (
-            "r1".to_string(),
-            b"AAACCCGGG".to_vec(),
-            vec![b'I'; 9],
-        ),
-        (
-            "r2".to_string(),
-            b"CCCCCCCCCC".to_vec(),
-            vec![b'I'; 10],
-        ),
+        ("r1".to_string(), b"AAACCCGGG".to_vec(), vec![b'I'; 9]),
+        ("r2".to_string(), b"CCCCCCCCCC".to_vec(), vec![b'I'; 10]),
     ];
 
     let results = map_reads(&reads, &index, reference, "ref", &config);
@@ -274,10 +266,7 @@ fn dedup_no_op_with_single_candidate() {
 
 #[test]
 fn dedup_disabled_when_distance_zero() {
-    let mut candidates = vec![
-        make_candidate(100, 80),
-        make_candidate(101, 70),
-    ];
+    let mut candidates = vec![make_candidate(100, 80), make_candidate(101, 70)];
     dedup_candidates(&mut candidates, 0);
     // distance=0 means abs_diff < 0 is never true, so nothing is deduped
     assert_eq!(candidates.len(), 2);
@@ -301,7 +290,11 @@ fn dedup_repetitive_region_improves_mapq() {
     dedup_candidates(&mut candidates_no_dedup, 50);
     let mapq_after_dedup = compute_mapq(&candidates_no_dedup, None);
 
-    assert_eq!(candidates_no_dedup.len(), 2, "cluster should collapse to 1 + distant 1");
+    assert_eq!(
+        candidates_no_dedup.len(),
+        2,
+        "cluster should collapse to 1 + distant 1"
+    );
     assert!(
         mapq_after_dedup >= mapq_no_dedup,
         "dedup should improve or maintain MAPQ: {mapq_after_dedup} vs {mapq_no_dedup}"

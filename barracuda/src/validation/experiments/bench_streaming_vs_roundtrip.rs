@@ -25,12 +25,12 @@
 //!
 //! Provenance: Streaming vs roundtrip transfer benchmark
 
-use std::time::Instant;
 use crate::bio::{diversity, diversity_gpu, streaming_gpu, taxonomy};
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use std::time::Instant;
 
 const N_FEATURES: usize = 256;
 
@@ -204,14 +204,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "streaming_vs_roundtrip",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_streaming_vs_roundtrip",
-        provenance_date: "2026-05-20",
-        description: "Exp091: Streaming vs Round-Trip Benchmark",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "streaming_vs_roundtrip",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_streaming_vs_roundtrip",
+            provenance_date: "2026-05-20",
+            description: "Exp091: Streaming vs Round-Trip Benchmark",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

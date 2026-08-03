@@ -23,7 +23,6 @@
 //!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
-use std::time::Instant;
 use crate::bio::{
     capacitor::{self, CapacitorParams},
     chimera::{self, ChimeraParams},
@@ -45,6 +44,7 @@ use crate::io::fastq::FastqRecord;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 const SS_FRAC: f64 = 0.1;
 
@@ -72,7 +72,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     )]
     let elapsed_us = t_total.elapsed().as_nanos() as f64 / 1000.0;
     println!("\n  Total v8 validation: {elapsed_us:.0} µs");
-
 }
 
 fn print_timing(label: &str, t0: Instant) {
@@ -637,14 +636,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v8",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v8",
-        provenance_date: "2026-05-20",
-        description: "Exp102: `BarraCuda` CPU Parity v8 — Pure Rust Math for 13 GPU-Promoted Domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v8",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v8",
+            provenance_date: "2026-05-20",
+            description: "Exp102: `BarraCuda` CPU Parity v8 — Pure Rust Math for 13 GPU-Promoted Domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

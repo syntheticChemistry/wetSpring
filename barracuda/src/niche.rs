@@ -48,8 +48,8 @@ pub const GUIDESTONE_BINARY: &str = "wetspring";
 pub const GUIDESTONE_READINESS: u8 = 5;
 
 use crate::primal_names::{
-    BEARDOG, CORALREEF, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SKUNKBAT, SONGBIRD,
-    SQUIRREL, SWEETGRASS, TOADSTOOL,
+    BEARDOG, CORALREEF, LOAMSPINE, NESTGATE, PETALTONGUE, RHIZOCRYPT, SKUNKBAT, SONGBIRD, SQUIRREL,
+    SWEETGRASS, TOADSTOOL,
 };
 
 /// Primals this niche depends on (germination order matters).
@@ -320,6 +320,9 @@ pub const CAPABILITIES: &[&str] = &[
     "bonding.terminate",
     "bonding.list",
     // ── ecosystem client integrations (optional primals) ──
+    "integration.braid",
+    "integration.performance_surface",
+    // backward-compat aliases (primal-named integration strings)
     "integration.sweetgrass.braid",
     "integration.toadstool.performance_surface",
     "protocol.stream_item",
@@ -488,8 +491,8 @@ mod tests {
     fn capabilities_count_matches_domains() {
         assert_eq!(
             CAPABILITIES.len(),
-            52,
-            "7 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 2 composition + 6 bonding + 3 ecosystem integrations"
+            54,
+            "7 health/meta + 19 science + 4 provenance + 3 brain + 1 metrics + 1 ai + 3 data.fetch + 3 vault + 2 composition + 6 bonding + 5 ecosystem integrations (2 canonical + 2 legacy aliases + 1 protocol)"
         );
     }
 

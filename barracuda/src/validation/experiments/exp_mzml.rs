@@ -27,14 +27,13 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::path::PathBuf;
 use crate::io::mzml;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use std::path::PathBuf;
 
 /// Run the `validate_mzml` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let data_dir = validation::data_dir("WETSPRING_MZML_DIR", "data/exp005_asari/MT02/MT02Dataset");
 
     // Collect all mzML files
@@ -80,7 +79,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         999.992_92,
         tolerances::MZ_TOLERANCE,
     );
-
 }
 
 struct Aggregates {
@@ -152,14 +150,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "mzml",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_mzml",
-        provenance_date: "2026-05-20",
-        description: "Validated against: asari 1.13.1; `scripts/validate_track2.py`",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "mzml",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_mzml",
+            provenance_date: "2026-05-20",
+            description: "Validated against: asari 1.13.1; `scripts/validate_track2.py`",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

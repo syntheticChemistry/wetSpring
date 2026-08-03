@@ -19,6 +19,12 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
+use crate::bio::gemm_cached::GemmCached;
+use crate::gpu::GpuF64;
+use crate::special;
+use crate::tolerances;
+use crate::validation::OrExit;
+use crate::validation::Validator;
 use barracuda::device::WgpuDevice;
 use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use barracuda::linalg::sparse::CsrMatrix;
@@ -28,12 +34,6 @@ use barracuda::ops::sparse_gemm_f64::SparseGemmF64;
 use barracuda::ops::transe_score_f64::TranseScoreF64;
 use std::sync::Arc;
 use std::time::Instant;
-use crate::bio::gemm_cached::GemmCached;
-use crate::gpu::GpuF64;
-use crate::special;
-use crate::tolerances;
-use crate::validation::OrExit;
-use crate::validation::Validator;
 
 struct LcgRng(u64);
 
@@ -552,7 +552,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let total_ms = t_total.elapsed().as_millis();
     println!("\n  Total wall-clock: {total_ms} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -563,14 +562,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_drug_repurposing",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_drug_repurposing",
-        provenance_date: "2026-05-20",
-        description: "Exp164: GPU Drug Repurposing Validation — GEMM NMF, TransE, PeakDetect",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_drug_repurposing",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_drug_repurposing",
+            provenance_date: "2026-05-20",
+            description: "Exp164: GPU Drug Repurposing Validation — GEMM NMF, TransE, PeakDetect",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

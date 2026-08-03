@@ -29,6 +29,7 @@
 //!   methods used in multivariate analysis." Biometrika 53(3-4): 325–338.
 //! - Legendre, P. & Legendre, L. (2012). Numerical Ecology, 3rd ed. §9.2.
 
+use crate::cast;
 use crate::error::{Error, Result};
 use crate::tolerances;
 
@@ -113,8 +114,7 @@ pub fn pcoa(condensed: &[f64], n_samples: usize, n_axes: usize) -> Result<PcoaRe
     }
 
     // 2. Double-center: B = -0.5 * (D² - row_means - col_means + grand_mean)
-    #[expect(clippy::cast_precision_loss, reason = "N < 2^53 for any real dataset")]
-    let n_f = n as f64;
+    let n_f = cast::usize_f64(n);
     let mut row_means = vec![0.0; n];
     for i in 0..n {
         let sum: f64 = d_sq[i * n..(i + 1) * n].iter().sum();

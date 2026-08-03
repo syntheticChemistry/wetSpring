@@ -28,7 +28,6 @@
 
 use std::path::PathBuf;
 
-use barracuda::stats::norm_cdf;
 use crate::bio::diversity;
 use crate::bio::kinetics::{haldane, monod};
 use crate::cast;
@@ -39,6 +38,7 @@ use crate::visualization::ipc_push::PetalTonguePushClient;
 use crate::visualization::{
     DataChannel, EcologyScenario, ScenarioEdge, ScenarioNode, ScientificRange, scenario_to_json,
 };
+use barracuda::stats::norm_cdf;
 
 fn gompertz(t: f64, p: f64, rm: f64, lambda: f64) -> f64 {
     p * (-((rm * std::f64::consts::E / p).mul_add(lambda - t, 1.0)).exp()).exp()
@@ -50,7 +50,6 @@ fn first_order(t: f64, b_max: f64, k: f64) -> f64 {
 
 /// Run the `validate_petaltongue_biogas_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── Feedstock definitions ──
     struct Feedstock {
         name: &'static str,
@@ -504,7 +503,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         );
     }
     v.check_pass("industrial summary printed", true);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -515,14 +513,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "petaltongue_biogas_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_petaltongue_biogas_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp355: petalTongue Biogas Dashboard v1",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "petaltongue_biogas_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_petaltongue_biogas_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp355: petalTongue Biogas Dashboard v1",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

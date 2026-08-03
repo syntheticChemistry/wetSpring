@@ -28,6 +28,9 @@ pub struct Metrics {
     /// Cumulative wall-clock time across all calls (microseconds).
     pub total_duration_us: AtomicU64,
     /// Per-method breakdown.
+    ///
+    /// Write-heavy: every RPC call acquires this lock to update timings.
+    /// `RwLock`/`DashMap` would not help because reads are rare (snapshot only).
     method_timings: Mutex<HashMap<String, MethodMetrics>>,
 }
 

@@ -26,9 +26,7 @@
 //!
 //! Provenance: Generated data with known statistical properties
 
-use crate::io::nanopore::{
-    self, NanoporeIter, NanoporeRead, SyntheticSignalGenerator,
-};
+use crate::io::nanopore::{self, NanoporeIter, NanoporeRead, SyntheticSignalGenerator};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
@@ -283,14 +281,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nanopore_signal_bridge",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_nanopore_signal_bridge",
-        provenance_date: "2026-05-20",
-        description: "# Exp196a: Nanopore Signal Bridge — POD5 Parser Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nanopore_signal_bridge",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_nanopore_signal_bridge",
+            provenance_date: "2026-05-20",
+            description: "# Exp196a: Nanopore Signal Bridge — POD5 Parser Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -18,6 +18,8 @@
 //! (thousands of taxa), the distance matrix computation from sequences
 //! is also a GPU target via `score_batch` (Smith-Waterman) or JC distance.
 
+use crate::cast;
+
 /// Result of Neighbor-Joining: Newick string + branch lengths.
 #[derive(Debug, Clone)]
 pub struct NjResult {
@@ -38,11 +40,7 @@ pub struct NjResult {
 pub fn jukes_cantor_distance(seq1: &[u8], seq2: &[u8]) -> f64 {
     assert_eq!(seq1.len(), seq2.len(), "sequences must have equal length");
     let diffs = seq1.iter().zip(seq2.iter()).filter(|(a, b)| a != b).count();
-    #[expect(
-        clippy::cast_precision_loss,
-        reason = "Precision: diffs and seq len bounded"
-    )]
-    let p = diffs as f64 / seq1.len() as f64;
+    let p = cast::usize_f64(diffs) / cast::usize_f64(seq1.len());
     if p >= 0.75 {
         return 10.0;
     }
@@ -75,10 +73,6 @@ pub fn distance_matrix(sequences: &[&[u8]]) -> Vec<f64> {
 ///
 /// Panics if `labels.len() < 2` or `dist.len() != n * n`.
 #[must_use]
-#[expect(
-    clippy::cast_precision_loss,
-    reason = "Precision: n and max_nodes bounded"
-)]
 pub fn neighbor_joining(dist: &[f64], labels: &[impl AsRef<str>]) -> NjResult {
     let n = labels.len();
     assert!(n >= 2, "need at least 2 taxa");
@@ -99,7 +93,7 @@ pub fn neighbor_joining(dist: &[f64], labels: &[impl AsRef<str>]) -> NjResult {
     let mut n_joins = 0_usize;
 
     while active.len() > 2 {
-        let r = active.len() as f64;
+        let r = cast::usize_f64(active.len());
 
         // Row sums over active nodes
         let mut row_sums = vec![0.0_f64; max_nodes];

@@ -25,15 +25,15 @@
 //!
 //! Provenance: CPU reference implementation in `barracuda::bio`
 
-use std::time::Instant;
 use crate::bio::{diversity, diversity_gpu, spectral_match_gpu, streaming_gpu};
 use crate::gpu::GpuF64;
 use crate::special;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use std::time::Instant;
 
-use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 use crate::validation::OrExit;
+use barracuda::ops::fused_map_reduce_f64::FusedMapReduceF64;
 
 fn cosine_cpu(a: &[f64], b: &[f64]) -> f64 {
     let dot: f64 = special::dot(a, b);
@@ -82,246 +82,244 @@ fn make_spectra(n: usize) -> Vec<Vec<f64>> {
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            eprintln!("No GPU: {e}");
-            validation::exit_skipped("No GPU available");
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("No GPU: {e}");
+                validation::exit_skipped("No GPU available");
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
 
-    // ═══════════════════════════════════════════════════════════════════
-    // Test data
-    // ═══════════════════════════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════════════════
+        // Test data
+        // ═══════════════════════════════════════════════════════════════════
 
-    let abundances = make_abundances(256);
-    let samples = make_samples(8, 256);
-    let spectra = make_spectra(4);
+        let abundances = make_abundances(256);
+        let samples = make_samples(8, 256);
+        let spectra = make_spectra(4);
 
-    // ═══════════════════════════════════════════════════════════════════
-    // PATH A: CPU Baseline
-    // ═══════════════════════════════════════════════════════════════════
-    v.section("PATH A: CPU Baseline");
+        // ═══════════════════════════════════════════════════════════════════
+        // PATH A: CPU Baseline
+        // ═══════════════════════════════════════════════════════════════════
+        v.section("PATH A: CPU Baseline");
 
-    let t_cpu = Instant::now();
-    let cpu_shannon = diversity::shannon(&abundances);
-    let cpu_simpson = diversity::simpson(&abundances);
-    let cpu_observed = diversity::observed_features(&abundances);
-    let cpu_bray = diversity::bray_curtis_condensed(&samples);
-    let cpu_cosine = pairwise_cosine_cpu(&spectra);
-    let cpu_total_us = t_cpu.elapsed().as_micros() as f64;
+        let t_cpu = Instant::now();
+        let cpu_shannon = diversity::shannon(&abundances);
+        let cpu_simpson = diversity::simpson(&abundances);
+        let cpu_observed = diversity::observed_features(&abundances);
+        let cpu_bray = diversity::bray_curtis_condensed(&samples);
+        let cpu_cosine = pairwise_cosine_cpu(&spectra);
+        let cpu_total_us = t_cpu.elapsed().as_micros() as f64;
 
-    v.check(
-        "CPU: Shannon > 0",
-        f64::from(u8::from(cpu_shannon > 0.0)),
-        1.0,
-        tolerances::EXACT,
-    );
-    v.check(
-        "CPU: Simpson in (0,1)",
-        f64::from(u8::from(cpu_simpson > 0.0 && cpu_simpson < 1.0)),
-        1.0,
-        tolerances::EXACT,
-    );
-    v.check(
-        "CPU: Observed = 256",
-        cpu_observed,
-        256.0,
-        tolerances::EXACT,
-    );
-    v.check(
-        "CPU: Bray-Curtis len = 28",
-        cpu_bray.len() as f64,
-        28.0,
-        tolerances::EXACT,
-    );
-    v.check(
-        "CPU: Cosine len = 6",
-        cpu_cosine.len() as f64,
-        6.0,
-        tolerances::EXACT,
-    );
+        v.check(
+            "CPU: Shannon > 0",
+            f64::from(u8::from(cpu_shannon > 0.0)),
+            1.0,
+            tolerances::EXACT,
+        );
+        v.check(
+            "CPU: Simpson in (0,1)",
+            f64::from(u8::from(cpu_simpson > 0.0 && cpu_simpson < 1.0)),
+            1.0,
+            tolerances::EXACT,
+        );
+        v.check(
+            "CPU: Observed = 256",
+            cpu_observed,
+            256.0,
+            tolerances::EXACT,
+        );
+        v.check(
+            "CPU: Bray-Curtis len = 28",
+            cpu_bray.len() as f64,
+            28.0,
+            tolerances::EXACT,
+        );
+        v.check(
+            "CPU: Cosine len = 6",
+            cpu_cosine.len() as f64,
+            6.0,
+            tolerances::EXACT,
+        );
 
-    println!("  CPU total: {cpu_total_us:.0} µs");
+        println!("  CPU total: {cpu_total_us:.0} µs");
 
-    // ═══════════════════════════════════════════════════════════════════
-    // PATH B: GPU Individual Dispatch (new instances each time)
-    // ═══════════════════════════════════════════════════════════════════
-    v.section("PATH B: GPU Individual Dispatch");
+        // ═══════════════════════════════════════════════════════════════════
+        // PATH B: GPU Individual Dispatch (new instances each time)
+        // ═══════════════════════════════════════════════════════════════════
+        v.section("PATH B: GPU Individual Dispatch");
 
-    let t_ind = Instant::now();
-    let ind_shannon = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("GPU streaming");
-    let ind_simpson = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("GPU streaming");
-    let ind_observed =
-        diversity_gpu::observed_features_gpu(&gpu, &abundances).or_exit("GPU streaming");
-    let ind_bray =
-        diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("GPU streaming");
-    let ind_cosine =
-        spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("GPU streaming");
-    let ind_total_us = t_ind.elapsed().as_micros() as f64;
+        let t_ind = Instant::now();
+        let ind_shannon = diversity_gpu::shannon_gpu(&gpu, &abundances).or_exit("GPU streaming");
+        let ind_simpson = diversity_gpu::simpson_gpu(&gpu, &abundances).or_exit("GPU streaming");
+        let ind_observed =
+            diversity_gpu::observed_features_gpu(&gpu, &abundances).or_exit("GPU streaming");
+        let ind_bray =
+            diversity_gpu::bray_curtis_condensed_gpu(&gpu, &samples).or_exit("GPU streaming");
+        let ind_cosine =
+            spectral_match_gpu::pairwise_cosine_gpu(&gpu, &spectra).or_exit("GPU streaming");
+        let ind_total_us = t_ind.elapsed().as_micros() as f64;
 
-    v.check(
-        "Individual: Shannon == CPU",
-        ind_shannon,
-        cpu_shannon,
-        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-    );
-    v.check(
-        "Individual: Simpson == CPU",
-        ind_simpson,
-        cpu_simpson,
-        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-    );
-    v.check(
-        "Individual: Observed == CPU",
-        ind_observed,
-        cpu_observed,
-        tolerances::GPU_VS_CPU_F64,
-    );
-    v.check(
-        "Individual: Bray-Curtis[0] == CPU",
-        ind_bray[0],
-        cpu_bray[0],
-        tolerances::GPU_VS_CPU_BRAY_CURTIS,
-    );
-    v.check(
-        "Individual: Cosine[0] == CPU",
-        ind_cosine[0],
-        cpu_cosine[0],
-        tolerances::SPECTRAL_COSINE,
-    );
+        v.check(
+            "Individual: Shannon == CPU",
+            ind_shannon,
+            cpu_shannon,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+        v.check(
+            "Individual: Simpson == CPU",
+            ind_simpson,
+            cpu_simpson,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+        v.check(
+            "Individual: Observed == CPU",
+            ind_observed,
+            cpu_observed,
+            tolerances::GPU_VS_CPU_F64,
+        );
+        v.check(
+            "Individual: Bray-Curtis[0] == CPU",
+            ind_bray[0],
+            cpu_bray[0],
+            tolerances::GPU_VS_CPU_BRAY_CURTIS,
+        );
+        v.check(
+            "Individual: Cosine[0] == CPU",
+            ind_cosine[0],
+            cpu_cosine[0],
+            tolerances::SPECTRAL_COSINE,
+        );
 
-    println!("  Individual dispatch total: {ind_total_us:.0} µs");
+        println!("  Individual dispatch total: {ind_total_us:.0} µs");
 
-    // ═══════════════════════════════════════════════════════════════════
-    // PATH C: GPU Streaming (pre-warmed GpuPipelineSession)
-    // ═══════════════════════════════════════════════════════════════════
-    v.section("PATH C: GPU Streaming (Pre-Warmed Session)");
+        // ═══════════════════════════════════════════════════════════════════
+        // PATH C: GPU Streaming (pre-warmed GpuPipelineSession)
+        // ═══════════════════════════════════════════════════════════════════
+        v.section("PATH C: GPU Streaming (Pre-Warmed Session)");
 
-    let session = streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("GPU streaming");
-    println!("  Session warmup: {:.1} ms", session.warmup_ms);
+        let session = streaming_gpu::GpuPipelineSession::new(&gpu).or_exit("GPU streaming");
+        println!("  Session warmup: {:.1} ms", session.warmup_ms);
 
-    let t_stream = Instant::now();
-    let stream_shannon = session.shannon(&abundances).or_exit("GPU streaming");
-    let stream_simpson = session.simpson(&abundances).or_exit("GPU streaming");
-    let stream_observed = session
-        .observed_features(&abundances)
-        .or_exit("GPU streaming");
-    let stream_total_us = t_stream.elapsed().as_micros() as f64;
-
-    v.check(
-        "Streaming: Shannon == CPU",
-        stream_shannon,
-        cpu_shannon,
-        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-    );
-    v.check(
-        "Streaming: Simpson == CPU",
-        stream_simpson,
-        cpu_simpson,
-        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-    );
-    v.check(
-        "Streaming: Observed == CPU",
-        stream_observed,
-        cpu_observed,
-        tolerances::GPU_VS_CPU_F64,
-    );
-
-    println!("  Streaming dispatch total: {stream_total_us:.0} µs");
-    println!("  TensorContext stats: {}", session.ctx_stats());
-
-    // ═══════════════════════════════════════════════════════════════════
-    // PARITY: all three paths agree
-    // ═══════════════════════════════════════════════════════════════════
-    v.section("Cross-Path Parity");
-
-    v.check(
-        "Shannon: Individual == Streaming",
-        ind_shannon,
-        stream_shannon,
-        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-    );
-    v.check(
-        "Simpson: Individual == Streaming",
-        ind_simpson,
-        stream_simpson,
-        tolerances::GPU_VS_CPU_TRANSCENDENTAL,
-    );
-    v.check(
-        "Observed: Individual == Streaming",
-        ind_observed,
-        stream_observed,
-        tolerances::GPU_VS_CPU_F64,
-    );
-
-    // ═══════════════════════════════════════════════════════════════════
-    // SCALING: repeat with larger workload to show streaming advantage
-    // ═══════════════════════════════════════════════════════════════════
-    v.section("Scaling: 10-Iteration Repeat");
-
-    let big_abundances = make_abundances(2048);
-
-    let t_ind_10 = Instant::now();
-    for _ in 0..10 {
-        let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("GPU streaming");
-        let _ = fmr
-            .shannon_entropy(&big_abundances)
+        let t_stream = Instant::now();
+        let stream_shannon = session.shannon(&abundances).or_exit("GPU streaming");
+        let stream_simpson = session.simpson(&abundances).or_exit("GPU streaming");
+        let stream_observed = session
+            .observed_features(&abundances)
             .or_exit("GPU streaming");
-        let _ = fmr.simpson_index(&big_abundances).or_exit("GPU streaming");
-        let _ = fmr.sum(&big_abundances).or_exit("GPU streaming");
-    }
-    let ind_10_us = t_ind_10.elapsed().as_micros() as f64;
+        let stream_total_us = t_stream.elapsed().as_micros() as f64;
 
-    let t_stream_10 = Instant::now();
-    for _ in 0..10 {
-        let _ = session.shannon(&big_abundances).or_exit("GPU streaming");
-        let _ = session.simpson(&big_abundances).or_exit("GPU streaming");
-        let _ = session
-            .observed_features(&big_abundances)
-            .or_exit("GPU streaming");
-    }
-    let stream_10_us = t_stream_10.elapsed().as_micros() as f64;
+        v.check(
+            "Streaming: Shannon == CPU",
+            stream_shannon,
+            cpu_shannon,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+        v.check(
+            "Streaming: Simpson == CPU",
+            stream_simpson,
+            cpu_simpson,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+        v.check(
+            "Streaming: Observed == CPU",
+            stream_observed,
+            cpu_observed,
+            tolerances::GPU_VS_CPU_F64,
+        );
 
-    v.check(
-        "10x: streaming total < individual total",
-        f64::from(u8::from(stream_10_us < ind_10_us)),
-        1.0,
-        tolerances::EXACT,
-    );
+        println!("  Streaming dispatch total: {stream_total_us:.0} µs");
+        println!("  TensorContext stats: {}", session.ctx_stats());
 
-    println!("  10x Individual: {ind_10_us:.0} µs");
-    println!("  10x Streaming:  {stream_10_us:.0} µs");
-    let speedup = if stream_10_us > 0.0 {
-        ind_10_us / stream_10_us
-    } else {
-        f64::INFINITY
-    };
-    println!("  Streaming speedup: {speedup:.2}x");
+        // ═══════════════════════════════════════════════════════════════════
+        // PARITY: all three paths agree
+        // ═══════════════════════════════════════════════════════════════════
+        v.section("Cross-Path Parity");
 
-    // ═══════════════════════════════════════════════════════════════════
-    // Summary
-    // ═══════════════════════════════════════════════════════════════════
-    println!();
-    println!("┌──────────────────────────────────────────────────────┐");
-    println!("│ Exp072 Streaming Pipeline Summary                   │");
-    println!("├──────────────────┬──────────────┬───────────────────┤");
-    println!("│ Path             │ Time (µs)    │ Notes             │");
-    println!("├──────────────────┼──────────────┼───────────────────┤");
-    println!("│ A: CPU           │ {cpu_total_us:>12.0} │ baseline          │");
-    println!("│ B: GPU indiv.    │ {ind_total_us:>12.0} │ new FMR each time │");
-    println!("│ C: GPU streaming │ {stream_total_us:>12.0} │ pre-warmed FMR    │");
-    println!("│ 10x Individual   │ {ind_10_us:>12.0} │ repeated dispatch │");
-    println!("│ 10x Streaming    │ {stream_10_us:>12.0} │ session reuse     │");
-    println!("├──────────────────┼──────────────┼───────────────────┤");
-    println!("│ Speedup (10x)    │       {speedup:>5.2}x │ streaming/indiv.  │");
-    println!("└──────────────────┴──────────────┴───────────────────┘");
+        v.check(
+            "Shannon: Individual == Streaming",
+            ind_shannon,
+            stream_shannon,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+        v.check(
+            "Simpson: Individual == Streaming",
+            ind_simpson,
+            stream_simpson,
+            tolerances::GPU_VS_CPU_TRANSCENDENTAL,
+        );
+        v.check(
+            "Observed: Individual == Streaming",
+            ind_observed,
+            stream_observed,
+            tolerances::GPU_VS_CPU_F64,
+        );
 
+        // ═══════════════════════════════════════════════════════════════════
+        // SCALING: repeat with larger workload to show streaming advantage
+        // ═══════════════════════════════════════════════════════════════════
+        v.section("Scaling: 10-Iteration Repeat");
+
+        let big_abundances = make_abundances(2048);
+
+        let t_ind_10 = Instant::now();
+        for _ in 0..10 {
+            let fmr = FusedMapReduceF64::new(gpu.to_wgpu_device()).or_exit("GPU streaming");
+            let _ = fmr
+                .shannon_entropy(&big_abundances)
+                .or_exit("GPU streaming");
+            let _ = fmr.simpson_index(&big_abundances).or_exit("GPU streaming");
+            let _ = fmr.sum(&big_abundances).or_exit("GPU streaming");
+        }
+        let ind_10_us = t_ind_10.elapsed().as_micros() as f64;
+
+        let t_stream_10 = Instant::now();
+        for _ in 0..10 {
+            let _ = session.shannon(&big_abundances).or_exit("GPU streaming");
+            let _ = session.simpson(&big_abundances).or_exit("GPU streaming");
+            let _ = session
+                .observed_features(&big_abundances)
+                .or_exit("GPU streaming");
+        }
+        let stream_10_us = t_stream_10.elapsed().as_micros() as f64;
+
+        v.check(
+            "10x: streaming total < individual total",
+            f64::from(u8::from(stream_10_us < ind_10_us)),
+            1.0,
+            tolerances::EXACT,
+        );
+
+        println!("  10x Individual: {ind_10_us:.0} µs");
+        println!("  10x Streaming:  {stream_10_us:.0} µs");
+        let speedup = if stream_10_us > 0.0 {
+            ind_10_us / stream_10_us
+        } else {
+            f64::INFINITY
+        };
+        println!("  Streaming speedup: {speedup:.2}x");
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Summary
+        // ═══════════════════════════════════════════════════════════════════
+        println!();
+        println!("┌──────────────────────────────────────────────────────┐");
+        println!("│ Exp072 Streaming Pipeline Summary                   │");
+        println!("├──────────────────┬──────────────┬───────────────────┤");
+        println!("│ Path             │ Time (µs)    │ Notes             │");
+        println!("├──────────────────┼──────────────┼───────────────────┤");
+        println!("│ A: CPU           │ {cpu_total_us:>12.0} │ baseline          │");
+        println!("│ B: GPU indiv.    │ {ind_total_us:>12.0} │ new FMR each time │");
+        println!("│ C: GPU streaming │ {stream_total_us:>12.0} │ pre-warmed FMR    │");
+        println!("│ 10x Individual   │ {ind_10_us:>12.0} │ repeated dispatch │");
+        println!("│ 10x Streaming    │ {stream_10_us:>12.0} │ session reuse     │");
+        println!("├──────────────────┼──────────────┼───────────────────┤");
+        println!("│ Speedup (10x)    │       {speedup:>5.2}x │ streaming/indiv.  │");
+        println!("└──────────────────┴──────────────┴───────────────────┘");
     });
 }
 
@@ -333,14 +331,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gpu_streaming_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_gpu_streaming_pipeline",
-        provenance_date: "2026-05-20",
-        description: "Exp072: `ToadStool` Unidirectional Streaming — Zero CPU Round-Trips",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gpu_streaming_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_gpu_streaming_pipeline",
+            provenance_date: "2026-05-20",
+            description: "Exp072: `ToadStool` Unidirectional Streaming — Zero CPU Round-Trips",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

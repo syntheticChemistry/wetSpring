@@ -24,19 +24,17 @@
 //!
 //! Provenance: Phylogenetics + HMM GPU benchmark
 
-use barracuda::{FelsensteinGpu, PhyloTree};
-use std::sync::Arc;
-use std::time::Instant;
 use crate::bio::bootstrap::{self, Alignment};
-use crate::bio::felsenstein::{
-    N_STATES, TreeNode, encode_dna, log_likelihood, transition_matrix,
-};
+use crate::bio::felsenstein::{N_STATES, TreeNode, encode_dna, log_likelihood, transition_matrix};
 use crate::bio::hmm::{self, HmmModel};
 use crate::bio::hmm_gpu::HmmGpuForward;
 use crate::gpu::GpuF64;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::{self, Validator};
+use barracuda::{FelsensteinGpu, PhyloTree};
+use std::sync::Arc;
+use std::time::Instant;
 
 const MU: f64 = 1.0;
 const PI: [f64; 4] = [0.25, 0.25, 0.25, 0.25];
@@ -214,25 +212,23 @@ fn convert_tree(tree: &TreeNode, mu: f64) -> (PhyloTree, Vec<f64>, Vec<f64>, usi
 pub fn run(v: &mut crate::validation::Validator) {
     let __rt = tokio::runtime::Runtime::new().expect("tokio runtime");
     __rt.block_on(async {
-
-    let gpu = match GpuF64::new().await {
-        Ok(g) => g,
-        Err(e) => {
-            validation::exit_skipped(&format!("GPU init failed: {e}"));
+        let gpu = match GpuF64::new().await {
+            Ok(g) => g,
+            Err(e) => {
+                validation::exit_skipped(&format!("GPU init failed: {e}"));
+            }
+        };
+        gpu.print_info();
+        if !gpu.has_f64 {
+            validation::exit_skipped("No SHADER_F64 support on this GPU");
         }
-    };
-    gpu.print_info();
-    if !gpu.has_f64 {
-        validation::exit_skipped("No SHADER_F64 support on this GPU");
-    }
-    println!();
+        println!();
 
-    let device = gpu.to_wgpu_device();
+        let device = gpu.to_wgpu_device();
 
-    bench_felsenstein(&device, v);
-    bench_bootstrap(&device, v);
-    bench_hmm_batch(&device, v);
-
+        bench_felsenstein(&device, v);
+        bench_bootstrap(&device, v);
+        bench_hmm_batch(&device, v);
     });
 }
 
@@ -502,14 +498,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "phylo_hmm_gpu",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "benchmark_phylo_hmm_gpu",
-        provenance_date: "2026-05-20",
-        description: "Exp048: CPU vs GPU Benchmark — Phylogenetics & HMM",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "phylo_hmm_gpu",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "benchmark_phylo_hmm_gpu",
+            provenance_date: "2026-05-20",
+            description: "Exp048: CPU vs GPU Benchmark — Phylogenetics & HMM",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -72,7 +72,6 @@ fn generate_diversity_profile(seed: u64, regime: usize) -> Vec<f64> {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_npu_disorder_classifier` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("Generate disorder-regime training data");
     let mut train_inputs = Vec::with_capacity(N_TRAIN);
     let mut train_targets = Vec::with_capacity(N_TRAIN);
@@ -219,7 +218,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  GPU energy: {gpu_j:.0} J");
     println!("  Ratio: {:.0}×", gpu_j / npu_j);
     v.check_pass("NPU < GPU energy", npu_j < gpu_j);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -230,14 +228,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "npu_disorder_classifier",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_npu_disorder_classifier",
-        provenance_date: "2026-05-20",
-        description: "Exp119 — ESN QS-Disorder Regime Classifier for NPU Deployment",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "npu_disorder_classifier",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_npu_disorder_classifier",
+            provenance_date: "2026-05-20",
+            description: "Exp119 — ESN QS-Disorder Regime Classifier for NPU Deployment",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -4,13 +4,13 @@
 
 use std::time::Instant;
 
+use crate::tolerances;
+use crate::validation::{CrossSpringEntry, Validator};
 use barracuda::linalg::{
     belief_propagation_chain, disordered_laplacian, effective_rank, graph_laplacian,
 };
 use barracuda::sample::{BoltzmannResult, boltzmann_sampling};
 use barracuda::spectral::level_spacing_ratio;
-use crate::tolerances;
-use crate::validation::{CrossSpringEntry, Validator};
 
 pub(super) fn validate(v: &mut Validator, bench_results: &mut Vec<CrossSpringEntry>) {
     println!("\n══ S56: neuralSpring Final Absorption Primitives ══════════════\n");
@@ -152,15 +152,24 @@ fn validate_belief_propagation(v: &mut Validator, bench_results: &mut Vec<CrossS
 
     println!(
         "    Genus:  {:?}",
-        distributions[0].iter().map(|x| format!("{x:.3}")).collect::<Vec<_>>()
+        distributions[0]
+            .iter()
+            .map(|x| format!("{x:.3}"))
+            .collect::<Vec<_>>()
     );
     println!(
         "    Family: {:?}",
-        distributions[1].iter().map(|x| format!("{x:.3}")).collect::<Vec<_>>()
+        distributions[1]
+            .iter()
+            .map(|x| format!("{x:.3}"))
+            .collect::<Vec<_>>()
     );
     println!(
         "    Order:  {:?}",
-        distributions[2].iter().map(|x| format!("{x:.3}")).collect::<Vec<_>>()
+        distributions[2]
+            .iter()
+            .map(|x| format!("{x:.3}"))
+            .collect::<Vec<_>>()
     );
 
     bench_results.push(CrossSpringEntry {

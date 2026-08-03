@@ -60,10 +60,7 @@ use crate::ipc::protocol::RpcError;
 static BOOT_INSTANT: OnceLock<Instant> = OnceLock::new();
 
 fn uptime_secs() -> u64 {
-    BOOT_INSTANT
-        .get_or_init(Instant::now)
-        .elapsed()
-        .as_secs()
+    BOOT_INSTANT.get_or_init(Instant::now).elapsed().as_secs()
 }
 
 /// Capabilities advertised by this primal, derived from the dispatch table.
@@ -124,9 +121,6 @@ pub const CAPABILITIES: &[&str] = &[
     "bonding.terminate",
     "bonding.list",
 ];
-
-#[cfg(feature = "gpu")]
-use std::sync::OnceLock;
 
 #[cfg(feature = "gpu")]
 use crate::gpu::GpuF64;

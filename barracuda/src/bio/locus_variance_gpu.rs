@@ -65,7 +65,7 @@ impl LocusVarianceGpuWrapper {
         });
         let var_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("LocusVar output"),
-            size: (n_loci * 4) as u64,
+            size: cast::usize_u64(n_loci * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });

@@ -31,10 +31,10 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 use barracuda::stats::norm_cdf;
 
@@ -58,7 +58,6 @@ fn generate_community(richness: usize, evenness: f64, seed: u64) -> Vec<f64> {
 
 /// Run the `validate_soil_pore_diversity` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // S1: Pore-Size-Dependent Community Generation
     //
@@ -278,7 +277,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("\n  ── Exp171 Summary: {passed}/{total} checks ──");
     println!("  Paper: Feng et al. 2024, Nature Comms 15:3578");
     println!("  Key finding: Pore size → community composition (Anderson dimension)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -289,14 +287,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "soil_pore_diversity",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_soil_pore_diversity",
-        provenance_date: "2026-05-20",
-        description: "# Exp171: Soil Pore Diversity — Feng et al. 2024",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "soil_pore_diversity",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_soil_pore_diversity",
+            provenance_date: "2026-05-20",
+            description: "# Exp171: Soil Pore Diversity — Feng et al. 2024",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

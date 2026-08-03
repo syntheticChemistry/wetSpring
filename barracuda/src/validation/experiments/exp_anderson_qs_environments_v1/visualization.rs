@@ -26,7 +26,9 @@ pub(super) struct ModelData<'a> {
 }
 
 fn mean_p(indices: &[usize], vals: &[f64]) -> f64 {
-    if indices.is_empty() { return 0.0; }
+    if indices.is_empty() {
+        return 0.0;
+    }
     let sum: f64 = indices.iter().map(|&i| vals[i]).sum();
     sum / indices.len() as f64
 }
@@ -160,35 +162,59 @@ pub(super) fn export_scenario(v: &mut Validator, data: &ModelData<'_>) {
         scientific_ranges: vec![],
     };
     corr_node.data_channels.push(DataChannel::Gauge {
-        id: "corr_h1".into(), label: "H1 Correlation (inverse)".into(),
-        value: data.corr_h1, min: -1.0, max: 1.0, unit: "r".into(),
-        normal_range: [0.7, 1.0], warning_range: [-1.0, 0.7],
+        id: "corr_h1".into(),
+        label: "H1 Correlation (inverse)".into(),
+        value: data.corr_h1,
+        min: -1.0,
+        max: 1.0,
+        unit: "r".into(),
+        normal_range: [0.7, 1.0],
+        warning_range: [-1.0, 0.7],
     });
     corr_node.data_channels.push(DataChannel::Gauge {
-        id: "corr_h2".into(), label: "H2 Correlation (dilution)".into(),
-        value: data.corr_h2, min: -1.0, max: 1.0, unit: "r".into(),
-        normal_range: [0.7, 1.0], warning_range: [-1.0, 0.7],
+        id: "corr_h2".into(),
+        label: "H2 Correlation (dilution)".into(),
+        value: data.corr_h2,
+        min: -1.0,
+        max: 1.0,
+        unit: "r".into(),
+        normal_range: [0.7, 1.0],
+        warning_range: [-1.0, 0.7],
     });
     corr_node.data_channels.push(DataChannel::Gauge {
-        id: "corr_h3".into(), label: "H3 Correlation (O₂-modulated)".into(),
-        value: data.corr_h3, min: -1.0, max: 1.0, unit: "r".into(),
-        normal_range: [0.7, 1.0], warning_range: [-1.0, 0.7],
+        id: "corr_h3".into(),
+        label: "H3 Correlation (O₂-modulated)".into(),
+        value: data.corr_h3,
+        min: -1.0,
+        max: 1.0,
+        unit: "r".into(),
+        normal_range: [0.7, 1.0],
+        warning_range: [-1.0, 0.7],
     });
     corr_node.data_channels.push(DataChannel::Gauge {
-        id: "mae_h3".into(), label: "H3 Mean Absolute Error".into(),
-        value: data.mae_h3, min: 0.0, max: 0.5, unit: "MAE".into(),
-        normal_range: [0.0, 0.15], warning_range: [0.15, 0.3],
+        id: "mae_h3".into(),
+        label: "H3 Mean Absolute Error".into(),
+        value: data.mae_h3,
+        min: 0.0,
+        max: 0.5,
+        unit: "MAE".into(),
+        normal_range: [0.0, 0.15],
+        warning_range: [0.15, 0.3],
     });
     scenario.nodes.push(corr_node);
 
     scenario.edges = vec![
         ScenarioEdge {
-            from: "model_comparison".into(), to: "o2_regimes".into(),
-            edge_type: "data_flow".into(), label: "model → O₂ analysis".into(),
+            from: "model_comparison".into(),
+            to: "o2_regimes".into(),
+            edge_type: "data_flow".into(),
+            label: "model → O₂ analysis".into(),
         },
         ScenarioEdge {
-            from: "model_comparison".into(), to: "correlations".into(),
-            edge_type: "validation".into(), label: "predictions → correlation".into(),
+            from: "model_comparison".into(),
+            to: "correlations".into(),
+            edge_type: "validation".into(),
+            label: "predictions → correlation".into(),
         },
     ];
 

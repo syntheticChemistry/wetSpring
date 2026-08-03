@@ -19,13 +19,13 @@
 //!
 //! Provenance: Known-value formulas (Shannon H(uniform)=ln(S), Hill(EC50)=0.5, GOE/Poisson level spacing)
 
+use crate::bio::diversity;
+use crate::tolerances;
+use crate::validation::Validator;
 use barracuda::spectral::{
     GOE_R, POISSON_R, anderson_3d, lanczos, lanczos_eigenvalues, level_spacing_ratio,
 };
 use std::time::Instant;
-use crate::bio::diversity;
-use crate::tolerances;
-use crate::validation::Validator;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -297,7 +297,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let total_ms = t_total.elapsed().as_millis();
     println!("\n  Total wall-clock: {total_ms} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -308,14 +307,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v59_science",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_metalforge_v59_science",
-        provenance_date: "2026-05-20",
-        description: "Exp192: `metalForge` V59 Cross-Substrate — CPU↔GPU Parity for Science Domains",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v59_science",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_metalforge_v59_science",
+            provenance_date: "2026-05-20",
+            description: "Exp192: `metalForge` V59 Cross-Substrate — CPU↔GPU Parity for Science Domains",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

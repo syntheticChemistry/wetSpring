@@ -1,33 +1,39 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Benchmark report formatting and printing.
 
+use std::fmt::Write;
+
 use super::{BenchReport, PhaseResult, format_duration, format_eval_time};
 
-/// Print the benchmark summary table to stdout.
+/// Format the benchmark summary table as a string.
 ///
-/// # Panics
-///
-/// Panics if `matching` has fewer than 2 elements when computing speedup (internal logic error).
+/// Returns a multi-line report suitable for logging or display.
+#[must_use]
 #[expect(clippy::too_many_lines, reason = "complexity inherent to algorithm")]
-pub fn print_bench_report(report: &BenchReport) {
-    println!();
-    println!(
+pub fn format_bench_report(report: &BenchReport) -> String {
+    let mut out = String::with_capacity(4096);
+    let _ = writeln!(out);
+    let _ = writeln!(
+        out,
         "══════════════════════════════════════════════════════════════════════════════════════════"
     );
-    println!(
+    let _ = writeln!(
+        out,
         "  SUBSTRATE BENCHMARK REPORT — {} ({} / {})",
         report.hardware.gate_name, report.hardware.cpu_model, report.hardware.gpu_name
     );
-    println!(
+    let _ = writeln!(
+        out,
         "══════════════════════════════════════════════════════════════════════════════════════════"
     );
-    println!();
+    let _ = writeln!(out);
 
-    println!(
+    let _ = writeln!(
+        out,
         "  {:<24} {:<14} {:>10} {:>10} {:>9} {:>9} {:>10} {:>10}",
         "Phase", "Substrate", "Wall Time", "per-eval", "Energy J", "J/eval", "W (avg)", "W (peak)"
     );
-    println!("  {}", "─".repeat(100));
+    let _ = writeln!(out, "  {}", "─".repeat(100));
 
     for p in &report.phases {
         let wall_str = format_duration(p.wall_time_s);
@@ -97,7 +103,8 @@ pub fn print_bench_report(report: &BenchReport) {
             format!("{substrate} [C]")
         };
 
-        println!(
+        let _ = writeln!(
+            out,
             "  {:<24} {:<14} {:>10} {:>10} {:>9} {:>9} {:>10} {:>10}",
             p.phase,
             sub_label,
@@ -109,8 +116,9 @@ pub fn print_bench_report(report: &BenchReport) {
             peak_watts_str
         );
     }
-    println!("  {}", "─".repeat(100));
-    println!(
+    let _ = writeln!(out, "  {}", "─".repeat(100));
+    let _ = writeln!(
+        out,
         "  [C] = CPU energy (RAPL)  [G] = GPU energy (nvidia-smi, {}ms polling)",
         100
     );
@@ -121,15 +129,17 @@ pub fn print_bench_report(report: &BenchReport) {
         .filter(|p| p.substrate.contains("GPU") || p.substrate.contains("gpu"))
         .collect();
     if !gpu_phases.is_empty() {
-        println!();
-        println!("  GPU Power Detail:");
-        println!(
+        let _ = writeln!(out);
+        let _ = writeln!(out, "  GPU Power Detail:");
+        let _ = writeln!(
+            out,
             "  {:<22} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}",
             "Phase", "W (avg)", "W (peak)", "Temp °C", "VRAM MB", "Samples", "Total J"
         );
-        println!("  {}", "─".repeat(72));
+        let _ = writeln!(out, "  {}", "─".repeat(72));
         for p in &gpu_phases {
-            println!(
+            let _ = writeln!(
+                out,
                 "  {:<22} {:>7.1} {:>7.1} {:>7.0} {:>7.0} {:>8} {:>8.0}",
                 p.phase,
                 p.energy.gpu_watts_avg,
@@ -140,11 +150,10 @@ pub fn print_bench_report(report: &BenchReport) {
                 p.energy.gpu_joules
             );
         }
-        println!("  {}", "─".repeat(72));
+        let _ = writeln!(out, "  {}", "─".repeat(72));
     }
 
-    // Pairwise speedup comparisons for matching phases across substrates
-    println!();
+    let _ = writeln!(out);
     let mut seen = std::collections::HashSet::new();
     for p in &report.phases {
         if seen.contains(&p.phase) {
@@ -169,12 +178,13 @@ pub fn print_bench_report(report: &BenchReport) {
                 .iter()
                 .max_by(|a, b| a.wall_time_s.total_cmp(&b.wall_time_s)),
         ) else {
-            continue; // matching non-empty, so min/max are Some; defensive fallback
+            continue;
         };
 
         if fastest.wall_time_s > 0.0 && slowest.wall_time_s > fastest.wall_time_s {
             let speedup = slowest.wall_time_s / fastest.wall_time_s;
-            println!(
+            let _ = writeln!(
+                out,
                 "  {} : {} is {:.1}x faster than {} ({} vs {})",
                 fastest.phase,
                 fastest.substrate,
@@ -198,7 +208,8 @@ pub fn print_bench_report(report: &BenchReport) {
             };
             if fast_j > 0.0 && slow_j > 0.0 {
                 let ratio = slow_j / fast_j;
-                println!(
+                let _ = writeln!(
+                    out,
                     "           energy: {:.2}J ({}) vs {:.2}J ({}) — {:.1}x less",
                     fast_j,
                     if fast_gpu { "GPU" } else { "CPU" },
@@ -209,5 +220,10 @@ pub fn print_bench_report(report: &BenchReport) {
             }
         }
     }
-    println!();
+    out
+}
+
+/// Print the benchmark summary table via tracing.
+pub fn print_bench_report(report: &BenchReport) {
+    tracing::info!("{}", format_bench_report(report));
 }

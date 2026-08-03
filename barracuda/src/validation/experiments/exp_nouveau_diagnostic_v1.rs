@@ -23,8 +23,8 @@
 //!
 //! Provenance: Nouveau GPU driver diagnostic validation
 
-use std::time::Instant;
 use crate::validation::{OrExit, Validator};
+use std::time::Instant;
 
 fn scan_firmware(chip: &str) -> Vec<String> {
     let base = format!("/lib/firmware/nvidia/{chip}");
@@ -392,14 +392,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "nouveau_diagnostic_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_nouveau_diagnostic_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp361: Nouveau RTX 4070 Diagnostic + GPU Dispatch Pipeline Status",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "nouveau_diagnostic_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_nouveau_diagnostic_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp361: Nouveau RTX 4070 Diagnostic + GPU Dispatch Pipeline Status",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

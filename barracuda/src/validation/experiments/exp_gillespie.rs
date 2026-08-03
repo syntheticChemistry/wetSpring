@@ -48,7 +48,6 @@ const ANALYTICAL_MEAN: f64 = 100.0; // k_dgc / k_pde
 )]
 /// Run the `validate_gillespie` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── Determinism ──");
 
     let traj1 = gillespie::birth_death_ssa(K_DGC, K_PDE, T_MAX, BASE_SEED);
@@ -149,7 +148,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         1.0,
         tolerances::GILLESPIE_FANO_PHYSICAL,
     );
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -160,14 +158,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gillespie",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_gillespie",
-        provenance_date: "2026-05-20",
-        description: "Validated against: `scripts/gillespie_baseline.py` ensemble statistics",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gillespie",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_gillespie",
+            provenance_date: "2026-05-20",
+            description: "Validated against: `scripts/gillespie_baseline.py` ensemble statistics",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

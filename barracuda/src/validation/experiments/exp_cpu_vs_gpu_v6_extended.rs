@@ -341,7 +341,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let total_ms = t_total.elapsed().as_secs_f64() * 1000.0;
     println!("  Total: {total_ms:.1} ms");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -352,14 +351,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cpu_vs_gpu_v6_extended",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_cpu_vs_gpu_v6_extended",
-        provenance_date: "2026-05-20",
-        description: "# Exp243: CPU vs GPU Extended Parity — 22 Domains Head-to-Head",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cpu_vs_gpu_v6_extended",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_cpu_vs_gpu_v6_extended",
+            provenance_date: "2026-05-20",
+            description: "# Exp243: CPU vs GPU Extended Parity — 22 Domains Head-to-Head",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

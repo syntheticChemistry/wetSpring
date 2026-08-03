@@ -19,6 +19,8 @@ workspace = true
 
 [features]
 default = []
+# Synthetic signal generation for validation scenarios (not linked in production IPC/facade builds).
+validation = []
 # barraCuda as local path dependency (library linking).
 # Disable for IPC-only sovereign deployment where barraCuda runs as a separate primal.
 barracuda-lib = ["dep:barracuda"]
@@ -39,7 +41,7 @@ json = ["dep:serde", "dep:serde_json"]
 ipc = ["json", "dep:tracing-subscriber", "dep:blake3"]
 # guideStone: self-validating NUCLEUS composition node (Level 5 primal proof).
 # Depends on primalspring composition API + ipc feature for JSON-RPC.
-guidestone = ["ipc", "dep:primalspring", "dep:clap"]
+guidestone = ["ipc", "dep:primalspring", "dep:clap", "validation"]
 # Nautilus Shell: evolutionary reservoir computing for bio sentinel monitoring.
 # Adds concept edge detection, drift monitoring, evolutionary adaptation.
 nautilus = ["dep:bingocube-nautilus", "bingocube-nautilus/json"]

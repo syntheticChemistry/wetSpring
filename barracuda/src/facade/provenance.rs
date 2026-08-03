@@ -304,8 +304,11 @@ fn try_tier2_inner(method: &str, params: &Value, result_hash: &str) -> Option<Va
     Some(json!({
         "tier": 2,
         "rhizocrypt_session": session_id,
+        "derivation_session": session_id,
         "loamspine_commit": commit_id,
+        "ledger_commit": commit_id,
         "sweetgrass_braid": braid_id,
+        "attribution_braid": braid_id,
         "merkle_root": merkle_root,
         "witnesses": dehydration_witnesses,
     }))
@@ -433,7 +436,11 @@ pub fn envelope(method: &str, params: &Value, result: &Value) -> Value {
     let t2 = try_tier2(method, params, &content_hash);
     let t3 = t2
         .as_ref()
-        .and_then(|v| v["sweetgrass_braid"].as_str())
+        .and_then(|v| {
+            v["attribution_braid"]
+                .as_str()
+                .or_else(|| v["sweetgrass_braid"].as_str())
+        })
         .filter(|s| !s.is_empty())
         .and_then(try_tier3);
 
@@ -455,8 +462,11 @@ pub fn envelope(method: &str, params: &Value, result: &Value) -> Value {
     if let Some(tier2) = t2 {
         prov["trio"] = json!({
             "rhizocrypt_session": tier2["rhizocrypt_session"],
+            "derivation_session": tier2["derivation_session"],
             "loamspine_commit": tier2["loamspine_commit"],
+            "ledger_commit": tier2["ledger_commit"],
             "sweetgrass_braid": tier2["sweetgrass_braid"],
+            "attribution_braid": tier2["attribution_braid"],
             "merkle_root": tier2["merkle_root"],
         });
         prov["tier"] = json!(2);

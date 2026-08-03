@@ -22,11 +22,11 @@
 //!
 //! Provenance: Workload routing strategy validation
 
-use std::path::PathBuf;
-use std::time::Instant;
 use crate::ipc::discover;
 use crate::ipc::primal_names;
 use crate::validation::{OrExit, Validator};
+use std::path::PathBuf;
+use std::time::Instant;
 
 /// Discover primal sockets via env-based discovery. Returns capability names
 /// for primals whose sockets exist.
@@ -234,14 +234,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "workload_routing_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_workload_routing_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp358: Workload Routing + VRAM-Aware Dispatch for Bio Pipelines",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "workload_routing_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_workload_routing_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp358: Workload Routing + VRAM-Aware Dispatch for Bio Pipelines",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

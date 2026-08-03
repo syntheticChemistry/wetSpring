@@ -32,10 +32,10 @@
 
 use std::time::Instant;
 
-use barracuda::stats::{hill, mean};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::stats::{hill, mean};
 
 struct Timing {
     domain: &'static str,
@@ -312,7 +312,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     );
     println!("╚═════════════════════════╩════════════╩═══════════════════════╝");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -323,14 +322,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "gonzales_ic50_s79",
-        track: crate::validation::scenarios::registry::Track::Pharmacology,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_gonzales_ic50_s79",
-        provenance_date: "2026-05-20",
-        description: "# Exp280: Gonzales 2014 — Oclacitinib IC50 Dose-Response (Paper 54)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "gonzales_ic50_s79",
+            track: crate::validation::scenarios::registry::Track::Pharmacology,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_gonzales_ic50_s79",
+            provenance_date: "2026-05-20",
+            description: "# Exp280: Gonzales 2014 — Oclacitinib IC50 Dose-Response (Paper 54)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

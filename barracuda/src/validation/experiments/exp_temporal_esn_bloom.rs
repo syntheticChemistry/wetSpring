@@ -109,7 +109,6 @@ fn one_hot(class: usize) -> Vec<f64> {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_temporal_esn_bloom` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("── S1: Trajectory generation ──");
     let traj = simulate_bloom_trajectory(N_WINDOWS, 42);
     let total_windows = traj.len();
@@ -343,7 +342,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let days = coin_cell_j / daily_j;
     println!("  Coin-cell (500 J) feasibility: {days:.0} days");
     v.check_pass("coin-cell feasible > 30 days", days > 30.0);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -354,14 +352,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "temporal_esn_bloom",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_temporal_esn_bloom",
-        provenance_date: "2026-05-20",
-        description: "Exp123 — Temporal ESN Bloom Cascade",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "temporal_esn_bloom",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_temporal_esn_bloom",
+            provenance_date: "2026-05-20",
+            description: "Exp123 — Temporal ESN Bloom Cascade",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

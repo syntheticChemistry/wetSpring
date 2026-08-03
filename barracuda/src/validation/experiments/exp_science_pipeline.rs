@@ -34,17 +34,16 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-use std::io::{BufRead, BufReader, Write};
-use std::os::unix::net::UnixStream;
-use std::time::Duration;
 use crate::ipc::Server;
 use crate::tolerances;
 use crate::validation;
+use std::io::{BufRead, BufReader, Write};
+use std::os::unix::net::UnixStream;
+use std::time::Duration;
 
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_science_pipeline` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     let dir = std::env::temp_dir().join("wetspring_exp203");
     let _ = std::fs::create_dir_all(&dir);
     let sock_path = dir.join("test.sock");
@@ -279,7 +278,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     // Cleanup
     let _ = std::fs::remove_file(&sock_path);
     let _ = std::fs::remove_dir(&dir);
-
 }
 
 /// Send a JSON-RPC request and return the response.
@@ -350,14 +348,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "science_pipeline",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_science_pipeline",
-        provenance_date: "2026-05-20",
-        description: "Exp203: `biomeOS` Science Pipeline Integration Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "science_pipeline",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_science_pipeline",
+            provenance_date: "2026-05-20",
+            description: "Exp203: `biomeOS` Science Pipeline Integration Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

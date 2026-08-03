@@ -31,8 +31,6 @@
 //!
 //! Provenance: `metalForge` dispatch/routing validation
 
-use serde_json::json;
-use std::time::Instant;
 use crate::bio::diversity;
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::df64_host;
@@ -40,6 +38,8 @@ use crate::ipc::dispatch;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use serde_json::json;
+use std::time::Instant;
 
 fn synthetic_community(n_species: usize, evenness: f64, seed: u64) -> Vec<f64> {
     let mut counts = Vec::with_capacity(n_species);
@@ -300,7 +300,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  PCIe bypass: 4 transition paths validated");
     println!("  Error handling: 2 negative tests");
     println!("  Total wall-clock: {total_ms} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -311,14 +310,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "metalforge_v8_cross_system",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_metalforge_v8_cross_system",
-        provenance_date: "2026-05-20",
-        description: "# Exp228: `metalForge` v8 — Cross-System (GPU → NPU → CPU) Dispatch",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "metalforge_v8_cross_system",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_metalforge_v8_cross_system",
+            provenance_date: "2026-05-20",
+            description: "# Exp228: `metalForge` v8 — Cross-System (GPU → NPU → CPU) Dispatch",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

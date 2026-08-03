@@ -3,6 +3,8 @@
 //!
 //! Low-level functions used by [`super::trim_read`] and [`super::filter_reads_flat`].
 
+use crate::cast;
+
 /// Trim low-quality leading bases from a read.
 ///
 /// Removes bases from the 5' end where quality < `min_quality`.
@@ -62,11 +64,7 @@ pub(super) fn trim_sliding_window(
         .map(|&q| u32::from(q.saturating_sub(phred_offset)))
         .sum();
 
-    #[expect(
-        clippy::cast_possible_truncation,
-        reason = "read lengths are always small"
-    )]
-    let threshold = u32::from(min_quality) * window_size as u32;
+    let threshold = u32::from(min_quality) * cast::usize_u32(window_size);
 
     if window_sum < threshold {
         return 0;

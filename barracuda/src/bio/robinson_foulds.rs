@@ -20,6 +20,7 @@
 use std::collections::HashSet;
 
 use super::unifrac::PhyloTree;
+use crate::cast;
 
 /// Compute the unweighted Robinson-Foulds distance between two Newick trees.
 ///
@@ -42,7 +43,6 @@ pub fn rf_distance(tree_a: &PhyloTree, tree_b: &PhyloTree) -> usize {
 /// For unrooted binary trees with n leaves, max RF = 2(n-3).
 /// Returns 0.0 for degenerate cases (n ≤ 3).
 #[must_use]
-#[expect(clippy::cast_precision_loss, reason = "leaf counts are small")]
 pub fn rf_distance_normalized(tree_a: &PhyloTree, tree_b: &PhyloTree) -> f64 {
     let n = leaf_count(tree_a);
     if n <= 3 {
@@ -50,7 +50,7 @@ pub fn rf_distance_normalized(tree_a: &PhyloTree, tree_b: &PhyloTree) -> f64 {
     }
     let max_rf = 2 * (n - 3);
     let rf = rf_distance(tree_a, tree_b);
-    rf as f64 / max_rf as f64
+    cast::usize_f64(rf) / cast::usize_f64(max_rf)
 }
 
 /// Extract the set of bipartitions induced by internal edges of a tree.

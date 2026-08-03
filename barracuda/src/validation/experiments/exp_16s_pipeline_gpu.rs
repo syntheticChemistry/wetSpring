@@ -40,9 +40,6 @@
 //!
 //! Provenance: End-to-end pipeline integration test
 
-
-use std::path::Path;
-use std::time::Instant;
 use crate::bio::chimera::{self, ChimeraParams};
 use crate::bio::chimera_gpu;
 use crate::bio::dada2::{self, Dada2Params};
@@ -56,6 +53,8 @@ use crate::gpu::GpuF64;
 use crate::io::fastq::FastqRecord;
 use crate::tolerances;
 use crate::validation::{self, Validator};
+use std::path::Path;
+use std::time::Instant;
 
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_16s_pipeline_gpu` experiment, recording checks into `v`.
@@ -719,14 +718,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "16s_pipeline_gpu",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_16s_pipeline_gpu",
-        provenance_date: "2026-05-20",
-        description: "GPU validation of the full 16S pipeline — math parity across hardware",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "16s_pipeline_gpu",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_16s_pipeline_gpu",
+            provenance_date: "2026-05-20",
+            description: "GPU validation of the full 16S pipeline — math parity across hardware",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

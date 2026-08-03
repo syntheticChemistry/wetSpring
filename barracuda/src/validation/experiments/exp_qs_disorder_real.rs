@@ -55,7 +55,6 @@ fn evenness_to_disorder(pielou_j: f64) -> f64 {
 #[expect(clippy::too_many_lines)]
 /// Run the `validate_qs_disorder_real` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ── S1: Synthetic ecosystem diversity surveys ──
     v.section("── S1: Ecosystem diversity profiles ──");
 
@@ -285,7 +284,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  threshold (W_c ≈ 6-8 in the 1D model).");
 
     v.check_count("biological predictions generated", 1, 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -296,14 +294,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "qs_disorder_real",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_qs_disorder_real",
-        provenance_date: "2026-05-20",
-        description: "# Exp113: QS-Disorder Prediction from Real Metagenomics Diversity",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "qs_disorder_real",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_qs_disorder_real",
+            provenance_date: "2026-05-20",
+            description: "# Exp113: QS-Disorder Prediction from Real Metagenomics Diversity",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

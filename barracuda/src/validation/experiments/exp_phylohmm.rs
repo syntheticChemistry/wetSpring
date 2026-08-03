@@ -27,7 +27,6 @@ use crate::validation::Validator;
 
 /// Run the `validate_phylohmm` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // Binary observation sequence: first 20 values from Python baseline.
     // Full sequence has 199 obs; we validate the first 20 for exact parity,
     // then check HMM properties on a longer synthetic sequence.
@@ -125,7 +124,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let fwd_single = forward(&model, &[1]);
     let single_finite = fwd_single.log_likelihood.is_finite();
     v.check_count("single_obs_finite", usize::from(single_finite), 1);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -136,14 +134,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "phylohmm",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_phylohmm",
-        provenance_date: "2026-05-20",
-        description: "Exp037 — HMM discordance detection on real `PhyNetPy` gene tree RF sequence",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "phylohmm",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_phylohmm",
+            provenance_date: "2026-05-20",
+            description: "Exp037 — HMM discordance detection on real `PhyNetPy` gene tree RF sequence",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

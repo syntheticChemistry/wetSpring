@@ -267,7 +267,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  ToadStool unidirectional: zero CPU round-trips between GPU stages");
     println!("  Total pipeline time: {total_ms:.2} ms");
     println!();
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -278,14 +277,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "pure_gpu_streaming_v7",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_pure_gpu_streaming_v7",
-        provenance_date: "2026-05-20",
-        description: "# Exp241: Pure GPU Streaming v7 — Extended `ToadStool` Unidirectional Pipeline",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "pure_gpu_streaming_v7",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_pure_gpu_streaming_v7",
+            provenance_date: "2026-05-20",
+            description: "# Exp241: Pure GPU Streaming v7 — Extended `ToadStool` Unidirectional Pipeline",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

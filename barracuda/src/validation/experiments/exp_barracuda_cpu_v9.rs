@@ -21,11 +21,11 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
-use std::time::Instant;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
+use std::time::Instant;
 
 struct LcgRng(u64);
 
@@ -562,7 +562,6 @@ pub fn run(v: &mut crate::validation::Validator) {
 
     let total_ms = t_total.elapsed().as_millis();
     println!("\n  Total wall-clock: {total_ms} ms");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -573,14 +572,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "barracuda_cpu_v9",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_barracuda_cpu_v9",
-        provenance_date: "2026-05-20",
-        description: "Exp163: `BarraCuda` CPU Parity v9 — Pure Rust Math for Track 3 Drug Repurposing",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "barracuda_cpu_v9",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_barracuda_cpu_v9",
+            provenance_date: "2026-05-20",
+            description: "Exp163: `BarraCuda` CPU Parity v9 — Pure Rust Math for Track 3 Drug Repurposing",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

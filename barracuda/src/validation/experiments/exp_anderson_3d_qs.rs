@@ -79,7 +79,6 @@ fn find_j_c(sweep: &[(f64, f64)], midpoint: f64) -> Option<f64> {
 
 /// Run the `validate_anderson_3d_qs` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     #[cfg(feature = "gpu")]
     {
         let midpoint = f64::midpoint(GOE_R, POISSON_R);
@@ -275,7 +274,6 @@ pub fn run(v: &mut crate::validation::Validator) {
         println!("  [skipped — no GPU feature]");
         v.check_count("ecosystems generated (sanity)", 6, 6);
     }
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -286,14 +284,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "anderson_3d_qs",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_anderson_3d_qs",
-        provenance_date: "2026-05-20",
-        description: "# Exp127: 3D Anderson Dimensional QS Sweep",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "anderson_3d_qs",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_anderson_3d_qs",
+            provenance_date: "2026-05-20",
+            description: "# Exp127: 3D Anderson Dimensional QS Sweep",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

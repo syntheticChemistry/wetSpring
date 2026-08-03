@@ -18,11 +18,11 @@
 //!
 //! Provenance: Known-value formulas and algorithmic invariants
 
-use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 use crate::cast;
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use barracuda::linalg::nmf::{self, NmfConfig, NmfObjective};
 
 struct LcgRng(u64);
 
@@ -212,7 +212,6 @@ fn validate_gpu_roadmap(v: &mut Validator, elapsed_ms: u128, n_nonzero: usize) {
 
 /// Run the `validate_repodb_nmf` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     v.section("§1 repoDB-Proportional Data (CPU Tier)");
 
     let total = N_DRUGS * N_DISEASES;
@@ -259,7 +258,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     let rel_err = nmf::relative_reconstruction_error(&matrix, &result);
 
     validate_factorisation_and_structure(v, &matrix, &result, elapsed_ms, rel_err, n_nonzero);
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -270,14 +268,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "repodb_nmf",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Both,
-        provenance_crate: "validate_repodb_nmf",
-        provenance_date: "2026-05-20",
-        description: "# Exp160: repoDB NMF Reproduction (Gao et al. 2020)",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "repodb_nmf",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Both,
+            provenance_crate: "validate_repodb_nmf",
+            provenance_date: "2026-05-20",
+            description: "# Exp160: repoDB NMF Reproduction (Gao et al. 2020)",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

@@ -21,9 +21,9 @@
 //!
 //! Provenance: Stable special function (erf, norm_cdf, gamma) validation
 
-use std::time::Instant;
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
 /// Run the `validate_stable_specials_v1` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
@@ -257,14 +257,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "stable_specials_v1",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_stable_specials_v1",
-        provenance_date: "2026-05-20",
-        description: "# Exp359: Stable GPU Specials + Tridiag Eigensolver Validation",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "stable_specials_v1",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_stable_specials_v1",
+            provenance_date: "2026-05-20",
+            description: "# Exp359: Stable GPU Specials + Tridiag Eigensolver Validation",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

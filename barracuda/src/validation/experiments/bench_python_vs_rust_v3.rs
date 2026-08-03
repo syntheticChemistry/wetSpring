@@ -37,11 +37,11 @@
 //!
 //! Provenance: Python vs Rust parity benchmark (V3)
 
-use std::time::Instant;
 use crate::bio::{diversity, dnds, hmm, kmer, pcoa};
 use crate::tolerances;
 use crate::validation::OrExit;
 use crate::validation::Validator;
+use std::time::Instant;
 
 struct ParityBench {
     domain: &'static str,
@@ -604,7 +604,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("  Typical speedup: 10-1000× vs Python (no interpreter overhead).");
     println!("  Next step: GPU portability (Exp254) proves same math on GPU.");
     println!("  ═════════════════════════════════════════════════════════════════");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -615,14 +614,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "python_vs_rust_v3",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "benchmark_python_vs_rust_v3",
-        provenance_date: "2026-05-20",
-        description: "# Exp253: Python vs Rust Benchmark v3 — Paper Parity Proof",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "python_vs_rust_v3",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "benchmark_python_vs_rust_v3",
+            provenance_date: "2026-05-20",
+            description: "# Exp253: Python vs Rust Benchmark v3 — Paper Parity Proof",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

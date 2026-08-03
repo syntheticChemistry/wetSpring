@@ -34,15 +34,15 @@
 //!
 //! Provenance: Python/QIIME2/SciPy baseline script (see doc table for script, commit, date)
 
-use std::time::Instant;
 use crate::bio::cooperation::{self, CooperationParams};
 use crate::bio::qs_biofilm::{self, QsBiofilmParams};
 use crate::tolerances;
 use crate::validation::Validator;
+use std::time::Instant;
 
+use crate::validation::OrExit;
 use barracuda::special::erf;
 use barracuda::stats::norm_cdf;
-use crate::validation::OrExit;
 
 fn autoinducer_at_distance(source_conc: f64, distance_um: f64, diffusion_length: f64) -> f64 {
     source_conc * (-distance_um / diffusion_length).exp()
@@ -50,7 +50,6 @@ fn autoinducer_at_distance(source_conc: f64, distance_um: f64, diffusion_length:
 
 /// Run the `validate_soil_distance_colonization` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══════════════════════════════════════════════════════════════
     // S1: Autoinducer Diffusion — Signal vs Distance
     //
@@ -295,7 +294,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("\n  ── Exp172 Summary: {passed}/{total} checks ──");
     println!("  Paper: Mukherjee et al. 2024, Environmental Microbiome 19:14");
     println!("  Key finding: Cell distancing affects 41% of dominant groups (Anderson distance)");
-
 }
 
 /// Bridge into [`primalspring::validation::ValidationResult`] for UniBin dispatch.
@@ -306,14 +304,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "soil_distance_colonization",
-        track: crate::validation::scenarios::registry::Track::Science,
-        tier: crate::validation::scenarios::registry::Tier::Rust,
-        provenance_crate: "validate_soil_distance_colonization",
-        provenance_date: "2026-05-20",
-        description: "# Exp172: Soil Distance & Colonization — Mukherjee et al. 2024",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "soil_distance_colonization",
+            track: crate::validation::scenarios::registry::Track::Science,
+            tier: crate::validation::scenarios::registry::Tier::Rust,
+            provenance_crate: "validate_soil_distance_colonization",
+            provenance_date: "2026-05-20",
+            description: "# Exp172: Soil Distance & Colonization — Mukherjee et al. 2024",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

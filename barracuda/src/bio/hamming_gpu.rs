@@ -78,7 +78,7 @@ impl HammingGpu {
         let n_pairs = n_seqs * (n_seqs - 1) / 2;
         let dist_buf = d.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Hamming dists"),
-            size: (n_pairs * 4) as u64,
+            size: cast::usize_u64(n_pairs * 4),
             usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });

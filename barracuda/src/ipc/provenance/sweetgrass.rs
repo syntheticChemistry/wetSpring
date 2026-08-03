@@ -17,7 +17,7 @@ use std::time::Duration;
 use serde::Serialize;
 use serde_json::{Value, json};
 
-use crate::primal_names::SWEETGRASS;
+use crate::primal_names::{SWEETGRASS, SWEETGRASS_DISPLAY};
 
 use super::capability_call;
 
@@ -86,7 +86,7 @@ pub fn record_experiment_provenance(create: &BraidRequest, commit: &BraidCommitR
     let Some(socket) = discover_socket() else {
         tracing::debug!(
             primal = SWEETGRASS,
-            "sweetGrass socket not found; skipping braid IPC"
+            "{SWEETGRASS_DISPLAY} socket not found; skipping braid IPC"
         );
         return;
     };
@@ -95,7 +95,7 @@ pub fn record_experiment_provenance(create: &BraidRequest, commit: &BraidCommitR
         tracing::warn!(
             error = %e,
             primal = SWEETGRASS,
-            "sweetGrass braid provenance IPC failed; continuing without remote braid"
+            "{SWEETGRASS_DISPLAY} braid provenance IPC failed; continuing without remote braid"
         );
     }
 }
@@ -160,7 +160,7 @@ fn record_experiment_provenance_to(
         return Err(msg.to_string());
     }
 
-    tracing::debug!(braid_id = %braid_id, "sweetGrass braid.create + braid.commit completed");
+    tracing::debug!(braid_id = %braid_id, "{SWEETGRASS_DISPLAY} braid.create + braid.commit completed");
     Ok(())
 }
 
@@ -191,7 +191,7 @@ fn rpc_call(socket: &Path, request: &str) -> Result<String, String> {
         .map_err(|e| format!("read: {e}"))?;
 
     if line.is_empty() {
-        return Err("empty response from sweetGrass".to_string());
+        return Err(format!("empty response from {SWEETGRASS_DISPLAY}"));
     }
 
     Ok(line)

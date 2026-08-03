@@ -22,7 +22,7 @@ against Rust implementations, then promotes to GPU acceleration via
 
 | | |
 |---|---|
-| **Tests** | 2,160 workspace (0 failed) |
+| **Tests** | 2,201 workspace (0 failed) |
 | **Validation checks** | 5,967+ across 346 UniBin scenarios |
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
@@ -30,7 +30,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
-| **`#[allow()]`** | 2 (intentional `match_same_arms` for nucleotide encoding defaults) |
+| **`#[allow()]`** | 1 (validation experiment block); production code uses `#[expect(reason)]` |
 | **Local WGSL** | 0 — fully lean on barraCuda |
 | **Duplicate math** | 0 — all NMF, stats, special delegated to barraCuda |
 | **Composition** | 136/136 proto-nucleate alignment checks (Exp400, D01–D07, guard constant) |
@@ -40,7 +40,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **License** | AGPL-3.0-or-later |
 | **MSRV** | 1.87 (edition 2024) |
 
-**Current release — V206:** WS-11 MAPQ calibration — simulated read generator, training pipeline, MapqModel lookup table wired into compute_mapq. Full MAPQ chain: calibrate() → MapqModel → pileup mapq_sums → binomial_quality combined error model. Per-generation LTEE thresholds + breseq cross-validation engine. **Clippy zero warnings**. 2,160 tests, 0 failures. 346 scenarios, 52 niche, 59 consumed, 47 dispatch, 22 domains. **WS-11 5/8 parity items complete. 0 PG gaps open.**
+**Current release — V210+:** Deep debt evolution — capability-based discovery (wire-protocol methods evolved to capability domains), 186 bare `as` casts migrated to `crate::cast::*` helpers, `#[allow]→#[expect(reason)]`, `println→tracing`, `process::exit→ExitCode`, `Mutex→RwLock`, GPU CPU-fallback sentinel logging, `SyntheticSignalGenerator` feature-gated, `pollster` removed, MOB/AMP/CON/INV variant types explicitly handled. Hardcoded primal names replaced with SSOT constants across 15+ files. **Clippy zero warnings**. 2,201 tests, 0 failures. 346 scenarios, 54 niche, 59 consumed, 47 dispatch, 22 domains. **WS-11 6/8 parity items complete. 0 PG gaps open.**
 
 ---
 

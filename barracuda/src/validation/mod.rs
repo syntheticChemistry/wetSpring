@@ -54,11 +54,23 @@ mod domain;
     clippy::collection_is_never_read,
     clippy::unnecessary_sort_by,
     clippy::cast_lossless,
-    clippy::duration_suboptimal_units,
     clippy::ignored_unit_patterns,
     clippy::needless_borrow,
     clippy::needless_range_loop,
-    clippy::unnecessary_trailing_comma,
+    clippy::approx_constant,
+    clippy::field_reassign_with_default,
+    clippy::len_zero,
+    clippy::match_same_arms,
+    clippy::no_effect_underscore_binding,
+    clippy::ptr_arg,
+    clippy::single_match_else,
+    clippy::too_many_arguments,
+    clippy::type_complexity,
+    clippy::uninlined_format_args,
+    clippy::unnecessary_cast,
+    clippy::useless_let_if_seq,
+    clippy::useless_vec,
+    unfulfilled_lint_expectations
 )]
 pub mod experiments;
 mod harness;
@@ -186,14 +198,18 @@ pub fn print_result(name: &str, passed: u32, total: u32) -> bool {
     total > 0 && passed == total
 }
 
-/// Print summary banner and exit with appropriate code.
+/// Print summary banner and return the appropriate exit code.
 ///
-/// Exit code 0 if all checks passed, 1 otherwise.
+/// Returns [`ExitCode::SUCCESS`] if all checks passed, [`ExitCode::FAILURE`] otherwise.
 ///
 /// Prefer [`print_result`] + `ExitCode` for new binaries.
-pub fn exit_with_result(name: &str, passed: u32, total: u32) {
-    let ok = print_result(name, passed, total);
-    std::process::exit(i32::from(!ok));
+#[must_use]
+pub fn exit_with_result(name: &str, passed: u32, total: u32) -> std::process::ExitCode {
+    if print_result(name, passed, total) {
+        std::process::ExitCode::SUCCESS
+    } else {
+        std::process::ExitCode::FAILURE
+    }
 }
 
 /// Exit code for skipped validations (data unavailable, no GPU, etc.).

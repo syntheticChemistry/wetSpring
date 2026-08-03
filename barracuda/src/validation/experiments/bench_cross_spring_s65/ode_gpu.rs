@@ -40,7 +40,11 @@ pub(super) fn validate(
         "Bistable: 128 batches finite",
         bist_res.iter().all(|r| r.iter().all(|x| x.is_finite())),
     );
-    timings.push(BenchRow { label: "Bistable GPU 128×", origin: "wetSpring→S58", ms: bist_ms });
+    timings.push(BenchRow {
+        label: "Bistable GPU 128×",
+        origin: "wetSpring→S58",
+        ms: bist_ms,
+    });
 
     let (coop_res, coop_ms) = bench_print("Cooperation GPU (128 batches)", || {
         let gpu_ode = CooperationGpu::new(Arc::clone(device)).or_exit("CooperationGpu");
@@ -62,10 +66,19 @@ pub(super) fn validate(
             clamp_max: 1e6,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).or_exit("integrate")
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .or_exit("integrate")
     });
-    v.check_pass("Cooperation: 128 batches finite", coop_res.iter().all(|x| x.is_finite()));
-    timings.push(BenchRow { label: "Cooperation GPU 128×", origin: "wetSpring→S58", ms: coop_ms });
+    v.check_pass(
+        "Cooperation: 128 batches finite",
+        coop_res.iter().all(|x| x.is_finite()),
+    );
+    timings.push(BenchRow {
+        label: "Cooperation GPU 128×",
+        origin: "wetSpring→S58",
+        ms: coop_ms,
+    });
 
     let (phage_res, phage_ms) = bench_print("PhageDefense GPU (128 batches)", || {
         let gpu_ode = PhageDefenseGpu::new(Arc::clone(device)).or_exit("PhageDefenseGpu");
@@ -78,7 +91,10 @@ pub(super) fn validate(
                 ..PhageDefenseParams::default()
             })
             .collect();
-        let flat_p: Vec<f64> = params.iter().flat_map(PhageDefenseParams::to_flat).collect();
+        let flat_p: Vec<f64> = params
+            .iter()
+            .flat_map(PhageDefenseParams::to_flat)
+            .collect();
         let config = PhageDefenseOdeConfig {
             n_batches,
             n_steps: 500,
@@ -87,10 +103,19 @@ pub(super) fn validate(
             clamp_max: 1e8,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).or_exit("integrate")
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .or_exit("integrate")
     });
-    v.check_pass("PhageDefense: 128 batches finite", phage_res.iter().all(|x| x.is_finite()));
-    timings.push(BenchRow { label: "PhageDefense GPU 128×", origin: "wetSpring→S58", ms: phage_ms });
+    v.check_pass(
+        "PhageDefense: 128 batches finite",
+        phage_res.iter().all(|x| x.is_finite()),
+    );
+    timings.push(BenchRow {
+        label: "PhageDefense GPU 128×",
+        origin: "wetSpring→S58",
+        ms: phage_ms,
+    });
 
     let (cap_res, cap_ms) = bench_print("Capacitor GPU (128 batches)", || {
         use crate::bio::capacitor::{CapacitorParams, N_VARS as CAP_V};
@@ -117,10 +142,19 @@ pub(super) fn validate(
             clamp_max: 1e6,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).or_exit("integrate")
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .or_exit("integrate")
     });
-    v.check_pass("Capacitor: 128 batches finite", cap_res.iter().all(|x| x.is_finite()));
-    timings.push(BenchRow { label: "Capacitor GPU 128×", origin: "wetSpring→S58", ms: cap_ms });
+    v.check_pass(
+        "Capacitor: 128 batches finite",
+        cap_res.iter().all(|x| x.is_finite()),
+    );
+    timings.push(BenchRow {
+        label: "Capacitor GPU 128×",
+        origin: "wetSpring→S58",
+        ms: cap_ms,
+    });
 
     let (multi_res, multi_ms) = bench_print("MultiSignal GPU (128 batches)", || {
         use crate::bio::multi_signal::{MultiSignalParams, N_VARS as MS_V};
@@ -147,8 +181,17 @@ pub(super) fn validate(
             clamp_max: 1e6,
             clamp_min: 0.0,
         };
-        gpu_ode.integrate(&config, &flat_y0, &flat_p).or_exit("integrate")
+        gpu_ode
+            .integrate(&config, &flat_y0, &flat_p)
+            .or_exit("integrate")
     });
-    v.check_pass("MultiSignal: 128 batches finite", multi_res.iter().all(|x| x.is_finite()));
-    timings.push(BenchRow { label: "MultiSignal GPU 128×", origin: "wetSpring→S58", ms: multi_ms });
+    v.check_pass(
+        "MultiSignal: 128 batches finite",
+        multi_res.iter().all(|x| x.is_finite()),
+    );
+    timings.push(BenchRow {
+        label: "MultiSignal GPU 128×",
+        origin: "wetSpring→S58",
+        ms: multi_ms,
+    });
 }

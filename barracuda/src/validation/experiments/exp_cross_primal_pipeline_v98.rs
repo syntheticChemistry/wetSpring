@@ -33,7 +33,6 @@ use crate::validation::Validator;
 
 /// Run the `validate_cross_primal_pipeline_v98` experiment, recording checks into `v`.
 pub fn run(v: &mut crate::validation::Validator) {
-
     // ═══ §0: Pipeline Setup ═════════════════════════════════════════════
     v.section("§0 Pipeline Setup — IPC Server + CPU Math Engine");
 
@@ -286,7 +285,6 @@ pub fn run(v: &mut crate::validation::Validator) {
     println!("║                                                                      ║");
     println!("║  biomeOS graph: wetspring_deploy.toml wired + validated              ║");
     println!("╚═══════════════════════════════════════════════════════════════════════╝");
-
 }
 
 fn rpc(sock: &std::path::Path, method: &str, params: &str) -> String {
@@ -348,14 +346,15 @@ pub fn run_as_scenario(result: &mut primalspring::validation::ValidationResult) 
 }
 
 /// Scenario registration for the UniBin registry.
-pub const SCENARIO: crate::validation::scenarios::registry::Scenario = crate::validation::scenarios::registry::Scenario {
-    meta: crate::validation::scenarios::registry::ScenarioMeta {
-        id: "cross_primal_pipeline_v98",
-        track: crate::validation::scenarios::registry::Track::Pipeline,
-        tier: crate::validation::scenarios::registry::Tier::Live,
-        provenance_crate: "validate_cross_primal_pipeline_v98",
-        provenance_date: "2026-05-20",
-        description: "# Exp322: Cross-Primal Pipeline V98+ — Ecosystem Integration",
-    },
-    run: |v, _ctx| run_as_scenario(v),
-};
+pub const SCENARIO: crate::validation::scenarios::registry::Scenario =
+    crate::validation::scenarios::registry::Scenario {
+        meta: crate::validation::scenarios::registry::ScenarioMeta {
+            id: "cross_primal_pipeline_v98",
+            track: crate::validation::scenarios::registry::Track::Pipeline,
+            tier: crate::validation::scenarios::registry::Tier::Live,
+            provenance_crate: "validate_cross_primal_pipeline_v98",
+            provenance_date: "2026-05-20",
+            description: "# Exp322: Cross-Primal Pipeline V98+ — Ecosystem Integration",
+        },
+        run: |v, _ctx| run_as_scenario(v),
+    };

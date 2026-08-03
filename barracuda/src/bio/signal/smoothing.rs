@@ -4,6 +4,7 @@
 //! Fits a local polynomial by least squares over a sliding window, evaluates at
 //! center. `(VᵀV)c = e₀` via Vandermonde V, `conv_coeffs = V·c`. Edge: shrink window.
 
+use crate::cast;
 use crate::error::{Error, Result};
 
 fn coefficients_for_x(x_values: &[f64], poly_order: usize) -> Result<Vec<f64>> {
@@ -64,12 +65,7 @@ pub fn savitzky_golay_coefficients(window_size: usize, poly_order: usize) -> Res
         .map_err(|_| Error::InvalidInput("window_size too large for Savitzky-Golay".into()))?;
     let x_values: Vec<f64> = (0..window_size)
         .map(|i| {
-            #[expect(
-                clippy::cast_possible_truncation,
-                clippy::cast_possible_wrap,
-                reason = "Savitzky–Golay window index fits i32 for bounded window sizes"
-            )]
-            let idx = i as i32;
+            let idx = cast::usize_i32(i);
             f64::from(idx - half_i32)
         })
         .collect();
@@ -162,12 +158,7 @@ pub fn savitzky_golay(data: &[f64], window_size: usize, poly_order: usize) -> Re
         }
         let x_values: Vec<f64> = (left..=right)
             .map(|j| {
-                #[expect(
-                    clippy::cast_possible_truncation,
-                    clippy::cast_possible_wrap,
-                    reason = "chromatogram indices fit i32 for bounded signal lengths"
-                )]
-                let offset = j as i32 - i as i32;
+                let offset = cast::usize_i32(j) - cast::usize_i32(i);
                 f64::from(offset)
             })
             .collect();
