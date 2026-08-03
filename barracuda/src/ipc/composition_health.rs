@@ -159,13 +159,7 @@ pub fn probe_biomeos_status() -> BiomeOsLiveStatus {
 /// Self-check: validate that our own `capability.list` response conforms
 /// to the Wave 20 canonical schema (`capabilities` array + `count` field).
 #[derive(Debug)]
-#[expect(
-    clippy::struct_excessive_bools,
-    reason = "each bool maps to a distinct schema check"
-)]
 pub struct SchemaParity {
-    /// Overall conformance: all three sub-checks pass.
-    pub conformant: bool,
     /// `capabilities` key is present and is a JSON array.
     pub has_capabilities_array: bool,
     /// `count` key is present and is a JSON number.
@@ -175,11 +169,17 @@ pub struct SchemaParity {
 }
 
 impl SchemaParity {
+    /// Overall conformance: all three sub-checks pass.
+    #[must_use]
+    pub const fn conformant(&self) -> bool {
+        self.has_capabilities_array && self.has_count && self.count_matches
+    }
+
     /// Serialize to a JSON object for inclusion in health responses.
     #[must_use]
     pub fn to_json(&self) -> Value {
         json!({
-            "conformant": self.conformant,
+            "conformant": self.conformant(),
             "has_capabilities_array": self.has_capabilities_array,
             "has_count": self.has_count,
             "count_matches": self.count_matches,
@@ -188,10 +188,10 @@ impl SchemaParity {
 }
 
 /// Validate our own `capability.list` response against Wave 20 canonical shape.
+#[must_use]
 pub fn probe_schema_parity() -> SchemaParity {
     let Ok(response) = super::handlers::handle_capability_list() else {
         return SchemaParity {
-            conformant: false,
             has_capabilities_array: false,
             has_count: false,
             count_matches: false,
@@ -213,10 +213,7 @@ pub fn probe_schema_parity() -> SchemaParity {
         _ => false,
     };
 
-    let conformant = has_capabilities_array && has_count && count_matches;
-
     SchemaParity {
-        conformant,
         has_capabilities_array,
         has_count,
         count_matches,
@@ -482,7 +479,7 @@ mod tests {
     fn schema_parity_self_check() {
         let parity = probe_schema_parity();
         assert!(
-            parity.conformant,
+            parity.conformant(),
             "own capability.list must pass Wave 20 schema check"
         );
         assert!(parity.has_capabilities_array);

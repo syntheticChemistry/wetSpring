@@ -40,6 +40,7 @@ pub fn normalize_method(method: &str) -> Cow<'_, str> {
 /// Returns a [`ParseError`] on failure, following JSON-RPC error codes:
 /// - `-32700`: Parse error (malformed JSON)
 /// - `-32600`: Invalid request (missing required fields)
+#[must_use = "parsed request should be dispatched"]
 pub fn parse_request(line: &str) -> Result<Request, ParseError> {
     let val: Value = serde_json::from_str(line.trim()).map_err(|e| ParseError {
         id: Value::Null,

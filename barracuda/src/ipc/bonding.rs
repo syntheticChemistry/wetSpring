@@ -36,10 +36,6 @@ fn registry() -> &'static Mutex<IonicContractRegistry> {
     REGISTRY.get_or_init(|| Mutex::new(IonicContractRegistry::new()))
 }
 
-#[expect(
-    clippy::needless_pass_by_value,
-    reason = "IonicProtocolError consumed by to_string()"
-)]
 fn map_ionic_err(e: IonicProtocolError) -> RpcError {
     RpcError {
         code: -32001,

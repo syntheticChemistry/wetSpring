@@ -159,11 +159,11 @@ fn query_performance_surface_to(socket: &Path) -> Result<Vec<PerformanceSurfaceH
         return Err(msg.to_string());
     }
 
-    let Some(result) = val.get("result") else {
+    let Some(result) = val.get("result").cloned() else {
         return Err("missing result in performance_surface.query response".to_string());
     };
 
-    parse_hints_from_result(result.clone())
+    parse_hints_from_result(result)
 }
 
 fn parse_hints_from_result(

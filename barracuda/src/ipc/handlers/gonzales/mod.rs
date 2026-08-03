@@ -19,6 +19,7 @@ pub use pharmacology::{handle_dose_response, handle_pk_decay};
 pub use tissue::{handle_cross_species, handle_tissue_lattice};
 
 /// Linearly spaced vector from 0.0 to `max`, `n` points.
+#[must_use]
 pub fn linspace(n: usize, max: f64) -> Vec<f64> {
     let denom = n.saturating_sub(1).max(1);
     (0..n)

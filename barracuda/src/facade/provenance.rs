@@ -32,6 +32,10 @@ const REPRODUCTION_MANIFEST: &str = include_str!("../../data/reproduction_manife
 const DEPLOY_GRAPH: &str = crate::primal_names::NUCLEUS_GRAPH_NAME;
 const PLASMID_FETCH_TAG: &str = "v0.7.0";
 
+static PIPELINE_AGENT: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| {
+    format!("{}:pipeline:{WETSPRING_VERSION}", primal_names::SELF_NAME)
+});
+
 // ── Circuit breaker (epoch-based, pattern from primalSpring) ──────────
 
 const BREAKER_THRESHOLD: u64 = 3;
@@ -84,7 +88,7 @@ fn now_nanos() -> u64 {
 /// Build a hash observation witness (content hash of data at rest).
 fn witness_hash(evidence_hex: &str, context: &str) -> Value {
     json!({
-        "agent": format!("wetspring:pipeline:{WETSPRING_VERSION}"),
+        "agent": &*PIPELINE_AGENT,
         "kind": "hash",
         "evidence": evidence_hex,
         "witnessed_at": now_nanos(),
@@ -97,7 +101,7 @@ fn witness_hash(evidence_hex: &str, context: &str) -> Value {
 /// Build a pipeline checkpoint witness (computation step marker).
 fn witness_checkpoint(context: &str) -> Value {
     json!({
-        "agent": format!("wetspring:pipeline:{WETSPRING_VERSION}"),
+        "agent": &*PIPELINE_AGENT,
         "kind": "checkpoint",
         "evidence": "",
         "witnessed_at": now_nanos(),

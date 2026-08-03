@@ -27,6 +27,7 @@ pub use handlers::{extract_f64_array, extract_string_array};
 /// - `-32601`: Method not found
 /// - `-32602`: Invalid params
 /// - `-32000` to `-32099`: Server errors (NCBI, GPU, etc.)
+#[must_use = "dispatch result contains the RPC response"]
 pub fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
     let method_norm = normalize_method(method);
     match method_norm.as_ref() {
