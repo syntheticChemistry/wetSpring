@@ -9,7 +9,7 @@
 
 | Metric | Value |
 |--------|-------|
-| wetSpring | V210+ (346 scenarios, 54 niche, 59 consumed, 47 dispatch, 22 domains, 2,201 tests, clippy zero) |
+| wetSpring | V210+ (346 scenarios, 54 niche, 59 consumed, 47 dispatch, 22 domains, 2,210 tests, clippy zero) |
 | Gate | **westGate** (primary dev + Data NAS); southGate (NUCLEUS); strandGate (GPU science) |
 | NUCLEUS deployment | **southGate** — 13/13 processes, 11/13 health-responding, 2 BTSP-gated |
 | Architecture | Capability-based discovery, SSOT primal constants, `cast::*` safety, `tracing` observability |
