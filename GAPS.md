@@ -4,9 +4,9 @@ Intentional gaps scaffolded by the wetSpring science NUCLEUS deployment.
 Each gap is documented so it feeds back to the owning team via wateringHole
 and primalSpring evolution tracking.
 
-Last updated: 2026-06-14 (V210 — guideStone amendment: health.liveness includes version.
-DEPLOY-THEN-STALE structurally proven via integration tests. 1,805 tests, clippy zero warnings.
-WS-11 variant caller parity 6/8.)
+Last updated: 2026-08-03 (V211 — deep debt evolution: capability-based discovery, cast safety,
+idiom modernization, mock isolation, dep evolution, coverage expansion, variant completion.
+2,201 tests, clippy zero warnings. WS-11 variant caller parity 6/8. westGate Data NAS.)
 
 ---
 
@@ -301,6 +301,8 @@ Interrupt/restart braid cycle verified — deterministic reproduction confirmed
 - [x] Mapper-level deduplication of repetitive region alignments — V207 `dedup_candidates` (post-SW, configurable distance)
 - [x] Per-generation frequency threshold calibration — V205 `thresholds` module
 - [x] Cross-validate against breseq polymorphism mode — V205 `cross_validation` module
+- [x] MOB/AMP/CON/INV variant types explicitly handled — V211 `cross_validation/mod.rs` (tracing::debug, concordance test)
+- [ ] MOB/AMP/CON/INV full cross-validation (blocked: no reference data for mobile element variants)
 
 Parity evolution tracked in `provenance/braids/barrick_2009_calibration_v2.json`.
 

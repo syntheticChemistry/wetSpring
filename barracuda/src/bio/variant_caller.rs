@@ -29,6 +29,7 @@ mod tests;
 pub mod thresholds;
 
 use crate::bio::pileup::PileupColumn;
+#[cfg(feature = "gpu")]
 use crate::cast;
 use crate::io::fasta::GenBankFeature;
 #[cfg(test)]
