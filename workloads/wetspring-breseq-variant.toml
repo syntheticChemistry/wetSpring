@@ -1,0 +1,35 @@
+# wetSpring — breseq variant calling validation
+# LTEE mutation detection: SNPs, indels, IS element insertions
+# across 75,000 generations of E. coli evolution.
+#
+# Compute ladder:
+#   Tier 0 (CPU): Reference-guided variant calling with breseq.
+#
+# Feeds lithoSpore bio_variant module and foundation Thread 1.
+
+[metadata]
+name = "wetspring-breseq-variant"
+description = "breseq variant calling: LTEE mutation detection across 75k generations"
+version = "0.1.0"
+spring = "wetSpring"
+compute_tier = "cpu"
+domain = "evolutionary-biology"
+paper = "Barrick et al. 2009, Tenaillon et al. 2016"
+lithoSpore_module = "bio_variant"
+
+[execution]
+type = "native"
+command = "$SPRINGS_ROOT/wetSpring/target/release/wetspring_unibin"
+args = ["validate", "--scenario", "breseq-variant", "--format", "json"]
+working_dir = "$SPRINGS_ROOT/wetSpring"
+
+[output]
+format = "json"
+schema = "toadstool-validate-v1"
+
+[resources]
+max_memory_bytes = 8589934592
+max_cpu_percent = 90.0
+
+[security]
+isolation_level = "None"

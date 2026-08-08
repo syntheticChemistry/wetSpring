@@ -1,0 +1,49 @@
+# wetSpring LTEE B7 — Tenaillon 2016 Mutation Accumulation (Exp380)
+# Downloads 264 genomes from NCBI BioProject PRJNA294072, computes
+# mutation accumulation curves per lineage, and produces expected values
+# JSON for lithoSpore module 6 (breseq comparison).
+#
+# Tier 1: Python baseline → expected_values.json
+# Tier 2: Rust validation binary (validate_ltee_b7_mutation_accumulation)
+# Tier 3: lithoSpore module 6 integration
+
+[metadata]
+name = "wetspring-ltee-b7-mutation-accumulation"
+description = "LTEE B7 Tenaillon 2016: 264-genome mutation accumulation pipeline (Exp380)"
+version = "0.1.0"
+paper = "Tenaillon et al. Nature 536, 165-170 (2016)"
+bioproject = "PRJNA294072"
+ltee_queue_id = "B7"
+litho_module = 6
+foundation_thread = 5
+
+[execution]
+type = "native"
+command = "$SPRINGS_ROOT/wetSpring/target/release/validate_ltee_b7_mutation_accumulation"
+working_dir = "$SPRINGS_ROOT/wetSpring"
+args = ["--format", "json"]
+
+[execution.env]
+NCBI_API_KEY = "${NCBI_API_KEY}"
+FAMILY_ID = "${FAMILY_ID:-default}"
+
+[resources]
+max_memory_bytes = 8589934592
+max_cpu_percent = 90.0
+max_disk_bytes = 53687091200
+
+[security]
+isolation_level = "None"
+
+[output]
+format = "json"
+schema = "toadstool-validate-v1"
+
+[outputs]
+expected_values = "experiments/results/ltee_b7_expected_values.json"
+mutation_curves = "experiments/results/ltee_b7_mutation_curves.json"
+
+[provenance]
+blake3_genomes = true
+blake3_results = true
+sweetgrass_attribution = "Tenaillon et al. 2016"

@@ -1,0 +1,34 @@
+# wetSpring — 16S rRNA metagenomics pipeline validation
+# DADA2 denoise → ASV → taxonomy → diversity indices (Shannon, Simpson, Chao1)
+#
+# Compute ladder:
+#   Tier 0 (CPU): This workload — FASTQ processing, bioinformatics pipeline.
+#                 Validates species identification reproducibility.
+#
+# Feeds lithoSpore bio_16s module and foundation Thread 1 (metagenomics).
+
+[metadata]
+name = "wetspring-16s-pipeline"
+description = "16S rRNA amplicon pipeline: QC, denoise, taxonomy, diversity"
+version = "0.1.0"
+spring = "wetSpring"
+compute_tier = "cpu"
+domain = "metagenomics"
+lithoSpore_module = "bio_16s_pipeline"
+
+[execution]
+type = "native"
+command = "$SPRINGS_ROOT/wetSpring/target/release/wetspring_unibin"
+args = ["validate", "--scenario", "16s-pipeline", "--format", "json"]
+working_dir = "$SPRINGS_ROOT/wetSpring"
+
+[output]
+format = "json"
+schema = "toadstool-validate-v1"
+
+[resources]
+max_memory_bytes = 4294967296
+max_cpu_percent = 80.0
+
+[security]
+isolation_level = "None"

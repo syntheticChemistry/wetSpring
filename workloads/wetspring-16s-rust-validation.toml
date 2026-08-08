@@ -1,0 +1,23 @@
+# wetSpring 16S Rust validation — dispatched through toadStool
+# Validates the Rust 16S pipeline against Python baseline results
+
+[metadata]
+name = "wetspring-16s-rust-validation"
+description = "Rust 16S pipeline validation (FASTQ QC, derep, taxonomy, UniFrac) — parity check vs Python baseline"
+version = "0.1.0"
+
+[execution]
+type = "native"
+command = "$SPRINGS_ROOT/wetSpring/target/release/validate_16s_pipeline --format json"
+working_dir = "$SPRINGS_ROOT/wetSpring"
+
+[output]
+format = "json"
+schema = "toadstool-validate-v1"
+
+[resources]
+max_memory_bytes = 2147483648
+max_cpu_percent = 80.0
+
+[security]
+isolation_level = "None"
