@@ -103,7 +103,7 @@ tokio = { version = "1", features = ["rt", "macros"], optional = true }
 # Pure Rust + serde, no GPU deps. Used for Nautilus Shell bio bridge (concept edge
 # detection, drift monitoring, evolutionary adaptation for bio sentinel).
 # Cross-spring provenance: primalTools/bingoCube (shared ecosystem tool).
-bingocube-nautilus = { path = "../../../primals/bingoCube/nautilus", optional = true }
+bingocube-nautilus = { path = "../../../primals/bingoCube/crates/nautilus", optional = true }
 
 # tracing: structured diagnostic logging (replaces ad-hoc eprintln! in IPC/server code).
 # Pure Rust, zero C deps, ~4KB. Used by 4+ sibling springs (coralReef, neuralSpring, etc.).

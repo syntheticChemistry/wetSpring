@@ -25,11 +25,12 @@ const VALID_DOMAIN_PREFIXES: &[&str] = &[
     "vault",
     "composition",
     "bonding",
+    "gossip",
 ];
 
 /// All capability domains this primal registers with Songbird.
 ///
-/// Covers 9 domain families (48 capabilities total):
+/// Covers 10 domain families (48 capabilities + gossip emitter):
 /// - `ecology.*`      — 14 science capabilities (diversity, ODE, alignment, AI, …)
 /// - `health`         — 4 probes (check, liveness, readiness, lifecycle.status)
 /// - `provenance`     — 4 provenance-trio lifecycle methods
@@ -39,6 +40,7 @@ const VALID_DOMAIN_PREFIXES: &[&str] = &[
 /// - `vault`          — 3 consent-gated storage methods
 /// - `composition`    — 1 science health probe
 /// - `bonding`        — 6 ionic bond lifecycle methods
+/// - `gossip.emit`    — outbound mesh events (pipeline, provenance, data)
 pub const DOMAINS: &[CapabilityDomain] = &[
     // ── ecology (science) ───────────────────────────────────────────
     CapabilityDomain {
@@ -192,6 +194,12 @@ pub const DOMAINS: &[CapabilityDomain] = &[
             "bonding.list",
         ],
     },
+    // ── gossip (outbound mesh events) ─────────────────────────────────
+    CapabilityDomain {
+        name: "gossip.emit",
+        description: "Outbound gossip events: pipeline completion, provenance witness, data ingest",
+        methods: &[],
+    },
 ];
 
 /// A capability domain grouping related IPC methods.
@@ -242,6 +250,9 @@ mod tests {
     #[test]
     fn no_empty_method_lists() {
         for d in DOMAINS {
+            if d.name == "gossip.emit" {
+                continue;
+            }
             assert!(!d.methods.is_empty(), "domain '{}' has no methods", d.name);
         }
     }
@@ -270,11 +281,14 @@ mod tests {
     fn total_capability_count_matches_registry() {
         assert_eq!(
             DOMAINS.len(),
-            22,
-            "22 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition + bonding)"
+            23,
+            "23 domains (13 ecology + health + provenance + brain + metrics + ai_assist + data + vault + composition + bonding + gossip.emit)"
         );
         let total_methods: usize = DOMAINS.iter().map(|d| d.methods.len()).sum();
-        assert_eq!(total_methods, 47, "47 total capability methods");
+        assert_eq!(
+            total_methods, 47,
+            "47 total capability methods (gossip.emit is outbound-only)"
+        );
     }
 
     #[test]

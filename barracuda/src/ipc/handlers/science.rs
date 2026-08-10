@@ -371,6 +371,18 @@ pub fn handle_full_pipeline(params: &Value) -> Result<Value, RpcError> {
     }
 
     pipeline_result.insert("pipeline".into(), json!("complete"));
+
+    let stage_count = u32::try_from(pipeline_result.len()).unwrap_or(u32::MAX);
+    let sample_id = params
+        .get("sample_id")
+        .and_then(Value::as_str)
+        .map(String::from);
+    crate::ipc::gossip::emit(&crate::ipc::gossip::GossipEvent::PipelineComplete {
+        pipeline_id: format!("full_pipeline_{}", crate::primal_names::SELF_NAME),
+        stage_count,
+        sample_id,
+    });
+
     Ok(Value::Object(pipeline_result))
 }
 

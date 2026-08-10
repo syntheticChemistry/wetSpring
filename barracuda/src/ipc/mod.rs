@@ -69,6 +69,8 @@ pub mod discover;
 pub mod dispatch;
 #[cfg(feature = "ipc")]
 pub mod dispatch_strategy;
+#[cfg(feature = "ipc")]
+pub mod gossip;
 #[cfg(all(feature = "ipc", feature = "barracuda-lib"))]
 pub mod handlers;
 #[cfg(feature = "ipc")]

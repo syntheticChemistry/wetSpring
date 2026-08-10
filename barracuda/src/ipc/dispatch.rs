@@ -362,7 +362,7 @@ mod tests {
         let result = dispatch("capability.list", &json!({})).unwrap();
 
         let provided = result["provided_capabilities"].as_array().unwrap();
-        assert_eq!(provided.len(), 22);
+        assert_eq!(provided.len(), 23);
         let types: Vec<&str> = provided.iter().filter_map(|d| d["type"].as_str()).collect();
         assert!(types.contains(&"ecology.diversity"));
         assert!(types.contains(&"health"));

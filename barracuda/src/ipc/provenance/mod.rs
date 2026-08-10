@@ -445,7 +445,20 @@ pub fn handle_provenance_complete(params: &Value) -> Result<Value, RpcError> {
         .and_then(Value::as_str)
         .ok_or_else(|| RpcError::invalid_params("missing required param: session_id"))?;
 
-    Ok(complete_session(session_id))
+    let result = complete_session(session_id);
+
+    if result.get("provenance").and_then(Value::as_str) == Some("complete") {
+        let step_count = result
+            .get("primals_reached")
+            .and_then(Value::as_array)
+            .map_or(0, |a| u32::try_from(a.len()).unwrap_or(u32::MAX));
+        super::gossip::emit(&super::gossip::GossipEvent::ProvenanceWitness {
+            session_id: session_id.to_string(),
+            step_count,
+        });
+    }
+
+    Ok(result)
 }
 
 #[cfg(test)]
