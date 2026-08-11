@@ -61,6 +61,12 @@ pub fn handle_chembl_fetch(params: &Value) -> Result<Value, RpcError> {
             );
             let completion = trio::complete_session(&session.id);
 
+            crate::ipc::gossip::emit(&crate::ipc::gossip::GossipEvent::DataIngested {
+                dataset_id: format!("chembl:{chembl_id}"),
+                record_count: data.as_array().map_or(1, |a| a.len() as u64),
+                format: "json".into(),
+            });
+
             Ok(json!({
                 "chembl_id": chembl_id,
                 "data": data,
@@ -122,6 +128,12 @@ pub fn handle_pubchem_fetch(params: &Value) -> Result<Value, RpcError> {
                 }),
             );
             let completion = trio::complete_session(&session.id);
+
+            crate::ipc::gossip::emit(&crate::ipc::gossip::GossipEvent::DataIngested {
+                dataset_id: format!("pubchem:{aid}"),
+                record_count: 1,
+                format: "json".into(),
+            });
 
             Ok(json!({
                 "aid": aid,
@@ -196,6 +208,13 @@ pub fn handle_register_table(params: &Value) -> Result<Value, RpcError> {
     let completion = trio::complete_session(&session.id);
 
     nestgate_store(&format!("ref:{doi}:{table_id}"), &canonical, &content_hash);
+
+    let record_count = values.as_object().map_or(1, |m| m.len() as u64);
+    crate::ipc::gossip::emit(&crate::ipc::gossip::GossipEvent::DataIngested {
+        dataset_id: format!("ref:{doi}:{table_id}"),
+        record_count,
+        format: "reference_table".into(),
+    });
 
     Ok(json!({
         "doi": doi,

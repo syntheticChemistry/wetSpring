@@ -234,6 +234,11 @@ pub fn handle_ncbi_fetch(params: &Value) -> Result<Value, RpcError> {
             } else {
                 "sovereign"
             };
+            crate::ipc::gossip::emit(&crate::ipc::gossip::GossipEvent::DataIngested {
+                dataset_id: format!("ncbi:{db}:{id}"),
+                record_count: 1,
+                format: "fasta".into(),
+            });
             json!({"fasta": fasta, "source": source})
         })
         .map_err(|e| RpcError::server_error(-32000, format!("NCBI fetch failed: {e}")))

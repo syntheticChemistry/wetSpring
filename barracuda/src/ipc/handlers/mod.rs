@@ -327,6 +327,16 @@ pub fn handle_composition_science_health(_params: &Value) -> Result<Value, RpcEr
         "wave": 20,
     });
 
+    let trio_live = trio.summary() == "live";
+    let nestgate_live = nestgate == composition_health::ComponentStatus::Live;
+
+    if trio_live && nestgate_live {
+        crate::ipc::gossip::emit(&crate::ipc::gossip::GossipEvent::ValidationPass {
+            validation_id: format!("science_health:{}", env!("CARGO_PKG_VERSION")),
+            method: "composition.science_health".into(),
+        });
+    }
+
     Ok(json!({
         "healthy": true,
         "spring": crate::primal_names::SELF_DISPLAY,

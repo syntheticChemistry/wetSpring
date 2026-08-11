@@ -27,7 +27,7 @@ against Rust implementations, then promotes to GPU acceleration via
 | **Experiments** | 385 completed + 1 in progress (386 indexed) |
 | **Coverage** | 91.20% line / 90.30% function (llvm-cov gated at 90%) |
 | **IPC capabilities** | 52 niche, 59 consumed (33 canonical + 15 legacy + 7 bonding/lifecycle + 4 Wave 17/20), 47 dispatch, 23 domains |
-| **Gossip events** | 4 outbound (`PipelineComplete`, `ValidationPass`, `ProvenanceWitness`, `DataIngested`) |
+| **Gossip events** | 4 outbound — all wired (`PipelineComplete`, `ValidationPass`, `ProvenanceWitness`, `DataIngested`) |
 | **Named tolerances** | 242 with machine-readable provenance trail |
 | **Clippy** | 0 warnings (pedantic + nursery) |
 | **Unsafe** | 0 (`forbid(unsafe_code)` workspace-level + per-crate) |
